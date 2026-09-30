@@ -1,0 +1,12 @@
+// Codigo de navegador con React: ui, repo-view, la web, el frontend de
+// escritorio y los webviews de la extension.
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Ramal React",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": []
+  }
+}

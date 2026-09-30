@@ -1,0 +1,97 @@
+# Hooks de git del monorepo. Bloquean el commit: lo que no cumple, no entra.
+#
+#   corepack pnpm exec lefthook install     (lo hace `just setup`)
+#   LEFTHOOK=0 git commit ...               (saltarselos; solo para emergencias)
+#
+# pre-commit mira SOLO lo que esta en el index y tiene que ser rapido.
+# Lo caro (clippy, tests, typecheck) vive en pre-push y en CI.
+#
+# pnpm se llama como ${PNPM:-corepack pnpm}, igual que en el justfile: el pnpm
+# global de la maquina puede ser otra version mayor, y corepack respeta el
+# `packageManager` de package.json.
+
+min_version: 2.0.0
+
+pre-commit:
+  jobs:
+    # Los que reescriben ficheros van en fila, no en paralelo: eslint --fix y
+    # prettier sobre el mismo fichero a la vez se pisan y uno de los dos pierde
+    # sus cambios. Prettier va el ultimo para que el formato final sea el suyo.
+    - name: arreglos
+      group:
+        piped: true
+        jobs:
+          # ESLint 10 busca la configuracion desde el directorio de cada fichero,
+          # asi que un solo job cubre la raiz, los paquetes y las apps, cada uno
+          # con su eslint.config.js.
+          - name: eslint
+            glob: '*.{ts,tsx,mts,cts,js,mjs,cjs}'
+            # --no-warn-ignored: lefthook pasa los ficheros por glob, asi que puede
+            # colar alguno que el propio eslint.config ignora (los *.d.ts, lo
+            # generado, docs/). Sin esta bandera ese aviso cuenta contra
+            # --max-warnings 0 y bloquea el commit sin motivo.
+            run: ${PNPM:-corepack pnpm} exec eslint --fix --max-warnings 0 --no-warn-ignored {staged_files}
+            stage_fixed: true
+
+          - name: stylelint
+            glob: '*.css'
+            run: ${PNPM:-corepack pnpm} exec stylelint --fix --allow-empty-input --max-warnings 0 {staged_files}
+            stage_fixed: true
+
+          # rustfmt formatea el workspace y se re-anaden los .rs que iban en el commit.
+          - name: rustfmt
+            glob: '*.rs'
+            run: cargo fmt --all
+            stage_fixed: true
+
+          # Formatea lo que prettier entiende y vuelve a anadirlo al index.
+          # .prettierignore deja fuera lo generado y los lockfiles.
+          - name: prettier
+            run: ${PNPM:-corepack pnpm} exec prettier --write --ignore-unknown {staged_files}
+            stage_fixed: true
+
+    # Las comprobaciones solo leen, asi que van en paralelo.
+    - name: comprobaciones
+      group:
+        parallel: true
+        jobs:
+          # Las reglas comunes a todos los lenguajes.
+          - name: file-size
+            run: node tools/checks/file-size.mjs --staged
+
+          - name: focused-tests
+            run: node tools/checks/no-focused-tests.mjs --staged
+
+          - name: todo-without-ticket
+            run: node tools/checks/todo-without-ticket.mjs --staged
+
+          # El grafo de paquetes solo cambia cuando cambia un package.json.
+          - name: package-graph
+            glob: '{package.json,**/package.json,pnpm-workspace.yaml}'
+            run: node tools/checks/package-graph.mjs
+
+          # Secretos, .env y ficheros enormes.
+          - name: scan-staged
+            run: bash tools/scripts/scan-staged.sh {staged_files}
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: ${PNPM:-corepack pnpm} exec commitlint --edit {1}
+
+pre-push:
+  parallel: true
+  jobs:
+    # Sin --workspace: los default-members dejan fuera el escritorio, que
+    # necesita webkit2gtk.
+    - name: rust
+      glob: '*.{rs,toml}'
+      run: cargo clippy --all-targets --all-features -- -D warnings && cargo test
+
+    - name: typescript
+      glob: '*.{ts,tsx,mts,cts}'
+      run: ${PNPM:-corepack pnpm} -r --if-present run typecheck && ${PNPM:-corepack pnpm} -r --if-present run test
+
+    - name: tools
+      glob: '{tools/**,packages/eslint-config/**}'
+      run: ${PNPM:-corepack pnpm} run check:tools-test

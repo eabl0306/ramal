@@ -1,0 +1,10 @@
+[package]
+name = "ramal-git"
+description = "Adaptador de Git: implementa los puertos del motor sobre el repositorio real."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

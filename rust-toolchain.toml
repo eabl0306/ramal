@@ -1,0 +1,9 @@
+# Version exacta del compilador para todo el workspace de Rust. Fijada, y no
+# "stable", para que la maquina de desarrollo, la CI y las imagenes compilen con
+# el mismo rustc: un clippy nuevo trae lints nuevos y rompe la CI sin que nadie
+# haya tocado el codigo. Se sube a mano (o con dependabot) y junto con el
+# ARG RUST_VERSION de los Dockerfile.
+[toolchain]
+channel = "1.98.1"
+components = ["rustfmt", "clippy", "llvm-tools-preview"]
+profile = "minimal"

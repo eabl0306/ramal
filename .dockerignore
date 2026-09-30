@@ -1,0 +1,43 @@
+# Contexto de build comun. Cada Dockerfile con contexto en la raiz puede tener
+# ademas su propio <Dockerfile>.dockerignore, que BuildKit prefiere a este.
+# Aqui solo se excluye lo que nunca debe entrar en una imagen.
+
+# Control de versiones y CI
+.git
+.github
+.gitignore
+.gitattributes
+
+# Editores
+.idea
+.vscode
+
+# Dependencias y artefactos de build
+**/node_modules
+**/dist
+**/build
+**/out
+**/target
+**/.vite
+**/.react-router
+**/.vscode-test
+**/*.tsbuildinfo
+**/*.vsix
+
+# Informes y cobertura
+**/coverage
+**/lcov.info
+**/playwright-report
+**/test-results
+**/blob-report
+
+# Secretos y entorno local
+.env
+.env.*
+!.env.example
+
+# Documentacion y ficheros de la maquina
+docs
+*.md
+!README.md
+.DS_Store

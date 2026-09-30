@@ -1,0 +1,43 @@
+# Lo comun a todo el Rust del workspace: formato, clippy estricto y auditoria de
+# dependencias. Los tests y la cobertura de cada parte viven en api.yml y
+# engine.yml; el crate de escritorio, en desktop.yml.
+name: rust
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  verify:
+    name: formato, clippy y dependencias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Sin argumentos, rustup instala el toolchain que fija rust-toolchain.toml,
+      # con sus componentes. Asi la version vive en un solo sitio.
+      - name: Instalar el toolchain de rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny
+
+      - name: Formato
+        run: cargo fmt --all --check
+
+      # Sin --workspace: default-members deja fuera el crate de escritorio, que
+      # necesita webkit2gtk y tiene su propio job en desktop.yml.
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Dependencias (cargo deny)
+        run: cargo deny check

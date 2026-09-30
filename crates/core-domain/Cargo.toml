@@ -1,0 +1,10 @@
+[package]
+name = "ramal-core-domain"
+description = "Nucleo de dominio del cliente de Git: tipos y reglas puras, sin IO ni runtime."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

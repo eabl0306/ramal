@@ -1,0 +1,10 @@
+[package]
+name = "ramal-core-application"
+description = "Casos de uso y puertos del motor de Git, independientes de la plataforma."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

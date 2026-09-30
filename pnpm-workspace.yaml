@@ -1,0 +1,23 @@
+packages:
+  - "apps/web"
+  - "apps/desktop"
+  - "apps/vscode"
+  - "packages/*"
+  - "tools/*"
+# engines.node de package.json se hace cumplir en el install. pnpm 11 ya no lee
+# esta opcion de .npmrc (solo lee de alli el registro y la autenticacion), por eso
+# vive aqui y el repo no tiene .npmrc.
+engineStrict: true
+# pnpm 11 se niega a instalar si una dependencia trae scripts de instalacion que
+# nadie ha aprobado. Cada entrada nueva aqui es una decision: ese paquete puede
+# ejecutar codigo en `pnpm install`.
+allowBuilds:
+  esbuild: true
+  lefthook: true
+  unrs-resolver: true
+peerDependencyRules:
+  allowedVersions:
+    # jsx-a11y 6.10.2 aun no declara ESLint 10 en sus peers, pero sus reglas
+    # funcionan (comprobado en Gastonomo con jsx-a11y/alt-text). Se acepta
+    # explicitamente en lugar de dejar el aviso suelto en cada instalacion.
+    eslint-plugin-jsx-a11y>eslint: "10"

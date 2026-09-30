@@ -1,0 +1,153 @@
+# Actualizaciones automaticas. Agrupadas para no abrir veinte PR a la semana.
+#
+# Dos decisiones que explican como esta montado esto (vienen de Gastonomo):
+#
+#   - Cada ecosistema llega un dia distinto. Si todos caen el lunes salen seis PR
+#     de golpe, compiten por los mismos runners y no los revisa nadie.
+#   - Los mayores tambien van agrupados, uno por ecosistema, para no llegar sueltos.
+#
+# Las reglas `ignore` de abajo son rechazos razonados. Cada una dice por que se
+# rechaza y que tiene que pasar para poder borrarla. Si cumples la condicion, borrala.
+version: 2
+
+updates:
+  # --------------------------------------------------------------------- Rust
+  # Un solo workspace en la raiz: API, motor, sidecar y escritorio.
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      rust:
+        patterns: ['*']
+        update-types: [minor, patch]
+      rust-major:
+        patterns: ['*']
+        update-types: [major]
+    ignore:
+      # tauri mayor: pasar a Tauri 3 es migrar la app de escritorio, no subir un
+      # numero. Ademas los plugins y los paquetes @tauri-apps de npm tienen que ir a
+      # la vez.
+      # Para borrar esta regla: cuando se planee la migracion en un PR dedicado.
+      - dependency-name: 'tauri*'
+        update-types: ['version-update:semver-major']
+
+  # Version del compilador, en rust-toolchain.toml.
+  # OJO: los Dockerfile fijan la misma version en `ARG RUST_VERSION` y dependabot
+  # no la toca, porque es un argumento y no una imagen. Tienen que subir juntas.
+  - package-ecosystem: rust-toolchain
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: 'chore(deps)'
+
+  # ------------------------------------------------------------ TypeScript (npm)
+  # Una sola entrada para todo el workspace de pnpm: dependabot lee pnpm-lock.yaml
+  # y actualiza los package.json de la raiz, apps/*, packages/* y tools/*.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: tuesday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      js:
+        patterns: ['*']
+        update-types: [minor, patch]
+      js-major:
+        patterns: ['*']
+        update-types: [major]
+    ignore:
+      # typescript: el techo es la 6.1. typescript-eslint declara peer
+      # typescript "<6.1.0" (y TypeScript 7 ya no trae la API del compilador que
+      # usa). Por encima se apaga el lint type-aware, en silencio: eslint sigue en
+      # verde y ya no comprueba tipos.
+      # Para borrar esta regla: que typescript-eslint publique una version cuyo peer
+      # admita la linea nueva (npm view typescript-eslint peerDependencies), y subir
+      # a la vez el peer de packages/eslint-config/package.json.
+      - dependency-name: 'typescript'
+        versions: ['>=6.1.0']
+
+      # @types/node: los tipos van con el runtime, que es Node 24 (.nvmrc). Con los
+      # de Node 26 el typecheck aprueba APIs que en ejecucion no existen.
+      # Para borrar esta regla: subir Node a la vez en .nvmrc, engines.node y las
+      # imagenes node de los Dockerfile.
+      - dependency-name: '@types/node'
+        versions: ['>=25.0.0']
+
+      # @tauri-apps/*: su mayor va con el del crate tauri (regla de cargo arriba).
+      - dependency-name: '@tauri-apps/*'
+        update-types: ['version-update:semver-major']
+
+  # ----------------------------------------------------------------- GitHub Actions
+  # Sin filtro de update-types a proposito: los mayores de las actions son casi siempre
+  # el bump de la runtime de Node del runner, y conviene que vayan en el mismo PR.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: thursday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(ci)'
+    groups:
+      actions:
+        patterns: ['*']
+
+  # ------------------------------------------------------- Imagenes de los Dockerfile
+  - package-ecosystem: docker
+    directories:
+      - /apps/api
+      - /apps/web
+    schedule:
+      interval: weekly
+      day: friday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      images:
+        patterns: ['*']
+        update-types: [minor, patch]
+      images-major:
+        patterns: ['*']
+        update-types: [major]
+    ignore:
+      # Imagen node: va con la maquina de desarrollo y la CI, que estan en Node 24.
+      # Para borrar esta regla: pasar a Node 26 en todos los sitios a la vez.
+      - dependency-name: 'node'
+        update-types: ['version-update:semver-major']
+
+  # --------------------------------------------------------- Imagenes de compose
+  # El ecosistema docker solo mira Dockerfile. En la practica esta entrada existe
+  # por postgres: nginx:alpine y mailpit:latest son etiquetas flotantes.
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: friday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      compose:
+        patterns: ['*']
+        update-types: [minor, patch]
+      compose-major:
+        patterns: ['*']
+        update-types: [major]
+    ignore:
+      # postgres mayor: PostgreSQL guarda los datos en un subdirectorio por version y
+      # un salto de mayor pide migrar el volumen a mano.
+      # Para borrar esta regla: cuando alguien planee esa migracion de verdad.
+      - dependency-name: 'postgres'
+        update-types: ['version-update:semver-major']

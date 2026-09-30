@@ -1,0 +1,38 @@
+{
+  "name": "ramal-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Monorepo de Ramal: cliente de Git con API en Rust, web, escritorio con Tauri y extension de VS Code.",
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:file-size": "node tools/checks/file-size.mjs",
+    "check:focused-tests": "node tools/checks/no-focused-tests.mjs",
+    "check:todos": "node tools/checks/todo-without-ticket.mjs",
+    "check:package-graph": "node tools/checks/package-graph.mjs",
+    "check:quality": "node tools/checks/file-size.mjs && node tools/checks/no-focused-tests.mjs && node tools/checks/todo-without-ticket.mjs && node tools/checks/package-graph.mjs",
+    "check:tools-test": "node --test \"tools/checks/*.test.mjs\" \"packages/eslint-config/rules/*.test.js\"",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "lint:css": "stylelint \"apps/**/*.css\" \"packages/**/*.css\" --allow-empty-input --max-warnings 0",
+    "knip": "knip"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
+    "@eslint/js": "10.0.1",
+    "@ramal/eslint-config": "workspace:*",
+    "eslint": "10.11.0",
+    "knip": "6.38.0",
+    "lefthook": "2.1.15",
+    "prettier": "3.9.9",
+    "stylelint": "17.15.0",
+    "stylelint-config-standard": "40.0.0",
+    "stylelint-declaration-strict-value": "1.12.1"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@ramal/tsconfig",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Configuraciones base de TypeScript compartidas por el monorepo.",
+  "type": "module",
+  "files": [
+    "base.json",
+    "library.json",
+    "react.json",
+    "node.json"
+  ],
+  "exports": {
+    "./base.json": "./base.json",
+    "./library.json": "./library.json",
+    "./react.json": "./react.json",
+    "./node.json": "./node.json"
+  }
+}

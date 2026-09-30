@@ -1,0 +1,32 @@
+# Prettier no formatea Rust: de eso vive rustfmt. Aqui solo se ignora lo que no
+# le toca: artefactos de build, informes y ficheros que escribe una herramienta.
+
+# El prototipo de diseno es material de referencia tal cual llego. Si prettier
+# lo reescribe, deja de ser comparable con el original.
+docs/design/handoff/
+
+# Artefactos de build e informes.
+target/
+dist/
+build/
+out/
+coverage/
+playwright-report/
+test-results/
+.vscode-test/
+.react-router/
+*.min.js
+*.min.css
+
+# Codigo generado. Lo reescribe su generador y prettier solo meteria ruido en el
+# diff que vigila `just protocol-check`.
+packages/bridge/src/protocol/generated/
+packages/api-client/src/generated/
+packages/api-client/openapi.json
+apps/desktop/src-tauri/gen/
+
+# Los lockfiles y el workspace los escriben cargo y pnpm por su cuenta: que no
+# peleen los dos formateadores.
+Cargo.lock
+pnpm-lock.yaml
+pnpm-workspace.yaml

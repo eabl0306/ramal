@@ -1,0 +1,87 @@
+# Reglas que valen para todo el repo, sin importar el lenguaje: formato,
+# mensajes de commit, tamano de fichero, tests apagados, marcadores sin ticket,
+# grafo de paquetes, codigo muerto y secretos. Corre siempre, en cualquier cambio.
+name: quality
+
+on:
+  workflow_call:
+    secrets:
+      # Solo hace falta en organizaciones. En repos personales llega vacia y
+      # gitleaks funciona igual, por eso no es required.
+      GITLEAKS_LICENSE:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: formato y reglas comunes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # La misma version que `packageManager` en package.json. En local se llega
+      # a ella por corepack; aqui la instala la action.
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Formato (prettier)
+        run: pnpm run format:check
+
+      - name: Reglas comunes (tamano, tests enfocados, marcadores, grafo de paquetes)
+        run: pnpm run check:quality
+
+      # ESLint de la raiz: packages/eslint-config y tools/, que son JavaScript
+      # puro. Cada app y paquete de TypeScript tiene su lint en su workflow.
+      - name: Lint de la configuracion compartida y los scripts
+        run: pnpm run lint
+
+      - name: CSS (stylelint)
+        run: pnpm run lint:css
+
+      - name: Tests de los scripts de calidad y de las reglas de ESLint
+        run: pnpm run check:tools-test
+
+      - name: Codigo muerto (knip)
+        run: pnpm run knip
+
+      - name: Mensajes de commit del PR
+        if: github.event_name == 'pull_request'
+        run: >-
+          pnpm exec commitlint --verbose
+          --from ${{ github.event.pull_request.base.sha }}
+          --to ${{ github.event.pull_request.head.sha }}
+
+  secrets:
+    name: secretos
+    runs-on: ubuntu-latest
+    # gitleaks-action pide los commits del PR con
+    # GET /repos/{owner}/{repo}/pulls/{n}/commits, asi que necesita
+    # pull-requests: read. Sin el devuelve 403 en todos los pull request y se
+    # confunde facilmente con un fallo de la action.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Solo hace falta en organizaciones. En repos personales se ignora.
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}

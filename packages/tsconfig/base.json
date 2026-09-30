@@ -1,0 +1,36 @@
+// Reglas estrictas comunes. No se usa sola: la extienden library, react y node.
+// Un paquete no relaja estas reglas en su tsconfig: si una estorba, se discute
+// aqui. `erasableSyntaxOnly` prohibe enum, namespace y propiedades de parametro:
+// el codigo tiene que poder ejecutarse quitando los tipos, sin transformarlo.
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Ramal base",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    "allowImportingTsExtensions": false,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "useUnknownInCatchVariables": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "types": [],
+    "skipLibCheck": true,
+    "noEmit": true
+  }
+}

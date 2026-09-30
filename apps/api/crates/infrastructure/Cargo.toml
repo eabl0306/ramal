@@ -1,0 +1,10 @@
+[package]
+name = "ramal-api-infrastructure"
+description = "Adaptadores driven de la API: configuracion, PostgreSQL y telemetria."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

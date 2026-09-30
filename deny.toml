@@ -1,0 +1,66 @@
+# Politica de dependencias para cargo-deny, para todo el workspace de Rust.
+#
+#   cargo deny check        (just rust-deny)
+#
+# Falla si aparece un aviso de seguridad, una licencia no aprobada, una fuente
+# que no sea crates.io o una dependencia baneada. Mira el grafo entero, tambien
+# el del crate de escritorio aunque no este en default-members.
+
+[graph]
+all-features = true
+
+[advisories]
+version = 2
+yanked = "deny"
+ignore = []
+
+[licenses]
+version = 2
+confidence-threshold = 0.9
+# Cada licencia que no sea obvia lleva al lado el crate que la trae. Una nueva se
+# anade solo despues de leerla, nunca para que la CI pase.
+allow = [
+  "0BSD",
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "BSL-1.0",
+  "CC0-1.0",
+  # webpki-roots: la lista de CAs de Mozilla se publica con esta licencia.
+  "CDLA-Permissive-2.0",
+  "ISC",
+  "MIT",
+  "MIT-0",
+  "MPL-2.0",
+  "Unicode-3.0",
+  "Unlicense",
+  "Zlib",
+]
+
+# Los crates del workspace no se publican (publish = false) y no declaran
+# licencia: no tiene sentido exigirsela a codigo que no sale del repositorio.
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+# Nada de crates que dupliquen lo que ya trae el stack elegido. openssl queda
+# fuera porque TLS va con rustls en todas partes: si una dependencia nueva lo
+# arrastra (git2 con https, por ejemplo), se busca la feature de rustls antes de
+# tocar esta lista.
+deny = [
+  { name = "openssl" },
+  { name = "openssl-sys" },
+  { name = "actix-web" },
+  { name = "axum" },
+  { name = "rocket" },
+]
+skip = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

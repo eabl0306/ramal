@@ -1,0 +1,57 @@
+# --- Sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Editores ---
+# Solo la configuracion compartida del editor de la raiz va en git. La de la
+# extension (apps/vscode/.vscode) no la tapa esta regla, porque va anclada a la raiz.
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.iml
+*.swp
+
+# --- Secretos y entorno local ---
+# Las plantillas SI van en git; cualquier otro .env se queda en la maquina que lo
+# escribio. Cada plantilla nueva necesita su propia excepcion aqui, porque `.env.*`
+# las ignora todas.
+.env
+.env.*
+!.env.example
+
+# --- JS / TS ---
+node_modules/
+dist/
+# Salida de React Router en modo framework (build/client y build/server).
+build/
+out/
+coverage/
+.vite/
+*.tsbuildinfo
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+# Tipos que genera React Router en modo framework. Se regeneran en cada typecheck.
+.react-router/
+
+# --- VS Code (extension) ---
+.vscode-test/
+*.vsix
+# El binario del motor que `just vscode-package` copia dentro de la extension
+# antes de empaquetarla. Sale de cargo, no se versiona.
+apps/vscode/bin/
+
+# --- Rust ---
+target/
+
+# --- Tauri ---
+# Tauri 2 regenera los esquemas de capacidades en cada build. Su documentacion
+# recomienda no versionarlos.
+apps/desktop/src-tauri/gen/schemas/
+
+# --- Herramientas ---
+.turbo/
+.cache/
+lcov.info

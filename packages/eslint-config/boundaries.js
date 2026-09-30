@@ -1,0 +1,56 @@
+import boundaries from 'eslint-plugin-boundaries';
+
+/**
+ * Arquitectura forzada por el linter. Las capas se declaran como tipos de
+ * elemento, los ficheros de test como categoria aparte, y la direccion de
+ * dependencias se escribe una sola vez, aqui.
+ *
+ * Esto vigila las capas DENTRO de un paquete. Que paquete puede depender de cual
+ * lo vigila tools/checks/package-graph.mjs leyendo los package.json.
+ *
+ * @param {{
+ *   files?: string[],
+ *   elements: Array<Record<string, unknown>>,
+ *   fileCategories?: Array<Record<string, unknown>>,
+ *   policies: Array<Record<string, unknown>>,
+ *   ignore?: string[],
+ *   include?: string[],
+ *   extensions?: string[],
+ * }} options
+ * @returns {import('eslint').Linter.Config[]}
+ */
+export function boundariesConfig({
+  files = ['**/*.{ts,tsx}'],
+  elements,
+  fileCategories = [],
+  policies,
+  ignore = [],
+  include = ['src/**/*'],
+  extensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.css'],
+}) {
+  return [
+    {
+      files,
+      plugins: { boundaries },
+      settings: {
+        'boundaries/elements': elements,
+        'boundaries/files': fileCategories,
+        'boundaries/include': include,
+        'boundaries/ignore': ignore,
+        // El plugin resuelve los imports con eslint-module-utils, que lee esta
+        // clave. Sin las extensiones de TypeScript no encuentra los ficheros.
+        'import/resolver': { node: { extensions } },
+      },
+      rules: {
+        // checkAllOrigins hace que la regla mire tambien los paquetes de
+        // node_modules, no solo los ficheros del propio proyecto.
+        'boundaries/dependencies': [
+          'error',
+          { default: 'disallow', checkAllOrigins: true, policies },
+        ],
+        'boundaries/no-unknown-dependencies': 'error',
+        'boundaries/no-unknown-files': 'error',
+      },
+    },
+  ];
+}

@@ -1,0 +1,10 @@
+[package]
+name = "ramal-api-domain"
+description = "Dominio de la API: reglas puras, sin framework, sin HTTP y sin SQL."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,13 @@
+// Paquetes puros (domain, i18n, bridge): sin DOM y sin tipos de Node.
+// `lib` en ES2023 y `types` vacio a proposito: si el dominio usa `document` o
+// `process`, el typecheck falla. Asi la pureza la comprueba el compilador y no
+// una revision de codigo.
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Ramal libreria pura",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": []
+  }
+}

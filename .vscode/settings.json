@@ -1,0 +1,28 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/target": true,
+    "**/dist": true,
+    "**/out": true,
+    "**/coverage": true,
+    "pnpm-lock.yaml": true,
+    "Cargo.lock": true
+  },
+  "[javascript][javascriptreact][typescript][typescriptreact][json][jsonc][css][html][markdown][yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "stylelint.validate": ["css"],
+  "css.validate": false,
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "rust-analyzer.check.command": "clippy"
+}

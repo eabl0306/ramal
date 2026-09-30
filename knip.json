@@ -1,0 +1,28 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignore": ["docs/**"],
+  "ignoreExportsUsedInFile": true,
+  "workspaces": {
+    ".": {},
+    "packages/eslint-config": {
+      "entry": ["rules/*.test.js"]
+    },
+    "packages/tsconfig": {},
+    "tools/checks": {
+      "entry": ["*.mjs"]
+    },
+    "packages/domain": {},
+    "packages/i18n": {},
+    "packages/ui": {},
+    "packages/repo-view": {},
+    "packages/bridge": {
+      "ignore": ["src/protocol/generated/**"]
+    },
+    "packages/api-client": {
+      "ignore": ["src/generated/**"]
+    },
+    "apps/web": {},
+    "apps/desktop": {},
+    "apps/vscode": {}
+  }
+}

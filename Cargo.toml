@@ -1,0 +1,145 @@
+# Workspace unico de Rust para todo el monorepo: el motor de Git compartido
+# (crates/*), la API (apps/api/crates/*), el sidecar de la extension de VS Code
+# y el lado nativo de la app de escritorio. Un solo Cargo.lock y un solo target/:
+# las versiones de las dependencias comunes no pueden divergir entre apps.
+[workspace]
+resolver = "3"
+members = [
+  "crates/core-domain",
+  "crates/core-application",
+  "crates/protocol",
+  "crates/git",
+  "crates/engine",
+  "apps/api/crates/domain",
+  "apps/api/crates/application",
+  "apps/api/crates/infrastructure",
+  "apps/api/crates/http",
+  "apps/api/crates/api",
+  "apps/vscode-engine",
+  "apps/desktop/src-tauri",
+]
+# Todos menos el de escritorio. Tauri enlaza con webkit2gtk, que no esta en todas
+# las maquinas ni en los runners de la CI que no son de escritorio: sin esta lista,
+# un `cargo test` a secas fallaria en cualquier sitio sin esas librerias.
+# Consecuencia: ninguna receta usa `--workspace`, porque pisa esta lista. El crate
+# de escritorio se compila con `-p ramal-desktop` (just desktop-rust-check).
+default-members = [
+  "crates/core-domain",
+  "crates/core-application",
+  "crates/protocol",
+  "crates/git",
+  "crates/engine",
+  "apps/api/crates/domain",
+  "apps/api/crates/application",
+  "apps/api/crates/infrastructure",
+  "apps/api/crates/http",
+  "apps/api/crates/api",
+  "apps/vscode-engine",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98"
+publish = false
+
+[workspace.dependencies]
+# --- Crates del workspace ---
+ramal-core-domain = { path = "crates/core-domain", version = "0.1.0" }
+ramal-core-application = { path = "crates/core-application", version = "0.1.0" }
+ramal-protocol = { path = "crates/protocol", version = "0.1.0" }
+ramal-git = { path = "crates/git", version = "0.1.0" }
+ramal-engine = { path = "crates/engine", version = "0.1.0" }
+ramal-api-domain = { path = "apps/api/crates/domain", version = "0.1.0" }
+ramal-api-application = { path = "apps/api/crates/application", version = "0.1.0" }
+ramal-api-infrastructure = { path = "apps/api/crates/infrastructure", version = "0.1.0" }
+ramal-api-http = { path = "apps/api/crates/http", version = "0.1.0" }
+ramal-api = { path = "apps/api/crates/api", version = "0.1.0" }
+ramal-vscode-engine = { path = "apps/vscode-engine", version = "0.1.0" }
+ramal-desktop = { path = "apps/desktop/src-tauri", version = "0.1.0" }
+
+# --- Externas ---
+async-trait = "0.1.92"
+chrono = { version = "0.4.45", default-features = false, features = ["std", "clock"] }
+figment = { version = "0.10.19", features = ["env"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+# Sin las features por defecto: traen aws-lc-rs, que necesita cmake y un
+# compilador de C para algo que aqui no se usa. `oapi` genera el documento
+# OpenAPI desde el propio router, y de ese documento sale packages/api-client.
+salvo = { version = "1.0.0", default-features = false, features = [
+  "server",
+  "server-handle",
+  "http1",
+  "http2",
+  "test",
+  "oapi",
+] }
+sqlx = { version = "0.9.0", default-features = false, features = [
+  "runtime-tokio",
+  "tls-rustls-ring",
+  "macros",
+  "postgres",
+  "uuid",
+  "chrono",
+  "migrate",
+] }
+thiserror = "2.0.21"
+tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "signal", "time"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
+# Genera los tipos de TypeScript del protocolo (packages/bridge) desde los tipos
+# de Rust: `just protocol-gen` los escribe y `just protocol-check` vigila que esten al dia.
+ts-rs = { version = "12.0.1", features = ["serde-compat", "uuid-impl", "chrono-impl"] }
+uuid = { version = "1.26.1", features = ["v4", "v7"] }
+
+# Escritorio. Las versiones de los plugins van a la par que sus paquetes de npm
+# (@tauri-apps/plugin-*): se suben juntos.
+tauri = { version = "2.12.1", features = [] }
+tauri-build = { version = "2.7.1", features = [] }
+tauri-plugin-dialog = "2.8.0"
+tauri-plugin-opener = "2.7.0"
+
+# Solo tests.
+pretty_assertions = "1.4.1"
+tempfile = "3.27.0"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+missing_debug_implementations = "warn"
+unused_crate_dependencies = "warn"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "deny"
+print_stderr = "deny"
+cognitive_complexity = "deny"
+# Restriction lint: no entra por `all`/`pedantic`/`nursery`, hay que pedirlo.
+# Sin esta linea el umbral de clippy.toml no hace nada.
+excessive_nesting = "deny"
+too_many_lines = "deny"
+too_many_arguments = "deny"
+indexing_slicing = "deny"
+# Allowed on purpose: these fight against module layout and DTO naming that we
+# want to keep explicit. Everything else in pedantic/nursery stays on.
+module_name_repetitions = "allow"
+multiple_crate_versions = "allow"
+# La documentacion en prose va en castellano y cita nombres de producto
+# (Salvo, SQLx, PostgreSQL) que este lint quiere entre backticks.
+doc_markdown = "allow"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+panic = "abort"
+strip = "symbols"

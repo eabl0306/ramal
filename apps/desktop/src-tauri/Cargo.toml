@@ -1,0 +1,10 @@
+[package]
+name = "ramal-desktop"
+description = "Lado nativo de la app de escritorio (Tauri 2)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

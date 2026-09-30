@@ -1,0 +1,196 @@
+# Unico punto de entrada de la CI. Mira que ha cambiado, llama a los workflows
+# que hagan falta y deja un check final, "all-green", que es el unico que se
+# marca como required en la proteccion de rama.
+#
+# Cada parte del monorepo tiene su workflow reutilizable (on: workflow_call):
+# quality, rust, api, engine, web, desktop, vscode y stack. Un job que no toca
+# porque su parte no cambio sale como "skipped", y all-green lo cuenta como
+# verde.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  # En un pull request, un empujon nuevo deja la ejecucion anterior sin sentido y
+  # se cancela. En main no se cancela: cada commit de main tiene que quedar con
+  # su resultado.
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  changes:
+    name: que ha cambiado
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      rust: ${{ steps.filter.outputs.rust }}
+      api: ${{ steps.filter.outputs.api }}
+      engine: ${{ steps.filter.outputs.engine }}
+      web: ${{ steps.filter.outputs.web }}
+      desktop: ${{ steps.filter.outputs.desktop }}
+      vscode: ${{ steps.filter.outputs.vscode }}
+      stack: ${{ steps.filter.outputs.stack }}
+    steps:
+      - uses: actions/checkout@v7
+      # Los anclajes (&cargo, &node) son las piezas comunes: el workspace de
+      # Cargo afecta a todo lo que es Rust, y el de pnpm a todo lo que es
+      # TypeScript. Cambiar ci.yml lo ejecuta todo.
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            cargo: &cargo
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - 'rust-toolchain.toml'
+              - 'clippy.toml'
+              - 'rustfmt.toml'
+              - 'deny.toml'
+              - '.github/workflows/ci.yml'
+            node: &node
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'packages/**'
+              - '.github/workflows/ci.yml'
+            rust:
+              - *cargo
+              - 'crates/**'
+              - 'apps/api/**'
+              - 'apps/vscode-engine/**'
+              - 'apps/desktop/src-tauri/**'
+              - '.github/workflows/rust.yml'
+            api:
+              - *cargo
+              - 'apps/api/**'
+              - '.github/workflows/api.yml'
+            engine:
+              - *cargo
+              - 'crates/**'
+              - 'apps/vscode-engine/**'
+              - 'packages/bridge/**'
+              - '.github/workflows/engine.yml'
+            web:
+              - *node
+              - 'apps/web/**'
+              - '.github/workflows/web.yml'
+            desktop:
+              - *cargo
+              - *node
+              - 'crates/**'
+              - 'apps/desktop/**'
+              - '.github/workflows/desktop.yml'
+            vscode:
+              - *cargo
+              - *node
+              - 'crates/**'
+              - 'apps/vscode/**'
+              - 'apps/vscode-engine/**'
+              - '.github/workflows/vscode.yml'
+            stack:
+              - 'compose.yaml'
+              - 'docker/**'
+              - 'tools/scripts/smoke-stack.sh'
+              - '.github/workflows/stack.yml'
+              - '.github/workflows/ci.yml'
+
+  quality:
+    name: calidad
+    uses: ./.github/workflows/quality.yml
+    permissions:
+      contents: read
+      # Un workflow reutilizable no puede tener mas permisos de los que le da
+      # quien lo llama. gitleaks los necesita para leer los commits de un PR.
+      pull-requests: read
+    # Un workflow reutilizable no ve los secretos del que lo llama si no se le
+    # pasan. Sin esta linea, GITLEAKS_LICENSE llegaria siempre vacia.
+    secrets:
+      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  rust:
+    name: rust
+    needs: changes
+    if: needs.changes.outputs.rust == 'true'
+    uses: ./.github/workflows/rust.yml
+    permissions:
+      contents: read
+
+  api:
+    name: api
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    uses: ./.github/workflows/api.yml
+    permissions:
+      contents: read
+
+  engine:
+    name: motor
+    needs: changes
+    if: needs.changes.outputs.engine == 'true'
+    uses: ./.github/workflows/engine.yml
+    permissions:
+      contents: read
+
+  web:
+    name: web
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    uses: ./.github/workflows/web.yml
+    permissions:
+      contents: read
+
+  desktop:
+    name: escritorio
+    needs: changes
+    if: needs.changes.outputs.desktop == 'true'
+    uses: ./.github/workflows/desktop.yml
+    permissions:
+      contents: read
+
+  vscode:
+    name: vscode
+    needs: changes
+    if: needs.changes.outputs.vscode == 'true'
+    uses: ./.github/workflows/vscode.yml
+    permissions:
+      contents: read
+
+  stack:
+    name: pila
+    needs: changes
+    # La composicion se prueba si cambia cualquiera de las piezas que la forman:
+    # la API, la web o los ficheros de compose y del gateway.
+    if: needs.changes.outputs.api == 'true' || needs.changes.outputs.web == 'true' || needs.changes.outputs.stack == 'true'
+    uses: ./.github/workflows/stack.yml
+    permissions:
+      contents: read
+
+  all-green:
+    name: all-green
+    # always(): sin el, un job saltado por los filtros de ruta propaga el
+    # "skipped" por la cadena de needs y este job se saltaria tambien, que para
+    # la proteccion de rama es lo mismo que no haber pasado.
+    if: always()
+    needs: [changes, quality, rust, api, engine, web, desktop, vscode, stack]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar que nada ha fallado
+        run: |
+          set -euo pipefail
+          results='${{ join(needs.*.result, ' ') }}'
+          echo "resultados: ${results}"
+          for result in ${results}; do
+            if [ "${result}" != "success" ] && [ "${result}" != "skipped" ]; then
+              echo "::error::un job requerido termino en '${result}'"
+              exit 1
+            fi
+          done
+          echo "todo en verde"

@@ -1,0 +1,13 @@
+// Codigo que corre en Node: el host de la extension de VS Code, scripts y
+// configuracion. Solo trae los tipos de Node (el paquete necesita @types/node).
+// La extension anade "vscode" a `types` en su propio tsconfig, porque
+// @types/vscode solo existe alli.
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Ramal Node",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["node"]
+  }
+}

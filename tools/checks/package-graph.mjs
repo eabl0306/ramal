@@ -1,0 +1,140 @@
+#!/usr/bin/env node
+import { report, run } from './lib/cli.mjs';
+import { workspaceGlobs, workspacePackages } from './lib/workspace.mjs';
+
+/**
+ * Quien puede depender de quien entre los paquetes del monorepo. ESLint vigila
+ * las capas dentro de un paquete; esto vigila el grafo entre paquetes, leyendo
+ * los package.json (dependencies, devDependencies, peerDependencies y
+ * optionalDependencies).
+ *
+ * `pure` marca los paquetes que no pueden tener ninguna dependencia externa en
+ * runtime: el dominio, los textos y el protocolo tienen que poder usarse igual
+ * en la web, en Tauri y en la extension sin arrastrar nada.
+ *
+ * repo-view no depende de bridge a proposito: define sus propios puertos y
+ * modelos de vista, y cada app adapta el bridge a ellos. Asi la vista del
+ * repositorio no sabe si habla con Tauri o con el host de VS Code.
+ *
+ * Anadir un paquete nuevo es anadir una linea aqui: un paquete que no esta en la
+ * matriz hace fallar la comprobacion.
+ */
+export const MATRIX = {
+  '@ramal/domain': { dir: 'packages/domain', allowed: [], pure: true },
+  '@ramal/i18n': { dir: 'packages/i18n', allowed: [], pure: true },
+  '@ramal/bridge': { dir: 'packages/bridge', allowed: [], pure: true },
+  '@ramal/ui': { dir: 'packages/ui', allowed: ['@ramal/i18n'] },
+  '@ramal/repo-view': {
+    dir: 'packages/repo-view',
+    allowed: ['@ramal/ui', '@ramal/domain', '@ramal/i18n'],
+  },
+  '@ramal/api-client': { dir: 'packages/api-client', allowed: [] },
+  '@ramal/web': {
+    dir: 'apps/web',
+    allowed: ['@ramal/domain', '@ramal/i18n', '@ramal/ui', '@ramal/api-client'],
+  },
+  '@ramal/desktop': {
+    dir: 'apps/desktop',
+    allowed: ['@ramal/domain', '@ramal/i18n', '@ramal/ui', '@ramal/repo-view', '@ramal/bridge'],
+  },
+  ramal: {
+    dir: 'apps/vscode',
+    allowed: ['@ramal/domain', '@ramal/i18n', '@ramal/ui', '@ramal/repo-view', '@ramal/bridge'],
+  },
+  '@ramal/eslint-config': { dir: 'packages/eslint-config', allowed: [] },
+  '@ramal/tsconfig': { dir: 'packages/tsconfig', allowed: [] },
+};
+
+/** Configuracion compartida: cualquiera puede usarla, pero solo para desarrollar. */
+export const CONFIG_PACKAGES = new Set(['@ramal/eslint-config', '@ramal/tsconfig']);
+
+const TOOLS_RULE = { allowed: [] };
+const SECTIONS = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
+
+function isInternal(name) {
+  return name === 'ramal' || name.startsWith('@ramal/');
+}
+
+function ruleFor(pkg) {
+  if (pkg.dir.startsWith('tools/')) return { rule: TOOLS_RULE, problems: [] };
+  const rule = MATRIX[pkg.name];
+  if (rule === undefined) {
+    return {
+      rule: null,
+      problems: [`paquete desconocido "${pkg.name}": anadelo a MATRIX en package-graph.mjs`],
+    };
+  }
+  const problems =
+    rule.dir === pkg.dir ? [] : [`"${pkg.name}" tiene que vivir en ${rule.dir}, no en ${pkg.dir}`];
+  return { rule, problems };
+}
+
+function internalProblem(pkg, rule, dep, section, version) {
+  if (MATRIX[dep] === undefined) return `depende de un paquete desconocido "${dep}"`;
+  if (!rule.allowed.includes(dep)) {
+    const allowed = rule.allowed.length > 0 ? rule.allowed.join(', ') : 'ninguno';
+    return `"${pkg.name}" no puede depender de "${dep}" (${section}). Permitidos: ${allowed}`;
+  }
+  if (!String(version).startsWith('workspace:')) {
+    return `"${dep}" se enlaza con workspace:*, no con "${version}"`;
+  }
+  return null;
+}
+
+function dependencyProblem(pkg, rule, dep, section, version) {
+  if (CONFIG_PACKAGES.has(dep)) {
+    return section === 'devDependencies' ? null : `"${dep}" solo puede ir en devDependencies`;
+  }
+  if (isInternal(dep)) return internalProblem(pkg, rule, dep, section, version);
+  if (rule.pure === true && section !== 'devDependencies') {
+    return `"${pkg.name}" no admite dependencias externas en runtime: "${dep}" (${section})`;
+  }
+  return null;
+}
+
+function dependencyProblems(pkg, rule) {
+  const problems = [];
+  for (const section of SECTIONS) {
+    for (const [dep, version] of Object.entries(pkg.manifest[section] ?? {})) {
+      const problem = dependencyProblem(pkg, rule, dep, section, version);
+      if (problem !== null) problems.push(problem);
+    }
+  }
+  return problems;
+}
+
+function duplicateNames(packages) {
+  const seen = new Map();
+  const problems = [];
+  for (const pkg of packages) {
+    const first = seen.get(pkg.name);
+    if (first === undefined) {
+      seen.set(pkg.name, pkg.dir);
+      continue;
+    }
+    problems.push({ file: `${pkg.dir}/package.json`, message: `nombre repetido con ${first}` });
+  }
+  return problems;
+}
+
+export function checkPackageGraph({ root }) {
+  const globs = workspaceGlobs(root);
+  if (globs === null) {
+    return { scanned: 0, violations: [{ file: 'pnpm-workspace.yaml', message: 'no existe' }] };
+  }
+  const packages = workspacePackages(root, globs).map((pkg) => ({
+    ...pkg,
+    name: String(pkg.manifest.name ?? pkg.dir),
+  }));
+  const violations = duplicateNames(packages);
+  for (const pkg of packages) {
+    const { rule, problems } = ruleFor(pkg);
+    const all = rule === null ? problems : [...problems, ...dependencyProblems(pkg, rule)];
+    for (const message of all) violations.push({ file: `${pkg.dir}/package.json`, message });
+  }
+  return { scanned: packages.length, violations };
+}
+
+if (import.meta.main) {
+  run((options) => report({ name: 'grafo de paquetes', ...checkPackageGraph(options) }));
+}

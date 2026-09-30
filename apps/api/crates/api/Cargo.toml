@@ -1,0 +1,10 @@
+[package]
+name = "ramal-api"
+description = "Binario de la API: composition root que cablea los adaptadores y arranca el servidor."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,10 @@
+[package]
+name = "ramal-protocol"
+description = "Mensajes entre el motor y las interfaces, exportados a TypeScript con ts-rs."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

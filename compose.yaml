@@ -1,0 +1,138 @@
+# Pila de DESARROLLO. Codigo montado, recarga en caliente y puertos abiertos.
+#
+#   just db-up    (solo Postgres: lo que necesitan los tests de la API)
+#   just up       (la pila entera, perfil full)
+#   just logs
+#   just down
+#
+# api, web, gateway y mailpit van en el perfil `full`. Sin perfil, compose solo
+# levanta la base de datos, y asi `just db-up` funciona aunque las apps todavia
+# no tengan su Dockerfile.dev. Las recetas de la pila entera pasan
+# `--profile full` (variable compose_full del justfile).
+#
+# Las variables salen de .env (copia .env.example). Todas tienen valor por defecto.
+
+name: ramal
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ramal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ramal}
+      POSTGRES_DB: ${POSTGRES_DB:-ramal}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      # postgres:18 guarda los datos en un subdirectorio por version mayor: el
+      # volumen va en /var/lib/postgresql, no en /var/lib/postgresql/data. Con la
+      # ruta vieja el contenedor no arranca.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-ramal} -d ${POSTGRES_DB:-ramal}']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  api:
+    profiles: [full]
+    build:
+      # Contexto en la raiz: el workspace de Cargo y el Cargo.lock viven aqui, no
+      # en apps/api.
+      context: .
+      dockerfile: apps/api/Dockerfile.dev
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    environment:
+      RAMAL__SERVER__HOST: 0.0.0.0
+      RAMAL__SERVER__PORT: '8080'
+      RAMAL__DATABASE__URL: postgres://${POSTGRES_USER:-ramal}:${POSTGRES_PASSWORD:-ramal}@db:5432/${POSTGRES_DB:-ramal}
+      RAMAL__TELEMETRY__LOG_LEVEL: ${RAMAL__TELEMETRY__LOG_LEVEL:-debug}
+      # Fuera del bind mount a proposito. Si el directorio de compilacion cuelga
+      # del codigo montado, docker lo crea en el repositorio del host como root
+      # cada vez que se levanta la pila, y ahi se queda: git lo ve, los guards lo
+      # recorren y no se puede borrar sin sudo.
+      CARGO_TARGET_DIR: /cargo-target
+    ports:
+      - '${API_PORT:-8080}:8080'
+    volumes:
+      # El codigo en caliente. El target y el registro de cargo viven en
+      # volumenes para no pelearse con los del host ni perder la cache.
+      - .:/app
+      - api-cargo-registry:/usr/local/cargo/registry
+      - api-target:/cargo-target
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail --silent http://127.0.0.1:8080/health/live || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 30
+      # La primera compilacion del workspace dentro del contenedor tarda.
+      start_period: 300s
+
+  web:
+    profiles: [full]
+    build:
+      # Contexto en la raiz: el lockfile de pnpm y los paquetes compartidos viven aqui.
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - '${WEB_PORT:-5173}:5173'
+    volumes:
+      # Solo el codigo fuente. node_modules se queda el del contenedor.
+      - ./apps/web/app:/repo/apps/web/app
+      - ./packages:/repo/packages
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --quiet --tries=1 --spider http://127.0.0.1:5173/ || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+  # Buzon de correo de desarrollo. La API le habla por SMTP en el 1025 y los
+  # mensajes se leen en http://localhost:8025. No sale nada a internet.
+  mailpit:
+    profiles: [full]
+    image: axllent/mailpit:latest
+    ports:
+      - '${MAILPIT_WEB_PORT:-8025}:8025'
+      - '${MAILPIT_SMTP_PORT:-1025}:1025'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget --quiet --tries=1 --spider http://127.0.0.1:8025/ || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+  # Un solo origen para la web y la API. Es por donde hay que entrar:
+  # http://localhost:8090 sirve la web y reenvia a la API lo que es suyo.
+  gateway:
+    profiles: [full]
+    image: nginx:alpine
+    depends_on:
+      api:
+        condition: service_started
+      web:
+        condition: service_started
+    ports:
+      - '${GATEWAY_PORT:-8090}:8080'
+    volumes:
+      - ./docker/gateway.dev.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'wget --quiet --tries=1 --spider http://127.0.0.1:8080/health/live || exit 1']
+      interval: 10s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+
+volumes:
+  postgres-data:
+  api-cargo-registry:
+  api-target:
