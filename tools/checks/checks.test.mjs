@@ -126,6 +126,21 @@ describe('todo-without-ticket', () => {
     assert.equal(runCheck('todo-without-ticket.mjs', root).code, 1);
   });
 
+  it('revisa tambien el CSS, los scripts de shell y la configuracion', () => {
+    const root = sandbox({
+      'packages/ui/src/button.css': `/* ${MARKER}: pasar a token */\n`,
+      'tools/scripts/deploy.sh': `# ${MARKER}: quitar esto\n`,
+      '.github/workflows/web.yml': `# ${ODD}: revisar\n`,
+      'Cargo.toml': `# ${MARKER}: subir version\n`,
+    });
+    const { code, output } = runCheck('todo-without-ticket.mjs', root);
+    assert.equal(code, 1);
+    assert.match(output, /button\.css:1/u);
+    assert.match(output, /deploy\.sh:1/u);
+    assert.match(output, /web\.yml:1/u);
+    assert.match(output, /^ {2}Cargo\.toml:1/mu);
+  });
+
   it('no confunde la palabra castellana todo con un marcador', () => {
     const root = sandbox({ 'packages/ui/src/a.ts': '// esto lo hace todo de golpe\n' });
     assert.equal(runCheck('todo-without-ticket.mjs', root).code, 0);
