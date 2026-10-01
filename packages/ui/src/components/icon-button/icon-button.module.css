@@ -1,0 +1,57 @@
+/* Boton de solo icono: el ⋯ de cada fila, el ⚙︎ de la barra, el × de una pestana. */
+.button {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--r-hc-border);
+  border-radius: var(--r-radius-sm);
+  outline: none;
+  background: transparent;
+  color: var(--r-muted);
+  cursor: pointer;
+}
+
+.button[data-hovered] {
+  background: var(--r-surface-hover);
+  color: var(--r-text);
+}
+
+.button[data-focus-visible] {
+  outline: 2px solid var(--r-focus);
+  outline-offset: 1px;
+}
+
+.button[data-disabled] {
+  color: var(--r-faint);
+  cursor: default;
+}
+
+.button[data-variant='bordered'] {
+  border-color: var(--r-border);
+  background: var(--r-bg);
+}
+
+.button[data-size='22'] {
+  width: 22px;
+  height: 22px;
+  color: var(--r-faint);
+}
+
+.button[data-size='24'] {
+  width: 24px;
+  height: 24px;
+}
+
+.button[data-size='28'] {
+  width: 28px;
+  height: 28px;
+}
+
+.button[data-size='36'] {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-radius-md);
+}

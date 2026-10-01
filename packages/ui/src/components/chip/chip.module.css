@@ -1,0 +1,82 @@
+/* Chip de filtro (estados de PR) y chip de etiqueta (workspace de un repo). */
+.chip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-sm);
+  outline: none;
+  background: var(--r-bg);
+  color: var(--r-text);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+button.chip {
+  cursor: pointer;
+}
+
+.chip[data-hovered] {
+  background: var(--r-surface-hover);
+}
+
+.chip[data-focus-visible] {
+  outline: 2px solid var(--r-focus);
+  outline-offset: 1px;
+}
+
+.chip[data-selected] {
+  border-color: var(--r-accent);
+  background: var(--r-accent-soft);
+}
+
+.label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count {
+  color: var(--r-faint);
+  font-family: var(--r-font-code);
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--r-muted);
+}
+
+.dot[data-tone='accent'] {
+  background: var(--r-accent);
+}
+
+.dot[data-tone='ok'] {
+  background: var(--r-ok);
+}
+
+.dot[data-tone='warn'] {
+  background: var(--r-warn);
+}
+
+.dot[data-tone='danger'] {
+  background: var(--r-danger);
+}
+
+.dot[data-tone='info'] {
+  background: var(--r-info);
+}
+
+.dot[data-tone='merged'] {
+  background: var(--r-merged);
+}
+
+.dot[data-tone='faint'] {
+  background: var(--r-faint);
+}

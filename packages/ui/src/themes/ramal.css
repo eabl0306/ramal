@@ -1,0 +1,95 @@
+/*
+ * Tema propio de Ramal, para escritorio y web. Los valores son los oklch del
+ * handoff (la tabla del README y los prototipos *.dc.html, que mandan). El host
+ * pone en <html> data-theme="dark" o "light", data-density y, en la web,
+ * data-host="web", que sube la letra a 14 px y aplica los matices del prototipo
+ * web.
+ */
+@import url('./base.css');
+
+:root,
+[data-theme='dark'] {
+  --r-bg: oklch(18.5% 0.008 230deg);
+  --r-panel: oklch(21% 0.009 230deg);
+  --r-surface: oklch(24% 0.01 230deg);
+  --r-surface-hover: oklch(28.5% 0.012 230deg);
+  --r-border: oklch(31.5% 0.012 230deg);
+  --r-text: oklch(95% 0.005 230deg);
+  --r-muted: oklch(76% 0.012 230deg);
+  --r-faint: oklch(62% 0.012 230deg);
+  --r-accent: oklch(74% 0.12 190deg);
+  --r-accent-ink: oklch(20% 0.03 190deg);
+  --r-accent-soft: oklch(74% 0.12 190deg / 14%);
+  --r-ok: oklch(76% 0.15 150deg);
+  --r-warn: oklch(80% 0.14 80deg);
+  --r-danger: oklch(70% 0.17 25deg);
+  --r-info: oklch(74% 0.12 245deg);
+  --r-merged: oklch(68% 0.18 300deg);
+  --r-add-bg: oklch(76% 0.15 150deg / 13%);
+  --r-del-bg: oklch(70% 0.17 25deg / 14%);
+  --r-hatch: repeating-linear-gradient(
+    135deg,
+    transparent 0 6px,
+    oklch(28.5% 0.012 230deg) 6px 7px
+  );
+  --r-shadow-overlay:
+    0 12px 40px oklch(5% 0.01 230deg / 50%), 0 2px 6px oklch(5% 0.01 230deg / 30%);
+  --r-backdrop: oklch(10% 0.01 230deg / 50%);
+  --r-knob: oklch(100% 0 0deg);
+}
+
+[data-theme='light'] {
+  --r-bg: oklch(96.5% 0.004 230deg);
+  --r-panel: oklch(98.5% 0.003 230deg);
+  --r-surface: oklch(100% 0 0deg);
+  --r-surface-hover: oklch(94% 0.006 230deg);
+  --r-border: oklch(89% 0.008 230deg);
+  --r-text: oklch(24% 0.012 230deg);
+  --r-muted: oklch(44% 0.012 230deg);
+  --r-faint: oklch(54% 0.01 230deg);
+  --r-accent: oklch(54% 0.1 190deg);
+  --r-accent-ink: oklch(99% 0.005 190deg);
+  --r-accent-soft: oklch(54% 0.1 190deg / 10%);
+  --r-ok: oklch(52% 0.13 150deg);
+  --r-warn: oklch(58% 0.13 70deg);
+  --r-danger: oklch(55% 0.18 25deg);
+  --r-info: oklch(52% 0.13 250deg);
+  --r-add-bg: oklch(62% 0.15 150deg / 13%);
+  --r-del-bg: oklch(60% 0.18 25deg / 12%);
+  --r-hatch: repeating-linear-gradient(135deg, transparent 0 6px, oklch(92% 0.006 230deg) 6px 7px);
+  --r-shadow-overlay:
+    0 12px 40px oklch(30% 0.02 230deg / 16%), 0 2px 6px oklch(30% 0.02 230deg / 8%);
+}
+
+/* Lo que no cambia entre claro y oscuro. */
+:root {
+  --r-status-m: var(--r-warn);
+  --r-status-a: var(--r-ok);
+  --r-status-d: var(--r-danger);
+  --r-status-r: var(--r-info);
+  --r-status-c: var(--r-info);
+  --r-focus: var(--r-accent);
+  --r-font-ui: 'IBM Plex Sans', system-ui, sans-serif;
+  --r-font-code: 'IBM Plex Mono', ui-monospace, monospace;
+  --r-font-size-base: 13px;
+  --r-radius-sm: 6px;
+  --r-radius-md: 9px;
+  --r-radius-lg: 12px;
+  --r-radius-xl: 16px;
+}
+
+/* La web: letra de 14 px y la sombra mas amplia de su prototipo. */
+[data-host='web'] {
+  --r-font-size-base: 14px;
+  --r-shadow-overlay:
+    0 24px 70px oklch(5% 0.01 230deg / 55%), 0 2px 8px oklch(5% 0.01 230deg / 30%);
+}
+
+/* El claro de la web es un punto mas luminoso que el del escritorio. */
+[data-host='web'][data-theme='light'] {
+  --r-bg: oklch(97.5% 0.004 230deg);
+  --r-surface-hover: oklch(94.5% 0.006 230deg);
+  --r-border: oklch(90% 0.008 230deg);
+  --r-shadow-overlay:
+    0 24px 70px oklch(30% 0.02 230deg / 18%), 0 2px 8px oklch(30% 0.02 230deg / 8%);
+}

@@ -1,0 +1,86 @@
+/*
+ * Tokens que no dependen del tema y que comparten ramal.css y vscode.css:
+ * carriles del grafo, colores de plataforma, densidades y la base del documento.
+ *
+ * Los carriles son los mismos en todos los temas y tambien en VS Code, como pide
+ * el diseno. Los colores de plataforma son colores de marca, tampoco cambian.
+ * Este es uno de los pocos sitios donde se escriben colores: fuera de
+ * src/themes stylelint y ramal/no-raw-colors lo prohiben.
+ */
+
+:root {
+  --r-lane-0: oklch(72% 0.15 190deg);
+  --r-lane-1: oklch(68% 0.2 300deg);
+  --r-lane-2: oklch(76% 0.16 60deg);
+  --r-lane-3: oklch(68% 0.21 355deg);
+  --r-lane-4: oklch(74% 0.18 140deg);
+  --r-lane-5: oklch(70% 0.16 250deg);
+
+  /* Texto sobre un color de carril (iniciales de avatar, letra de lado del resolvedor). */
+  --r-on-lane: oklch(20% 0.02 230deg);
+  --r-platform-github: oklch(50% 0.03 260deg);
+  --r-platform-gitlab: oklch(64% 0.17 40deg);
+  --r-platform-bitbucket: oklch(56% 0.15 255deg);
+  --r-platform-gitea: oklch(60% 0.14 145deg);
+  --r-platform-azure: oklch(58% 0.14 235deg);
+
+  /* Texto sobre un color saturado: distintivos de plataforma, boton de peligro. */
+  --r-on-emphasis: oklch(100% 0 0deg);
+
+  /* Variantes suaves (fondo de pildora, chip activo): el color al 14%, como el prototipo. */
+  --r-ok-soft: color-mix(in oklch, var(--r-ok) 14%, transparent);
+  --r-warn-soft: color-mix(in oklch, var(--r-warn) 14%, transparent);
+  --r-danger-soft: color-mix(in oklch, var(--r-danger) 14%, transparent);
+  --r-info-soft: color-mix(in oklch, var(--r-info) 14%, transparent);
+  --r-merged-soft: color-mix(in oklch, var(--r-merged) 14%, transparent);
+  --r-faint-soft: color-mix(in oklch, var(--r-faint) 14%, transparent);
+
+  /*
+   * Bordes que solo se ven en alto contraste. Fuera de el son transparentes, que
+   * ademas es lo que pide el modo de alto contraste de Windows para dibujarlos.
+   */
+  --r-hc-border: transparent;
+  --r-hc-active-border: transparent;
+}
+
+/*
+ * Densidades. DENSITIES (src/tokens/densities.ts) repite estos numeros para el
+ * SVG del grafo, y un test falla si las dos copias no coinciden.
+ */
+:root,
+[data-density='comfortable'] {
+  --r-row-h: 40px;
+  --r-menu-item-h: 32px;
+  --r-sidebar-item-h: 30px;
+  --r-toolbar-h: 62px;
+}
+
+[data-density='compact'] {
+  --r-row-h: 28px;
+  --r-menu-item-h: 24px;
+  --r-sidebar-item-h: 22px;
+  --r-toolbar-h: 34px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--r-bg);
+  color: var(--r-text);
+  font-family: var(--r-font-ui);
+  font-size: var(--r-font-size-base);
+}
+
+input,
+select,
+textarea,
+button {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}

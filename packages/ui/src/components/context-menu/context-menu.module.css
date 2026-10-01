@@ -1,0 +1,83 @@
+/* Menu contextual del inventario 2.4: panel de radio 12, elementos de 32 o 24 px. */
+.anchor {
+  position: fixed;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.popover {
+  z-index: 50;
+  outline: none;
+}
+
+.menu {
+  min-width: 236px;
+  max-height: inherit;
+  padding: 6px;
+  overflow: auto;
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-lg);
+  outline: none;
+  background: var(--r-surface);
+  box-shadow: var(--r-shadow-overlay);
+}
+
+.item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: var(--r-menu-item-h);
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--r-hc-border);
+  border-radius: var(--r-radius-sm);
+  outline: none;
+  color: var(--r-text);
+  white-space: nowrap;
+  cursor: default;
+}
+
+.item[data-focused],
+.item[data-open] {
+  border-color: var(--r-hc-active-border);
+  background: var(--r-surface-hover);
+}
+
+.item[data-disabled] {
+  color: var(--r-faint);
+}
+
+.item[data-danger='true'] {
+  color: var(--r-danger);
+}
+
+.check {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 16px;
+  color: var(--r-accent);
+}
+
+.label {
+  flex: 1;
+}
+
+.hint {
+  margin-left: 12px;
+  color: var(--r-faint);
+  font-family: var(--r-font-code);
+  font-size: 11px;
+}
+
+.more {
+  color: var(--r-faint);
+}
+
+.separator {
+  height: 1px;
+  margin: 4px 6px;
+  border: 0;
+  background: var(--r-border);
+}

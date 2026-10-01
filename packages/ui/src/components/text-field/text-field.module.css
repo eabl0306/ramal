@@ -1,0 +1,60 @@
+/* Campo de texto de modales y ajustes: etiqueta de 12 px y caja de 36 px. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.label {
+  color: var(--r-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.input {
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+  outline: none;
+  background: var(--r-bg);
+  color: var(--r-text);
+}
+
+textarea.input {
+  height: auto;
+  padding: 8px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.input::placeholder {
+  color: var(--r-faint);
+}
+
+.input[data-focused] {
+  border-color: var(--r-focus);
+}
+
+.input[data-invalid] {
+  border-color: var(--r-danger);
+}
+
+.input[data-disabled] {
+  color: var(--r-faint);
+}
+
+.field[data-mono='true'] .input {
+  font-family: var(--r-font-code);
+}
+
+.description {
+  color: var(--r-muted);
+  font-size: 12px;
+}
+
+.error {
+  color: var(--r-danger);
+  font-size: 12px;
+}

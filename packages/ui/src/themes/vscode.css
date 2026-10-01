@@ -1,0 +1,72 @@
+/*
+ * Tema de los webviews de VS Code: cada token apunta a una variable --vscode-*,
+ * asi el webview sigue el tema del editor (incluidos los de alto contraste) sin
+ * una linea de codigo. VS Code pone esas variables en <html> y la clase del tema
+ * en <body>. La segunda opcion de cada var() es la reserva si un tema antiguo no
+ * define la primera.
+ *
+ * Los carriles y los colores de plataforma vienen de base.css y no cambian: el
+ * diseno pide los mismos en todos los temas.
+ */
+@import url('./base.css');
+
+/* stylelint-disable custom-property-pattern -- las variables --vscode-* las nombra VS Code en camelCase y no se pueden renombrar */
+
+:root {
+  --r-bg: var(--vscode-editor-background);
+  --r-panel: var(--vscode-sideBar-background, var(--vscode-editor-background));
+  --r-surface: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+  --r-surface-hover: var(--vscode-list-hoverBackground);
+  --r-border: var(--vscode-panel-border, var(--vscode-widget-border));
+  --r-text: var(--vscode-foreground);
+  --r-muted: var(--vscode-descriptionForeground);
+  --r-faint: var(--vscode-disabledForeground, var(--vscode-descriptionForeground));
+  --r-accent: var(--vscode-button-background);
+  --r-accent-ink: var(--vscode-button-foreground);
+  --r-accent-soft: var(--vscode-list-inactiveSelectionBackground);
+  --r-ok: var(--vscode-testing-iconPassed, var(--vscode-charts-green));
+  --r-warn: var(--vscode-editorWarning-foreground);
+  --r-danger: var(--vscode-errorForeground);
+  --r-info: var(--vscode-editorInfo-foreground);
+  --r-merged: var(--vscode-charts-purple);
+  --r-add-bg: var(--vscode-diffEditor-insertedLineBackground);
+  --r-del-bg: var(--vscode-diffEditor-removedLineBackground);
+  --r-status-m: var(--vscode-gitDecoration-modifiedResourceForeground);
+  --r-status-a: var(--vscode-gitDecoration-addedResourceForeground);
+  --r-status-d: var(--vscode-gitDecoration-deletedResourceForeground);
+  --r-status-r: var(--vscode-gitDecoration-renamedResourceForeground);
+  --r-status-c: var(--vscode-gitDecoration-renamedResourceForeground);
+  --r-hatch: repeating-linear-gradient(
+    135deg,
+    transparent 0 6px,
+    var(--vscode-diffEditor-diagonalFill) 6px 7px
+  );
+  --r-font-ui: var(--vscode-font-family);
+  --r-font-code: var(--vscode-editor-font-family);
+  --r-font-size-base: var(--vscode-font-size);
+  --r-radius-sm: 2px;
+  --r-radius-md: 3px;
+  --r-radius-lg: 4px;
+  --r-radius-xl: 6px;
+  --r-shadow-overlay: 0 0 8px 2px var(--vscode-widget-shadow);
+  --r-backdrop: var(--vscode-widget-shadow);
+  --r-knob: var(--vscode-button-foreground);
+  --r-focus: var(--vscode-focusBorder);
+}
+
+/*
+ * Alto contraste, oscuro y claro: los temas de VS Code quitan fondos y lo dibujan
+ * todo con bordes. Los componentes pintan --r-hc-border en sus contornos y
+ * --r-hc-active-border en el elemento activo; fuera de este bloque son
+ * transparentes.
+ */
+body.vscode-high-contrast,
+body.vscode-high-contrast-light {
+  --r-border: var(--vscode-contrastBorder);
+  --r-surface-hover: transparent;
+  --r-accent-soft: transparent;
+  --r-shadow-overlay: none;
+  --r-focus: var(--vscode-contrastActiveBorder, var(--vscode-focusBorder));
+  --r-hc-border: var(--vscode-contrastBorder);
+  --r-hc-active-border: var(--vscode-contrastActiveBorder, var(--vscode-focusBorder));
+}

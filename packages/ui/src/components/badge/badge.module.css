@@ -1,0 +1,177 @@
+/* Pildoras, distintivos de plataforma y letras de estado (inventario 2.2). */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border: 1px solid var(--r-hc-border);
+  border-radius: 11px;
+  background: var(--r-surface-hover);
+  color: var(--r-muted);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pill[data-tone='accent'] {
+  background: var(--r-accent-soft);
+  color: var(--r-accent);
+}
+
+.pill[data-tone='ok'],
+.pill[data-pr-state='approved'] {
+  background: var(--r-ok-soft);
+  color: var(--r-ok);
+}
+
+.pill[data-tone='warn'],
+.pill[data-pr-state='changes'] {
+  background: var(--r-warn-soft);
+  color: var(--r-warn);
+}
+
+.pill[data-tone='danger'],
+.pill[data-pr-state='closed'] {
+  background: var(--r-danger-soft);
+  color: var(--r-danger);
+}
+
+.pill[data-tone='info'],
+.pill[data-pr-state='open'] {
+  background: var(--r-info-soft);
+  color: var(--r-info);
+}
+
+.pill[data-tone='merged'],
+.pill[data-pr-state='merged'] {
+  background: var(--r-merged-soft);
+  color: var(--r-merged);
+}
+
+.pill[data-tone='faint'],
+.pill[data-pr-state='draft'] {
+  background: var(--r-faint-soft);
+  color: var(--r-faint);
+}
+
+/* El estado de PR del prototipo es un punto mas alto que el resto de pildoras. */
+.pill[data-pr-state] {
+  height: 24px;
+  border-radius: 12px;
+}
+
+.platform {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  color: var(--r-on-emphasis);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.platform[data-platform='github'] {
+  background: var(--r-platform-github);
+}
+
+.platform[data-platform='gitlab'] {
+  background: var(--r-platform-gitlab);
+}
+
+.platform[data-platform='bitbucket'] {
+  background: var(--r-platform-bitbucket);
+}
+
+.platform[data-platform='gitea'] {
+  background: var(--r-platform-gitea);
+}
+
+.platform[data-platform='azure'] {
+  background: var(--r-platform-azure);
+}
+
+.platform[data-platform='local'] {
+  background: var(--r-surface-hover);
+  color: var(--r-muted);
+}
+
+.platform[data-size='14'] {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  font-size: 6px;
+}
+
+.platform[data-size='18'] {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+
+.platform[data-size='24'] {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  font-size: 9px;
+}
+
+.platform[data-size='26'] {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  font-size: 9px;
+}
+
+.platform[data-size='30'] {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-size: 10px;
+}
+
+.platform[data-size='34'] {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+.status {
+  display: inline-block;
+  width: 16px;
+  font-family: var(--r-font-code);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.status[data-variant='box'] {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid currentcolor;
+  border-radius: 5px;
+}
+
+.status[data-status='M'] {
+  color: var(--r-status-m);
+}
+
+.status[data-status='A'] {
+  color: var(--r-status-a);
+}
+
+.status[data-status='D'] {
+  color: var(--r-status-d);
+}
+
+.status[data-status='R'] {
+  color: var(--r-status-r);
+}
+
+.status[data-status='C'] {
+  color: var(--r-status-c);
+}

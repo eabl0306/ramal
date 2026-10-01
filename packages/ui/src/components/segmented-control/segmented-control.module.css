@@ -1,0 +1,73 @@
+/* Control segmentado: contenedor con borde y una pastilla por opcion. */
+.group {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+  background: var(--r-bg);
+}
+
+.segment {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 12px;
+  border: 1px solid var(--r-hc-border);
+  border-radius: var(--r-radius-sm);
+  outline: none;
+  background: transparent;
+  color: var(--r-muted);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.segment[data-hovered] {
+  color: var(--r-text);
+}
+
+.segment[data-focus-visible] {
+  outline: 2px solid var(--r-focus);
+  outline-offset: 1px;
+}
+
+.segment[data-selected] {
+  border-color: var(--r-hc-active-border);
+  background: var(--r-accent);
+  color: var(--r-accent-ink);
+}
+
+.group[data-variant='bar'] {
+  padding: 2px;
+  border-radius: var(--r-radius-sm);
+}
+
+.group[data-variant='bar'] .segment {
+  height: 24px;
+  padding: 0 9px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.group[data-variant='field'] {
+  display: flex;
+  width: 100%;
+}
+
+.group[data-variant='field'] .segment {
+  flex: 1;
+  height: 30px;
+}
+
+.group[data-variant='surface'] {
+  background: var(--r-surface);
+}
+
+.group[data-variant='surface'] .segment {
+  height: 24px;
+  padding: 0 10px;
+}
