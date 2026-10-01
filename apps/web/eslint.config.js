@@ -112,6 +112,7 @@ export default [
     },
   },
   ...boundariesConfig({
+    rootPath: tsconfigRootDir,
     files: ['src/**/*.{ts,tsx}'],
     elements,
     fileCategories,

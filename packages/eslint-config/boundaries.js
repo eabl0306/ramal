@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import boundaries from 'eslint-plugin-boundaries';
 
 /**
@@ -8,7 +10,14 @@ import boundaries from 'eslint-plugin-boundaries';
  * Esto vigila las capas DENTRO de un paquete. Que paquete puede depender de cual
  * lo vigila tools/checks/package-graph.mjs leyendo los package.json.
  *
+ * `rootPath` es obligatorio y absoluto: el directorio del paquete. Sin el, el
+ * plugin resuelve `include` y los patrones de las capas desde el directorio
+ * donde se lanza ESLint. El hook de pre-commit lo lanza desde la raiz del repo,
+ * y alli `src/domain` no casa con nada: todas las reglas de capas se apagaban en
+ * silencio y un import prohibido entraba en el commit.
+ *
  * @param {{
+ *   rootPath: string,
  *   files?: string[],
  *   elements: Array<Record<string, unknown>>,
  *   fileCategories?: Array<Record<string, unknown>>,
@@ -20,6 +29,7 @@ import boundaries from 'eslint-plugin-boundaries';
  * @returns {import('eslint').Linter.Config[]}
  */
 export function boundariesConfig({
+  rootPath,
   files = ['**/*.{ts,tsx}'],
   elements,
   fileCategories = [],
@@ -28,11 +38,18 @@ export function boundariesConfig({
   include = ['src/**/*'],
   extensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.css'],
 }) {
+  if (typeof rootPath !== 'string' || !path.isAbsolute(rootPath)) {
+    throw new Error(
+      'boundariesConfig necesita rootPath: la ruta absoluta del paquete ' +
+        "(fileURLToPath(new URL('.', import.meta.url))).",
+    );
+  }
   return [
     {
       files,
       plugins: { boundaries },
       settings: {
+        'boundaries/root-path': rootPath,
         'boundaries/elements': elements,
         'boundaries/files': fileCategories,
         'boundaries/include': include,

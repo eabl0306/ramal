@@ -45,7 +45,13 @@ export default [
   { ignores: [...DEFAULT_IGNORES] },
   ...baseConfig({ tsconfigRootDir }),
   ...qualityConfig(),
-  ...boundariesConfig({ files: ['src/**/*.ts'], elements, fileCategories, policies }),
+  ...boundariesConfig({
+    rootPath: tsconfigRootDir,
+    files: ['src/**/*.ts'],
+    elements,
+    fileCategories,
+    policies,
+  }),
   ...testsConfig(),
   ...nodeConfig({ files: ['*.js', 'vitest.config.ts'] }),
 ];

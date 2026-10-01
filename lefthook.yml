@@ -23,7 +23,11 @@ pre-commit:
         jobs:
           # ESLint 10 busca la configuracion desde el directorio de cada fichero,
           # asi que un solo job cubre la raiz, los paquetes y las apps, cada uno
-          # con su eslint.config.js.
+          # con su eslint.config.js. Las reglas de capas (eslint-plugin-boundaries)
+          # resuelven sus rutas desde el directorio de trabajo salvo que se les
+          # de `boundaries/root-path`; por eso boundariesConfig exige rootPath y
+          # este job, lanzado desde la raiz, las aplica igual que el lint de cada
+          # paquete.
           - name: eslint
             glob: '*.{ts,tsx,mts,cts,js,mjs,cjs}'
             # --no-warn-ignored: lefthook pasa los ficheros por glob, asi que puede

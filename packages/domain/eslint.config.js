@@ -45,6 +45,7 @@ export default [
   ...baseConfig({ tsconfigRootDir }),
   ...qualityConfig(),
   ...boundariesConfig({
+    rootPath: tsconfigRootDir,
     files: ['src/**/*.ts'],
     elements,
     fileCategories,
