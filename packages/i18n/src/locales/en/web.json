@@ -50,7 +50,9 @@
     "title": "Ramal inside VS Code",
     "text": "The graph, pending changes, the conflict resolver and AI, for the repository you have open. It uses your editor theme and language and the same Ramal account.",
     "install": "Install extension",
-    "requirement": "VS Code 1.90 or later"
+    "requirement": "VS Code 1.90 or later",
+    "marketplace": "VS Code Marketplace",
+    "openVsx": "Open VSX"
   },
   "download": {
     "kicker": "DOWNLOAD",
@@ -62,7 +64,29 @@
       "windows": "Windows 10 and 11",
       "linux": "Ubuntu 20.04+, Fedora 38+, Debian 11+"
     },
-    "started": "Download started: {file}"
+    "started": "Download started: {file}",
+    "os": {
+      "mac": "macOS",
+      "windows": "Windows",
+      "linux": "Linux"
+    },
+    "size": "{size} MB",
+    "mobile": "Ramal is a desktop app. Open this page on your computer to download it.",
+    "artifact": {
+      "appleSiliconDmg": "Apple Silicon (.dmg)",
+      "intelDmg": "Intel (.dmg)",
+      "universalDmg": "Universal (.dmg)",
+      "windowsX64Exe": "x64 (.exe)",
+      "windowsArm64Exe": "ARM64 (.exe)",
+      "windowsX64Msi": "x64 (.msi), no automatic updates",
+      "linuxDeb": "Debian / Ubuntu (.deb)",
+      "linuxRpm": "Fedora / RHEL (.rpm)",
+      "linuxAppImage": "AppImage",
+      "linuxArm64Deb": "ARM64 (.deb)",
+      "vsix": ".vsix",
+      "flathub": "Flathub",
+      "openVsx": "Open VSX (VSCodium, Cursor)"
+    }
   },
   "cta": {
     "title": "Create your Ramal account",
@@ -201,5 +225,28 @@
     "signOutDevice": "Sign out on this device",
     "newOrganization": "Create organization…",
     "personal": "Personal"
+  },
+  "status": {
+    "title": "Service status",
+    "subtitle": "What the Ramal API is answering right now.",
+    "loading": "Checking the service…",
+    "ok": "Operational",
+    "degraded": "Degraded",
+    "unreachable": "No connection to the API",
+    "unreachableText": "The API did not answer. It may be down or under maintenance.",
+    "checks": "Components",
+    "checkOk": "Responding",
+    "checkError": "Not responding",
+    "component": {
+      "database": "Database"
+    },
+    "latency": "{ms} ms",
+    "version": "Version {version}",
+    "checkedAt": "Checked on {time}",
+    "retry": "Check again"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "This address does not exist in Ramal."
   }
 }

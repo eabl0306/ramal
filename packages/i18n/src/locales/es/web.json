@@ -50,7 +50,9 @@
     "title": "Ramal dentro de VS Code",
     "text": "El grafo, los cambios pendientes, el resolutor de conflictos y la IA, en el repositorio que tienes abierto. Usa el tema y el idioma de tu editor y la misma cuenta de Ramal.",
     "install": "Instalar extensión",
-    "requirement": "VS Code 1.90 o posterior"
+    "requirement": "VS Code 1.90 o posterior",
+    "marketplace": "VS Code Marketplace",
+    "openVsx": "Open VSX"
   },
   "download": {
     "kicker": "DESCARGA",
@@ -62,7 +64,29 @@
       "windows": "Windows 10 y 11",
       "linux": "Ubuntu 20.04+, Fedora 38+, Debian 11+"
     },
-    "started": "Descarga iniciada: {file}"
+    "started": "Descarga iniciada: {file}",
+    "os": {
+      "mac": "macOS",
+      "windows": "Windows",
+      "linux": "Linux"
+    },
+    "size": "{size} MB",
+    "mobile": "Ramal es una app de escritorio. Abre esta página en tu ordenador para descargarla.",
+    "artifact": {
+      "appleSiliconDmg": "Apple Silicon (.dmg)",
+      "intelDmg": "Intel (.dmg)",
+      "universalDmg": "Universal (.dmg)",
+      "windowsX64Exe": "x64 (.exe)",
+      "windowsArm64Exe": "ARM64 (.exe)",
+      "windowsX64Msi": "x64 (.msi), sin actualizaciones automáticas",
+      "linuxDeb": "Debian / Ubuntu (.deb)",
+      "linuxRpm": "Fedora / RHEL (.rpm)",
+      "linuxAppImage": "AppImage",
+      "linuxArm64Deb": "ARM64 (.deb)",
+      "vsix": ".vsix",
+      "flathub": "Flathub",
+      "openVsx": "Open VSX (VSCodium, Cursor)"
+    }
   },
   "cta": {
     "title": "Crea tu cuenta de Ramal",
@@ -201,5 +225,28 @@
     "signOutDevice": "Cerrar sesión en este dispositivo",
     "newOrganization": "Crear organización…",
     "personal": "Personal"
+  },
+  "status": {
+    "title": "Estado del servicio",
+    "subtitle": "Lo que responde ahora mismo la API de Ramal.",
+    "loading": "Comprobando el servicio…",
+    "ok": "Operativo",
+    "degraded": "Degradado",
+    "unreachable": "Sin conexión con la API",
+    "unreachableText": "La API no ha respondido. Puede estar caída o en mantenimiento.",
+    "checks": "Componentes",
+    "checkOk": "Responde",
+    "checkError": "No responde",
+    "component": {
+      "database": "Base de datos"
+    },
+    "latency": "{ms} ms",
+    "version": "Versión {version}",
+    "checkedAt": "Comprobado el {time}",
+    "retry": "Volver a comprobar"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "text": "Esta dirección no existe en Ramal."
   }
 }
