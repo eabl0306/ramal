@@ -1,0 +1,120 @@
+# Ramal Desktop (apps/desktop): el frontend de Vite y el host de Tauri.
+#
+#   - frontend: lint con las reglas de capas, tipos, cobertura (80% en application,
+#     60% global), build de Vite y Playwright contra ese build con el IPC de Tauri
+#     simulado y la CSP de produccion.
+#   - nativo: en Linux con los requisitos de Tauri, clippy y tests de
+#     ramal-desktop (tauri::test), `tauri build` sin empaquetar y el E2E nativo
+#     con WebdriverIO bajo xvfb, con el binario real y git de verdad.
+#
+# Las mismas recetas que en local. En una maquina sin webkit2gtk, el lado nativo
+# se corre con las recetas desktop-docker-* (tools/docker/tauri-linux.Dockerfile).
+name: desktop
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CI: 'true'
+  # El justfile usa `corepack pnpm` por defecto; aqui pnpm ya lo instala la
+  # action con la version de packageManager.
+  PNPM: pnpm
+
+jobs:
+  frontend:
+    name: frontend y Playwright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Frontend (just desktop-check)
+        run: just desktop-check
+
+      - name: Navegador de Playwright
+        run: just desktop-e2e-install
+
+      - name: E2E con el IPC simulado (just desktop-e2e)
+        run: just desktop-e2e
+
+      - name: Subir informes
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: desktop-frontend-reports
+          path: |
+            apps/desktop/coverage
+            apps/desktop/playwright-report
+          if-no-files-found: ignore
+
+  native:
+    name: host de Tauri en Linux
+    # Version fija: el paquete de WebKitWebDriver cambia de nombre entre versiones
+    # de Ubuntu (webkit2gtk-driver en 24.04, webkitgtk-webdriver en 26.04).
+    runs-on: ubuntu-24.04
+    env:
+      CARGO_TERM_COLOR: always
+      RUSTFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v7
+
+      # La lista oficial de prerrequisitos de Tauri 2 en Debian y Ubuntu, mas xvfb
+      # para la app real sin pantalla. WebKitWebDriver no hace falta: el E2E usa el
+      # driver embebido en la app (feature `e2e`).
+      - name: Requisitos de Tauri en Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev \
+            libssl-dev libayatana-appindicator3-dev librsvg2-dev xvfb
+
+      # Sin argumentos, rustup instala el toolchain que fija rust-toolchain.toml.
+      - name: Instalar el toolchain de rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: desktop
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Clippy y tests de ramal-desktop (just desktop-rust-check)
+        run: just desktop-rust-check
+
+      - name: tauri build sin empaquetar (just desktop-build)
+        run: just desktop-build
+
+      - name: E2E nativo bajo xvfb (just desktop-e2e-native)
+        run: just desktop-e2e-native
