@@ -153,6 +153,42 @@ async fn an_empty_repository_has_no_history() {
 }
 
 #[tokio::test]
+async fn commits_with_dates_or_names_that_git_accepts_do_not_break_the_log() {
+    let repo = FixtureRepo::new();
+    let root = repo.commit("one");
+    let odd_zone = repo.raw_commit(&root, "T <t@t> 1700000000 +0090", "odd zone");
+    let far = repo.raw_commit(&odd_zone, "T <t@t> 99999999999999 +0000", "far future");
+    let separator = repo.raw_commit(
+        &far,
+        "Bad\u{1f}Name <a\u{1f}b@t> 1700000000 +0000",
+        "separator in name",
+    );
+    let no_date = repo.raw_commit(&separator, "T <t@t> notadate", "no date");
+    repo.git(&["update-ref", "refs/heads/main", &no_date]);
+
+    let commits = log(&repo, 100).await;
+
+    assert_eq!(
+        summaries(&commits),
+        vec![
+            "no date",
+            "separator in name",
+            "far future",
+            "odd zone",
+            "one"
+        ]
+    );
+    assert_eq!(commits[0].authored_at.seconds(), 0);
+    assert_eq!(commits[1].author.name, "Bad\u{1f}Name");
+    assert_eq!(commits[1].author.email, "a\u{1f}b@t");
+    assert_eq!(
+        commits[2].authored_at.to_string(),
+        "9999-12-31T23:59:59+00:00"
+    );
+    assert_eq!(commits[3].authored_at.offset_minutes(), 90);
+}
+
+#[tokio::test]
 async fn refs_the_graph_cannot_label_are_not_walked() {
     let repo = FixtureRepo::new();
     let one = repo.commit("one");

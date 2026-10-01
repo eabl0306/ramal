@@ -12,7 +12,7 @@ use ramal_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot, Sha}
 
 use crate::cli::version::{capabilities_for, parse_version};
 use crate::cli::{GitBinary, GitCommand, GitRunner, RunError, RunLimits, RunOutput};
-use crate::parse::log::{LOG_FORMAT, parse_log};
+use crate::parse::log::{LOG_DATE, LOG_FORMAT, parse_log};
 use crate::parse::refs::{REFS_FORMAT, parse_refs};
 
 /// Configuracion del lector.
@@ -149,6 +149,7 @@ impl GitReader for GitCliReader {
             .arg("--no-color")
             .arg("--no-show-signature")
             .arg("--encoding=UTF-8")
+            .arg(LOG_DATE)
             .arg(LOG_FORMAT)
             .max_count(query.max_count)
             // Tiene que ir lo ultimo: revisions() escribe --end-of-options y lo
