@@ -11,6 +11,7 @@ const WINDOW: GraphWindow = {
   rows: [],
   hasMore: false,
   laneCount: 0,
+  snapshot: 'f'.repeat(32),
 };
 
 async function rejection(promise: Promise<unknown>): Promise<unknown> {

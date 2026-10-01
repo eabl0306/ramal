@@ -19,7 +19,7 @@ pub(super) async fn window(
     let repo_id = RepoId::new(params.repo_id);
     let window = cases
         .graph
-        .execute(&repo_id, offset, limit)
+        .execute(&repo_id, offset, limit, params.snapshot.as_deref())
         .await
         .map_err(|e| engine_error(&e))?;
     to_result(&window_to_dto(&repo_id, &window))

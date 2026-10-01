@@ -78,7 +78,7 @@ impl GitVersionInfo {
 /// El adaptador recorre siempre las mismas refs que devuelve `read_refs` (ramas,
 /// ramas remotas y tags) mas HEAD, en orden topologico; aqui solo se dice cuantos
 /// commits como maximo. Asi cada fila del grafo cuelga de algo que se puede
-/// etiquetar.
+/// etiquetar, y la huella de esas refs basta para saber si el historial cambio.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LogQuery {
     /// Maximo de commits.

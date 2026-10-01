@@ -1,3 +1,4 @@
+import { PROTOCOL_VERSION } from '@ramal/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { FakeEngine, engineInfo, fail, ok } from '../../test/engine-fakes';
@@ -59,15 +60,19 @@ describe('tipos de error que ensena el host', () => {
 
 describe('comprobacion del protocolo al arrancar', () => {
   it('acepta un motor con la misma version', async () => {
-    const check = await checkEngineProtocol(new FakeEngine(), createRequestIds(), 1);
-    expect(check).toEqual({ outcome: 'compatible', info: engineInfo(1) });
+    const check = await checkEngineProtocol(new FakeEngine(), createRequestIds(), PROTOCOL_VERSION);
+    expect(check).toEqual({ outcome: 'compatible', info: engineInfo(PROTOCOL_VERSION) });
   });
 
   it('detecta un motor de otra version como fallo de empaquetado', async () => {
     const engine = new FakeEngine();
     engine.respond = (request) => Promise.resolve(ok(request, engineInfo(7)));
-    const check = await checkEngineProtocol(engine, createRequestIds(), 1);
-    expect(check).toEqual({ outcome: 'mismatch', engineVersion: 7, expected: 1 });
+    const check = await checkEngineProtocol(engine, createRequestIds(), PROTOCOL_VERSION);
+    expect(check).toEqual({
+      outcome: 'mismatch',
+      engineVersion: 7,
+      expected: PROTOCOL_VERSION,
+    });
   });
 
   it('devuelve el fallo si el motor no contesta', async () => {

@@ -49,6 +49,7 @@ function rpc({ rows }: E2eScenario, request: RpcRequest): RpcResponse | null {
     rows: rows.slice(offset, offset + limit),
     hasMore: offset + limit < rows.length,
     laneCount: 2,
+    snapshot: 'e2e',
   };
   return { jsonrpc: '2.0', id: request.id, result };
 }

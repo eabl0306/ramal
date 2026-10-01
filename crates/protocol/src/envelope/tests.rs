@@ -116,6 +116,7 @@ fn error_kinds_are_snake_case_literals() {
         (ErrorKind::GitNotFound, "git_not_found"),
         (ErrorKind::GitVersionUnsupported, "git_version_unsupported"),
         (ErrorKind::GitFailed, "git_failed"),
+        (ErrorKind::StaleWindow, "stale_window"),
         (ErrorKind::Internal, "internal"),
     ];
     for (kind, text) in kinds {

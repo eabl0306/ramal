@@ -117,6 +117,10 @@ pub struct GraphWindow {
     /// Carriles que necesita la columna del grafo hasta el final de la ventana.
     /// Crece o se mantiene al bajar, nunca encoge, asi la columna no salta.
     pub lane_count: usize,
+    /// Huella de las refs con las que se leyo ([`RefSnapshot::fingerprint`]).
+    /// La interfaz la devuelve al pedir la pagina siguiente para no pegar
+    /// paginas de dos historiales distintos.
+    pub snapshot: String,
 }
 
 impl GraphWindow {
@@ -151,6 +155,7 @@ impl GraphWindow {
             rows,
             has_more,
             lane_count: layout.width,
+            snapshot: refs.fingerprint(),
         }
     }
 }

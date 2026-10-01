@@ -16,7 +16,10 @@ use crate::repo::{OpenRepoParams, RepoHandle};
 
 /// Version del protocolo. Sube con cualquier cambio incompatible. El extension
 /// host la compara al arrancar el sidecar con la que trae generada.
-pub const PROTOCOL_VERSION: u32 = 1;
+///
+/// 2: `graph/window` lleva `snapshot` y puede responder `stale_window`. Un motor
+/// de la version 1 rechazaria el parametro nuevo por `deny_unknown_fields`.
+pub const PROTOCOL_VERSION: u32 = 2;
 
 /// Un metodo del motor con sus tipos.
 pub trait RpcMethod {

@@ -76,6 +76,7 @@ export class FakeEngine implements Transport {
       rows,
       hasMore: offset + limit < this.#history.length,
       laneCount: this.laneCount,
+      snapshot: 'snap-1',
     };
   }
 }

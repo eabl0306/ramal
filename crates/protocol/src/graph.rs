@@ -17,6 +17,12 @@ pub struct GraphWindowParams {
     pub offset: u32,
     /// Numero de filas, de 1 a 1000.
     pub limit: u32,
+    /// `snapshot` de la primera pagina. Las paginas siguientes lo mandan para
+    /// que el motor responda `stale_window` si el repositorio cambio entre medias,
+    /// en vez de pegar filas de dos historiales. La primera pagina no lo lleva.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub snapshot: Option<String>,
 }
 
 /// Clase de arista.
@@ -124,4 +130,7 @@ pub struct GraphWindow {
     pub has_more: bool,
     /// Carriles que necesita la columna del grafo hasta el final de la ventana.
     pub lane_count: u32,
+    /// Huella opaca de las refs con las que se leyo la ventana. Se devuelve tal
+    /// cual en `GraphWindowParams::snapshot` al pedir la pagina siguiente.
+    pub snapshot: String,
 }

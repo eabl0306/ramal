@@ -24,4 +24,9 @@ hasMore: boolean,
 /**
  * Carriles que necesita la columna del grafo hasta el final de la ventana.
  */
-laneCount: number, };
+laneCount: number, 
+/**
+ * Huella opaca de las refs con las que se leyo la ventana. Se devuelve tal
+ * cual en `GraphWindowParams::snapshot` al pedir la pagina siguiente.
+ */
+snapshot: string, };

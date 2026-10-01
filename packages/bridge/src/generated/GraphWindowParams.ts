@@ -15,4 +15,10 @@ offset: number,
 /**
  * Numero de filas, de 1 a 1000.
  */
-limit: number, };
+limit: number, 
+/**
+ * `snapshot` de la primera pagina. Las paginas siguientes lo mandan para
+ * que el motor responda `stale_window` si el repositorio cambio entre medias,
+ * en vez de pegar filas de dos historiales. La primera pagina no lo lleva.
+ */
+snapshot?: string, };

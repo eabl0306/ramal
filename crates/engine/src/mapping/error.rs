@@ -18,6 +18,7 @@ pub fn engine_error(error: &EngineError) -> RpcError {
             (error_code::ENGINE_ERROR, ErrorKind::GitVersionUnsupported)
         }
         EngineError::InvalidWindow(_) => (error_code::INVALID_PARAMS, ErrorKind::InvalidParams),
+        EngineError::StaleWindow => (error_code::ENGINE_ERROR, ErrorKind::StaleWindow),
         EngineError::GitFailed { detail } => {
             tracing::warn!(%detail, "git command failed");
             return RpcError::new(

@@ -79,5 +79,5 @@ export function graphWindow(
   hasMore: boolean,
   laneCount = 1,
 ): GraphWindow {
-  return { repoId: 'repo-1', offset, rows: [...rows], hasMore, laneCount };
+  return { repoId: 'repo-1', offset, rows: [...rows], hasMore, laneCount, snapshot: 'snap-1' };
 }

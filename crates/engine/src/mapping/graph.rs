@@ -15,6 +15,7 @@ pub fn window_to_dto(repo_id: &RepoId, window: &GraphWindow) -> dto::GraphWindow
         rows: window.rows.iter().map(row_to_dto).collect(),
         has_more: window.has_more,
         lane_count: to_u32(window.lane_count),
+        snapshot: window.snapshot.clone(),
     }
 }
 

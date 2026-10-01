@@ -32,6 +32,7 @@ export const TWO_COMMITS: GraphWindow = {
   offset: 0,
   hasMore: false,
   laneCount: 1,
+  snapshot: 'e2e',
   rows: [
     {
       sha: 'b'.repeat(40),

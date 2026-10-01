@@ -96,6 +96,12 @@ impl FakeGitReader {
         self
     }
 
+    /// Cambia las refs de un lector ya compartido, como si alguien hiciera un
+    /// commit o un fetch entre dos llamadas.
+    pub fn set_refs(&self, refs: RefSnapshot) {
+        self.lock().refs = Ok(refs);
+    }
+
     /// Fija la respuesta de `read_log`. Se recorta a `max_count` como haria git.
     #[must_use]
     pub fn with_log(self, log: Result<Vec<CommitRecord>, GitReadError>) -> Self {

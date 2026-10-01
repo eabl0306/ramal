@@ -40,6 +40,11 @@ pub enum EngineError {
     /// La ventana del grafo pedida no es valida.
     #[error("invalid graph window: {0}")]
     InvalidWindow(#[from] WindowError),
+    /// Se pidio una pagina del grafo con la huella de unas refs que ya no son
+    /// las del repositorio: la interfaz tiene que volver a empezar desde la
+    /// fila 0 en vez de pegar paginas de dos historiales.
+    #[error("the graph changed since the first page was read")]
+    StaleWindow,
     /// git fallo. El detalle va solo al log; la interfaz recibe un tipo estable.
     #[error("git command failed: {detail}")]
     GitFailed {

@@ -69,6 +69,7 @@ fn a_window_in_the_middle_keeps_absolute_rows_and_says_there_is_more() {
     assert_eq!(window.lane_count, 1);
     assert_eq!(window.rows[0].commit.node.sha, sha(3));
     assert_eq!(window.rows[0].edges[0].parent_row, Some(3));
+    assert_eq!(window.snapshot, refs.fingerprint());
 }
 
 #[test]

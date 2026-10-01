@@ -3,6 +3,8 @@
 //! Se guardan con el nombre completo (`refs/heads/main`) porque es el unico que no
 //! es ambiguo: una rama local y un tag pueden llamarse igual.
 
+mod fingerprint;
+
 use std::collections::HashMap;
 
 use thiserror::Error;
