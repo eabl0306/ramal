@@ -111,6 +111,8 @@ impl<'ast> Visit<'ast> for Cognitive {
         self.if_chain(node, false);
     }
 
+    // La guarda de cada brazo (un Pat::Guard desde syn 3) se recorre con su
+    // patron, asi que paga el anidamiento del match igual que el cuerpo.
     fn visit_expr_match(&mut self, node: &'ast syn::ExprMatch) {
         self.structural();
         self.visit_expr(&node.expr);

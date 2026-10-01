@@ -11,7 +11,7 @@
 //!   funciones anidadas se miden aparte.
 
 use syn::visit::{self, Visit};
-use syn::{BinOp, Block, Expr, Item, Local};
+use syn::{BinOp, Block, Expr, Item, Local, Pat};
 
 /// La ciclomatica de un closure, medido aparte de la funcion que lo contiene.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -69,8 +69,16 @@ impl<'ast> Visit<'ast> for Cyclomatic {
         visit::visit_expr_binary(self, node);
     }
 
+    // Desde syn 3 la guarda de un brazo no es un campo del brazo: envuelve su
+    // patron en un Pat::Guard. syn solo lo crea en la raiz del patron de un brazo
+    // (nunca dentro de un `|` ni de un parentesis), asi que mirar esa raiz cuenta
+    // las mismas guardas que antes.
     fn visit_expr_match(&mut self, node: &'ast syn::ExprMatch) {
-        let guards = node.arms.iter().filter(|arm| arm.guard.is_some()).count();
+        let guards = node
+            .arms
+            .iter()
+            .filter(|arm| matches!(arm.pat, Pat::Guard(_)))
+            .count();
         self.add(node.arms.len().saturating_sub(1) + guards);
         visit::visit_expr_match(self, node);
     }
@@ -103,7 +111,8 @@ impl<'ast> Visit<'ast> for Cyclomatic {
 
     fn visit_expr_closure(&mut self, node: &'ast syn::ExprClosure) {
         let (cyclomatic, nested) = score_expr(&node.body);
-        let line = node.or1_token.span.start().line;
+        // La linea del primer `|`, aunque delante vayan `move`, `async` o `for<'a>`.
+        let line = node.inputs_begin.span.start().line;
         self.closures.push(ClosureScore { line, cyclomatic });
         self.closures.extend(nested);
     }
