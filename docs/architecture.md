@@ -1911,6 +1911,7 @@ sustituye y se enlaza desde el viejo.
 | [0016](adr/0016-actualizaciones-y-descargas.md)       | Actualizador de Tauri con artefactos en GitHub Releases y manifiesto servido por la API, con canales, despliegue gradual y retirada          |
 | [0017](adr/0017-internacionalizacion-compartida.md)   | Un solo paquete de textos con claves tipadas y plurales; regla de idioma comun y manifiesto de VS Code con `package.nls`                     |
 | [0018](adr/0018-cuentas-de-plataformas-git.md)        | Cuentas de plataformas con clientes OAuth publicos primero, broker solo para Bitbucket, PAT donde no hay OAuth y PRs pedidos desde el motor  |
+| [0021](adr/0021-licencia-fsl.md)                      | Todo el repositorio con la FSL 1.1 y Apache 2.0 como licencia futura (`FSL-1.1-ALv2`)                                                        |
 
 Pendientes de escribir, con su issue en el backlog (epica E02):
 

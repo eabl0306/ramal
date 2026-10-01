@@ -121,3 +121,9 @@ El detalle esta en el [ADR 0005](docs/adr/0005-enforcement-automatizado.md).
 - Cada app y cada paquete tiene su README: [apps/api](apps/api/README.md),
   [apps/web](apps/web/README.md), [apps/desktop](apps/desktop/README.md),
   [apps/vscode](apps/vscode/README.md), [crates](crates/README.md).
+
+## Licencia
+
+[FSL-1.1-ALv2](LICENSE.md): el codigo se puede leer, usar y modificar salvo para un producto que
+compita con Ramal, y cada version pasa a Apache 2.0 a los dos anos. El porque esta en el
+[ADR 0021](docs/adr/0021-licencia-fsl.md).
