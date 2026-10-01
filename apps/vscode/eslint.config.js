@@ -49,6 +49,18 @@ function external(type, source) {
   };
 }
 
+/**
+ * Solo los tipos de un paquete: `import type`, nunca su codigo. Con `external`
+ * la UI de un webview podia importar `createBridgeClient` y montar clientes por
+ * su cuenta sin que el lint dijera nada; escritorio ya lo cerraba asi.
+ */
+function typesOnly(type, source) {
+  return {
+    from: { element: { type }, file: { categories: 'source' } },
+    allow: { to: { module: { origin: 'external', source } }, dependency: { kind: 'type' } },
+  };
+}
+
 function core(type) {
   return {
     from: { element: { type }, file: { categories: 'source' } },
@@ -63,7 +75,7 @@ function core(type) {
  */
 const policies = [
   layer('shared', ['shared']),
-  external('shared', ['@ramal/bridge']),
+  typesOnly('shared', ['@ramal/bridge']),
   layer('ext-application', ['shared', 'ext-application']),
   external('ext-application', ['@ramal/i18n', '@ramal/bridge']),
   layer('ext-infrastructure', ['shared', 'ext-application', 'ext-infrastructure']),
@@ -81,8 +93,8 @@ const policies = [
     '@ramal/repo-view',
     '@ramal/i18n',
     '@ramal/domain',
-    '@ramal/bridge',
   ]),
+  typesOnly('web-ui', ['@ramal/bridge']),
   layer('web-app', ['shared', 'web-infrastructure', 'web-ui', 'web-app']),
   external('web-app', ['react', 'react-dom', 'react-dom/client', '@tanstack/react-query']),
   {
