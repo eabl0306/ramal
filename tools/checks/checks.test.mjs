@@ -54,7 +54,7 @@ describe('file-size', () => {
   it('ignora lo generado, los artefactos y lo que no es codigo fuente', () => {
     const big = 'const a = 1;\n'.repeat(500);
     const root = sandbox({
-      'packages/bridge/src/protocol/generated/Commit.ts': big,
+      'packages/bridge/src/generated/Commit.ts': big,
       'packages/api-client/src/generated/schema.ts': big,
       'apps/desktop/src-tauri/gen/schemas/desktop.ts': big,
       'apps/vscode/out/extension.js': big,

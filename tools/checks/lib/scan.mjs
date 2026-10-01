@@ -50,7 +50,6 @@ const EXCLUDED_PATTERNS = [
   /^docs\/design\/handoff\//u,
   // Lo que escriben los generadores: tipos del protocolo (ts-rs), cliente de la
   // API (OpenAPI) y los esquemas de Tauri. Se corrigen en el generador.
-  /(^|\/)src\/protocol\/generated\//u,
   /(^|\/)src\/generated\//u,
   /(^|\/)src-tauri\/gen\//u,
 ];

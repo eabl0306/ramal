@@ -16,7 +16,7 @@
     "packages/ui": {},
     "packages/repo-view": {},
     "packages/bridge": {
-      "ignore": ["src/protocol/generated/**"]
+      "ignore": ["src/generated/**"]
     },
     "packages/api-client": {
       "ignore": ["src/generated/**"]

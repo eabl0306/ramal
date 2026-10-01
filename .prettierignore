@@ -20,9 +20,9 @@ test-results/
 
 # Codigo generado. Lo reescribe su generador y prettier solo meteria ruido en el
 # diff que vigila `just protocol-check`.
-packages/bridge/src/protocol/generated/
+packages/bridge/src/generated/
 packages/api-client/src/generated/
-packages/api-client/openapi.json
+apps/api/openapi.json
 apps/desktop/src-tauri/gen/
 
 # Los lockfiles y el workspace los escriben cargo y pnpm por su cuenta: que no

@@ -42,7 +42,7 @@ api_crates := "-p ramal-api-domain -p ramal-api-application -p ramal-api-infrast
 engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protocol -p ramal-git -p ramal-engine -p ramal-vscode-engine"
 # Paquetes de TypeScript compartidos, para pasarlos a pnpm.
 ts_packages := "--filter @ramal/domain --filter @ramal/i18n --filter @ramal/ui --filter @ramal/repo-view --filter @ramal/bridge --filter @ramal/api-client"
-protocol_out := "packages/bridge/src/protocol/generated"
+protocol_out := "packages/bridge/src/generated"
 
 # Lista todas las recetas.
 default:
@@ -230,11 +230,18 @@ api-docker:
     docker build -f apps/api/Dockerfile -t ramal-api:local .
 
 # Contrato del binario: con `--openapi <ruta>` escribe el documento y sale sin
-# tocar la base de datos. packages/api-client genera su cliente a partir de el.
+# tocar la base de datos. Se versiona y @ramal/api-client genera su cliente de el.
 [group('api')]
-[doc('Escribe el documento OpenAPI de la API en packages/api-client/openapi.json.')]
+[doc('Escribe el documento OpenAPI de la API en apps/api/openapi.json.')]
 api-openapi:
-    cargo run --quiet --bin ramal-api -- --openapi packages/api-client/openapi.json
+    cargo run --quiet --bin ramal-api -- --openapi apps/api/openapi.json
+
+# El cliente de la web se genera desde el documento versionado, nunca desde la
+# API en marcha: asi la CI puede comprobar que no hay diff sin levantar nada.
+[group('api')]
+[doc('Regenera los tipos de @ramal/api-client desde apps/api/openapi.json.')]
+api-client:
+    {{pnpm_filter}} @ramal/api-client generate
 
 # ------------------------------------------------------------------ engine ---
 

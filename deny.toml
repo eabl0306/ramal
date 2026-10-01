@@ -57,6 +57,10 @@ deny = [
   { name = "actix-web" },
   { name = "axum" },
   { name = "rocket" },
+  # El motor usa la CLI de git y nunca libgit2 (ADR 0009). Vetarlos aqui impide
+  # que entren por la puerta de atras como dependencia transitiva.
+  { name = "git2" },
+  { name = "libgit2-sys" },
 ]
 skip = []
 
