@@ -1,0 +1,86 @@
+/*
+ * Pildoras de refs: borde del color de la rama (o del tono de aviso en un tag) y
+ * fondo del mismo color al 14% (32% la rama de HEAD), como el prototipo. El
+ * tinte va en un ::before con opacidad porque fuera de los temas no se pueden
+ * escribir funciones de color: el color llega en --rv-ref-color desde un token.
+ */
+.refs {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+  padding-left: 12px;
+  overflow: hidden;
+}
+
+.ref {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 1;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+  max-width: 150px;
+  height: 22px;
+  padding: 0 7px;
+  border: 1px solid var(--rv-ref-color);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  isolation: isolate;
+}
+
+.ref::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--rv-ref-color);
+  content: '';
+  opacity: 0.14;
+}
+
+.ref[data-head='true']::before {
+  opacity: 0.32;
+}
+
+.ref-icon {
+  flex-shrink: 0;
+}
+
+.ref-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.more {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--r-surface-hover);
+  color: var(--r-muted);
+  font-size: 11px;
+}
+
+/* VS Code: pildoras de 18 px con esquinas de 3 px. */
+[data-density='compact'] .refs {
+  gap: 3px;
+  padding-left: 10px;
+}
+
+[data-density='compact'] .ref {
+  gap: 3px;
+  max-width: 110px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 3px;
+}
+
+[data-density='compact'] .more {
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 3px;
+}
