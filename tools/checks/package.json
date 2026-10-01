@@ -9,7 +9,9 @@
     "check-focused-tests": "./no-focused-tests.mjs",
     "check-todos": "./todo-without-ticket.mjs",
     "check-package-graph": "./package-graph.mjs",
-    "check-limit-suppressions": "./no-limit-suppressions.mjs"
+    "check-limit-suppressions": "./no-limit-suppressions.mjs",
+    "check-cargo-lints": "./cargo-lints.mjs",
+    "check-eslint-configs": "./eslint-configs.mjs"
   },
   "scripts": {
     "test": "node --test \"*.test.mjs\""

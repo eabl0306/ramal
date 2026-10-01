@@ -41,7 +41,7 @@ jobs:
       - name: Formato (prettier)
         run: pnpm run format:check
 
-      - name: Reglas comunes (tamano, tests enfocados, marcadores, grafo de paquetes, limites apagados)
+      - name: Reglas comunes (tamano, tests, marcadores, grafo, limites apagados, lints de cargo, eslint)
         run: pnpm run check:quality
 
       # ESLint de la raiz: packages/eslint-config y tools/, que son JavaScript

@@ -70,6 +70,18 @@ pre-commit:
           - name: limit-suppressions
             run: node tools/checks/no-limit-suppressions.mjs --staged
 
+          # Un crate que no hereda [workspace.lints] o un clippy.toml que no
+          # repite los umbrales dejan a clippy sin limites y en verde.
+          - name: cargo-lints
+            glob: '{Cargo.toml,**/Cargo.toml,clippy.toml,**/clippy.toml,.cargo/*}'
+            run: node tools/checks/cargo-lints.mjs
+
+          # Un paquete con TypeScript y sin eslint.config.js propio no lo linta
+          # nadie: la configuracion de la raiz ignora apps/ y packages/.
+          - name: eslint-configs
+            glob: '{*.ts,*.tsx,*.mts,*.cts,**/eslint.config.*,**/package.json,pnpm-workspace.yaml}'
+            run: node tools/checks/eslint-configs.mjs
+
           # El grafo de paquetes solo cambia cuando cambia un package.json.
           - name: package-graph
             glob: '{package.json,**/package.json,pnpm-workspace.yaml}'
