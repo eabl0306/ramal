@@ -13,7 +13,8 @@ falta esta en [docs/backlog.md](docs/backlog.md).
 
 Necesitas: Node 24 con corepack, Rust con rustup (`rust-toolchain.toml` fija 1.98.1 y rustup lo
 instala solo), Docker y [just](https://just.systems). Para la cobertura y la auditoria,
-`cargo install cargo-llvm-cov cargo-deny`.
+`cargo install cargo-llvm-cov cargo-deny`. Reserva unos 15 GB de disco: el `target/` de Rust
+de un `just check` completo ronda los 12 GB.
 
 pnpm va siempre por corepack y tiene que ser el 11. Si tienes otro pnpm global, quitalo:
 
