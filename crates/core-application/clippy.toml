@@ -1,6 +1,6 @@
 # Clippy usa el clippy.toml mas cercano al crate y no lo fusiona con el de la
-# raiz, asi que los umbrales comunes se repiten aqui. El test de arquitectura de
-# ramal-engine (crates/engine/tests/architecture.rs) falla si dejan de coincidir.
+# raiz, asi que los umbrales comunes se repiten aqui. El test de pureza de
+# ramal-engine (crates/engine/tests/core_purity.rs) falla si dejan de coincidir.
 cognitive-complexity-threshold = 15
 too-many-arguments-threshold = 5
 too-many-lines-threshold = 50
@@ -12,21 +12,76 @@ avoid-breaking-exported-api = false
 # la hora de pared. Prohibir tokio en Cargo.toml no basta: todo esto esta en la
 # biblioteca estandar. La hora llega por el puerto Clock; Instant::now si se
 # permite porque medir una latencia no es leer la hora.
+#
+# La lista cubre cada puerta de entrada, no solo la mas comun: con solo
+# fs::read y File, un OpenOptions, un fs::read_dir o un path.exists() pasaban
+# clippy limpios. Los metodos de Path cuentan porque las rutas ya circulan por
+# el nucleo. Los tests de arquitectura comprueban que la lista sigue entera, la
+# misma en los cuatro nucleos.
 disallowed-types = [
   { path = "std::process::Command", reason = "the core never spawns processes; use a port" },
   { path = "std::fs::File", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::OpenOptions", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::DirBuilder", reason = "the core never touches the file system; use a port" },
   { path = "std::net::TcpStream", reason = "the core never opens sockets; use a port" },
   { path = "std::net::TcpListener", reason = "the core never opens sockets; use a port" },
   { path = "std::net::UdpSocket", reason = "the core never opens sockets; use a port" },
+  { path = "std::net::ToSocketAddrs", reason = "the core never resolves names; use a port" },
+  { path = "std::os::unix::net::UnixStream", reason = "the core never opens sockets; use a port", allow-invalid = true },
+  { path = "std::os::unix::net::UnixListener", reason = "the core never opens sockets; use a port", allow-invalid = true },
+  { path = "std::os::unix::net::UnixDatagram", reason = "the core never opens sockets; use a port", allow-invalid = true },
+  { path = "std::time::SystemTime", reason = "wall-clock time comes through the Clock port" },
+  { path = "std::thread::Builder", reason = "the host runtime owns threads" },
 ]
 disallowed-methods = [
   { path = "std::process::Command::new", reason = "the core never spawns processes; use a port" },
+  { path = "std::process::exit", reason = "the host decides when the process ends" },
+  { path = "std::process::abort", reason = "the host decides when the process ends" },
   { path = "std::fs::read", reason = "the core never touches the file system; use a port" },
   { path = "std::fs::read_to_string", reason = "the core never touches the file system; use a port" },
   { path = "std::fs::write", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::canonicalize", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::copy", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::create_dir", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::create_dir_all", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::exists", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::hard_link", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::metadata", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::read_dir", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::read_link", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::remove_dir", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::remove_dir_all", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::remove_file", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::rename", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::set_permissions", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::symlink_metadata", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::canonicalize", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::exists", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::try_exists", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::is_dir", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::is_file", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::is_symlink", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::metadata", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::symlink_metadata", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::read_dir", reason = "the core never touches the file system; use a port" },
+  { path = "std::path::Path::read_link", reason = "the core never touches the file system; use a port" },
   { path = "std::env::var", reason = "configuration reaches the core as values, never from the environment" },
   { path = "std::env::var_os", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::vars", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::vars_os", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::args", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::args_os", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::current_dir", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::current_exe", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::home_dir", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::temp_dir", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::set_current_dir", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::net::ToSocketAddrs::to_socket_addrs", reason = "the core never resolves names; use a port" },
+  { path = "std::io::stdin", reason = "the core never does IO; use a port" },
+  { path = "std::io::stdout", reason = "the core never does IO; use a port" },
+  { path = "std::io::stderr", reason = "the core never does IO; use a port" },
   { path = "std::time::SystemTime::now", reason = "wall-clock time comes through the Clock port" },
+  { path = "std::time::SystemTime::elapsed", reason = "wall-clock time comes through the Clock port" },
   { path = "std::thread::spawn", reason = "the host runtime owns threads" },
   { path = "std::thread::sleep", reason = "the host runtime owns time; never block the core" },
 ]

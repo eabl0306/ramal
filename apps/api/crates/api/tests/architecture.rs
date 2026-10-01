@@ -228,6 +228,21 @@ fn core_clippy_files_repeat_the_root_thresholds_and_forbid_io() {
 }
 
 #[test]
+fn a_commented_or_misplaced_clippy_entry_forbids_nothing() {
+    let text = r#"
+disallowed-types = [
+  { path = "std::env::var", reason = "x" },
+]
+disallowed-methods = [
+  # { path = "std::env::var", reason = "x" },
+  { path = "std::fs::read", reason = "x" }, # { path = "std::fs::write" }
+]
+"#;
+    let methods = support::clippy::declared_paths(text, "disallowed-methods");
+    assert_eq!(methods, BTreeSet::from(["std::fs::read".to_owned()]));
+}
+
+#[test]
 fn the_parser_reads_names_versions_and_nested_edges() {
     let lock = r#"
 version = 4
