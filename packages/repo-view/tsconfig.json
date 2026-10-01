@@ -1,0 +1,7 @@
+// Solucion del paquete: el codigo (tsconfig.lib.json) y los tests
+// (tsconfig.test.json). Escritorio y los webviews de VS Code referencian
+// tsconfig.lib.json.
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.lib.json" }, { "path": "./tsconfig.test.json" }]
+}
