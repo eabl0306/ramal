@@ -1,0 +1,15 @@
+// Tests y configuracion de Vitest: ven Node y referencian el codigo en vez de
+// incluirlo, asi cada fichero de src se comprueba una vez y con sus reglas.
+{
+  "extends": "@ramal/tsconfig/node.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/test",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/test.tsbuildinfo"
+  },
+  "references": [{ "path": "./tsconfig.lib.json" }],
+  "include": ["src/**/*.test.ts", "vitest.config.ts"]
+}
