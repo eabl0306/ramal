@@ -45,6 +45,8 @@ engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protoc
 # Los tests.rs y tests/ ya los deja fuera cargo-llvm-cov por defecto.
 cov_ignore := "--ignore-filename-regex '/src/testing/'"
 # Carpetas de los paquetes de TypeScript compartidos; cada una es @ramal/<carpeta>.
+# Tiene que nombrar todos los de packages/ salvo la configuracion (eslint-config,
+# tsconfig): tools/checks/package-graph.mjs falla si sobra o falta alguno.
 ts_package_dirs := "domain i18n ui repo-view bridge api-client"
 protocol_out := "packages/bridge/src/generated"
 # Imagen con los requisitos de Tauri en Linux (tools/docker/tauri-linux.Dockerfile).
@@ -132,7 +134,8 @@ build: api-build web-build desktop-web-build vscode-build
 
 # Los scripts de tools/checks: tamano de fichero, tests apagados, marcadores sin
 # ticket, grafo de paquetes, limites apagados en linea, lints heredados por cada
-# crate, eslint.config.js por paquete y tests de Rust fuera de linea.
+# crate, eslint.config.js por paquete, tests de Rust fuera de linea y versiones
+# de los Dockerfile.
 [group('monorepo')]
 [doc('Reglas comunes a todos los lenguajes (tools/checks).')]
 guard:
@@ -369,12 +372,11 @@ packages-cov: (_packages-run "test:coverage")
 i18n-gen:
     {{pnpm_filter}} @ramal/i18n generate
 
-# Los paquetes compartidos llegan de varias ramas (bridge, repo-view y
-# api-client los montan otros), asi que una carpeta que todavia no existe se
-# salta con un aviso en vez de fallar. Lo que no se esconde: un paquete que
-# existe tiene que llamarse @ramal/<carpeta> y declarar el script del contrato
-# (si no, pnpm lo saltaria en silencio), y cualquier fallo de su script pone la
-# receta en rojo. Sin ningun paquete, falla.
+# Nada se salta en silencio: una carpeta de la lista que no existe (un paquete
+# renombrado o borrado) falla, cada paquete tiene que llamarse @ramal/<carpeta>
+# y declarar el script del contrato (si no, pnpm lo saltaria sin avisar), y
+# cualquier fallo de su script pone la receta en rojo. Que la lista no se deje
+# ningun paquete lo vigila tools/checks/package-graph.mjs.
 [private]
 _packages-run script:
     #!/usr/bin/env bash
@@ -383,8 +385,8 @@ _packages-run script:
     for dir in {{ts_package_dirs}}; do
       manifest="packages/${dir}/package.json"
       if [ ! -f "${manifest}" ]; then
-        echo "packages: packages/${dir} todavia no existe, se salta" >&2
-        continue
+        echo "packages: packages/${dir} esta en ts_package_dirs pero no existe" >&2
+        exit 1
       fi
       info="$(node -p "const p = require('./${manifest}'); [p.name, Boolean(p.scripts && p.scripts['{{script}}'])].join(' ')")"
       if [ "${info}" != "@ramal/${dir} true" ]; then
@@ -536,15 +538,16 @@ desktop-build:
 
 # El binario del E2E se compila con la feature `e2e`, que mete el servidor
 # WebDriver embebido y deja elegir la carpeta por variable de entorno (el dialogo
-# del sistema no se puede manejar con WebDriver). Sin DISPLAY (CI, SSH, Docker)
-# se arranca un servidor X virtual con xvfb-run.
+# del sistema no se puede manejar con WebDriver). En Linux sin DISPLAY (CI, SSH,
+# Docker) se arranca un servidor X virtual con xvfb-run. En macOS y Windows no
+# hay X ni xvfb-run: la app abre su ventana sin mas.
 [group('desktop')]
-[doc('E2E nativos con WebdriverIO y la app real. Necesita webkit2gtk.')]
+[doc('E2E nativos con WebdriverIO y la app real. En Linux necesita webkit2gtk.')]
 desktop-e2e-native:
     #!/usr/bin/env bash
     set -euo pipefail
     {{pnpm_filter}} @ramal/desktop exec tauri build --debug --no-bundle --features e2e
-    if [ -n "${DISPLAY:-}" ]; then
+    if [ "$(uname -s)" != Linux ] || [ -n "${DISPLAY:-}" ]; then
       {{pnpm_filter}} @ramal/desktop e2e:native
     else
       xvfb-run -a {{pnpm_filter}} @ramal/desktop e2e:native
@@ -625,14 +628,15 @@ vscode-build:
 vscode-e2e:
     {{pnpm_filter}} ramal e2e
 
-# Sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run. Necesita
-# el sidecar compilado (lo ejecuta de verdad) y el build de la extension.
+# En Linux sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run;
+# en macOS y Windows VS Code abre su ventana sin mas. Necesita el sidecar
+# compilado (lo ejecuta de verdad) y el build de la extension.
 [group('vscode')]
 [doc('Tests de integracion dentro de un VS Code de verdad (@vscode/test-cli).')]
 vscode-test-integration: vscode-engine-build vscode-build
     #!/usr/bin/env bash
     set -euo pipefail
-    if [ -n "${DISPLAY:-}" ]; then
+    if [ "$(uname -s)" != Linux ] || [ -n "${DISPLAY:-}" ]; then
       {{pnpm_filter}} ramal test:integration
     else
       xvfb-run -a {{pnpm_filter}} ramal test:integration
@@ -691,14 +695,22 @@ ps:
 smoke url="":
     bash tools/scripts/smoke-stack.sh {{ if url == "" { "http://127.0.0.1:${GATEWAY_PORT:-8090}" } else { url } }}
 
-# Levanta la pila completa, le pasa la prueba de humo y la tumba.
+# Corre en su propio proyecto de compose (ramal-smoke) y con puertos que elige
+# Docker (el 0), asi que no toca la pila de desarrollo: ni sus contenedores, ni
+# sus puertos, ni sus volumenes. Antes compartia el proyecto `ramal`, y su
+# `down -v` borraba la base local y la cache de cargo de la API en cada
+# `just ci`. El entorno del shell gana a .env y al `name:` de compose.yaml.
 [group('docker')]
+[doc('Levanta una pila completa aparte, le pasa la prueba de humo y la tumba.')]
 stack-smoke:
     #!/usr/bin/env bash
     set -euo pipefail
+    export COMPOSE_PROJECT_NAME=ramal-smoke RAMAL_BIND_IP=127.0.0.1
+    export POSTGRES_PORT=0 API_PORT=0 WEB_PORT=0 GATEWAY_PORT=0
+    export MAILPIT_WEB_PORT=0 MAILPIT_SMTP_PORT=0
     trap '{{compose_full}} down -v >/dev/null 2>&1 || true' EXIT
     {{compose_full}} up -d --build --wait
-    bash tools/scripts/smoke-stack.sh "http://127.0.0.1:${GATEWAY_PORT:-8090}"
+    bash tools/scripts/smoke-stack.sh "http://$({{compose_full}} port gateway 8080)"
 
 # Levanta solo Postgres y espera a que responda.
 [group('docker')]

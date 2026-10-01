@@ -36,7 +36,7 @@ fn falls_back_to_defaults_when_the_environment_is_empty() {
 fn reads_nested_keys_from_double_underscore_variables() {
     Jail::expect_with(|jail| {
         jail.clear_env();
-        jail.set_env("RAMAL__SERVER__HOST", "127.0.0.1");
+        jail.set_env("RAMAL__SERVER__HOST", "0.0.0.0");
         jail.set_env("RAMAL__SERVER__PORT", "9090");
         jail.set_env("RAMAL__DATABASE__URL", "postgres://u:p@db:5432/x");
         jail.set_env("RAMAL__DATABASE__MAX_CONNECTIONS", "9");
@@ -49,7 +49,7 @@ fn reads_nested_keys_from_double_underscore_variables() {
         assert_eq!(config.telemetry.log_level, "debug");
         assert_eq!(
             config.socket_addr().expect("address should resolve"),
-            "127.0.0.1:9090".parse().expect("literal is valid")
+            "0.0.0.0:9090".parse().expect("literal is valid")
         );
         Ok(())
     });

@@ -16,7 +16,7 @@ env:
 jobs:
   verify:
     name: formato, clippy y dependencias
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -25,7 +25,11 @@ jobs:
       - name: Instalar el toolchain de rust-toolchain.toml
         run: rustup toolchain install
 
+      # Clave propia, como el resto de caches de Rust: hoy su entorno ya la
+      # separa de api.yml y engine.yml, pero no deberia depender de eso.
       - uses: Swatinem/rust-cache@v2
+        with:
+          key: rust-lint
 
       - uses: taiki-e/install-action@v2
         with:

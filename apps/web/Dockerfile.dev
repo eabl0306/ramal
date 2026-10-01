@@ -36,5 +36,8 @@ COPY packages/ packages/
 COPY apps/web/ apps/web/
 
 EXPOSE 5173
-# vite.config.ts ya escucha en 0.0.0.0 y en el 5173.
+# Fuera del contenedor vite.config.ts escucha solo en 127.0.0.1. Aqui tiene que
+# ser 0.0.0.0: el gateway entra por la red de Docker (web:5173) y, sin esto, la
+# pila entera se queda sin web.
+ENV VITE_DEV_HOST=0.0.0.0
 CMD ["pnpm", "--filter", "@ramal/web", "dev"]

@@ -20,7 +20,7 @@ env:
 jobs:
   checks:
     name: lint, tipos, cobertura y build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -55,7 +55,7 @@ jobs:
 
   e2e:
     name: Playwright del webview
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -92,7 +92,7 @@ jobs:
 
   integration:
     name: integracion bajo xvfb y VSIX
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -120,7 +120,7 @@ jobs:
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
 
-      # La imagen de ubuntu-latest trae xvfb; si algun dia no, se instala.
+      # La imagen de ubuntu-24.04 trae xvfb; si algun dia no, se instala.
       - name: Comprobar xvfb
         run: command -v xvfb-run || (sudo apt-get update && sudo apt-get install -y xvfb)
 

@@ -9,6 +9,13 @@ const DEV_PORT = 5173;
  * mismos prefijos que enruta docker/gateway.dev.conf.
  */
 const API_TARGET = process.env['VITE_DEV_API_TARGET'] ?? 'http://127.0.0.1:8080';
+
+/**
+ * Solo esta maquina por defecto: `host: true` abria el servidor de desarrollo a
+ * toda la red local. El contenedor de compose pone VITE_DEV_HOST=0.0.0.0
+ * (Dockerfile.dev), porque el gateway le llega por la red de Docker.
+ */
+const DEV_HOST = process.env['VITE_DEV_HOST'] ?? '127.0.0.1';
 const API_PREFIXES = ['/v1', '/health', '/openapi.json'];
 
 const devProxy = Object.fromEntries(
@@ -33,7 +40,7 @@ export default defineConfig({
   plugins: [reactRouter()],
   optimizeDeps: { include: PREBUNDLED },
   server: {
-    host: true,
+    host: DEV_HOST,
     port: DEV_PORT,
     strictPort: true,
     proxy: devProxy,

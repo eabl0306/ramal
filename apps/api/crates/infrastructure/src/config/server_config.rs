@@ -10,7 +10,9 @@ use super::app_config::ConfigError;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct ServerConfig {
-    /// IP de escucha. `0.0.0.0` dentro de un contenedor.
+    /// IP de escucha. Por defecto solo loopback: `just api-run` en una red
+    /// compartida no tiene por que abrir la API a toda la red. Los
+    /// contenedores ponen `0.0.0.0` por entorno (compose.yaml y los Dockerfile).
     pub host: String,
     /// Puerto de escucha.
     pub port: u16,
@@ -19,7 +21,7 @@ pub struct ServerConfig {
 impl Default for ServerConfig {
     fn default() -> Self {
         Self {
-            host: "0.0.0.0".to_owned(),
+            host: "127.0.0.1".to_owned(),
             port: 8080,
         }
     }

@@ -91,10 +91,17 @@ pre-commit:
             glob: '{*.ts,*.tsx,*.mts,*.cts,**/eslint.config.*,**/package.json,pnpm-workspace.yaml}'
             run: node tools/checks/eslint-configs.mjs
 
-          # El grafo de paquetes solo cambia cuando cambia un package.json.
+          # El grafo de paquetes solo cambia cuando cambia un package.json, o la
+          # lista de paquetes de just packages-check en el justfile.
           - name: package-graph
-            glob: '{package.json,**/package.json,pnpm-workspace.yaml}'
+            glob: '{package.json,**/package.json,pnpm-workspace.yaml,justfile}'
             run: node tools/checks/package-graph.mjs
+
+          # Las versiones que los Dockerfile repiten en un ARG van a la par con
+          # rust-toolchain.toml, .nvmrc y el packageManager de package.json.
+          - name: toolchain-versions
+            glob: '{rust-toolchain.toml,.nvmrc,package.json,**/Dockerfile*,**/*.Dockerfile}'
+            run: node tools/checks/toolchain-versions.mjs
 
           # Secretos, .env y ficheros enormes.
           - name: scan-staged

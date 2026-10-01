@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { report, run } from './lib/cli.mjs';
 import { workspaceGlobs, workspacePackages } from './lib/workspace.mjs';
 
@@ -18,7 +21,8 @@ import { workspaceGlobs, workspacePackages } from './lib/workspace.mjs';
  * transporte concreto lo pone cada app.
  *
  * Anadir un paquete nuevo es anadir una linea aqui: un paquete que no esta en la
- * matriz hace fallar la comprobacion.
+ * matriz hace fallar la comprobacion. Si es un paquete compartido de packages/,
+ * tambien va en `ts_package_dirs` del justfile (ver packageListProblems).
  */
 export const MATRIX = {
   '@ramal/domain': { dir: 'packages/domain', allowed: [], pure: true },
@@ -118,6 +122,47 @@ function duplicateNames(packages) {
   return problems;
 }
 
+const PACKAGE_DIRS_VAR = /^ts_package_dirs\s*:=\s*"([^"]*)"/mu;
+
+/** Las carpetas de `ts_package_dirs` en el justfile, o null si no hay lista. */
+function listedPackageDirs(root) {
+  const file = path.join(root, 'justfile');
+  if (!existsSync(file)) return null;
+  const match = PACKAGE_DIRS_VAR.exec(readFileSync(file, 'utf8'));
+  return match === null ? null : (match[1] ?? '').split(/\s+/u).filter((dir) => dir !== '');
+}
+
+/**
+ * `just packages-check` (lo unico que corre packages.yml) recorre solo las
+ * carpetas de `ts_package_dirs`. Un paquete compartido que no este en esa lista
+ * se queda sin lint, tipos ni cobertura en la CI, y la CI sigue en verde. Por
+ * eso la lista tiene que coincidir con los paquetes de packages/ que no son
+ * configuracion: ni uno de mas (renombrado o borrado) ni uno de menos.
+ */
+function packageListProblems(root, packages) {
+  const shared = packages.filter(
+    (pkg) => pkg.dir.startsWith('packages/') && !CONFIG_PACKAGES.has(pkg.name),
+  );
+  if (shared.length === 0) return [];
+  const listed = listedPackageDirs(root);
+  if (listed === null) {
+    const message = 'falta ts_package_dirs: sin esa lista just packages-check no comprueba nada';
+    return [{ file: 'justfile', message }];
+  }
+  const dirs = new Set(shared.map((pkg) => path.posix.basename(pkg.dir)));
+  const problems = shared
+    .filter((pkg) => !listed.includes(path.posix.basename(pkg.dir)))
+    .map((pkg) => ({
+      file: `${pkg.dir}/package.json`,
+      message: 'no esta en ts_package_dirs del justfile: just packages-check no lo comprobaria',
+    }));
+  for (const dir of listed.filter((name) => !dirs.has(name))) {
+    const message = `ts_package_dirs nombra packages/${dir}, que no es un paquete compartido`;
+    problems.push({ file: 'justfile', message });
+  }
+  return problems;
+}
+
 export function checkPackageGraph({ root }) {
   const globs = workspaceGlobs(root);
   if (globs === null) {
@@ -133,6 +178,7 @@ export function checkPackageGraph({ root }) {
     const all = rule === null ? problems : [...problems, ...dependencyProblems(pkg, rule)];
     for (const message of all) violations.push({ file: `${pkg.dir}/package.json`, message });
   }
+  violations.push(...packageListProblems(root, packages));
   return { scanned: packages.length, violations };
 }
 

@@ -8,11 +8,11 @@
 use super::{ConfigError, ServerConfig};
 
 #[test]
-fn the_default_listens_on_every_interface() {
+fn the_default_listens_only_on_loopback() {
     let address = ServerConfig::default()
         .socket_addr()
         .expect("the default should resolve");
-    assert_eq!(address.to_string(), "0.0.0.0:8080");
+    assert_eq!(address.to_string(), "127.0.0.1:8080");
 }
 
 #[test]

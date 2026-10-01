@@ -6,6 +6,12 @@
 # quality, rust, api, engine, packages, web, desktop, vscode y stack. Un job
 # que no toca porque su parte no cambio sale como "skipped", y all-green lo
 # cuenta como verde.
+#
+# Todos los runners llevan la version de Ubuntu fijada (ubuntu-24.04), nunca
+# ubuntu-latest: latest salta de version solo (a Ubuntu 26 el 2026-10-19) y
+# cambia de golpe paquetes, glibc y herramientas sin que nadie toque el repo.
+# La excepcion es el host de Tauri en desktop.yml, en ubuntu-22.04 a proposito.
+# Subir de version es un PR con su CI en verde.
 name: ci
 
 on:
@@ -26,7 +32,7 @@ concurrency:
 jobs:
   changes:
     name: que ha cambiado
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pull-requests: read
@@ -41,9 +47,13 @@ jobs:
       stack: ${{ steps.filter.outputs.stack }}
     steps:
       - uses: actions/checkout@v7
-      # Los anclajes (&cargo, &node) son las piezas comunes: el workspace de
-      # Cargo afecta a todo lo que es Rust, y el de pnpm a todo lo que es
-      # TypeScript. Cambiar ci.yml lo ejecuta todo.
+      # Los anclajes son las piezas comunes. &cargo: el workspace de Cargo y su
+      # entorno (.cargo/) afectan a todo lo que es Rust. &node: el workspace de
+      # pnpm y la version de Node (.nvmrc) afectan a todo lo que es TypeScript.
+      # &recipes: el justfile define los gates de todos los workflows que
+      # corren `just <receta>`; sin el, un PR que solo baja un umbral o rompe
+      # una receta saldria en verde con esos jobs saltados. Cambiar ci.yml lo
+      # ejecuta todo.
       - uses: dorny/paths-filter@v4
         id: filter
         with:
@@ -55,15 +65,22 @@ jobs:
               - 'clippy.toml'
               - 'rustfmt.toml'
               - 'deny.toml'
+              - '.cargo/**'
               - '.github/workflows/ci.yml'
             node: &node
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
+              - '.nvmrc'
               - 'packages/**'
               - '.github/workflows/ci.yml'
+            recipes: &recipes
+              - 'justfile'
+              - '.github/workflows/ci.yml'
+            # rust.yml corre la complejidad con `just rust-complexity`.
             rust:
               - *cargo
+              - *recipes
               - 'crates/**'
               - 'apps/api/**'
               - 'apps/vscode-engine/**'
@@ -72,19 +89,25 @@ jobs:
               - '.github/workflows/rust.yml'
             api:
               - *cargo
+              - *recipes
               - 'apps/api/**'
               - '.github/workflows/api.yml'
+            # El job del puente instala Node con .nvmrc.
             engine:
               - *cargo
+              - *recipes
+              - '.nvmrc'
               - 'crates/**'
               - 'apps/vscode-engine/**'
               - 'packages/bridge/**'
               - '.github/workflows/engine.yml'
             packages:
               - *node
+              - *recipes
               - '.github/workflows/packages.yml'
             web:
               - *node
+              - *recipes
               - 'apps/web/**'
               # El contrato de la API: @ramal/api-client se genera de el y la web
               # comprueba que el cliente commiteado sigue al dia.
@@ -93,22 +116,24 @@ jobs:
             desktop:
               - *cargo
               - *node
+              - *recipes
               - 'crates/**'
               - 'apps/desktop/**'
               - '.github/workflows/desktop.yml'
             vscode:
               - *cargo
               - *node
+              - *recipes
               - 'crates/**'
               - 'apps/vscode/**'
               - 'apps/vscode-engine/**'
               - '.github/workflows/vscode.yml'
             stack:
+              - *recipes
               - 'compose.yaml'
               - 'docker/**'
               - 'tools/scripts/smoke-stack.sh'
               - '.github/workflows/stack.yml'
-              - '.github/workflows/ci.yml'
 
   quality:
     name: calidad
@@ -196,7 +221,7 @@ jobs:
     # la proteccion de rama es lo mismo que no haber pasado.
     if: always()
     needs: [changes, quality, rust, api, engine, packages, web, desktop, vscode, stack]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Comprobar que nada ha fallado
         run: |

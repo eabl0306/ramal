@@ -21,7 +21,7 @@ env:
 jobs:
   verify:
     name: lint, tipos, cobertura y build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -59,7 +59,7 @@ jobs:
 
   e2e:
     name: e2e con la red simulada
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -104,7 +104,7 @@ jobs:
 
   image:
     name: imagen docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 

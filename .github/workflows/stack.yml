@@ -21,7 +21,7 @@ env:
 jobs:
   smoke:
     name: prueba de humo y e2e por el gateway
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # La primera compilacion de la API dentro de su contenedor tarda varios minutos.
     timeout-minutes: 40
     steps:

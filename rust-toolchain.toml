@@ -2,7 +2,8 @@
 # "stable", para que la maquina de desarrollo, la CI y las imagenes compilen con
 # el mismo rustc: un clippy nuevo trae lints nuevos y rompe la CI sin que nadie
 # haya tocado el codigo. Se sube a mano (o con dependabot) y junto con el
-# ARG RUST_VERSION de los Dockerfile.
+# ARG RUST_VERSION de los Dockerfile: tools/checks/toolchain-versions.mjs falla
+# si no van a la par.
 [toolchain]
 channel = "1.98.1"
 components = ["rustfmt", "clippy", "llvm-tools-preview"]
