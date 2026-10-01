@@ -2,9 +2,24 @@ import { describe, expect, it } from 'vitest';
 
 import { DELETED_FILE, I18N_FILE, LABELS, SESSION_FILE } from '../test/conflict-fixtures';
 
-import { buildOutput, hunkMarkerText } from './build-output';
+import { type ConflictOutput, buildOutput, hunkMarkerText } from './build-output';
 import { resolveEmpty, takeAll, toggleBlock, toggleLine } from './choices';
-import { initResolution } from './model';
+import { type ConflictFile, initResolution } from './model';
+
+/** Un fichero con un solo bloque entre dos lineas de contexto, resuelto tomando A y B enteros. */
+function bothBlocks(ours: readonly string[], theirs: readonly string[]): ConflictOutput {
+  const file: ConflictFile = {
+    path: 'ejemplo.txt',
+    segments: [
+      { kind: 'context', lines: ['<antes>'] },
+      { kind: 'hunk', ours, theirs },
+      { kind: 'context', lines: ['<despues>'] },
+    ],
+  };
+  let resolution = toggleBlock(file, initResolution(file), 0, 'ours');
+  resolution = toggleBlock(file, resolution, 0, 'theirs');
+  return buildOutput(file, resolution, LABELS);
+}
 
 describe('buildOutput', () => {
   it('sin elecciones deja los marcadores en el texto y un hueco sin numero', () => {
@@ -71,16 +86,32 @@ describe('buildOutput', () => {
     expect(lines).not.toContain('    refresh_token: token.refresh,');
   });
 
-  it('no duplica una linea identica elegida en los dos lados', () => {
+  it('una linea identica elegida en los dos lados se queda dos veces y se avisa', () => {
     let resolution = toggleBlock(SESSION_FILE, initResolution(SESSION_FILE), 1, 'ours');
     resolution = toggleBlock(SESSION_FILE, resolution, 1, 'theirs');
     const output = buildOutput(SESSION_FILE, resolution, LABELS);
     const occurrences = output.text
       .split('\n')
       .filter((line) => line === '    refresh_token: token.refresh,');
-    expect(occurrences).toHaveLength(1);
-    expect(output.deduplicated).toBe(1);
-    expect(output.text).toContain('    timeout: 5000,\n    scope: acc.scopes.join(" "),');
+    expect(occurrences).toHaveLength(2);
+    expect(output.duplicates).toBe(1);
+  });
+
+  it('tomar los dos bloques no borra el cierre ni la linea en blanco del segundo', () => {
+    const ours = ['  fun a() {', '    return 1', '  }', ''];
+    const theirs = ['  fun b() {', '    return 2', '  }', ''];
+    const output = bothBlocks(ours, theirs);
+    expect(output.text).toBe(['<antes>', ...ours, ...theirs, '<despues>'].join('\n'));
+    // El `}` repetido se avisa; la linea en blanco no, que seria ruido.
+    expect(output.duplicates).toBe(1);
+  });
+
+  it('tomar los dos bloques no cambia el significado de un YAML', () => {
+    const ours = ['  a:', '    enabled: true', '    port: 1'];
+    const theirs = ['  b:', '    enabled: true', '    port: 2'];
+    const output = bothBlocks(ours, theirs);
+    expect(output.text).toBe(['<antes>', ...ours, ...theirs, '<despues>'].join('\n'));
+    expect(output.duplicates).toBe(1);
   });
 
   it('un bloque resuelto a vacio no aporta lineas', () => {

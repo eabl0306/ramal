@@ -41,6 +41,6 @@
   "markersFound": "El texto todavía tiene marcadores de conflicto.",
   "discardManualTitle": "¿Descartar la edición manual?",
   "discardManualInfo": "Al cambiar una elección se pierde el texto editado a mano de este archivo.",
-  "deduplicated_one": "Se ha quitado {count} línea repetida en los dos lados.",
-  "deduplicated_other": "Se han quitado {count} líneas repetidas en los dos lados."
+  "duplicates_one": "{count} línea aparece en los dos lados: revisa el resultado.",
+  "duplicates_other": "{count} líneas aparecen en los dos lados: revisa el resultado."
 }

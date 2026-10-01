@@ -11,10 +11,12 @@ import type {
  * El panel "Resultado": como quedara el fichero con las elecciones actuales.
  *
  * Orden fijo dentro de cada bloque: lineas elegidas de A y despues de B, como en
- * el prototipo. Una linea identica elegida en los dos lados sale una sola vez
- * (gaps B-19): es lo mismo que haria git con marcadores zdiff3, que saca las
- * lineas comunes fuera del bloque. `deduplicated` cuenta cuantas se fundieron
- * para que la interfaz pueda avisar.
+ * el prototipo. Toda linea elegida sale, aunque el otro lado tenga otra igual:
+ * un `}`, una linea en blanco o un `enabled: true` repetidos son codigo de cada
+ * lado, y quitarlos dejaba el fichero roto contando como resuelto. Las lineas
+ * comunes del principio y del final las saca git con marcadores zdiff3, que pide
+ * el motor (gaps B-19); si aun asi quedan iguales en los dos lados, `duplicates`
+ * las cuenta para que la interfaz avise, sin tocar el texto.
  */
 
 export type OutputLine =
@@ -34,7 +36,8 @@ export interface ConflictOutput {
   readonly lines: readonly OutputLine[];
   /** Texto final. Los bloques sin resolver llevan sus marcadores: es la semilla del editor manual. */
   readonly text: string;
-  readonly deduplicated: number;
+  /** Lineas elegidas de B con otra identica elegida de A en el mismo bloque. Es un aviso. */
+  readonly duplicates: number;
   readonly unresolved: number;
 }
 
@@ -57,13 +60,13 @@ export function hunkMarkerText(hunk: HunkSegment, labels: ConflictLabels): strin
 
 /**
  * Acumula las lineas del resultado. Es una clase para que los contadores
- * mutables (numero de linea, fundidas, sin resolver) vivan en un solo sitio.
+ * mutables (numero de linea, repetidas, sin resolver) vivan en un solo sitio.
  */
 class OutputBuilder {
   readonly lines: OutputLine[] = [];
   private readonly text: string[] = [];
   private number = 0;
-  deduplicated = 0;
+  duplicates = 0;
   unresolved = 0;
 
   private readonly labels: ConflictLabels;
@@ -89,8 +92,8 @@ class OutputBuilder {
   }
 
   result(): ConflictOutput {
-    const { lines, deduplicated, unresolved } = this;
-    return { lines, text: this.text.join('\n'), deduplicated, unresolved };
+    const { lines, duplicates, unresolved } = this;
+    return { lines, text: this.text.join('\n'), duplicates, unresolved };
   }
 
   private pick(side: ConflictSide, hunk: number, line: number, text: string): void {
@@ -108,13 +111,12 @@ class OutputBuilder {
     });
     hunk.theirs.forEach((text, line) => {
       if (choice.theirs[line] !== true) return;
+      this.pick('theirs', index, line, text);
       const remaining = pickedOurs.get(text) ?? 0;
-      if (remaining === 0) {
-        this.pick('theirs', index, line, text);
-        return;
-      }
+      // Una linea en blanco repetida no es una eleccion duplicada: avisar de ella es ruido.
+      if (remaining === 0 || text.trim() === '') return;
       pickedOurs.set(text, remaining - 1);
-      this.deduplicated += 1;
+      this.duplicates += 1;
     });
   }
 }
@@ -123,7 +125,7 @@ function manualOutput(manual: string): ConflictOutput {
   const lines = manual
     .split('\n')
     .map((text, index): OutputLine => ({ kind: 'manual', text, number: index + 1 }));
-  return { lines, text: manual, deduplicated: 0, unresolved: 0 };
+  return { lines, text: manual, duplicates: 0, unresolved: 0 };
 }
 
 export function buildOutput(
