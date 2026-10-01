@@ -1,0 +1,3 @@
+# Contexto de apps/api/Dockerfile.dev. La imagen de desarrollo no copia nada:
+# el codigo llega montado desde compose.yaml. Contexto vacio, build rapido.
+*

@@ -1,0 +1,25 @@
+# Contexto de apps/api/Dockerfile. BuildKit usa este fichero en lugar del
+# .dockerignore de la raiz cuando construye con ese Dockerfile.
+#
+# Lista blanca: solo entra el workspace de Rust. Un crate nuevo fuera de crates/
+# necesita aqui su linea, o cargo no podra resolver el workspace dentro de la
+# imagen.
+#
+# rust-toolchain.toml se queda fuera a proposito: la version ya la fija la
+# imagen base (ARG RUST_VERSION), y con el fichero dentro rustup intentaria
+# descargar componentes (clippy, rustfmt, llvm-tools) que una build no usa.
+
+*
+
+!Cargo.toml
+!Cargo.lock
+!.cargo
+!crates
+!apps/api/crates
+!apps/api/migrations
+!apps/vscode-engine
+!apps/desktop/src-tauri
+
+**/target
+**/node_modules
+apps/desktop/src-tauri/gen

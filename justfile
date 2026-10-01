@@ -201,11 +201,19 @@ api-test:
 # esto se pone en rojo en vez de pasar sin ejecutar nada. `--tests` y no una
 # lista de suites: en Gastonomo la lista se quedo vieja al partir un fichero en
 # dos y una bateria entera dejo de correr sin ponerse en rojo.
+#
+# Si RAMAL_TEST_DATABASE_URL ya viene puesta (la CI, con su servicio de
+# postgres), se usa esa y no se levanta compose: dos Postgres en el 5432 chocan.
 [group('api')]
 [doc('Tests de la API contra el Postgres de docker compose, sin permitir que se salten.')]
-api-test-db: db-up
-    RAMAL_TEST_DATABASE_URL="{{database_url}}" RAMAL_TEST_REQUIRE_DATABASE=1 \
-      cargo test {{api_crates}} --tests -- --nocapture
+api-test-db:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -z "${RAMAL_TEST_DATABASE_URL:-}" ]; then
+      just db-up
+      export RAMAL_TEST_DATABASE_URL="{{database_url}}"
+    fi
+    RAMAL_TEST_REQUIRE_DATABASE=1 cargo test {{api_crates}} --tests -- --nocapture
 
 # Cobertura de la API: 80% en el nucleo (dominio y aplicacion) y 60% global.
 [group('api')]
@@ -224,10 +232,11 @@ api-build:
     cargo build --release -p ramal-api
 
 # El contexto es la raiz porque el workspace de Cargo y el Cargo.lock viven aqui.
+# CARGO_BUILD_JOBS del entorno limita los hilos de cargo dentro de la imagen.
 [group('api')]
 [doc('Construye la imagen de produccion de la API.')]
 api-docker:
-    docker build -f apps/api/Dockerfile -t ramal-api:local .
+    docker build -f apps/api/Dockerfile --build-arg CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-default}" -t ramal-api:local .
 
 # Contrato del binario: con `--openapi <ruta>` escribe el documento y sale sin
 # tocar la base de datos. Se versiona y @ramal/api-client genera su cliente de el.
