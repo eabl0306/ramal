@@ -31,10 +31,10 @@ pub const PROBLEM_CONTENT_TYPE: &str = "application/problem+json";
 
 /// Prefijo de los `type` del contrato. Si el producto cambia de dominio, cambia
 /// esto y nada mas.
-pub const TYPE_PREFIX: &str = "https://ramal.dev/problems/";
+pub const TYPE_PREFIX: &str = "https://ramal.bahoque.com/problems/";
 
 /// Cuerpo de respaldo si un problema no se pudiera serializar.
-const FALLBACK_BODY: &[u8] = br#"{"type":"https://ramal.dev/problems/internal-error","title":"Error interno","status":500,"detail":"No hemos podido completar la operacion. Intentalo de nuevo.","code":"internal_error"}"#;
+const FALLBACK_BODY: &[u8] = br#"{"type":"https://ramal.bahoque.com/problems/internal-error","title":"Error interno","status":500,"detail":"No hemos podido completar la operacion. Intentalo de nuevo.","code":"internal_error"}"#;
 
 /// Error de un campo concreto del cuerpo.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
@@ -57,7 +57,10 @@ pub struct FieldProblem {
 pub struct Problem {
     /// URI que identifica el tipo de problema.
     #[serde(rename = "type")]
-    #[salvo(schema(rename = "type", example = "https://ramal.dev/problems/not-found"))]
+    #[salvo(schema(
+        rename = "type",
+        example = "https://ramal.bahoque.com/problems/not-found"
+    ))]
     pub kind: String,
     /// Resumen en castellano, siempre el mismo para un `type`.
     #[salvo(schema(example = "No encontrado"))]

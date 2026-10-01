@@ -77,7 +77,7 @@ fn internal_details_never_reach_the_body() {
 
 #[test]
 fn each_error_maps_to_its_status_type_and_code() {
-    let prefix = "https://ramal.dev/problems/";
+    let prefix = "https://ramal.bahoque.com/problems/";
     assert_eq!(
         kind(&AppError::not_found("x")),
         (404, format!("{prefix}not-found"), "not_found".to_owned())

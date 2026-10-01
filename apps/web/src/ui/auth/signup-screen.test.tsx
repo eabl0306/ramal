@@ -8,7 +8,7 @@ import { SignupScreen } from './signup-screen';
 
 async function fillValidForm(user: ReturnType<typeof userEvent.setup>): Promise<void> {
   await user.type(screen.getByLabelText('Nombre'), 'Marta Ruiz');
-  await user.type(screen.getByLabelText('Email'), 'marta@ramal.dev');
+  await user.type(screen.getByLabelText('Email'), 'marta@example.com');
   await user.type(screen.getByLabelText('Contraseña'), 'contrasena-larga');
   await user.click(screen.getByRole('checkbox'));
 }
@@ -28,7 +28,7 @@ describe('SignupScreen', () => {
     renderScreen(<SignupScreen />);
 
     await user.type(screen.getByLabelText('Nombre'), 'Marta');
-    await user.type(screen.getByLabelText('Email'), 'marta@ramal.dev');
+    await user.type(screen.getByLabelText('Email'), 'marta@example.com');
     await user.type(screen.getByLabelText('Contraseña'), 'contrasena-larga');
     await user.click(screen.getByRole('button', { name: 'Crear cuenta' }));
 

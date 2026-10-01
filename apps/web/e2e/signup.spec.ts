@@ -15,7 +15,7 @@ test('el registro valida campo a campo y despues dice que aun no esta disponible
   await submit.click();
   await expect(error).toHaveText('Escribe un email válido.');
 
-  await page.getByLabel('Email').fill('marta@ramal.dev');
+  await page.getByLabel('Email').fill('marta@example.com');
   await page.getByLabel('Contraseña').fill('corta');
   await expect(page.getByText('Mínimo 8 caracteres')).toBeVisible();
   await submit.click();
@@ -34,7 +34,7 @@ test('el registro valida campo a campo y despues dice que aun no esta disponible
 test('entrar no exige longitud minima y contesta lo mismo', async ({ page }) => {
   await page.goto('/login');
 
-  await page.getByLabel('Email').fill('marta@ramal.dev');
+  await page.getByLabel('Email').fill('marta@example.com');
   await page.getByLabel('Contraseña').fill('corta');
   await page.getByLabel('Contraseña').press('Enter');
 

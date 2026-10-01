@@ -22,7 +22,7 @@ describe('LoginScreen', () => {
     const user = userEvent.setup();
     renderScreen(<LoginScreen />);
 
-    await user.type(screen.getByLabelText('Email'), 'marta@ramal.dev');
+    await user.type(screen.getByLabelText('Email'), 'marta@example.com');
     await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }));
     expect(screen.getByRole('alert')).toHaveTextContent('Escribe tu contraseña.');
 
@@ -78,11 +78,11 @@ describe('LoginScreen', () => {
     await user.click(screen.getByRole('button', { name: 'Continuar con GitLab' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('No hay conexión con Ramal.');
 
-    await user.type(screen.getByLabelText('Email'), 'marta@ramal.dev');
+    await user.type(screen.getByLabelText('Email'), 'marta@example.com');
     await user.type(screen.getByLabelText('Contraseña'), 'x');
     await user.click(screen.getByRole('button', { name: 'Iniciar sesión' }));
 
-    expect(await screen.findByText('Sesión iniciada como marta@ramal.dev')).toBeInTheDocument();
+    expect(await screen.findByText('Sesión iniciada como marta@example.com')).toBeInTheDocument();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });
