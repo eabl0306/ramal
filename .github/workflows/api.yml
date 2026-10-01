@@ -61,7 +61,7 @@ jobs:
 
       - uses: taiki-e/install-action@v2
         with:
-          tool: just,cargo-llvm-cov
+          tool: just,cargo-llvm-cov@0.9.0
 
       - name: Clippy, tests y cobertura (just api-check)
         run: just api-check

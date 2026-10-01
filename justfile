@@ -117,7 +117,8 @@ lint: root-lint lint-css rust-lint packages-lint web-lint desktop-lint vscode-li
 [group('monorepo')]
 test: tools-test rust-test packages-test web-test desktop-test vscode-test
 
-# Cobertura de todo, con sus umbrales.
+# Cobertura de todo, con sus umbrales. La del host de Tauri (desktop-rust-cov)
+# necesita webkit2gtk y la corre desktop-rust-check.
 [group('monorepo')]
 cov: api-cov engine-cov packages-cov web-cov desktop-cov vscode-cov
 
@@ -502,11 +503,20 @@ desktop-e2e:
 desktop-e2e-install:
     {{pnpm_filter}} @ramal/desktop exec playwright install --with-deps chromium
 
-# Clippy y tests del lado nativo. Necesita webkit2gtk (libwebkit2gtk-4.1-dev).
+# Clippy, tests y cobertura del lado nativo. Necesita webkit2gtk (libwebkit2gtk-4.1-dev).
 [group('desktop')]
 desktop-rust-check:
     cargo clippy -p ramal-desktop --all-targets --all-features -- -D warnings
     cargo test -p ramal-desktop
+    @just desktop-rust-cov
+
+# No se llama desktop-cov: ese nombre es la cobertura de Vitest del frontend. No
+# entra en `just cov` porque necesita webkit2gtk; la corre desktop-rust-check, en
+# local, en la CI y en la imagen de Tauri.
+[group('desktop')]
+[doc('Cobertura del host de Tauri (ramal-desktop): 60% global (ADR 0006).')]
+desktop-rust-cov:
+    cargo llvm-cov -p ramal-desktop --summary-only --fail-under-lines 60
 
 # El empaquetado (.deb, .AppImage, .dmg, instaladores) llega con el workflow de
 # release; hasta entonces el build compila el binario con el frontend embebido y
@@ -539,7 +549,7 @@ desktop-e2e-native:
 desktop-docker-image:
     docker build -f tools/docker/tauri-linux.Dockerfile -t {{tauri_image}} tools/docker
 
-# Clippy y tests de ramal-desktop dentro de la imagen de Tauri.
+# Clippy, tests y cobertura de ramal-desktop dentro de la imagen de Tauri.
 [group('desktop')]
 desktop-docker-rust-check: desktop-docker-image
     @just _desktop-docker desktop-rust-check

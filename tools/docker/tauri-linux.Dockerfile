@@ -24,6 +24,7 @@ ARG RUSTUP_VERSION=1.29.1
 ARG NODE_VERSION=24.21.0
 ARG PNPM_VERSION=11.18.0
 ARG JUST_VERSION=1.58.0
+ARG CARGO_LLVM_COV_VERSION=0.9.0
 ARG TARGETARCH
 
 # Requisitos de Tauri 2 en Linux (guia oficial de prerrequisitos, pestana
@@ -111,6 +112,22 @@ RUN set -eux; \
   tar -xzf "/tmp/${tarball}" -C /usr/local/bin just; \
   rm "/tmp/${tarball}"; \
   just --version
+
+# cargo-llvm-cov, con la suma de su release: desktop-rust-check mide la cobertura
+# de ramal-desktop (60% global, ADR 0006). La misma version que instala la CI.
+RUN set -eux; \
+  case "${TARGETARCH:-amd64}" in \
+    amd64) cov_triple=x86_64-unknown-linux-musl; cov_sha=bc2122fd7bd9b6d3eb371690ed085f82e5a8bf1851f4645ef521d12ed04b2616 ;; \
+    arm64) cov_triple=aarch64-unknown-linux-musl; cov_sha=3c299780e109d59fd77044e64734421d43c0067b92937a49be302fee66d04727 ;; \
+    *) echo "arquitectura no soportada: ${TARGETARCH}" >&2; exit 1 ;; \
+  esac; \
+  tarball="cargo-llvm-cov-${cov_triple}.tar.gz"; \
+  curl -fsSL --retry 5 --retry-all-errors -o "/tmp/${tarball}" \
+    "https://github.com/taiki-e/cargo-llvm-cov/releases/download/v${CARGO_LLVM_COV_VERSION}/${tarball}"; \
+  echo "${cov_sha}  /tmp/${tarball}" | sha256sum -c -; \
+  tar -xzf "/tmp/${tarball}" -C /usr/local/bin cargo-llvm-cov; \
+  rm "/tmp/${tarball}"; \
+  cargo llvm-cov --version
 
 # La receta ejecuta el contenedor con el uid del usuario de la maquina, para que
 # lo que escribe en el repo montado (dist/, los esquemas de Tauri) no quede de
