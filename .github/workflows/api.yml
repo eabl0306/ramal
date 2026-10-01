@@ -57,7 +57,13 @@ jobs:
       - name: Instalar el toolchain de rust-toolchain.toml
         run: rustup toolchain install
 
+      # Clave propia: rust-cache solo distingue por el id del job y las
+      # variables CARGO*/RUST*, y este job y el del motor se llaman los dos
+      # `verify` con el mismo entorno. Con la misma clave uno restauraba siempre
+      # el target del otro y recompilaba sus dependencias en cada ejecucion.
       - uses: Swatinem/rust-cache@v2
+        with:
+          key: api
 
       - uses: taiki-e/install-action@v2
         with:

@@ -32,7 +32,11 @@ jobs:
       - name: Instalar el toolchain de rust-toolchain.toml
         run: rustup toolchain install
 
+      # Clave propia: el job de api.yml tambien se llama `verify` y tiene el
+      # mismo entorno, y sin ella las dos caches se pisan (ver api.yml).
       - uses: Swatinem/rust-cache@v2
+        with:
+          key: engine
 
       - uses: taiki-e/install-action@v2
         with:
