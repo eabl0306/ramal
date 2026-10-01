@@ -46,15 +46,8 @@ pub fn run<I: IntoIterator<Item = OsString>>(arguments: I) -> ExitCode {
 }
 
 fn serve_stdio(args: &Args) -> ExitCode {
-    let runtime = match tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-    {
-        Ok(runtime) => runtime,
-        Err(error) => {
-            tracing::error!(%error, "could not start the async runtime");
-            return ExitCode::FAILURE;
-        }
+    let Some(runtime) = build_runtime() else {
+        return ExitCode::FAILURE;
     };
     let handler = Arc::new(EngineHandler::new(bootstrap::build_engine(args)));
     tracing::info!(
@@ -69,16 +62,38 @@ fn serve_stdio(args: &Args) -> ExitCode {
     // La lectura de stdin de tokio vive en un hilo bloqueante; sin un limite, cerrar
     // el runtime esperaria a una lectura que no va a llegar.
     runtime.shutdown_timeout(Duration::from_millis(200));
+    exit_code(result)
+}
+
+// Las macros de tracing cuentan para `cognitive_complexity`, y mas cuando otro
+// crate del workspace activa su feature `log` (sqlx en la API). Por eso el
+// arranque del runtime y cada salida van en funciones aparte.
+fn build_runtime() -> Option<tokio::runtime::Runtime> {
+    match tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+    {
+        Ok(runtime) => Some(runtime),
+        Err(error) => {
+            tracing::error!(%error, "could not start the async runtime");
+            None
+        }
+    }
+}
+
+fn exit_code(result: Result<(), server::ServeError>) -> ExitCode {
     match result {
         Ok(()) => {
             tracing::info!("stdin closed; engine stopped");
             ExitCode::SUCCESS
         }
-        Err(error) => {
-            tracing::error!(%error, "connection closed by a protocol error");
-            ExitCode::FAILURE
-        }
+        Err(error) => protocol_failure(&error),
     }
+}
+
+fn protocol_failure(error: &server::ServeError) -> ExitCode {
+    tracing::error!(%error, "connection closed by a protocol error");
+    ExitCode::FAILURE
 }
 
 fn print_version() -> ExitCode {
