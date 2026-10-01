@@ -440,6 +440,9 @@ personales sincronizadas. El resto de textos tiene que acompanarlo:
   **Cambio:** "Ubuntu 22.04+, Debian 12+", y en Fedora solo versiones con soporte vigente que CI pruebe
   (Fedora 38 ya no tiene soporte). **Por que:** Tauri 2 necesita `webkit2gtk-4.1`, que no existe en
   Ubuntu 20.04 ni en Debian 11.
+  **Estado (2026-10-01):** la landing ya dice "Ubuntu 22.04+, Debian 12+", pero sigue anadiendo
+  "Fedora 38+" (`web.download.requirement.linux` en `@ramal/i18n` y su test). Falta quitarlo o cambiarlo por una
+  version que CI pruebe.
 - **Windows Portable (.zip), hoy:** tarjeta con 121 MB.
   **Cambio:** se quita (ADR 0016). **Por que:** el empaquetador de Tauri no lo produce y nunca se
   actualizaria solo.

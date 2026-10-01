@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -41,16 +42,21 @@ por su lado; nadie probaba la pila compuesta entrando por la puerta de verdad.
   workspace de Cargo con su `Cargo.lock` y el lockfile de pnpm
   ([ADR 0001](0001-monorepo-poliglota.md)).
 - Todos los puertos y credenciales salen de `.env`, con valores por defecto.
+- Los puertos se publican solo en `127.0.0.1` (`RAMAL_BIND_IP`). Docker abre los puertos
+  publicados saltandose el cortafuegos de la maquina: sin IP, PostgreSQL con la contrasena por
+  defecto quedaria abierto a toda la red local. Quien necesite entrar desde otra maquina pone
+  `RAMAL_BIND_IP=0.0.0.0` en su `.env`.
 
 ### El gateway enruta por prefijo, y el orden importa
 
-`docker/gateway.dev.conf` (y su gemelo de produccion) tiene un `location` por cada prefijo de la
-API, siempre antes del `location /` que manda todo lo demas a la web:
+`docker/gateway.dev.conf` tiene un `location` por cada prefijo de la API, siempre antes del
+`location /` que manda todo lo demas a la web. Su gemelo de produccion
+(`docker/gateway.prod.conf`) todavia no existe:
 
 ```
 location /health/        -> api
 location = /openapi.json -> api
-location /swagger-ui     -> api   (solo desarrollo)
+location /swagger-ui     -> api   (solo desarrollo; la API solo la sirve con la bandera)
 location /v1/            -> api
 location /               -> web
 ```
@@ -63,29 +69,37 @@ location /               -> web
   el gateway ([ADR 0008](0008-autenticacion-con-tokens.md)); sin ella, todas las peticiones
   parecen venir del gateway.
 - Todo va bajo `/v1`, asi que un prefijo nuevo es raro. Cuando aparezca, necesita su `location`
-  en los dos ficheros del gateway y una sonda en `tools/scripts/smoke-stack.sh`, en el mismo PR.
+  en el gateway (en los dos ficheros cuando exista el de produccion) y una sonda en
+  `tools/scripts/smoke-stack.sh`, en el mismo PR.
 
 ### La pila se prueba entrando por la puerta
 
 `tools/scripts/smoke-stack.sh` recibe la URL del gateway y comprueba lo que un test de una sola
 pieza no puede ver. La senal de fallo que busca es `text/html` en una ruta de la API:
 
-| Sonda                                    | Esperado                                                                               |
-| ---------------------------------------- | -------------------------------------------------------------------------------------- |
-| `GET /health/live` y `GET /health/ready` | 200 con JSON                                                                           |
-| Un `GET` bajo `/v1/` sin token           | 401 con `application/problem+json`. Si llega `text/html`, el gateway lo mando a la SPA |
-| Un `POST` bajo `/v1/`                    | Una respuesta de la API, no un 405 en HTML de nginx                                    |
-| `GET /openapi.json`                      | 200 con JSON                                                                           |
-| `GET /` y `GET /en/`                     | 200 con HTML prerenderizado, con contenido real y no un cascaron vacio                 |
-| Una ruta profunda de la SPA              | 200 con HTML (el fallback de la SPA)                                                   |
+| Sonda                                       | Esperado                                                                                                                          |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /health/live` y `GET /health/ready`    | 200 con JSON                                                                                                                      |
+| Un `GET` a una ruta de `/v1/` que no existe | 404 con `application/problem+json`. Si llega `text/html`, el gateway lo mando a la SPA. No depende de que haya endpoints en `/v1` |
+| Un `POST` bajo `/v1/`                       | Una respuesta de la API, no un 405 en HTML de nginx                                                                               |
+| `GET /openapi.json`                         | 200 con JSON                                                                                                                      |
+| `GET /` y `GET /en/`                        | 200 con HTML prerenderizado, con contenido real y no un cascaron vacio                                                            |
+| Una ruta profunda de la SPA                 | 200 con HTML (el fallback de la SPA)                                                                                              |
 
-`just stack-smoke` levanta la pila, corre el script y la tira; la CI lo ejecuta en cada PR
-([ADR 0006](0006-estrategia-de-testing.md)). En el primer corte usa la pila de desarrollo con el
-perfil `full`. En cuanto existan los Dockerfile de produccion de la API y de la web, pasa a un
-`infra/compose.smoke.yaml` con esas imagenes y el gateway de produccion, que es lo que se
-despliega, con credenciales efimeras generadas en cada ejecucion. Es lo que hizo Gastonomo al
-final (su ADR 0015), y el motivo es el mismo: la configuracion que importa probar es la de
-produccion.
+`just stack-smoke` levanta una pila completa aparte, corre el script y la tira. Va en su propio
+proyecto de compose (`ramal-smoke`) y con los puertos que elige Docker, asi que no toca la pila
+de desarrollo (proyecto `ramal`): ni sus contenedores, ni sus puertos, ni sus volumenes. Cuando
+compartia proyecto, su `down -v` borraba la base local en cada `just ci`. En la CI, `stack.yml`
+levanta la pila con credenciales efimeras, corre los e2e de Playwright por el gateway
+(`just e2e-stack`) y despues `just smoke` en cada PR que toca la pila
+([ADR 0006](0006-estrategia-de-testing.md)).
+
+En el primer corte las dos usan la pila de desarrollo con el perfil `full`. Los Dockerfile de
+produccion de la API y de la web ya existen y cada uno se prueba arrancado por separado
+(`smoke-image.sh`); lo que falta es el gateway de produccion. Cuando exista, la prueba pasa a un
+`infra/compose.smoke.yaml` con esas imagenes y ese gateway, que es lo que se despliega. Es lo
+que hizo Gastonomo al final (su ADR 0015), y el motivo es el mismo: la configuracion que importa
+probar es la de produccion.
 
 ### Produccion
 
@@ -101,7 +115,8 @@ produccion.
   ([ADR 0011](0011-ui-compartida-y-puente-tipado.md)), con `frame-ancestors 'none'` y
   `X-Frame-Options: DENY` en toda respuesta de la web y de la API para que ninguna pagina (la de
   autorizar una app, la de activar un codigo, el reinicio de la boveda o el borrado de la cuenta)
-  se pueda cargar dentro de un marco ajeno; no expone `/swagger-ui`, y desactiva el
+  se pueda cargar dentro de un marco ajeno; no reenvia `/swagger-ui` (la API ya la deja apagada
+  sin `RAMAL__SERVER__SWAGGER_UI=true`, asi que no depende de esto), y desactiva el
   buffer en la ruta del proxy de IA para que el streaming SSE llegue a medida que se genera (la
   API manda ademas `X-Accel-Buffering: no`). Su limite de cuerpo queda por encima del mayor de la
   API (2 MiB, la foto de perfil y la rotacion de la boveda); los limites exactos por endpoint los
@@ -130,8 +145,9 @@ En contra:
   volumen.
 - El bind mount del codigo es rapido en Linux y lento en macOS y Windows. Quien desarrolle ahi
   seguramente prefiera `cargo run` en local contra `just db-up`.
-- Mientras `just stack-smoke` use la pila de desarrollo, el gateway que se prueba no es
-  exactamente el de produccion. Queda cerrado cuando exista `infra/compose.smoke.yaml`.
+- Mientras la prueba de la pila use la de desarrollo, el gateway que se prueba no es el de
+  produccion, que ademas todavia no existe. Queda cerrado cuando exista
+  `infra/compose.smoke.yaml`.
 - Cada prefijo nuevo de la API exige tocar tres ficheros. Es una friccion deseada: obliga a
   pensar si de verdad hace falta un prefijo fuera de `/v1`.
 

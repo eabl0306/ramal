@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -35,7 +36,7 @@ Un solo repositorio git con esta forma:
 
 ```
 Cargo.toml            workspace unico de Rust (ver abajo)
-pnpm-workspace.yaml   apps/*, packages/*, tools/*
+pnpm-workspace.yaml   apps/web, apps/desktop, apps/vscode, packages/*, tools/*
 justfile              punto de entrada unico
 apps/api              la API: cinco crates, uno por capa
 apps/desktop          frontend de Vite y src-tauri (crate ramal-desktop)
@@ -45,6 +46,8 @@ apps/web              React Router
 crates/               el motor cliente, compartido por los dos hosts
 packages/             paquetes TS compartidos, eslint-config y tsconfig
 tools/checks          scripts de Node sin dependencias que valen para los dos lenguajes
+tools/rust-complexity cognitiva y ciclomatica de cada funcion de Rust (ADR 0005)
+tools/docker          imagen de Linux con los requisitos de Tauri
 tools/scripts         utilidades de shell para el justfile, los hooks y la CI
 docs/                 arquitectura, contrato, modelo de datos y estas decisiones
 ```
@@ -89,8 +92,8 @@ dependencias directas sin compilar Tauri.
   `pnpm/action-setup` de la CI. Las recetas y los hooks lo invocan por corepack. El pnpm
   global de una maquina puede ser otro: en la maquina de desarrollo hay un pnpm 9 instalado
   con npm que no cambia de version segun `packageManager` e ignora claves de pnpm 11 del
-  workspace (`allowBuilds`, `minimumReleaseAgeExclude`), asi que su instalacion no seria
-  equivalente.
+  workspace (`allowBuilds`), asi que su instalacion no seria equivalente. `just doctor` (lo
+  corre `just setup`) falla si el pnpm que ve no es el 11.18.
 - Existe pnpm 12.8.1, pero la 12 es una version mayor con cambios incompatibles publicada
   hace un mes. Se queda la 11.18.0, la misma que Gastonomo, para que las dos bases de codigo
   del mismo equipo se comporten igual. Subir a la 12 es un PR propio, con su prueba.

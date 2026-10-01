@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -60,17 +61,18 @@ deteccion de capacidades se pruebe de verdad.
 
 El E2E real usa el driver embebido (`tauri-plugin-wdio-webdriver`), que es el unico que cubre
 macOS. El plugin solo se compila detras de una feature de cargo que activan los builds de E2E:
-el binario que se publica no lleva un servidor de WebDriver dentro. En Linux corre bajo
-`xvfb-run` en los PRs que tocan escritorio o el motor; Windows y macOS corren cada noche.
+el binario que se publica no lleva un servidor de WebDriver dentro. En Linux sin pantalla corre
+bajo `xvfb-run` en los PRs que tocan escritorio o el motor. Windows y macOS iran cada noche
+cuando exista ese workflow; hoy no hay ninguno.
 
 ### VS Code
 
-| Nivel                                 | Herramienta                                                             | Que                                                                                                                                                         |
-| ------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Capa de aplicacion del extension host | Vitest                                                                  | Router de mensajes, supervision del sidecar, eleccion de repositorio, idioma. `application` no importa `vscode`, asi que no hace falta arrancar VS Code     |
-| Validacion de mensajes                | Vitest                                                                  | Mensajes malformados, metodos fuera de la superficie, ids fuera de rango, tamanos excesivos                                                                 |
-| Flujos de interfaz                    | Playwright contra el bundle de webviews con un `acquireVsCodeApi` falso | Los mismos flujos que escritorio en densidad compacta, con juegos de variables `--vscode-*` capturados de un tema oscuro, uno claro y uno de alto contraste |
-| Integracion                           | `@vscode/test-cli` y `@vscode/test-electron` bajo `xvfb-run -a`         | Activacion, comandos, arranque y reinicio del sidecar, un repositorio de prueba real                                                                        |
+| Nivel                                 | Herramienta                                                                            | Que                                                                                                                                                         |
+| ------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capa de aplicacion del extension host | Vitest                                                                                 | Router de mensajes, supervision del sidecar, eleccion de repositorio, idioma. `application` no importa `vscode`, asi que no hace falta arrancar VS Code     |
+| Validacion de mensajes                | Vitest                                                                                 | Mensajes malformados, metodos fuera de la superficie, ids fuera de rango, tamanos excesivos                                                                 |
+| Flujos de interfaz                    | Playwright contra el bundle de webviews con un `acquireVsCodeApi` falso                | Los mismos flujos que escritorio en densidad compacta, con juegos de variables `--vscode-*` capturados de un tema oscuro, uno claro y uno de alto contraste |
+| Integracion                           | `@vscode/test-cli` y `@vscode/test-electron`, bajo `xvfb-run -a` en Linux sin pantalla | Activacion, comandos, arranque y reinicio del sidecar, un repositorio de prueba real                                                                        |
 
 Los tests de integracion esperan a eventos que expone la extension para los tests, nunca a un
 `sleep`: con esperas por tiempo, estos tests son los primeros en volverse inestables.
@@ -101,11 +103,11 @@ verdad y fallan como los demas.
 
 ### Que corre y cuando
 
-| Momento                        | Que                                                                                                                                                                                                                                                                                                                                             |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `just check` y `pre-push`      | Unitarios de Rust y de Vitest, tests de `tools/checks`, cobertura                                                                                                                                                                                                                                                                               |
-| Cada PR (CI)                   | Todo lo anterior, tests de PostgreSQL con `RAMAL_TEST_REQUIRE_DATABASE=1`, suite del motor con git 2.34 y con la ultima, Playwright de las tres apps con el host simulado, integracion de VS Code bajo xvfb, E2E real de escritorio en Linux si cambia escritorio o el motor, tipos generados sin diff y la pila compuesta con `smoke-stack.sh` |
-| Cada noche y antes de publicar | E2E real de escritorio en Windows y macOS, y Playwright de flujos completos contra la pila de Docker (registro, login, workspaces, cuentas ligadas con un proveedor falso, invitaciones)                                                                                                                                                        |
+| Momento                                      | Que                                                                                                                                                                                                                                                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `just check` y `pre-push`                    | Unitarios de Rust y de Vitest, tests de `tools/checks`, cobertura                                                                                                                                                                                                                                                                               |
+| Cada PR (CI)                                 | Todo lo anterior, tests de PostgreSQL con `RAMAL_TEST_REQUIRE_DATABASE=1`, suite del motor con git 2.34 y con la ultima, Playwright de las tres apps con el host simulado, integracion de VS Code bajo xvfb, E2E real de escritorio en Linux si cambia escritorio o el motor, tipos generados sin diff y la pila compuesta con `smoke-stack.sh` |
+| Cada noche y antes de publicar (planificado) | E2E real de escritorio en Windows y macOS, y Playwright de flujos completos contra la pila de Docker (registro, login, workspaces, cuentas ligadas con un proveedor falso, invitaciones)                                                                                                                                                        |
 
 La pila compuesta va en cada PR, no a mano como acabo en Gastonomo: su ADR 0006 la dejo fuera de
 la CI por lo que tardaba, y fue el unico test que habria cazado un prefijo del gateway olvidado
@@ -113,11 +115,11 @@ la CI por lo que tardaba, y fue el unico test que habria cazado un prefijo del g
 
 ### Umbrales
 
-| Ambito                                                                                                                       | Minimo        |
-| ---------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| Nucleos de Rust (`ramal-core-domain`, `ramal-core-application`, `ramal-api-domain`, `ramal-api-application`)                 | 80% de lineas |
-| Nucleos de TypeScript (`@ramal/domain`, `@ramal/i18n`, `domain` y `application` de la web, `application` del extension host) | 80% de lineas |
-| Global de cada pieza                                                                                                         | 60% de lineas |
+| Ambito                                                                                                                                                         | Minimo        |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| Nucleos de Rust (`ramal-core-domain`, `ramal-core-application`, `ramal-api-domain`, `ramal-api-application`)                                                   | 80% de lineas |
+| Nucleos de TypeScript (`@ramal/domain`, `@ramal/i18n`, `@ramal/bridge`, `domain` y `application` de la web, `application` del escritorio y del extension host) | 80% de lineas |
+| Global de cada pieza                                                                                                                                           | 60% de lineas |
 
 Herramientas: `cargo-llvm-cov` y la cobertura v8 de Vitest con umbrales por glob. Bajar del
 umbral rompe la CI.

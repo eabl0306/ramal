@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -45,13 +46,20 @@ semantica exacta de git importa y donde las bibliotecas van por detras.
 
 Las que evitan los errores clasicos de envolver una CLI:
 
-- Siempre formatos de maquina: `-z`, `--porcelain=v2`, `--format` explicito con separadores
-  `%x00` y `%x1f`. Siempre `--no-pager`, `--no-color` y `-c core.quotepath=off`.
+- Siempre formatos de maquina: `-z`, `--porcelain=v2` y `--format` explicito, con separadores
+  que git no deja meter en el dato. En el log del grafo, NUL entre commits y un campo por linea:
+  el nombre y el correo viven en una linea de la cabecera del commit y `%s` une el asunto en una
+  sola. El separador `%x1f` se abandono porque git si deja meter un 0x1f en un nombre o un correo,
+  y los campos se desplazaban. En `for-each-ref`, NUL entre campos y salto de linea entre refs.
+  Siempre `--no-pager`, `-c color.ui=false` y `-c core.quotepath=off`.
 - Entorno fijo en cada llamada: `LC_ALL=C` (los mensajes de git no cambian con el idioma del
   usuario) y `GIT_TERMINAL_PROMPT=0` (git nunca se queda esperando una contrasena por una
-  terminal que no existe).
-- Las lecturas en segundo plano (refresco de estado, fetch automatico) anaden
-  `GIT_OPTIONAL_LOCKS=0`, para no tomar `index.lock` mientras el usuario trabaja en una terminal.
+  terminal que no existe). Ademas se quitan las variables que redirigen git a otro repositorio
+  (`GIT_DIR`, `GIT_WORK_TREE`, `GIT_INDEX_FILE`, `GIT_CONFIG_PARAMETERS`...), que el motor
+  heredaria si arranca desde un hook.
+- Las lecturas anaden `GIT_OPTIONAL_LOCKS=0`, para no tomar `index.lock` mientras el usuario
+  trabaja en una terminal. En el primer corte solo hay lecturas y va en todas las llamadas; las
+  escrituras no lo llevaran.
 - Las refs se leen con `git for-each-ref`, nunca con la decoracion `%D` del log: un nombre de ref
   puede contener comas y `%D` las usa como separador.
 - Rebase interactivo sin editor: el motor escribe el fichero de tareas desde el plan del dominio
@@ -102,8 +110,10 @@ tiene Workspace Trust; escritorio necesita su propio equivalente:
 
 - Git 2.34 es la primera con firma de commits por SSH, y es la que trae Ubuntu 22.04, la base
   minima de Linux de Ramal ([ADR 0016](0016-actualizaciones-y-descargas.md)).
-- Al arrancar, el motor parsea `git --version`, rechaza cualquier version inferior con el error
-  `git_version_unsupported` (que la interfaz traduce y explica) y calcula `GitCapabilities`.
+- El motor parsea `git --version` y calcula `GitCapabilities`. `engine/info` no falla con un git
+  viejo: devuelve `supported: false` para que la interfaz explique que hacer. El minimo se aplica
+  en `OpenRepository` (`repo/open`), que rechaza cualquier version inferior con el error
+  `git_version_unsupported` antes de tocar el repositorio, y no en el adaptador.
 - Lo que llego despues se detecta, no se supone: `merge-tree --write-tree` y
   `rebase --update-refs` necesitan 2.38. Si faltan, el motor usa el camino alternativo o
   desactiva la funcion con un motivo visible.

@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -35,14 +36,22 @@ de vistas, descripciones de ajustes), y los errores que vienen del motor de Rust
 Un paquete sin dependencias, la unica fuente de textos de interfaz de las tres apps:
 
 ```
-src/locales/es/<espacio>.ts   Fuente de verdad
-src/locales/en/<espacio>.ts   Tipado contra es: una clave que falta en ingles no compila
-src/translator.ts             createTranslator(locale): t(clave, parametros)
-src/plural.ts                 Sufijos _one y _other resueltos con Intl.PluralRules
-src/format.ts                 formatRelativeTime, formatDate, formatShortcut
-src/locale.ts                 Locale ("es" | "en") y resolveLocale
-test/parity.test.ts           Paridad de claves, de parametros y de plurales entre es y en
+src/locales/es/<espacio>.json   Fuente de verdad
+src/locales/en/<espacio>.json   Tipado contra es: una clave que falta o sobra en ingles no compila
+src/catalog.ts                  Importa los JSON; el tipo Catalog sale del castellano
+src/keys.ts                     Claves tipadas, plurales y parametros por clave
+src/generated/params.ts         Parametros de cada texto, generado por scripts/generate-params.mjs
+src/translator.ts               createTranslator(locale): t(clave, parametros)
+src/plural.ts                   Sufijos _one y _other resueltos con Intl.PluralRules
+src/format.ts                   formatRelativeTime, formatDate, formatTimeZone, formatShortcut
+src/locale.ts                   Locale ("es" | "en") y resolveLocale
+test/parity.test.ts             Paridad de claves, de parametros y de plurales entre es y en
 ```
+
+Los textos van en JSON y no en TypeScript. TypeScript tipa las claves de un JSON importado, pero
+no ve dentro de sus textos, asi que los parametros de cada texto los escribe
+`scripts/generate-params.mjs` en `src/generated/params.ts` (`just i18n-gen`). El test de paridad
+falla si ese fichero no esta al dia.
 
 Espacios de nombres: `common`, `repos`, `graph`, `staging`, `diff`, `conflict`, `rebase`, `menu`,
 `dialog`, `toast`, `settings`, `ai`, `team`, `errors`, `vscode`, `web`, y `email` cuando la API
@@ -52,7 +61,8 @@ mande correos. El enlace con React (`I18nProvider`, `useT`) vive en `@ramal/ui`,
 ### Claves y parametros con tipos
 
 - `t("toast.pushed", { branch: "main" })` compila; sin `branch`, o con otro nombre, no compila. Los
-  tipos salen del propio diccionario castellano, sin una lista escrita a mano.
+  tipos salen del propio diccionario castellano (las claves del JSON y los parametros generados
+  desde el), sin una lista escrita a mano.
 - Los marcadores tienen nombres descriptivos: `{count}`, `{branch}`, `{sha}`, `{source}`,
   `{target}`, `{file}`, `{provider}`, `{model}`, `{user}`, `{email}`, `{org}`, `{device}`.
 - Nunca se trocea una traduccion para fabricar otra: cada texto que se pinta tiene su clave
@@ -71,7 +81,9 @@ datos que i18next, asi que cambiar a i18next algun dia no obliga a reescribir lo
 
 El tiempo relativo usa `Intl.RelativeTimeFormat` y las fechas `Intl.DateTimeFormat`, siempre con el
 idioma de la interfaz. Sustituyen a la funcion `ago()` del prototipo, que tenia los textos escritos
-a mano.
+a mano. `formatDate` tiene cuatro estilos: `date`, `dateTime`, `time` y `monthDayTime`, la columna
+de fecha del grafo (el `MM-DD HH:mm` de los prototipos en el orden de cada idioma, con hora de
+24 horas para que quepa en la columna de VS Code).
 
 ### La regla de idioma
 
@@ -107,8 +119,9 @@ porque la regla es la misma, sin ninguno de esos costes.
 ### Rust no devuelve textos traducidos
 
 - **El motor** devuelve un `ErrorKind` cerrado y la interfaz lo traduce con
-  `errors.engine.<kind>`. La correspondencia es un `Record<ErrorKind, clave>` en
-  `@ramal/repo-view`, asi que un `kind` nuevo sin traduccion no compila. El `message` del error va
+  `errors.engine.<kind>`. La correspondencia es un `Record<BridgeErrorKind, clave>`
+  (`ENGINE_ERROR_KEYS` en `@ramal/repo-view`, y otro en el extension host para sus avisos), asi
+  que un `kind` nuevo sin traduccion no compila. El `message` del error va
   en ingles y es para el log.
 - **La API** devuelve problem+json con los mensajes en castellano, como Gastonomo, y un `code`
   estable en el problema y en cada error de campo. La web traduce el `code` con
@@ -131,7 +144,13 @@ porque la regla es la misma, sin ninguno de esos costes.
 Un script de un solo uso (`scripts/migrate-from-prototype.ts`) convierte `D` y `W` a espacios de
 nombres. `W` va entero a `web.*`, porque 8 de sus claves chocan en texto con `D`. En la conversion
 se renombran los marcadores, los recuentos pasan a plurales, y los glifos y los atajos salen de los
-textos. Despues el script se borra: la fuente de verdad es el paquete, no el prototipo.
+textos. Despues el script se borra: la fuente de verdad es el paquete, no el prototipo, y el
+repositorio no lo conserva.
+
+En la conversion se quitaron tres claves: `D.accSub`, que duplicaba otra, y `W.ownerTeam` y
+`W.teamAcc`, de las cuentas de plataforma compartidas con el equipo, que ya no existen (gaps
+X-01). La etiqueta del
+rol de propietario es "Titular" (gaps B-50).
 
 ## Consecuencias
 

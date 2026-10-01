@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -39,19 +40,23 @@ enero de 2025 y npm lo marca como obsoleto.
 `@ramal/ui` contiene tokens, temas, densidades, primitivas y el proveedor de iconos. Los
 componentes solo leen tokens semanticos, nunca un color literal:
 
-| Grupo                        | Tokens                                                                                                                                      |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Superficies                  | `--r-bg`, `--r-panel`, `--r-surface`, `--r-surface-hover`, `--r-border`                                                                     |
-| Texto                        | `--r-text`, `--r-muted`, `--r-faint`                                                                                                        |
-| Acento y estados             | `--r-accent`, `--r-accent-ink`, `--r-accent-soft`, `--r-ok`, `--r-warn`, `--r-danger`, `--r-info`, `--r-merged`                             |
-| Diff y estado de fichero     | `--r-add-bg`, `--r-del-bg`, `--r-status-m`, `--r-status-a`, `--r-status-d`, `--r-status-r`, `--r-status-c`                                  |
-| Carriles del grafo           | `--r-lane-0` a `--r-lane-5`                                                                                                                 |
-| Tipografia, forma y densidad | `--r-font-ui`, `--r-font-code`, `--r-font-size-base`, radios, sombra, `--r-row-h`, `--r-menu-item-h`, `--r-sidebar-item-h`, `--r-toolbar-h` |
+| Grupo                        | Tokens                                                                                                                                                              |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Superficies                  | `--r-bg`, `--r-panel`, `--r-surface`, `--r-surface-hover`, `--r-border`                                                                                             |
+| Texto                        | `--r-text`, `--r-muted`, `--r-faint`                                                                                                                                |
+| Acento, seleccion y estados  | `--r-accent`, `--r-accent-ink`, `--r-accent-soft`, `--r-selection`, `--r-selection-ink`, `--r-ok`, `--r-warn`, `--r-danger`, `--r-info`, `--r-merged` y sus `-soft` |
+| Diff y estado de fichero     | `--r-add-bg`, `--r-del-bg`, `--r-status-m`, `--r-status-a`, `--r-status-d`, `--r-status-r`, `--r-status-c`                                                          |
+| Carriles del grafo           | `--r-lane-0` a `--r-lane-5`, `--r-on-lane`                                                                                                                          |
+| Interaccion y alto contraste | `--r-focus`, `--r-backdrop`, `--r-knob`, `--r-hatch`, `--r-on-emphasis`, `--r-hc-border`, `--r-hc-active-border`                                                    |
+| Marcas                       | `--r-platform-github`, `-gitlab`, `-bitbucket`, `-gitea`, `-azure`, `--r-provider-google`                                                                           |
+| Tipografia, forma y densidad | `--r-font-ui`, `--r-font-code`, `--r-font-size-base`, radios, sombra, `--r-row-h`, `--r-menu-item-h`, `--r-sidebar-item-h`, `--r-toolbar-h`                         |
 
 Dos ficheros de tema dan valor a esos tokens:
 
 - `themes/ramal.css`: los valores oklch del diseno para `[data-theme="dark"]` y
-  `[data-theme="light"]`. Lo usan escritorio y web.
+  `[data-theme="light"]`. Lo usan escritorio y web; la letra de 14 px y el claro de la web van en
+  el mismo fichero bajo `[data-host="web"]`. Los tokens que no cambian con el tema (carriles,
+  marcas, `-soft`, alto contraste, densidades) viven en `themes/base.css`.
 - `themes/vscode.css`: cada token apunta a una variable de VS Code
   (`--r-bg: var(--vscode-editor-background)`,
   `--r-status-m: var(--vscode-gitDecoration-modifiedResourceForeground)`, y asi con el resto).
@@ -93,9 +98,16 @@ de Adobe), que da el comportamiento y la accesibilidad sin estilos.
 **Por que React Aria y no Radix.** Los dos son buenos en accesibilidad. La diferencia es la CSP:
 el bloqueo de scroll de los dialogos de Radix (`react-remove-scroll`) inyecta una etiqueta
 `<style>` en tiempo de ejecucion, que una CSP con `style-src` sin `'unsafe-inline'` ni nonce
-bloquea. React Aria aplica sus estilos por las propiedades `style` de React, que van por CSSOM y
-la CSP no bloquea. Ademas trae submenus en su `Menu`, que el diseno usa en todos los menus
-contextuales.
+bloquea. React Aria aplica casi todos sus estilos por las propiedades `style` de React, que van
+por CSSOM y la CSP no bloquea. Ademas trae submenus en su `Menu`, que el diseno usa en todos los
+menus contextuales.
+
+Hay una excepcion, descubierta al implementar: `react-aria-components` 1.21 inyecta una etiqueta
+`<style>` fija (`react-aria-pressable-style`, con el `touch-action` de lo pulsable). En escritorio
+se permite ese texto exacto por su hash en `style-src`, nunca con `'unsafe-inline'`, y el E2E de
+Playwright falla con cualquier violacion de la CSP, asi que si React Aria lo cambia se ve. Los
+webviews de VS Code se topan con el mismo bloqueo y su CSP todavia no lleva el hash: alli el
+navegador descarta esa regla.
 
 Solo `@ramal/ui` importa `react-aria-components`; las apps y `@ramal/repo-view` usan las
 primitivas de `@ramal/ui`. La version exacta se fija al montar el paquete, como el resto de
@@ -136,7 +148,9 @@ aplica el validador de `@ramal/domain` que corresponde.
   notificaciones.
 - `createBridgeClient(transport)`: `client.call("graph/window", params, { signal, timeoutMs })`
   totalmente tipado por el mapa de metodos generado. 30 segundos por defecto; las operaciones
-  largas informan por `$/progress` y no usan timeout. Cancelar con `signal` manda `$/cancel`.
+  largas informan por `$/progress` y no usan timeout. Cancelar con `signal` rechaza con
+  `signal.reason`, como `fetch`, y manda `$/cancel`; todavia no hay un tipo `cancelled` y el motor
+  del primer corte ignora `$/cancel`.
 - `BridgeError { kind, message, data }`, donde `kind` es el `ErrorKind` cerrado del motor mas tres
   que anaden el puente y el extension host: `transport`, `timeout` y `engine_unavailable`.
 
@@ -152,8 +166,9 @@ El webview nunca envia rutas del sistema de ficheros: en VS Code, el extension h
 repositorio y pasa al webview solo su `repoId`; en escritorio, el comando de Tauri
 `repo_pick_and_open` ensena el dialogo nativo desde Rust y devuelve el `RepoHandle`. Los dos hosts
 filtran lo que el webview puede pedir con una lista de metodos por superficie o por ventana,
-generada desde `ramal-protocol`: los metodos marcados como del host (`repo/open`) no se aceptan
-nunca de un webview. Ningun metodo acepta rutas absolutas, una ruta relativa con `..` o NUL, o
+escrita con los nombres que salen de `ramal-protocol` (en VS Code tipada contra la lista generada;
+en escritorio, `surfaces.rs` con los marcadores de `define_methods!`). Los metodos marcados como
+del host (`repo/open`) no se aceptan nunca de un webview, y el motor lo vuelve a comprobar. Ningun metodo acepta rutas absolutas, una ruta relativa con `..` o NUL, o
 que salga del arbol de trabajo despues de seguir enlaces simbolicos, se rechaza, y ninguno
 devuelve material secreto a un webview.
 
@@ -174,11 +189,11 @@ devuelve material secreto a un webview.
 
 ### CSP
 
-| Host                | Politica                                                                                                                                                                                                                                                                                                          |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tauri               | `default-src 'none'`, `script-src 'self'`, `style-src 'self'`, `font-src 'self'`, `img-src 'self' data:`, `connect-src ipc: http://ipc.localhost`, `frame-src 'none'`, `object-src 'none'`, `base-uri 'none'`, `form-action 'none'`; `freezePrototype: true` y `withGlobalTauri: false`                           |
-| Webviews de VS Code | `default-src 'none'`, `script-src 'nonce-...'` con un nonce nuevo en cada carga, `style-src`, `font-src` e `img-src` limitados a `webview.cspSource` (mas `data:` en imagenes), `connect-src 'none'`, `frame-src 'none'`, `base-uri 'none'`, `form-action 'none'`; `localResourceRoots` limitado a `dist/webview` |
-| Web                 | La pone el gateway como cabecera. `script-src` con los hashes de los scripts de hidratacion que genera el build, nunca `'unsafe-inline'`                                                                                                                                                                          |
+| Host                | Politica                                                                                                                                                                                                                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tauri               | `default-src 'none'`, `script-src 'self'`, `style-src 'self'` mas el hash del `<style>` de React Aria, `font-src 'self'`, `img-src 'self' data:`, `connect-src ipc: http://ipc.localhost`, `frame-src 'none'`, `object-src 'none'`, `base-uri 'none'`, `form-action 'none'`; `freezePrototype: true` y `withGlobalTauri: false` |
+| Webviews de VS Code | `default-src 'none'`, `script-src 'nonce-...'` con un nonce nuevo en cada carga, `style-src`, `font-src` e `img-src` limitados a `webview.cspSource` (mas `data:` en imagenes), `connect-src 'none'`, `frame-src 'none'`, `base-uri 'none'`, `form-action 'none'`; `localResourceRoots` limitado a `dist/webview`               |
+| Web                 | La pone el gateway como cabecera. `script-src` con los hashes de los scripts de hidratacion que genera el build, nunca `'unsafe-inline'`                                                                                                                                                                                        |
 
 `connect-src` sin `https:` en escritorio es lo que garantiza que el webview no puede hablar con la
 red aunque alguien lo intente: toda salida pasa por el comando `rpc`. En desarrollo hay una CSP

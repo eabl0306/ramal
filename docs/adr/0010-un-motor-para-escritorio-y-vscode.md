@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -30,8 +31,10 @@ fino. Este ADR la desarrolla.
 
 ### `ramal-engine` es la unica puerta
 
-Los dos hosts llaman a la misma funcion, `Engine::handle(RpcRequest) -> Option<RpcResponse>`, que
-deserializa los parametros, llama al caso de uso y serializa el resultado. Por eso el protocolo es
+Los dos hosts llaman a la misma funcion, `Engine::handle(RpcRequest) -> Option<RpcResponse>` (o
+`handle_with`, que ademas dice si la peticion viene del host o de un webview), que deserializa los
+parametros, llama al caso de uso y serializa el resultado. Lo que viene de un webview no puede
+llamar a los metodos marcados como del host. Por eso el protocolo es
 identico en los dos productos: los metodos, los DTOs y los errores los define `ramal-protocol` una
 vez ([ADR 0011](0011-ui-compartida-y-puente-tipado.md)), y ningun host tiene una lista propia de
 metodos.
@@ -57,7 +60,12 @@ metodos.
   huerfano.
 - Notificaciones de control con prefijo `$/`: `$/cancel` para cancelar una peticion y
   `$/progress` para las operaciones largas, con los codigos de LSP donde existen (-32800 para una
-  peticion cancelada).
+  peticion cancelada). En el primer corte el motor todavia ignora `$/cancel` y no emite
+  `$/progress`.
+- Un JSON roto da -32700 y un sobre invalido (id de texto o fuera de rango, sin metodo, un array)
+  da -32600, con id `null` si no se pudo leer. Un metodo que no existe da -32601. Los tres llevan
+  `kind: internal`: la interfaz solo llama a los metodos del mapa generado, asi que son fallos de
+  empaquetado, no algo que el usuario pueda arreglar.
 
 ### El extension host se queda fino
 
@@ -72,7 +80,7 @@ Hace lo que solo el puede hacer y nada mas:
   de metodos y en la de su superficie, y reescribe los ids para que un webview no pueda chocar con
   otro ni cancelar peticiones ajenas. El motor vuelve a validar despues.
 - Resolver las peticiones nativas (dialogos, QuickPick, abrir un fichero, copiar) con la API de VS
-  Code, sin pasar por el sidecar.
+  Code, sin pasar por el sidecar. En el primer corte solo existe copiar (`clipboard/writeText`).
 - Guardar secretos en `SecretStorage`.
 - Leer de la API `vscode.git` solo tres cosas: la ruta de git configurada (que pasa al sidecar),
   el descubrimiento de repositorios en workspaces con varias carpetas y los avisos de "el
@@ -93,12 +101,25 @@ sistema. El caso de uso no sabe cual de los dos tiene delante.
 
 - El extension host arranca el sidecar la primera vez que hace falta, no al activarse la
   extension.
-- Al arrancar, llama a `engine/info` y compara `PROTOCOL_VERSION` con la que trae generada. Como
-  los dos viajan en el mismo VSIX, una diferencia es un fallo de empaquetado y se ensena como tal.
+- Cada vez que arranca un proceso, llama a `engine/info` y compara `PROTOCOL_VERSION` con la que
+  trae generada. Como los dos viajan en el mismo VSIX, una diferencia es un fallo de empaquetado,
+  se ensena como tal y no se reintenta.
+- Si `engine/info` contesta con un error (no hay git, o el git no arranca), el proceso esta sano y
+  reiniciarlo no arregla nada: no cuenta como caida. El host lo para, la peticion recibe el error
+  del motor con su tipo (`git_not_found`, por ejemplo) y la siguiente prueba con un proceso
+  nuevo, que ya ve el arreglo. Cuando contarlo como caida metia el motor en el bucle de
+  reinicios, el usuario veia "motor no disponible" y nunca "no se encuentra Git". Un git
+  anterior a 2.34 tampoco es un error aqui: `engine/info` devuelve `supported: false`.
 - Si el sidecar muere, lo reinicia tras 1, 2, 4, 8 y 16 segundos. Con cinco caidas en tres
   minutos deja de intentarlo y muestra una notificacion con "Reintentar". Las peticiones
   pendientes fallan con el tipo `engine_unavailable`, que genera el propio host, en vez de
   quedarse colgadas.
+- Tras un reinicio el registro de repositorios del motor esta vacio. Antes de dejar pasar ninguna
+  peticion, el host vuelve a abrir con `repo/open` la raiz de cada panel. El `repoId` sale de la
+  raiz (`repo-` y 16 cifras hexadecimales de su hash), asi que es el mismo que tenia el panel. Si
+  la carpeta ya no es un repositorio, cierra sus paneles y avisa.
+- Los webviews reciben los tipos de error del motor tal cual, mas `engine_unavailable` cuando el
+  motor no esta.
 - Cada ventana de VS Code tiene su extension host y por tanto su sidecar. Todos comparten
   `SecretStorage`, y de ahi sale la ventana de 30 segundos del refresco de sesion
   ([ADR 0008](0008-autenticacion-con-tokens.md)).

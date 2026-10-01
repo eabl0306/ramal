@@ -9,14 +9,18 @@ Git, el cifrado de secretos y la IA.
 Es un documento tecnico: aqui se entra en detalle a proposito. El modelo de datos que lo
 soporta esta en [data-model.md](data-model.md).
 
-Cuando el servicio exista, la referencia ejecutable sera `GET /openapi.json`. Si este
-documento y ese JSON no coinciden, el JSON tiene razon y este documento se corrige.
+La referencia ejecutable es `GET /openapi.json` del servicio en marcha, y su copia versionada,
+`apps/api/openapi.json`. Si este documento y ese JSON no coinciden, el JSON tiene razon y este
+documento se corrige.
 
 ## Estado
 
-Es una **propuesta de contrato**: no hay nada construido todavia. Cubre las tres
-superficies que hablan con la API (Ramal Desktop, Ramal para VS Code y Ramal Web) y cada
-accion que los inventarios del diseno clasificaron como `RAMAL_API`. El
+Es una **propuesta de contrato** salvo la fase F0: la salud, el documento OpenAPI y los
+errores en problem+json ya estan construidos (seccion [Salud y contrato](#salud-y-contrato)),
+y lo que dice este documento de ellos esta comprobado contra el codigo a fecha de 2026-10-01.
+Todo lo demas sigue sin construir. Cubre las tres superficies que hablan con la API (Ramal
+Desktop, Ramal para VS Code y Ramal Web) y cada accion que los inventarios del diseno
+clasificaron como `RAMAL_API`. El
 [apendice A](#apendice-a-pantalla-o-accion-y-endpoint) cruza cada pantalla y cada accion
 con su endpoint; si una pantalla pinta un dato, algun endpoint lo sirve.
 
@@ -160,14 +164,16 @@ cliente, `code` en los errores de campo, concurrencia optimista y streaming en e
   "title": "Datos invalidos",
   "status": 422,
   "detail": "Revisa los campos marcados.",
+  "code": "validation_failed",
   "errors": [
     { "field": "name", "code": "too_long", "message": "El nombre no puede pasar de 60 caracteres." }
   ]
 }
 ```
 
-- `code` aparece en los errores que el cliente tiene que distinguir: todos los 409, los 403,
-  los 410, algunos 400 y cada entrada de `errors`.
+- **Todo problema lleva `code`**, un texto estable en snake_case, y cada entrada de `errors`
+  tambien. `errors` solo aparece en los errores de validacion. Es lo que el cliente usa para
+  decidir; el `type` es la familia y el `code` el motivo concreto.
 - **Los mensajes vienen en castellano**, igual que en Gastonomo. Pero la interfaz de Ramal
   es bilingue: por eso cada error de campo lleva un `code` estable y los clientes pintan el
   texto desde `@ramal/i18n` en el idioma de la interfaz. El `message` es el texto de
@@ -176,9 +182,32 @@ cliente, `code` en los errores de campo, concurrencia optimista y streaming en e
   que no existe de uno caducado o ya usado diria si se acerto con uno que existe. El motivo
   real queda en la traza del servidor.
 - Los 404 y 405 del transporte tambien salen en `problem+json`, con el mismo catcher que
-  Gastonomo.
+  Gastonomo. Sin el, Salvo negociaria el `Accept` y responderia una pagina HTML. El catcher
+  respeta el estado: un 410 sigue siendo 410 aunque su `type` sea generico.
+- Los motivos internos (el `reason` de un 401, el recurso que falto en un 404, el detalle de un
+  fallo de una dependencia) se quedan en el log; al cliente solo le llega texto pensado para el.
 
-Los `type` que existen: `validation`, `bad-request`, `invalid-credentials`, `unauthorized`,
+Los `code` que ya existen en el primer corte:
+
+| Origen                           | `type`                   | Estado   | `code`                     |
+| -------------------------------- | ------------------------ | -------- | -------------------------- |
+| Ruta que no existe               | `not-found`              | 404      | `route_not_found`          |
+| Metodo no admitido               | `method-not-allowed`     | 405      | `method_not_allowed`       |
+| Cuerpo demasiado grande          | `payload-too-large`      | 413      | `payload_too_large`        |
+| Tipo de contenido                | `unsupported-media-type` | 415      | `unsupported_media_type`   |
+| Demasiadas peticiones            | `too-many-requests`      | 429      | `too_many_requests`        |
+| Servicio no disponible           | `service-unavailable`    | 503      | `service_unavailable`      |
+| Otro 4xx del transporte          | `bad-request`            | el suyo  | `bad_request`              |
+| Otro 5xx                         | `internal-error`         | 500      | `internal_error`           |
+| Validacion de un caso de uso     | `validation`             | 422      | `validation_failed`        |
+| Sin sesion valida                | `unauthorized`           | 401      | `unauthorized`             |
+| Recurso que no existe o es ajeno | `not-found`              | 404      | `not_found`                |
+| Sin permiso, conflicto           | `forbidden`, `conflict`  | 403, 409 | el que fije el caso de uso |
+
+Los de transporte salen de `ramal-api-http/src/problem/from_status.rs` y los de los casos de uso
+de `from_error.rs`; un endpoint nuevo anade los suyos.
+
+Los `type` del contrato completo (los del primer corte estan en la tabla de arriba): `validation`, `bad-request`, `invalid-credentials`, `unauthorized`,
 `forbidden`, `not-found`, `gone`, `method-not-allowed`, `conflict`, `precondition-failed`,
 `precondition-required`, `payload-too-large`, `unsupported-media-type`,
 `too-many-requests`, `internal-error`, `bad-gateway`, `gateway-timeout` y
@@ -401,7 +430,7 @@ Salud y contrato                                                        F0
 GET    /health/live                              200  publico
 GET    /health/ready                             200 | 503  publico
 GET    /openapi.json                             200  publico
-GET    /swagger-ui                               200  solo en desarrollo (el gateway de produccion no lo enruta)
+GET    /swagger-ui/                              200  solo con RAMAL__SERVER__SWAGGER_UI=true (desarrollo)
 
 Autenticacion web                                                       F1
 POST   /v1/auth/register                         201  publico, limitado
@@ -566,28 +595,44 @@ POST   /v1/platform-oauth/{provider}/refresh     200  publico, no-store
 
 ## Salud y contrato
 
-**F0.** Identico a Gastonomo.
+**F0. Construido.** Como Gastonomo, con `checkedAt` y sin el detalle de los fallos.
 
 ```
-GET /health/live    200 siempre, sin tocar dependencias
-GET /health/ready   200 si status=ok, 503 si status=degraded
+GET /health/live    200 siempre, sin tocar dependencias; checks siempre vacio
+GET /health/ready   200 si status=ok, 503 si status=degraded (mismo JSON, no problem+json)
 
 {"status":"ok"|"degraded",
- "checks":[{"name":"database","status":"ok"|"error","latencyMs":3},
-           {"name":"secrets","status":"ok"|"error","latencyMs":0}],
- "version":"0.1.0"}
+ "checks":[{"name":"database","status":"ok"|"error","latencyMs":3}],
+ "version":"0.1.0",
+ "checkedAt":"2026-09-30T10:00:00Z"}
 ```
 
-`secrets` comprueba que la llave maestra activa (la que cifra las llaves de IA de
+- `checkedAt` es el instante de la comprobacion, en RFC 3339 con `Z`. La hora sale del puerto
+  `Clock` de `ramal-api-application`: el nucleo no lee el reloj.
+- **El motivo de un fallo no viaja.** Un componente en `error` solo dice eso; el detalle
+  (timeout, conexion rechazada, esquema atrasado) queda en el log del servidor.
+- `database` no es un `SELECT 1`: lee la ultima migracion aplicada y la compara con la mas nueva
+  que trae el binario. Mientras las migraciones del arranque no terminan (se reintentan cada 10
+  segundos), `ready` responde 503 y `live` sigue en 200.
+
+`secrets` (todavia no existe) comprobara que la llave maestra activa (la que cifra las llaves de IA de
 organizacion) esta cargada y descifra un valor de prueba. Sin ella la API arranca, pero
 `ready` responde 503: un despliegue que no puede abrir las llaves de organizacion no debe
 recibir trafico del proxy de IA. Antes de F4 el check no existe.
 
-`GET /openapi.json` lo genera `salvo-oapi` desde el propio router, y de ese JSON sale
-`@ramal/api-client` (`openapi-typescript` + `openapi-fetch`). Es publico. `GET /swagger-ui` es el
-visor, **solo en desarrollo**: el gateway de produccion no lo enruta
-([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). Swagger UI ha tenido fallos de XSS, y
-servido en `ramal.dev` correria con las cookies de sesion y la cookie CSRF a su alcance.
+`GET /openapi.json` lo genera `salvo-oapi` desde el propio router (OpenAPI 3.1), y de ese JSON
+sale `@ramal/api-client` (`openapi-typescript` + `openapi-fetch`). Es publico. El documento se
+versiona en `apps/api/openapi.json`: un test de `ramal-api-http` falla si se queda atras y
+`just api-openapi` lo reescribe. El esquema `Problem` va en el documento aunque ningun endpoint
+lo declare todavia, porque cualquier ruta puede responderlo.
+
+`GET /swagger-ui/` es el visor, **solo en desarrollo**: la API solo lo monta con
+`RAMAL__SERVER__SWAGGER_UI=true`, que encienden `compose.yaml` y `just api-run`. Por defecto va
+apagado y la ruta responde 404 como cualquier otra, asi que una imagen de produccion no lo sirve
+aunque el gateway reenviara la ruta (el de produccion tampoco la enrutara;
+[ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). Swagger UI ha tenido fallos de XSS, y
+servido en `ramal.dev` correria con las cookies de sesion y la cookie CSRF a su alcance. Sus
+assets van embebidos en el binario: funciona sin salida a internet.
 Los tipos del protocolo del motor (Desktop y VS Code) no salen de aqui: salen de
 `ramal-protocol` con `ts-rs`, porque el motor no es un cliente HTTP de la web.
 

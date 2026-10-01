@@ -2,6 +2,7 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
 
 ## Contexto
 
@@ -38,10 +39,13 @@ gateway. Edition 2024 y Rust 1.98.1, por encima del minimo de 1.94 que piden sal
 ### Estructura
 
 - `ramal-api-http` es el unico crate que conoce Salvo: router, handlers, DTOs, problem+json,
-  catcher, documento OpenAPI y los middlewares de request id, limite de peticiones e
-  idempotencia. Es un adaptador driving.
+  catcher, documento OpenAPI, el middleware de request id y el arranque del servidor (`serve`,
+  con el apagado ordenado). Los middlewares de limite de peticiones e idempotencia llegan con
+  los endpoints que los necesitan. Es un adaptador driving.
 - `ramal-api` es el binario y el composition root (`src/bootstrap.rs` mas un modulo por
-  contexto en `src/bootstrap/`). Construye los adaptadores, los casos de uso y el router.
+  contexto en `src/bootstrap/`). Construye los adaptadores, los casos de uso y las
+  dependencias del router, y llama a `ramal_api_http::serve`. No depende de Salvo: el servidor
+  arranca dentro de `ramal-api-http`, asi que ningun tipo del framework sale de ese crate.
 - Configuracion con figment desde el entorno, prefijo `RAMAL__` y `__` como separador de nivel,
   con valores por defecto en el codigo. `.env.example` es la lista de lo que se puede mover.
 - Apagado ordenado: SIGTERM y SIGINT llaman a `stop_graceful` con margen, igual que Gastonomo.
@@ -52,7 +56,7 @@ El documento se genera con salvo-oapi 1.0.0, la feature `oapi` de Salvo, en luga
 utoipa 6.0.0.
 
 - salvo-oapi es un crate propio del proyecto Salvo, derivado de utoipa, que no depende de
-  utoipa. Su modelo es OpenAPI 3.2.
+  utoipa. El documento que genera hoy es OpenAPI 3.1 (`"openapi": "3.1.0"`).
 - Cada handler se declara con `#[endpoint]` y cada DTO deriva `ToSchema`. El documento se
   construye recorriendo el router (`OpenApi::new(...).merge_router(&router)`), asi que una ruta
   sin su documentacion no puede existir: la ruta es la documentacion.
@@ -62,10 +66,12 @@ utoipa 6.0.0.
   `impl` genericos, y eso fija una regla: los handlers guardan los casos de uso detras de `Arc`,
   y los casos de uso guardan sus puertos como `Arc<dyn Puerto>`, que es lo que ya pide
   `async-trait`. Un handler generico sobre el tipo del puerto no compila.
-- Se sirve en `/openapi.json`. La Swagger UI va en `/swagger-ui` con la feature `swagger-ui`
-  de salvo-oapi, que la feature `oapi` de Salvo activa. Sus assets van embebidos en el binario
-  (Swagger UI 5.32.11 con `rust-embed`), asi que funciona sin salida a internet, que era un
-  hueco de Gastonomo.
+- Se sirve en `/openapi.json`. La Swagger UI va en `/swagger-ui/` con la feature `swagger-ui`
+  de salvo-oapi, que la feature `oapi` de Salvo ya activa. Sus assets van embebidos en el
+  binario (Swagger UI 5.32.11 con `rust-embed`), asi que funciona sin salida a internet, que era
+  un hueco de Gastonomo. Solo se monta con `RAMAL__SERVER__SWAGGER_UI=true`; apagada, la ruta es
+  un 404 como cualquier otra. La encienden `compose.yaml` y `just api-run`; la imagen de
+  produccion arranca sin ella, asi que no depende de que el gateway no la reenvie.
 - El documento generado se versiona en `apps/api/openapi.json`. Un test de `ramal-api-http` lo
   compara con lo que genera el router y falla si difieren; `just api-openapi` lo reescribe. Ese
   fichero es la fuente de `@ramal/api-client` y de los tests de contrato del motor.

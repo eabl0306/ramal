@@ -20,9 +20,10 @@ La diferencia no se deja viva.
 
 ## Estado
 
-El documento describe a la vez el primer corte y el destino. Todo lo que no existe todavia
-se marca como planificado. La lista completa de que construye el primer corte y que queda
-fuera esta en la [seccion 10](#10-primer-corte-y-lo-planificado).
+El primer corte ya esta en `main`. El documento describe a la vez lo que hay en el codigo y el
+destino: todo lo que no existe todavia se marca como planificado. Se alineo con el codigo el
+2026-10-01. La lista de lo que trae el primer corte, lo que se verifico y lo que queda fuera
+esta en la [seccion 10](#10-primer-corte-y-lo-planificado).
 
 ## Decisiones de partida
 
@@ -138,77 +139,83 @@ rustfmt.toml                Formato de Rust
 deny.toml                   cargo-deny: licencias, avisos y crates vetados (git2, libgit2-sys)
 .cargo/config.toml          TS_RS_EXPORT_DIR, la carpeta donde ts-rs escribe los tipos
 package.json                packageManager pnpm@11.18.0, scripts de la raiz y tooling compartido
-pnpm-workspace.yaml         apps/*, packages/*, tools/*; allowBuilds y reglas de pnpm
+pnpm-workspace.yaml         apps/web, apps/desktop, apps/vscode, packages/*, tools/*; allowBuilds y engineStrict
 pnpm-lock.yaml
 tsconfig.json               Solo referencias a cada proyecto TS; lo usa tsc -b
-eslint.config.js            Calidad para tools/ (cada app y cada paquete TS tiene su propio config)
+eslint.config.js            Calidad para la raiz y tools/ (cada app y cada paquete TS tiene su propio config)
 justfile                    Punto de entrada unico: setup, check, ci, e2e y recetas por pieza
 lefthook.yml                pre-commit rapido, pre-push caro, commit-msg con commitlint
 commitlint.config.mjs
-.editorconfig  .prettierrc.json  .prettierignore  .gitignore  .gitattributes  .npmrc
+.editorconfig  .prettierrc.json  .prettierignore  .gitignore  .gitattributes  .nvmrc
+stylelint.config.mjs  knip.json  .dockerignore
 .env.example                Variables RAMAL__ de la API con sus valores por defecto
-compose.yaml                Pila de desarrollo: postgres, api, web y gateway
-docker/                     gateway.dev.conf y gateway.prod.conf: un location por prefijo de la API
+compose.yaml                Pila de desarrollo: postgres y, con el perfil full, api, web, gateway y mailpit
+docker/                     gateway.dev.conf: un location por prefijo de la API; (plan) gateway.prod.conf
 .github/workflows/          ci.yml (unica entrada y check all-green) y un workflow por pieza
 README.md  CLAUDE.md
 docs/
     architecture.md         Este documento
     api-surface.md          Contrato HTTP de la API, endpoint por endpoint
+    data-model.md           Modelo de datos de la API
+    backlog.md              Epicas e issues, con el hito de cada una
     adr/                    Decisiones, NNNN-slug-en-castellano.md
     design/handoff/         Diseno: prototipos *.dc.html, ramal-data.js y README
+    design/gaps.md          Huecos del diseno y lo que cambia cada uno
 apps/
     api/                    Ramal API: Salvo 1.x + PostgreSQL (SQLx)
         crates/domain/          ramal-api-domain: entidades y reglas del servidor
         crates/application/     ramal-api-application: puertos, casos de uso y fakes (feature testing)
-        crates/infrastructure/  ramal-api-infrastructure: config, SQLx, cifrado de sobre, correo, OAuth
+        crates/infrastructure/  ramal-api-infrastructure: config, telemetria, SQLx y reloj; (plan) cifrado, correo, OAuth
         crates/http/            ramal-api-http: router, handlers, DTOs, problem+json, OpenAPI
         crates/api/             ramal-api: binario; composition root en src/bootstrap.rs + src/bootstrap/
-        migrations/             SQL solo hacia delante, aplicado al arrancar
+        migrations/             SQL solo hacia delante, aplicado al arrancar en segundo plano
         openapi.json            Documento OpenAPI versionado; fuente de @ramal/api-client
-        Dockerfile
+        Dockerfile  Dockerfile.dev
+        scripts/smoke-image.sh  Arranca la imagen de produccion y la prueba
     desktop/                Ramal Desktop (paquete @ramal/desktop)
-        src/application/        Solo puertos del host de escritorio (RepositoryPicker, luego actualizador)
-        src/infrastructure/     TauriTransport y adaptadores de los plugins de Tauri
-        src/ui/                 Pantallas propias: shell y pestanas, inicio, ajustes
-        src/app/                Composition root, router y providers
+        src/application/        Puertos del host (RepositoryPicker, AppearanceStore) y el modelo de pestanas
+        src/infrastructure/     TauriTransport, el selector sobre repo_pick_and_open y localStorage
+        src/ui/                 Pantallas propias: barra de titulo con pestanas, inicio y vista del repositorio
+        src/app/                Composition root, providers y entrada
         e2e/                    Playwright contra el build de Vite con mockIPC
-        wdio/                   (plan) E2E real con WebdriverIO y @wdio/tauri-service
+        wdio/  wdio.conf.ts     E2E nativo con WebdriverIO y @wdio/tauri-service contra la app real
         src-tauri/              Crate ramal-desktop, el host Tauri
-            Cargo.toml              Fuera de default-members
+            Cargo.toml              Fuera de default-members; feature e2e para el E2E nativo
             build.rs                tauri-build con AppManifest (permiso explicito por comando)
             tauri.conf.json         Ventana, CSP, bundle y (plan) updater
-            capabilities/           Permisos minimos: rpc, repo_pick_and_open y los plugins usados
-            src/                    main.rs, bootstrap.rs, commands.rs, surfaces.rs, event_sink.rs
-    vscode/                 Ramal for VS Code (paquete @ramal/vscode, extension ramal.ramal)
+            capabilities/           Permisos minimos: solo rpc y repo_pick_and_open
+            src/                    lib.rs, main.rs, bootstrap.rs, commands.rs, surfaces.rs, picker.rs
+            tests/                  tauri::test sobre el runtime simulado
+    vscode/                 Ramal for VS Code (paquete ramal, extension ramal.ramal)
         package.json            Manifiesto: contributes, activationEvents, engines.vscode
         package.nls.json  package.nls.es.json   Textos del manifiesto (ingles por defecto, espanol)
         src/shared/             Tipos de los mensajes entre webview y extension host, sin dependencias
         src/extension/          Extension host
-            application/            Puertos y casos de uso del host; no importa vscode
-            infrastructure/         Adaptadores de la API de VS Code, proceso del sidecar, validacion, HTML de webviews
+            application/            Puertos y casos de uso del host; no importa vscode ni node:
+            infrastructure/         Adaptadores de la API de VS Code, proceso y marcos del sidecar, validacion, HTML de webviews
             app/                    extension.ts (activate, deactivate) y composition-root.ts
         src/webview/            Webviews, build multipagina de Vite en dist/webview
-            infrastructure/         VsCodeTransport y el RepoViewHost que habla con el extension host
-            ui/                     Pantallas propias de VS Code (vista Cambios, ajustes)
-            app/                    Una entrada por superficie: graph (primer corte), changes, merge, settings
-        test/integration/       @vscode/test-cli bajo xvfb
+            infrastructure/         VsCodeTransport y la conexion con el extension host
+            ui/                     GraphApp; (plan) vista Cambios y ajustes
+            app/                    Una entrada por superficie: graph; (plan) changes, merge, settings
+        test/integration/       @vscode/test-cli (bajo xvfb en Linux sin pantalla)
         e2e/                    Playwright contra el bundle de webviews con acquireVsCodeApi falso
         dist/                   Artefactos: extension.cjs, webview/, bin/ramal-vscode-engine (ignorado en git)
     vscode-engine/          Crate ramal-vscode-engine: sidecar JSON-RPC 2.0 por stdio
-        src/                    main.rs, bootstrap.rs, framing.rs, server.rs
+        src/                    main.rs, lib.rs, args.rs, bootstrap.rs, framing.rs, message.rs, server.rs
     web/                    Ramal Web (paquete @ramal/web)
         react-router.config.ts  appDirectory src/app, ssr false, prerender de la landing
-        src/domain/             Modelos propios de la web; sin imports externos salvo @ramal/domain
-        src/application/        Puertos (AuthGateway, HealthGateway, SessionStore...) y casos de uso
-        src/infrastructure/     Adaptadores HTTP sobre @ramal/api-client y adaptadores en memoria
+        src/domain/             Modelos propios de la web (salud, preferencias, descargas); sin imports externos salvo @ramal/domain
+        src/application/        Puertos (AuthGateway, HealthGateway, PreferencesStore, ReleaseCatalog...) y casos de uso
+        src/infrastructure/     HTTP sobre @ramal/api-client, navegador, localStorage y datos fijos de descarga
         src/ui/                 Componentes y pantallas; reciben los puertos por contexto
         src/app/                root.tsx, routes.ts, routes/, composition-root.ts
         e2e/                    Playwright con red simulada y, aparte, contra la pila Docker
 crates/
-    core-domain/            ramal-core-domain: dominio puro del cliente (commits, refs, grafo, conflictos, rebase)
+    core-domain/            ramal-core-domain: dominio puro del cliente (commits, refs, grafo; luego conflictos y rebase)
     core-application/       ramal-core-application: puertos, casos de uso y fakes en el modulo testing
     protocol/               ramal-protocol: metodos y DTOs del motor (serde + ts-rs), sin logica
-    git/                    ramal-git: adaptador del git CLI (GitReader; GitWriter despues)
+    git/                    ramal-git: adaptador del git CLI (GitCliReader; GitWriter despues)
     engine/                 ramal-engine: dispatch, mapeo dominio-DTO y composition root del cliente
     vault/                  (plan) ramal-vault: criptografia de la boveda E2E
     keychain/               (plan) ramal-keychain: SecretStore sobre keyring-core
@@ -223,10 +230,12 @@ packages/
     bridge/                 @ramal/bridge: tipos generados del protocolo y cliente tipado sobre Transport
     api-client/             @ramal/api-client: cliente generado del OpenAPI de la API, solo para la web
     eslint-config/          @ramal/eslint-config: base, calidad, React, tests y boundaries
-    tsconfig/               @ramal/tsconfig: base.json, react.json, node.json
+    tsconfig/               @ramal/tsconfig: base.json, library.json, react.json, node.json
 tools/
-    checks/                 @ramal/checks: tamano de fichero, tests enfocados, TODO con ticket, grafo de paquetes
-    scripts/                scan-staged.sh, smoke-stack.sh y generadores (i18n, manifiesto de VS Code)
+    checks/                 @ramal/checks: las reglas comunes a todos los lenguajes (ver 5.3), Node sin dependencias
+    rust-complexity/        ramal-rust-complexity: cognitiva y ciclomatica de cada funcion de Rust (syn)
+    docker/                 tauri-linux.Dockerfile: Ubuntu 22.04 con los requisitos de Tauri
+    scripts/                scan-staged.sh y smoke-stack.sh
 ```
 
 Convenciones que valen en todo el arbol:
@@ -235,7 +244,8 @@ Convenciones que valen en todo el arbol:
   `*.test.ts(x)`, sin enums ni namespaces (`erasableSyntaxOnly`).
 - Rust: ficheros en snake_case, modulos al estilo 2018 (`port.rs` mas la carpeta `port/`,
   sin `mod.rs` salvo `tests/support/mod.rs`), docs `//!` y `///` en castellano, mensajes de
-  `Display` y de `tracing` en ingles.
+  `Display` y de `tracing` en ingles. Los tests unitarios van en su propio fichero
+  (`#[cfg(test)] mod tests;` mas `<modulo>/tests.rs`), nunca en linea.
 - Nombres: paquetes npm `@ramal/*`, crates `ramal-*`, variables de entorno de la API con
   prefijo `RAMAL__`, tickets `RAM-123`.
 
@@ -288,8 +298,9 @@ que existe JSON, y la forma del JSON la decide `ramal-protocol`.
 src/sha.rs            Sha (40 hex validado) y la forma corta que da git (%h)
 src/repo.rs           RepoRoot (ruta de la raiz del repo, newtype sobre PathBuf) y RepoId (opaco)
 src/refs.rs           RefName, RefKind (rama local, rama remota, tag), RefSnapshot (refs + HEAD)
+src/refs/fingerprint.rs  Huella opaca de las refs: el `snapshot` de graph/window
 src/commit.rs         CommitNode (sha + padres en orden) y CommitRecord (autor, fecha, asunto)
-src/time.rs           GitTime: segundos unix mas desplazamiento en minutos, tal como lo da git
+src/time.rs           GitTime: leido de --date=raw (segundos y zona) y escrito en ISO 8601 estricto
 src/graph.rs          Punto de entrada de la disposicion del grafo
 src/graph/lanes.rs    Asignacion de carriles con puntas fijadas (pinned) y reutilizacion de huecos
 src/graph/edges.rs    Aristas con carril de viaje (travel lane) para no cruzar nodos
@@ -338,10 +349,11 @@ src/use_case.rs                       Declaracion de modulos de casos de uso
 src/use_case/engine/describe_engine.rs     DescribeEngine: version del motor y de git
 src/use_case/repo/open_repository.rs       OpenRepository: descubre la raiz y emite un RepoId
 src/use_case/graph/load_graph_window.rs    LoadGraphWindow: log + refs + disposicion + ventana
-src/state/open_repositories.rs        Registro RepoId -> RepoRoot (varias pestanas, varios repos)
+src/state/open_repositories.rs        Registro RepoId -> RepoRoot; el id sale de la raiz (`repo-` + 16 hex)
 src/error.rs                          EngineError, el unico error que sale de un caso de uso
 src/testing.rs                        Solo con #[cfg(any(test, feature = "testing"))]
 src/testing/fake_git_reader.rs        FakeGitReader: responde lo que le digas y cuenta llamadas
+src/testing/samples.rs                Datos de ejemplo para los tests
 src/testing/block_on.rs               Ejecutor sin runtime (Waker::noop) para tests sin tokio
 ```
 
@@ -361,9 +373,19 @@ pub trait GitReader: Send + Sync {
 ```
 
 `EngineError` tiene variantes cerradas (`RepositoryNotOpen`, `NotARepository`,
-`GitUnavailable`, `GitVersionUnsupported { found, minimum }`, `InvalidWindow`,
+`GitUnavailable`, `GitVersionUnsupported { found, minimum }`, `InvalidWindow`, `StaleWindow`,
 `GitFailed { detail }`, y mas adelante `Cancelled` y `NotSignedIn`). El `detail` de un
 fallo de git solo va al log; al cliente llega un tipo de error estable (ver 6.5).
+
+El `RepoId` no es un contador: es `repo-` mas el hash FNV-1a de 64 bits de la raiz en 16 cifras
+hexadecimales. Existe por un fallo real: el sidecar de VS Code se reinicia tras una caida con el
+registro vacio, y con un contador el `repo-1` del proceso nuevo podia ser otro repositorio que el
+del viejo. Con el id derivado de la raiz, volver a abrir la misma carpeta da el mismo id, y un id
+viejo nunca apunta a otro repositorio.
+
+El git minimo (2.34) se aplica en `OpenRepository`, antes de tocar un repositorio. `DescribeEngine`
+no falla con un git viejo: lo informa con `supported: false` para que la interfaz explique que
+hacer.
 
 #### ramal-protocol
 
@@ -375,11 +397,12 @@ cambiaria el contrato sin que nadie lo viera. El mapeo entre dominio y DTO vive 
 
 ```
 src/envelope.rs      RpcRequest, RpcResponse, RpcError, ErrorKind, RpcNotification, codigos JSON-RPC
-src/methods.rs       PROTOCOL_VERSION y la tabla de metodos (macro define_methods!)
+src/methods.rs       PROTOCOL_VERSION (hoy 2) y la tabla de metodos (macro define_methods!, con host_only)
 src/engine.rs        EngineInfo, GitInfo
 src/repo.rs          OpenRepoParams, RepoHandle
 src/graph.rs         GraphWindowParams, GraphWindow, GraphRow, GraphEdge, RefLabel
 tests/export_bindings.rs   Escribe methods.ts e index.ts en packages/bridge/src/generated
+tests/methods.rs           La tabla de metodos y sus marcas de host
 ```
 
 Los tipos no llevan sufijo `Dto`: son exactamente los nombres que vera TypeScript. En
@@ -388,38 +411,52 @@ Los tipos no llevan sufijo `Dto`: son exactamente los nombres que vera TypeScrip
 #### ramal-git
 
 Adaptador driven del git CLI. Implementa `GitReader` en el primer corte y `GitWriter`
-despues. Depende de `ramal-core-domain`, `ramal-core-application`, `tokio` (process,
-io-util, time), `thiserror` y `tracing`.
+despues. Depende de `ramal-core-domain`, `ramal-core-application`, `async-trait` (para
+implementar los puertos), `tokio` (process, io-util, fs), `thiserror` y `tracing`.
 
 ```
-src/cli.rs              Descubrimiento del binario y construccion de comandos
-src/cli/runner.rs       Lanza git, aplica entorno y limites, mata el grupo de procesos al cancelar
-src/cli/version.rs      Parsea git --version, rechaza < 2.34, calcula GitCapabilities
+src/cli.rs              Descubrimiento del binario
+src/cli/command.rs      Construccion de comandos: opciones con formato y revisiones tras --end-of-options
+src/cli/runner.rs       Lanza git con entorno fijo y limites (120 s, stderr acotado); kill_on_drop si se abandona
+src/cli/version.rs      Parsea git --version y calcula GitCapabilities (el minimo lo aplica OpenRepository)
 src/reader.rs           GitCliReader: implementa GitReader
 src/parse.rs            Declaracion de parsers
-src/parse/log.rs        Parser del log con separadores NUL y 0x1f
-src/parse/refs.rs       Parser de for-each-ref
+src/parse/log.rs        Parser del log: NUL entre commits y un campo por linea
+src/parse/refs.rs       Parser de for-each-ref: NUL entre campos y salto de linea entre refs
 (plan) src/writer.rs    GitCliWriter
 (plan) src/askpass.rs   Helper de credenciales por repo y de GIT_SSH (varias cuentas por plataforma)
 (plan) src/trust.rs     Lectura de la configuracion local que puede ejecutar codigo (confianza)
 (plan) src/sequence.rs  Helpers de GIT_SEQUENCE_EDITOR y GIT_EDITOR para el rebase interactivo
-tests/support/mod.rs    Constructor de repos de prueba con el propio git en un tempdir
-tests/log_reader.rs     Lecturas contra repos reales de prueba
+tests/support/mod.rs    Constructor de repos de prueba con el propio git en un tempdir (lo reutilizan
+                        el motor, el sidecar y el host de escritorio con #[path])
+tests/discover.rs  tests/log_reader.rs  tests/refs_reader.rs   Lecturas contra repos reales de prueba
 ```
 
-Reglas del adaptador que evitan los errores clasicos:
+Reglas del adaptador que evitan los errores clasicos. Las de red, credenciales y confianza son
+para lo que llega despues de las lecturas del primer corte:
 
-- Siempre formatos de maquina: `-z`, `--porcelain=v2`, `--format` explicito con `%x00` y
-  `%x1f`. Siempre `--no-pager`, `--no-color` y `-c core.quotepath=off`.
-- Entorno fijo en cada llamada: `LC_ALL=C`, `GIT_TERMINAL_PROMPT=0`. Las lecturas en
-  segundo plano anaden `GIT_OPTIONAL_LOCKS=0`, para que refrescar el estado nunca tome
-  `index.lock` mientras el usuario trabaja en una terminal.
+- Siempre formatos de maquina: `-z`, `--porcelain=v2` y `--format` explicito con separadores que
+  git no deja meter en el dato: en el log, NUL entre commits y un campo por linea; en
+  `for-each-ref`, NUL entre campos. El `%x1f` se abandono porque git si deja meterlo en un nombre
+  o un correo, y los campos se desplazaban. Siempre `--no-pager`, `-c color.ui=false` y
+  `-c core.quotepath=off`.
+- Entorno fijo en cada llamada: `LC_ALL=C`, `GIT_TERMINAL_PROMPT=0` y, mientras solo hay
+  lecturas, `GIT_OPTIONAL_LOCKS=0`, para que refrescar nunca tome `index.lock` mientras el
+  usuario trabaja en una terminal (las escrituras no lo llevaran). Se quitan las variables que
+  redirigen git a otro repositorio (`GIT_DIR`, `GIT_WORK_TREE`, `GIT_INDEX_FILE`,
+  `GIT_CONFIG_PARAMETERS`...), que el motor heredaria si arranca desde un hook. La ruta del
+  repositorio nunca va en argv: es el directorio de trabajo del proceso.
 - Las refs se leen con `git for-each-ref`, nunca con la decoracion `%D` del log: un nombre
   de ref puede contener comas y `%D` las usa como separador.
-- El log del grafo es `git log --topo-order --exclude=refs/stash --exclude=refs/notes/* --all
--z --format=%H%x1f%h%x1f%P%x1f%an%x1f%ae%x1f%aI%x1f%s --max-count=<offset+limit+1>`. Los
-  stashes y las notas no son historia del proyecto (los stashes se ensenan en su propia
-  seccion) y el commit sobrante solo dice si hay mas.
+- El log del grafo es `git log --topo-order --branches --remotes --tags --ignore-missing -z
+--no-color --no-show-signature --encoding=UTF-8 --date=raw --format=%H%n%h%n%P%n%ad%n%an%n%ae%n%s
+--max-count=<offset+limit+1> --end-of-options HEAD`. Solo recorre las refs que el grafo sabe
+  etiquetar (las mismas que lee `for-each-ref`) mas HEAD, para que un HEAD separado siga
+  saliendo. Con `--all` salian como ramas sin nombre `refs/original` (filter-branch),
+  `refs/prefetch`, `refs/pull` o `refs/bisect`; los stashes y las notas no son historia del
+  proyecto. `--ignore-missing` evita que una rama huerfana sin commits haga fallar el log. El
+  commit sobrante solo dice si hay mas. Un commit con una fecha ilegible no tumba el log: se le
+  pone la fecha cero, como hace git.
 - Binario: el ajuste explicito si existe (en VS Code llega el `git.path` que expone la API
   `vscode.git`), si no el del `PATH`, y solo en Desktop para Windows un MinGit empaquetado como
   respaldo ([ADR 0009](adr/0009-motor-git-hibrido.md)).
@@ -430,7 +467,7 @@ Reglas del adaptador que evitan los errores clasicos:
 - SSH por cuenta con `GIT_SSH` apuntando al helper, que recibe argv y lanza ssh sin shell, nunca
   con `core.sshCommand`. El helper de credenciales solo entrega un token si el protocolo es
   `https` y el host coincide exactamente (tras IDNA) con el de la cuenta ligada.
-- **Confianza.** Antes del primer comando en un repositorio que Ramal no clono, el motor lee
+- **Confianza (planificada).** Antes del primer comando en un repositorio que Ramal no clono, el motor lee
   `git config --local --list --show-origin` (no ejecuta nada) y mira `.git/hooks`. Si hay claves
   que lanzan comandos (`core.fsmonitor`, `core.hooksPath`, `core.sshCommand`, `core.pager`,
   `core.editor`, `sequence.editor`, `diff.external`, `diff.*.textconv`, `diff.*.command`,
@@ -452,32 +489,41 @@ Adaptador driving y composition root compartido del cliente. Es lo unico que los
 
 ```
 src/builder.rs          EngineBuilder y EngineConfig: construye los adaptadores compartidos
-src/engine.rs           Engine: handle(RpcRequest) y dispatch(method, params, ctx)
-src/dispatch.rs         Tabla metodo -> handler
+src/engine.rs           Engine, CallContext y CallOrigin: handle, handle_with y dispatch
+src/dispatch.rs         Tabla metodo -> handler; rechaza los metodos del host si llama un webview
 src/dispatch/engine.rs  engine/info
 src/dispatch/repo.rs    repo/open
 src/dispatch/graph.rs   graph/window
 src/mapping.rs          Funciones de mapeo dominio -> DTO y EngineError -> RpcError
-src/mapping/graph.rs
-src/mapping/error.rs
+src/mapping/engine.rs  src/mapping/repo.rs  src/mapping/graph.rs  src/mapping/error.rs
 (plan) src/host_ports.rs     Reexporta los puertos que implementan los hosts (SecretStore) y EventSink
 (plan) src/adapters/ai.rs    Envoltorio fino que implementa AiClient sobre ramal-ai
 tests/architecture.rs   Reglas de dependencia del hexagono del cliente (lee Cargo.lock)
-tests/graph_window.rs   dispatch de punta a punta contra un repo real de prueba
+tests/core_purity.rs    Los clippy.toml de los cuatro nucleos y que su codigo no nombra el IO
+tests/envelope.rs       handle y los errores estables del protocolo, con el lector de git falso
+tests/graph_window.rs  tests/repo_open.rs   dispatch de punta a punta contra repos reales de prueba
 ```
 
 La interfaz publica:
 
 ```rust
 impl Engine {
-    /// Punto de entrada de los dos hosts. None para notificaciones (sin id).
+    /// Peticion del propio host. None para notificaciones (sin id), que el primer corte ignora.
     pub async fn handle(&self, request: RpcRequest) -> Option<RpcResponse>;
 
-    /// Lo que usa handle por dentro; tambien lo usan los tests.
-    pub async fn dispatch(&self, method: &str, params: serde_json::Value, ctx: CallContext)
+    /// Como handle, diciendo quien llama: CallContext::host() o CallContext::webview().
+    pub async fn handle_with(&self, request: RpcRequest, context: CallContext)
+        -> Option<RpcResponse>;
+
+    /// Lo que usan handle y handle_with por dentro; tambien los hosts y los tests.
+    pub async fn dispatch(&self, method: &str, params: serde_json::Value, context: CallContext)
         -> Result<serde_json::Value, RpcError>;
 }
 ```
+
+Escritorio reenvia lo que llega del webview con `handle_with(request, CallContext::webview())`, y
+el motor rechaza entonces los metodos marcados como `host_only` en `define_methods!` aunque el
+host los dejara pasar por error: el motor es la autoridad.
 
 Detalles que conviene saber antes de escribir un handler:
 
@@ -502,31 +548,41 @@ Tiene dos mitades en dos lenguajes, y cada una es una capa concreta del hexagono
 la raiz de composicion exterior del cliente de escritorio.
 
 ```
-src/main.rs          Arranque: tracing, runtime de Tauri y bootstrap
-src/bootstrap.rs     Composition root: rutas de la app, EngineBuilder, plugins, estado gestionado
+src/main.rs          Llama a ramal_desktop::run y traduce el resultado a un codigo de salida
+src/lib.rs           La biblioteca: todo el arranque vive aqui para que los tests lo cubran
+src/bootstrap.rs     Composition root: tracing, EngineBuilder, plugins, estado gestionado y comandos
 src/commands.rs      Comandos de Tauri: rpc, repo_pick_and_open y (plan) rpc_subscribe. Delegan en Engine
-src/surfaces.rs      Lista de metodos del motor permitidos por ventana, generada como surfaces.ts de VS Code
-src/event_sink.rs    (plan) EventSink sobre tauri::ipc::Channel para las notificaciones del motor
+src/surfaces.rs      Metodos del motor permitidos por ventana, escrita a mano con los marcadores de define_methods!
+src/picker.rs        FolderPicker: el dialogo nativo de carpetas, o una carpeta fija en los tests y el E2E
+(plan) src/event_sink.rs   EventSink sobre tauri::ipc::Channel para las notificaciones del motor
 ```
 
 - Un comando de negocio, `rpc`, que recibe un `RpcRequest` y devuelve un
   `Option<RpcResponse>`. No hay un comando de Tauri por metodo: el protocolo es el mismo que
   el del sidecar y la lista de metodos vive en `ramal-protocol`, no en `commands.rs`.
 - **El webview es un cliente que puede estar comprometido**: pinta mensajes de commit, nombres
-  de rama y ficheros que no son de fiar. Por eso `rpc` no deja pasar todo al motor: rechaza los
-  metodos marcados como del host en `define_methods!` (como `repo/open`) y comprueba la lista de
-  la ventana que llama (`surfaces.rs`). Abrir un repositorio es otro comando,
-  `repo_pick_and_open`, que ensena el dialogo nativo desde Rust y devuelve el `RepoHandle`: el
-  webview nunca manda una ruta. Las acciones sobre ficheros ("Mostrar en carpeta", "Copiar
-  ruta") van por `repoId` y ruta relativa al motor, que las valida (6.5).
+  de rama y ficheros que no son de fiar. Por eso `rpc` no deja pasar todo al motor: comprueba la
+  lista de la ventana que llama (`surfaces.rs`; la principal solo puede pedir `graph/window`) y
+  reenvia como llamada de webview, asi que el motor vuelve a rechazar los metodos del host (como
+  `repo/open`). Un metodo fuera de la lista se responde como si no existiera. Abrir un
+  repositorio es otro comando, `repo_pick_and_open`, que ensena el dialogo nativo desde Rust y
+  devuelve el `RepoHandle`: el webview nunca manda una ruta. Las acciones sobre ficheros
+  (planificadas: "Mostrar en carpeta", "Copiar ruta") iran por `repoId` y ruta relativa al motor,
+  que las valida (6.5).
 - `rpc_subscribe` recibe un `Channel<RpcNotification>` al arrancar el frontend; por ahi
   salen progreso, cambios del repo y tokens de IA (planificado; el primer corte no emite
   notificaciones).
 - El `Engine` se guarda como estado gestionado (`app.manage(Arc<Engine>)`).
-- Plugins de Tauri solo donde el SO manda: dialogo (elegir carpeta, usado solo desde Rust),
-  opener (abrir URL `https:` desde el webview, sin `open-path`; revelar en el explorador lo hace
-  el host con un `repoId`), y mas adelante updater, deep-link y single-instance. Tauri no lanza
-  git ni hace HTTP de negocio: eso es trabajo del motor.
+- Plugins de Tauri solo donde el SO manda. Hoy, el de dialogo (elegir carpeta, usado solo desde
+  Rust y sin ningun permiso en las capacidades) y, solo en los builds de E2E, el servidor
+  WebDriver embebido (`tauri-plugin-wdio-webdriver`, feature `e2e`). Planificados: opener (abrir
+  URL `https:` desde el webview, sin `open-path`; revelar en el explorador lo hara el host con un
+  `repoId`), updater, deep-link y single-instance. Tauri no lanza git ni hace HTTP de negocio: eso
+  es trabajo del motor.
+- Con la feature `e2e`, la variable `RAMAL_E2E_FOLDER` sustituye el dialogo por una carpeta fija,
+  porque WebDriver no puede manejar un dialogo del sistema. El binario que se publica no lleva
+  nada de esto.
+- El log va a stderr; `RAMAL_LOG` fija el filtro (por defecto `info`).
 - `build.rs` declara los comandos con
   `tauri_build::AppManifest::commands(&["rpc", "repo_pick_and_open"])` (y `rpc_subscribe` cuando
   exista), asi cada comando necesita un permiso explicito en `capabilities/default.json` y
@@ -537,20 +593,23 @@ esta en Rust y la logica pura de interfaz en `@ramal/domain`.
 
 ```
 src/application/ports/     Puertos propios del host de escritorio: RepositoryPicker (elegir y abrir
-                           un repositorio), luego UpdateChecker. Solo interfaces.
-src/infrastructure/        tauri-transport.ts (Transport de @ramal/bridge sobre invoke y Channel),
-                           tauri-repository-picker.ts (invoke de repo_pick_and_open),
-                           (plan) adaptadores de RepoViewHost
-src/ui/                    Shell con pestanas, inicio (repos y workspaces), ajustes. La vista de
-                           repositorio es la de @ramal/repo-view
-src/app/                   composition-root.ts (createContainer), app.tsx (router y providers), main.tsx
+                           un repositorio) y AppearanceStore (tema e idioma guardados); luego
+                           UpdateChecker. Solo interfaces.
+src/application/workspace/ El modelo de pestanas de la ventana y de Inicio, sin dependencias
+src/infrastructure/        tauri/tauri-transport.ts (Transport de @ramal/bridge sobre invoke),
+                           tauri/tauri-repository-picker.ts (invoke de repo_pick_and_open),
+                           storage/local-appearance-store.ts (localStorage); (plan) RepoViewHost
+src/ui/                    Barra de titulo con pestanas, inicio y la vista del repositorio, que es la
+                           de @ramal/repo-view. El nombre "Ramal" es una constante (ui/shell/brand.ts),
+                           no una clave de i18n
+src/app/                   composition-root.ts (createContainer), app.tsx (providers), main.tsx
 ```
 
 Hay carpeta `application` aunque el escritorio no tenga casos de uso de negocio, y es a
 proposito: la interfaz no puede importar infraestructura, asi que las
 capacidades del host que usa una pantalla propia (elegir y abrir un repositorio) necesitan un
-tipo que viva en una capa que la interfaz si pueda importar. Solo lleva puertos y, si hace
-falta, casos de uso de orquestacion de pantalla (abrir repo, abrir pestana). Es una carpeta que
+tipo que viva en una capa que la interfaz si pueda importar. Solo lleva puertos y logica de
+orquestacion de pantalla, como el modelo de pestanas. Es una carpeta que
 el brief inicial no tenia (`src/{infrastructure,ui,app}`); se mantiene por ese motivo y
 [ADR 0002](adr/0002-arquitectura-hexagonal.md) la recoge.
 
@@ -561,22 +620,31 @@ que no son Git: arrancar y vigilar el sidecar, enrutar y validar mensajes de web
 decidir el idioma, y mas adelante el inicio de sesion con `AuthenticationProvider`.
 
 ```
-application/ports/          EngineConnection (request, notify, onNotification), WebviewSurface,
-                            Dialogs, Notifications, WorkspaceRepositories, Configuration, Timer, Logger
+application/ports/          EngineConnection (request, notify, onNotification), EngineLauncher (lanza
+                            el proceso), HostRequests (peticiones nativas de los webviews),
+                            WebviewSurface, Dialogs, Notifications, WorkspaceRepositories, Timer, Logger
 application/use-cases/      routeWebviewMessage, superviseEngine (reintentos con espera creciente),
+                            checkEngineProtocol (engine/info y PROTOCOL_VERSION en cada arranque),
+                            reopenRepositories (vuelve a abrir los repos de los paneles tras un reinicio),
                             openGraph (elige repo, abre en el motor, crea o revela el panel),
-                            startup (arranca el sidecar, compara PROTOCOL_VERSION, fija el idioma)
+                            startup (fija el idioma y prepara el motor supervisado), hostProbe (solo
+                            existe con ExtensionMode.Test, para los tests de integracion)
 application/surfaces.ts     Lista de metodos del motor permitidos por superficie
-infrastructure/vscode/      Adaptadores de la API de VS Code: comandos, paneles, vistas, dialogos, configuracion
-infrastructure/engine/      sidecar-engine-connection.ts (child_process.spawn y marcos Content-Length)
-infrastructure/webview/     webview-message-schema.ts (zod), webview-html.ts (CSP, nonce, manifiesto de Vite)
+application/restart-policy.ts  engine-errors.ts  call-engine.ts  request-ids.ts
+infrastructure/vscode/      Adaptadores de la API de VS Code: comandos y vistas, paneles, dialogos y avisos,
+                            portapapeles, ajustes del motor, git.path de vscode.git, canal de salida
+infrastructure/engine/      sidecar-launcher.ts (child_process.spawn), frame-codec.ts (marcos Content-Length),
+                            json-rpc-client.ts, engine-binary.ts (que binario se ejecuta), engine-args.ts
+infrastructure/webview/     webview-message-schema.ts (zod), webview-html.ts (CSP, nonce), vite-manifest.ts
 app/extension.ts            activate y deactivate
 app/composition-root.ts     Construye adaptadores y casos de uso
 ```
 
 `application` no importa `vscode` ni nada de `node:`. Por eso se prueba con Vitest sin
 arrancar VS Code; solo `infrastructure` y `app` tocan la API real, y eso lo cubren los tests
-de integracion bajo xvfb.
+de integracion (bajo xvfb en Linux sin pantalla). No hay puerto de configuracion: los dos
+ajustes del motor (`ramal.engine.path` y `ramal.engine.logLevel`) los lee la infraestructura al
+lanzar el sidecar.
 
 **Webviews, `apps/vscode/src/webview`.** Mismo papel que el frontend de escritorio:
 adaptadores driving que montan `@ramal/repo-view` con otra densidad, otro tema y otro
@@ -584,8 +652,9 @@ transporte.
 
 ```
 infrastructure/     vscode-transport.ts (Transport sobre acquireVsCodeApi y el evento message),
-                    vscode-repo-view-host.ts (RepoViewHost que pide al extension host dialogos nativos)
-ui/                 Pantallas propias de VS Code: la caja de commit de la vista Cambios, los ajustes
+                    host-connection.ts (init y host/request), vscode-api.ts, host-messages.ts;
+                    (plan) el RepoViewHost que pide al extension host dialogos nativos
+ui/                 graph-app.tsx; (plan) la caja de commit de la vista Cambios y los ajustes
 app/entries/        graph.tsx (primer corte); changes.tsx, merge.tsx, settings.tsx (plan)
 ```
 
@@ -598,7 +667,10 @@ importan; nadie mas. Del webview al host: `webview/ready { surface }`,
 `rpc/request { request }` y `host/request { id, method, params }`. Del host al webview:
 `init { locale, surface, repoId, protocolVersion }`, `rpc/response { response }`,
 `rpc/notification { notification }` y `host/response { id, result | error }`. `request`,
-`response` y `notification` son los tipos del sobre generados desde `ramal-protocol`.
+`response` y `notification` son los tipos del sobre generados desde `ramal-protocol`. El unico
+metodo nativo del primer corte es `clipboard/writeText`; los dialogos llegan con `RepoViewHost`.
+Un `rpc/request` lleva siempre id: un webview no manda notificaciones, asi que `$/cancel` no se
+reenvia todavia.
 
 **Superficies nativas, no clones.** La paleta de comandos, los dialogos (`showInputBox`,
 `showQuickPick`, avisos modales), las notificaciones, la barra de estado, las vistas de
@@ -611,9 +683,12 @@ merge (editor personalizado), formulario de PR y la parte de listas de los ajust
 JSON-RPC) y raiz de composicion exterior del cliente de VS Code.
 
 ```
-src/main.rs        Argumentos (--git-path, --log-level), runtime de tokio, arranque
+src/main.rs        Llama a la biblioteca con los argumentos
+src/lib.rs         Runtime de tokio, tracing a stderr y arranque
+src/args.rs        --git-path, --log-level y --version, sin crate de argumentos
 src/bootstrap.rs   Composition root: EngineBuilder con la configuracion recibida y los adaptadores del host
 src/framing.rs     Lectura y escritura de marcos Content-Length sobre stdin y stdout
+src/message.rs     De los bytes de un marco a la respuesta: JSON roto -32700, sobre invalido -32600
 src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en stdout
 (plan) src/reverse.rs   Peticiones del motor al extension host (secretos de SecretStorage)
 ```
@@ -622,33 +697,51 @@ src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en s
   extension host lo vuelca en el canal de salida "Ramal Engine". Un `println!` rompe el
   protocolo, y por eso `print_stdout` esta denegado en clippy en todo el workspace.
 - El sidecar termina cuando se cierra su stdin. El extension host lo arranca la primera
-  vez que hace falta y, si muere, lo reinicia tras 1, 2, 4, 8 y 16 segundos; con cinco
-  caidas en tres minutos deja de intentarlo y muestra una notificacion con "Reintentar".
-  Las peticiones pendientes fallan con el tipo `engine_unavailable`, que genera el host.
+  vez que hace falta y compara `PROTOCOL_VERSION` (con `engine/info`) cada vez que arranca un
+  proceso; una diferencia es un fallo de empaquetado y no se reintenta.
+- Si el sidecar muere, lo reinicia tras 1, 2, 4, 8 y 16 segundos; con cinco caidas en tres
+  minutos deja de intentarlo y muestra una notificacion con "Reintentar". Las peticiones
+  pendientes fallan con el tipo `engine_unavailable`, que genera el host.
+- Que `engine/info` conteste con un error (no hay git) no es una caida: el proceso esta sano.
+  El host lo para sin contarlo, la peticion recibe el error del motor con su tipo
+  (`git_not_found`) y la siguiente prueba con un proceso nuevo, que ya ve el arreglo. Contarlo
+  como caida metia el motor en el bucle de reinicios y el usuario nunca veia "no se encuentra
+  Git". Un git anterior a 2.34 tampoco es un error aqui: llega como `supported: false`.
+- Tras un reinicio, el registro del motor esta vacio. Antes de dejar pasar ninguna peticion, el
+  host vuelve a abrir con `repo/open` la raiz de cada panel (`reopenRepositories`). Como el
+  `repoId` sale de la raiz, el panel conserva el suyo. Si la carpeta ya no es un repositorio,
+  cierra sus paneles y avisa. Los webviews reciben los tipos de error del motor tal cual.
 - Ruta del binario: en produccion siempre `dist/bin/ramal-vscode-engine` (con `.exe` en
-  Windows) dentro de la VSIX de su plataforma. Solo en modo desarrollo
-  (`ExtensionMode.Development`) se acepta el ajuste `ramal.engine.path`, de ambito
-  aplicacion, para apuntar a `target/debug`. Un ajuste de workspace nunca puede elegir que
+  Windows) dentro de la VSIX de su plataforma; `just vscode-package` lo copia ahi. Solo fuera de
+  produccion (desarrollo y tests de integracion) se acepta, por este orden, el ajuste de usuario
+  `ramal.engine.path` (ambito aplicacion), la variable `RAMAL_ENGINE_PATH` o lo que haya
+  compilado cargo en `target/` del monorepo. Un ajuste de workspace nunca puede elegir que
   binario se ejecuta: seria ejecucion de codigo con abrir una carpeta.
+- El binario de git llega del `git.path` de la extension `vscode.git` (`--git-path`), que se
+  lee al activar la extension.
 - Manifiesto: `extensionKind: ["workspace"]` (git corre donde esta el repo, tambien en
   Remote SSH, WSL y contenedores), `capabilities.virtualWorkspaces: false` y
   `capabilities.untrustedWorkspaces.supported: false`, porque ejecutar git en una carpeta
-  no confiable puede ejecutar hooks y configuracion del repo. Un repositorio que se abre fuera
-  de las carpetas de confianza del workspace pasa por la misma comprobacion de confianza que en
-  escritorio (ver `ramal-git`).
+  no confiable puede ejecutar hooks y configuracion del repo. Un repositorio que se abra fuera
+  de las carpetas de confianza del workspace pasara por la misma comprobacion de confianza que en
+  escritorio (planificada, ver `ramal-git`).
 
 ### 4.5 La API (`apps/api`)
 
 Cinco crates, uno por capa, con el mismo molde que Gastonomo.
 
 ```
-crates/domain          ramal-api-domain. Entidades y value objects. thiserror, uuid, chrono. Sin serde.
-crates/application     ramal-api-application. Puertos y casos de uso, AppError, fakes en testing.
-crates/infrastructure  ramal-api-infrastructure. Config (figment, RAMAL__), SQLx, cifrado de sobre,
-                       hash de contrasenas, correo, clientes OAuth, (plan) adaptador de ramal-ai.
-crates/http            ramal-api-http. Router, handlers, DTOs, problem+json, catcher, OpenAPI,
-                       middlewares de request id, limite de ritmo e idempotencia.
-crates/api             ramal-api. Binario y composition root: src/bootstrap.rs + src/bootstrap/<contexto>.rs.
+crates/domain          ramal-api-domain. Entidades y value objects. thiserror y chrono. Sin serde.
+crates/application     ramal-api-application. Puertos (HealthProbe, Clock) y casos de uso, AppError,
+                       fakes en testing.
+crates/infrastructure  ramal-api-infrastructure. Config (figment, RAMAL__), telemetria, SQLx y la sonda
+                       de PostgreSQL, reloj del sistema. (plan) Cifrado de sobre, hash de contrasenas,
+                       correo, clientes OAuth y el adaptador de ramal-ai.
+crates/http            ramal-api-http. Router, handlers, DTOs, problem+json, catcher, OpenAPI, el
+                       middleware de request id y el arranque del servidor (serve). (plan) Limite de
+                       ritmo e idempotencia.
+crates/api             ramal-api. Binario y composition root: src/bootstrap.rs + src/bootstrap/<contexto>.rs
+                       (hoy health, migrations y wiring). No depende de Salvo: llama a ramal_api_http::serve.
 ```
 
 - **Contextos.** Primer corte: `health`. Planificados, cada uno con su modulo en las cinco
@@ -661,21 +754,29 @@ crates/api             ramal-api. Binario y composition root: src/bootstrap.rs +
   cliente, solo donde el proveedor lo exige) y `releases` (manifiesto del updater y datos de
   descarga).
 - **Adaptadores driving.** El router de Salvo es el obvio. Tambien lo son el catcher de
-  problem+json (traduce 404 y 405 antes de que llegue ningun handler), los trabajos
-  periodicos (reenvolver DEK tras rotar la KEK, limpiar refresh tokens caducados), que son
+  problem+json (traduce 404 y 405 antes de que llegue ningun handler) y, planificados, los
+  trabajos periodicos (reenvolver DEK tras rotar la KEK, limpiar refresh tokens caducados), que son
   bucles de tokio que llaman a casos de uso, y el middleware de idempotencia, que repite la
   respuesta de un reintento: vive en `http` porque repetir una respuesta es transporte, pero
   su almacen es un puerto de `application`.
 - **Convenciones del contrato.** Todo bajo `/v1`; listas envueltas en `items` con
   paginacion por cursor; errores `application/problem+json` (RFC 9457) con `title`,
-  `detail` y `errors[].message` en castellano y ademas un `code` estable en el problema y en
-  cada `errors[]`, que es lo que traducen los clientes con `@ramal/i18n` cuando la interfaz
-  esta en ingles; un recurso de otra cuenta responde 404, nunca 403 (lo decide el caso de
+  `detail` y `errors[].message` en castellano y ademas un `code` estable en todo problema
+  (`route_not_found`, `method_not_allowed`, `validation_failed`...) y en cada `errors[]`, que
+  es lo que traducen los clientes con `@ramal/i18n` cuando la interfaz esta en ingles; un recurso de otra cuenta responde 404, nunca 403 (lo decide el caso de
   uso con `AppError::NotFound`); `Idempotency-Key` donde un reintento podria duplicar algo;
   concurrencia optimista (`ETag` e `If-Match`) en los documentos sincronizados; limite de
-  ritmo; `x-request-id` en cada respuesta; salud en `/health/live` y `/health/ready`;
-  OpenAPI en `/openapi.json`, publico, y Swagger UI en `/swagger-ui` solo en desarrollo: el
-  gateway de produccion no lo enruta ([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)).
+  ritmo; `x-request-id` en cada respuesta, tambien en los 404 y 405; salud en `/health/live` y
+  `/health/ready`, con `checkedAt` (la hora sale del puerto `Clock`) y sin el detalle de un
+  fallo, que solo va al log; OpenAPI 3.1 en `/openapi.json`, publico; y Swagger UI en
+  `/swagger-ui/` solo con `RAMAL__SERVER__SWAGGER_UI=true`. Va apagada por defecto, que es como
+  arranca la imagen de produccion; la encienden `compose.yaml` y `just api-run`. Sin la bandera
+  la ruta es un 404 como cualquier otra, asi que produccion no depende de que el gateway no la
+  reenvie ([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)).
+- **Configuracion.** figment desde el entorno con prefijo `RAMAL__` y `__` como separador
+  (`RAMAL__DATABASE__URL`). Todo tiene valor por defecto y una clave desconocida hace fallar el
+  arranque (`deny_unknown_fields`), por eso `.env.example` deja comentadas las que aun no se
+  leen. La API escucha por defecto solo en `127.0.0.1`; los contenedores ponen `0.0.0.0`.
 - **OpenAPI.** Se genera con la feature `oapi` de Salvo (salvo-oapi 1.0) desde el propio
   router, en lugar de construirlo a mano con utoipa como en Gastonomo: con Salvo 1.0 es
   nativo y el documento no puede desincronizarse de las rutas. Un test de `ramal-api-http`
@@ -683,9 +784,11 @@ crates/api             ramal-api. Binario y composition root: src/bootstrap.rs +
   (`just api-openapi` lo reescribe, como dice [ADR 0003](adr/0003-rust-con-salvo.md)). Ese fichero
   es la fuente de `@ramal/api-client`.
 - **Migraciones.** `apps/api/migrations/<YYYYMMDDHHMMSS>_<nombre>.sql`, solo hacia delante,
-  embebidas con `sqlx::migrate!` y aplicadas al arrancar. Si fallan, el proceso sigue vivo y
-  `/health/ready` responde 503. Consultas en tiempo de ejecucion (`sqlx::query`), sin
-  macros `query!`, para no necesitar base de datos al compilar.
+  embebidas con `sqlx::migrate!` y aplicadas al arrancar, en segundo plano: el servidor escucha
+  desde el primer segundo y un fallo se reintenta cada 10 segundos hasta que sale bien. Mientras
+  tanto el proceso sigue vivo y `/health/ready` responde 503, porque la sonda compara la ultima
+  migracion aplicada con la mas nueva del binario. Consultas en tiempo de ejecucion
+  (`sqlx::query`), sin macros `query!`, para no necesitar base de datos al compilar.
 
 ### 4.6 La web (`apps/web`)
 
@@ -694,12 +797,15 @@ Router 8 en modo framework: `react-router.config.ts` fija `appDirectory: "src/ap
 `ssr: false` y `prerender` para las rutas de la landing; el panel es SPA.
 
 ```
-src/domain           Modelos propios de la web (resumen de dispositivo, fila de repositorio del panel).
-                     Sin imports externos salvo @ramal/domain.
-src/application      Puertos (HealthGateway, AuthGateway, SessionStore, Clock...) y casos de uso
-                     como funciones que reciben sus puertos y devuelven una union de resultados.
-src/infrastructure   Adaptadores HTTP sobre @ramal/api-client (createHttpHealthGateway...),
-                     adaptadores en memoria para tests y almacenamiento de sesion.
+src/domain           Modelos propios de la web: informe de salud, preferencias (idioma y tema) y
+                     datos de descarga. Sin imports externos salvo @ramal/domain.
+src/application      Puertos (HealthGateway, AuthGateway, PreferencesStore, ReleaseCatalog,
+                     VisitorEnvironment, Clipboard) y casos de uso como funciones que reciben sus
+                     puertos y devuelven una union de resultados (checkApiHealth, signIn, signUp,
+                     loadRelease).
+src/infrastructure   HTTP sobre @ramal/api-client (createHttpHealthGateway), el AuthGateway que
+                     responde "no disponible todavia", navegador, localStorage y datos fijos de
+                     descarga. Planificados: auth real y almacenamiento de sesion.
 src/ui               Componentes y pantallas. Reciben los puertos por contexto; nunca construyen adaptadores.
 src/app              root.tsx, routes.ts, routes/<ruta>.tsx, composition-root.ts.
 ```
@@ -724,10 +830,10 @@ build que orquestar: los transpila Vite o Vitest y los comprueba `tsc -b`.
 | Paquete             | Papel en el hexagono                                   | Contenido                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `@ramal/domain`     | Dominio puro de interfaz, compartido por las tres apps | Modelo interactivo del resolver de conflictos (elecciones por linea, tomar bloque, todo A o todo B, salida, edicion manual, regla de resuelto), modelo del editor de rebase (reordenar, cambiar accion, reword, resumen, validacion inmediata), filtros y agrupacion de repos, agregacion de PRs, tiempo relativo, enmascarado de llaves, reglas del mensaje de commit (72 caracteres, Conventional Commits), validacion de nombres de rama para prompts, validacion de formularios de auth, deteccion del SO para descargas. Cero dependencias. |
-| `@ramal/i18n`       | Biblioteca pura                                        | Diccionario ES/EN por espacios de nombres con claves tipadas, traductor, plurales con `Intl.PluralRules`, formatos de fecha y tiempo relativo, `resolveLocale`. Cero dependencias (ver seccion 7).                                                                                                                                                                                                                                                                                                                                               |
+| `@ramal/i18n`       | Biblioteca pura                                        | Diccionario ES/EN en JSON por espacios de nombres con claves tipadas y parametros generados, traductor, plurales con `Intl.PluralRules`, formatos de fecha y tiempo relativo, `resolveLocale`. Cero dependencias (ver seccion 7).                                                                                                                                                                                                                                                                                                                |
 | `@ramal/bridge`     | Puerto de transporte y cliente del motor               | `Transport` (el puerto), `createBridgeClient(transport)`, `BridgeError`, y en `src/generated/` los tipos de `ramal-protocol` generados con ts-rs mas el mapa de metodos. Cero dependencias en tiempo de ejecucion. Los transportes concretos viven en cada app.                                                                                                                                                                                                                                                                                  |
-| `@ramal/ui`         | Primitivas de interfaz, sin puertos                    | Tokens semanticos, `themes/ramal.css`, `themes/vscode.css`, densidades, primitivas (boton, menu contextual con submenus, modal, toast, toggle, segmentado, tabla), proveedor de iconos y el enlace React de `@ramal/i18n` (`I18nProvider`, `useT`).                                                                                                                                                                                                                                                                                              |
-| `@ramal/repo-view`  | Adaptador driving compartido                           | Grafo (filas virtualizadas y SVG a partir de la ventana del motor), fila WIP, detalle de commit, diff, resolver de conflictos, editor de rebase. Habla con el motor por el cliente de `@ramal/bridge` y con el host por el puerto `RepoViewHost`, que declara el propio paquete.                                                                                                                                                                                                                                                                 |
+| `@ramal/ui`         | Primitivas de interfaz, sin puertos                    | Tokens semanticos, `themes/ramal.css`, `themes/vscode.css`, densidades, primitivas (boton, boton de icono, insignias, chip, toggle, segmentado, campo de texto, modal, menu contextual con submenus, toast), proveedor de iconos y el enlace React de `@ramal/i18n` (`I18nProvider`, `useT`).                                                                                                                                                                                                                                                    |
+| `@ramal/repo-view`  | Adaptador driving compartido                           | Hoy, el grafo: filas virtualizadas, carriles en SVG a partir de la ventana del motor, pildoras de refs, seleccion con teclado y paginas de `graph/window` con su `snapshot`. Planificado: fila WIP, detalle de commit, diff, resolver de conflictos, editor de rebase y el puerto `RepoViewHost`. Habla con el motor por el cliente de `@ramal/bridge`. `@tanstack/react-query` es `peerDependency`: el host aporta la instancia (o la crea `RepoViewProvider`).                                                                                 |
 | `@ramal/api-client` | Ayuda para adaptadores driven de la web                | Tipos generados de `apps/api/openapi.json` con openapi-typescript y un cliente openapi-fetch. Solo lo importa `apps/web/src/infrastructure`.                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 **`RepoViewHost` (planificado, el grafo del primer corte no lo necesita)** es el puerto de las
@@ -747,17 +853,18 @@ y el motor comprueba que no quedan marcadores antes de completar el merge.
 
 ### 4.8 Donde vive cada test
 
-| Capa                                         | Herramienta                                                                                            | Donde                                                                  |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| Dominio y aplicacion de Rust (cliente y API) | `cargo test` con fakes y `block_on`, sin tokio                                                         | `#[cfg(test)] mod tests` o `tests/` de cada crate                      |
-| `ramal-git`                                  | `cargo test` contra repos reales creados con git en un tempdir                                         | `crates/git/tests/`                                                    |
-| Motor de punta a punta                       | `cargo test` de `dispatch` contra repos de prueba                                                      | `crates/engine/tests/`                                                 |
-| Framing y ciclo de vida del sidecar          | `cargo test`                                                                                           | `apps/vscode-engine/tests/`                                            |
-| Host de Tauri                                | `tauri::test` (feature `test`): comandos registrados y serializan                                      | `apps/desktop/src-tauri/tests/`                                        |
-| API contra PostgreSQL                        | `cargo test` con `RAMAL_TEST_DATABASE_URL`; `RAMAL_TEST_REQUIRE_DATABASE=1` impide que se salten solos | `apps/api/crates/infrastructure/tests/`, `apps/api/crates/http/tests/` |
-| Paquetes TS y capas puras de las apps        | Vitest                                                                                                 | Colocalizados, `*.test.ts(x)`                                          |
-| Flujos de interfaz                           | Playwright contra builds de Vite con hosts simulados (mockIPC, acquireVsCodeApi falso, red simulada)   | `apps/*/e2e/`                                                          |
-| E2E real, pocos                              | WebdriverIO + @wdio/tauri-service, @vscode/test-cli bajo xvfb, Playwright contra la pila Docker        | `apps/desktop/wdio/`, `apps/vscode/test/integration/`, `apps/web/e2e/` |
+| Capa                                         | Herramienta                                                                                                             | Donde                                                                                                                                                                                      |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Dominio y aplicacion de Rust (cliente y API) | `cargo test` con fakes y `block_on`, sin tokio                                                                          | `<modulo>/tests.rs` (`#[cfg(test)] mod tests;`) o `tests/` de cada crate; nunca `mod tests { }` en linea                                                                                   |
+| `ramal-git`                                  | `cargo test` contra repos reales creados con git en un tempdir                                                          | `crates/git/tests/`                                                                                                                                                                        |
+| Motor de punta a punta                       | `cargo test` de `dispatch` contra repos de prueba (el constructor de `crates/git/tests/support` por `#[path]`)          | `crates/engine/tests/`                                                                                                                                                                     |
+| Framing y ciclo de vida del sidecar          | `cargo test`                                                                                                            | `apps/vscode-engine/tests/`                                                                                                                                                                |
+| Host de Tauri                                | `tauri::test` (feature `test`): comandos registrados y serializan                                                       | `apps/desktop/src-tauri/tests/`                                                                                                                                                            |
+| Endpoints de la API sin base de datos        | `cargo test` con los fakes de `ramal-api-application` y el cliente de test de Salvo                                     | `apps/api/crates/http/tests/`                                                                                                                                                              |
+| API contra PostgreSQL                        | `cargo test` con `RAMAL_TEST_DATABASE_URL`; `RAMAL_TEST_REQUIRE_DATABASE=1` impide que se salten solos                  | `apps/api/crates/infrastructure/tests/` y, de punta a punta con el binario real, `apps/api/crates/api/tests/`. No en `http/tests`: `ramal-api-http` no puede alcanzar SQLx ni en sus tests |
+| Paquetes TS y capas puras de las apps        | Vitest                                                                                                                  | Colocalizados, `*.test.ts(x)`                                                                                                                                                              |
+| Flujos de interfaz                           | Playwright contra builds de Vite con hosts simulados (mockIPC, acquireVsCodeApi falso, red simulada)                    | `apps/*/e2e/`                                                                                                                                                                              |
+| E2E real, pocos                              | WebdriverIO + @wdio/tauri-service, @vscode/test-cli (bajo xvfb en Linux sin pantalla), Playwright contra la pila Docker | `apps/desktop/wdio/`, `apps/vscode/test/integration/`, `apps/web/e2e/`                                                                                                                     |
 
 El detalle de la piramide y de que corre en cada momento esta en el ADR de testing.
 
@@ -771,27 +878,27 @@ documento se rompe sola en tres semanas.
 
 En los crates de nucleo la regla es de lista blanca: sus dependencias directas deben ser un
 subconjunto exacto de la columna "externos permitidos". En los adaptadores la regla es de
-lista negra sobre el cierre transitivo.
+lista negra sobre el cierre transitivo, y la columna dice lo que usan hoy mas lo planificado.
 
-| Crate                       | Papel                                  | Workspace permitido                                                                                                                                     | Externos permitidos (directos)                                                                                                                                                                                                                                                       | Prohibido                                                                                                                                                                                                                                                                               |
-| --------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ramal-core-domain`         | Dominio del cliente                    | ninguno                                                                                                                                                 | `thiserror`                                                                                                                                                                                                                                                                          | En el cierre transitivo: `serde`, `serde_json`, `ts-rs`, `tokio`, `async-trait`, `reqwest`, `hyper`, `sqlx`, `salvo`, `tauri`, `gix`, `git2`, `libgit2-sys`, `keyring-core`, cualquier `ramal-*`. En el codigo: lanzar procesos, sistema de ficheros, red, variables de entorno, reloj. |
-| `ramal-core-application`    | Puertos y casos de uso del cliente     | `ramal-core-domain`                                                                                                                                     | `async-trait`, `thiserror`                                                                                                                                                                                                                                                           | Lo mismo que el dominio, salvo `async-trait` y `ramal-core-domain`.                                                                                                                                                                                                                     |
-| `ramal-protocol`            | Contrato del motor                     | ninguno                                                                                                                                                 | `serde`, `serde_json`, `ts-rs`                                                                                                                                                                                                                                                       | Cualquier `ramal-*`, `tokio`, `tauri`, `salvo`, `sqlx`.                                                                                                                                                                                                                                 |
-| `ramal-git`                 | Driven                                 | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `tokio`, `thiserror`, `tracing`; dev: `tempfile`, `rstest`, `insta`                                                                                                                                                                                                                  | `ramal-protocol`, `ramal-engine`, hosts, `tauri`, `salvo`, `sqlx`, `git2`, `libgit2-sys`.                                                                                                                                                                                               |
-| `ramal-engine`              | Driving y composition root del cliente | `ramal-core-domain`, `ramal-core-application`, `ramal-protocol`, `ramal-git`; (plan) `ramal-vault`, `ramal-platforms`, `ramal-ai`, `ramal-cloud-client` | `serde`, `serde_json`, `thiserror`, `tracing`, `tokio`                                                                                                                                                                                                                               | En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`, `git2`, `libgit2-sys`, cualquier `ramal-api-*`.                                                                                                                                                                                      |
-| `ramal-desktop`             | Host de escritorio                     | Solo `ramal-engine` y `ramal-protocol`; (plan) `ramal-keychain`                                                                                         | `tauri`, `tauri-build`, `tauri-plugin-*`, `serde`, `serde_json`, `tokio`, `tracing`, `tracing-subscriber`                                                                                                                                                                            | Dependencia directa de `ramal-core-*` o `ramal-git`: el host habla con el motor, no con sus piezas. `salvo`, `sqlx`, `ramal-api-*`.                                                                                                                                                     |
-| `ramal-vscode-engine`       | Host de VS Code                        | Solo `ramal-engine` y `ramal-protocol`                                                                                                                  | `tokio`, `serde`, `serde_json`, `thiserror`, `tracing`, `tracing-subscriber`                                                                                                                                                                                                         | Dependencia directa de `ramal-core-*` o `ramal-git`. En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`.                                                                                                                                                                                 |
-| `ramal-api-domain`          | Dominio del servidor                   | ninguno                                                                                                                                                 | `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                                        | Directos: `serde`. En el cierre: `tokio`, `sqlx`, `salvo`, `salvo-oapi`, `reqwest`, `hyper`, `figment`, `argon2`, `jsonwebtoken`, `lettre`, `aes-gcm`, cualquier crate del cliente. En el codigo: procesos, ficheros, red, entorno, reloj.                                              |
-| `ramal-api-application`     | Puertos y casos de uso del servidor    | `ramal-api-domain`                                                                                                                                      | `async-trait`, `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                         | Lo mismo que `ramal-api-domain`.                                                                                                                                                                                                                                                        |
-| `ramal-api-infrastructure`  | Driven                                 | `ramal-api-domain`, `ramal-api-application`; (plan) `ramal-ai`                                                                                          | `sqlx`, `figment`, `serde`, `serde_json`, `argon2`, `jsonwebtoken`, `ed25519-dalek` (proveedor EdDSA de ADR 0008), `hmac`, `sha2`, `aes-gcm`, `secrecy`, `zeroize`, `rand`, `base64`, `reqwest`, `lettre`, (plan) `image` (foto de perfil), `tokio`, `tracing`, `tracing-subscriber` | `salvo`, `ramal-api-http`, cualquier crate del cliente salvo `ramal-ai`.                                                                                                                                                                                                                |
-| `ramal-api-http`            | Driving                                | `ramal-api-domain`, `ramal-api-application`                                                                                                             | `salvo` (con `oapi`), `serde`, `serde_json`, `url` (validar redirecciones de loopback y `returnTo`), `tracing`                                                                                                                                                                       | `sqlx`, `ramal-api-infrastructure`, cualquier crate del cliente.                                                                                                                                                                                                                        |
-| `ramal-api`                 | Composition root del servidor          | Todos los `ramal-api-*`                                                                                                                                 | `tokio`, `tracing`, `tracing-subscriber`                                                                                                                                                                                                                                             | Cualquier crate del cliente.                                                                                                                                                                                                                                                            |
-| `ramal-vault` (plan)        | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `argon2`, `chacha20poly1305`, `hkdf`, `hmac`, `sha2`, `rand`, `zeroize`, `thiserror`                                                                                                                                                                                                 | Red, `tokio`, cualquier `ramal-api-*`.                                                                                                                                                                                                                                                  |
-| `ramal-keychain` (plan)     | Driven del cliente                     | `ramal-core-application`                                                                                                                                | `keyring-core` y sus almacenes por SO, `thiserror`                                                                                                                                                                                                                                   | `tauri`, cualquier `ramal-api-*`.                                                                                                                                                                                                                                                       |
-| `ramal-platforms` (plan)    | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                    | Cualquier `ramal-api-*`.                                                                                                                                                                                                                                                                |
-| `ramal-cloud-client` (plan) | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                    | Cualquier `ramal-api-*`: modela el contrato HTTP con sus propios tipos y lo protege con tests de contrato contra `apps/api/openapi.json`.                                                                                                                                               |
-| `ramal-ai` (plan)           | Biblioteca neutral                     | ninguno                                                                                                                                                 | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                    | Cualquier `ramal-*`. Es la unica pieza que usan los dos hexagonos, y solo puede serlo si no depende de ninguno.                                                                                                                                                                         |
+| Crate                       | Papel                                  | Workspace permitido                                                                                                                                     | Externos permitidos (directos)                                                                                                                                                                                                                                                                                                                                                          | Prohibido                                                                                                                                                                                                                                                                               |
+| --------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ramal-core-domain`         | Dominio del cliente                    | ninguno                                                                                                                                                 | `thiserror`                                                                                                                                                                                                                                                                                                                                                                             | En el cierre transitivo: `serde`, `serde_json`, `ts-rs`, `tokio`, `async-trait`, `reqwest`, `hyper`, `sqlx`, `salvo`, `tauri`, `gix`, `git2`, `libgit2-sys`, `keyring-core`, cualquier `ramal-*`. En el codigo: lanzar procesos, sistema de ficheros, red, variables de entorno, reloj. |
+| `ramal-core-application`    | Puertos y casos de uso del cliente     | `ramal-core-domain`                                                                                                                                     | `async-trait`, `thiserror`                                                                                                                                                                                                                                                                                                                                                              | Lo mismo que el dominio, salvo `async-trait` y `ramal-core-domain`.                                                                                                                                                                                                                     |
+| `ramal-protocol`            | Contrato del motor                     | ninguno                                                                                                                                                 | `serde`, `serde_json`, `ts-rs`                                                                                                                                                                                                                                                                                                                                                          | Cualquier `ramal-*`, `tokio`, `tauri`, `salvo`, `sqlx`.                                                                                                                                                                                                                                 |
+| `ramal-git`                 | Driven                                 | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `async-trait` (para implementar los puertos), `tokio`, `thiserror`, `tracing`; dev: `tempfile`, `pretty_assertions`                                                                                                                                                                                                                                                                     | `ramal-protocol`, `ramal-engine`, hosts, `tauri`, `salvo`, `sqlx`, `git2`, `libgit2-sys`.                                                                                                                                                                                               |
+| `ramal-engine`              | Driving y composition root del cliente | `ramal-core-domain`, `ramal-core-application`, `ramal-protocol`, `ramal-git`; (plan) `ramal-vault`, `ramal-platforms`, `ramal-ai`, `ramal-cloud-client` | `serde`, `serde_json`, `tracing`; dev: `tokio`, `tempfile`, `pretty_assertions`                                                                                                                                                                                                                                                                                                         | En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`, `git2`, `libgit2-sys`, cualquier `ramal-api-*`.                                                                                                                                                                                      |
+| `ramal-desktop`             | Host de escritorio                     | Solo `ramal-engine` y `ramal-protocol`; (plan) `ramal-keychain`                                                                                         | `tauri`, `tauri-build`, `tauri-plugin-dialog`, `tauri-plugin-wdio-webdriver` (opcional, feature `e2e`), `serde_json`, `tokio`, `tracing`, `tracing-subscriber`; (plan) otros `tauri-plugin-*`                                                                                                                                                                                           | Dependencia directa de `ramal-core-*` o `ramal-git`: el host habla con el motor, no con sus piezas. `salvo`, `sqlx`, `ramal-api-*`.                                                                                                                                                     |
+| `ramal-vscode-engine`       | Host de VS Code                        | Solo `ramal-engine` y `ramal-protocol`                                                                                                                  | `tokio`, `serde_json`, `thiserror`, `tracing`, `tracing-subscriber`                                                                                                                                                                                                                                                                                                                     | Dependencia directa de `ramal-core-*` o `ramal-git`. En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`.                                                                                                                                                                                 |
+| `ramal-api-domain`          | Dominio del servidor                   | ninguno                                                                                                                                                 | `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                                                                                                                                           | Directos: `serde`. En el cierre: `tokio`, `sqlx`, `salvo`, `salvo-oapi`, `reqwest`, `hyper`, `figment`, `argon2`, `jsonwebtoken`, `lettre`, `aes-gcm`, cualquier crate del cliente. En el codigo: procesos, ficheros, red, entorno, reloj.                                              |
+| `ramal-api-application`     | Puertos y casos de uso del servidor    | `ramal-api-domain`                                                                                                                                      | `async-trait`, `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                                                                                                                            | Lo mismo que `ramal-api-domain`.                                                                                                                                                                                                                                                        |
+| `ramal-api-infrastructure`  | Driven                                 | `ramal-api-domain`, `ramal-api-application`; (plan) `ramal-ai`                                                                                          | Hoy: `async-trait`, `chrono`, `figment`, `serde`, `sqlx`, `thiserror`, `tokio`, `tracing`, `tracing-subscriber`. Planificados: `serde_json`, `argon2`, `jsonwebtoken`, `ed25519-dalek` (proveedor EdDSA de ADR 0008), `hmac`, `sha2`, `aes-gcm`, `secrecy`, `zeroize`, `rand`, `base64`, `reqwest`, `lettre`, (plan) `image` (foto de perfil), `tokio`, `tracing`, `tracing-subscriber` | `salvo`, `ramal-api-http`, cualquier crate del cliente salvo `ramal-ai`.                                                                                                                                                                                                                |
+| `ramal-api-http`            | Driving                                | `ramal-api-domain`, `ramal-api-application`                                                                                                             | `salvo` (con `oapi`), `serde`, `serde_json`, `thiserror`, `tokio`, `tracing`, `uuid` (request id); (plan) `url` (validar redirecciones de loopback y `returnTo`)                                                                                                                                                                                                                        | `sqlx`, `ramal-api-infrastructure`, cualquier crate del cliente.                                                                                                                                                                                                                        |
+| `ramal-api`                 | Composition root del servidor          | Todos los `ramal-api-*`                                                                                                                                 | `thiserror`, `tokio`, `tracing`. No depende de `salvo`: el servidor arranca dentro de `ramal-api-http`                                                                                                                                                                                                                                                                                  | Cualquier crate del cliente.                                                                                                                                                                                                                                                            |
+| `ramal-vault` (plan)        | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `argon2`, `chacha20poly1305`, `hkdf`, `hmac`, `sha2`, `rand`, `zeroize`, `thiserror`                                                                                                                                                                                                                                                                                                    | Red, `tokio`, cualquier `ramal-api-*`.                                                                                                                                                                                                                                                  |
+| `ramal-keychain` (plan)     | Driven del cliente                     | `ramal-core-application`                                                                                                                                | `keyring-core` y sus almacenes por SO, `thiserror`                                                                                                                                                                                                                                                                                                                                      | `tauri`, cualquier `ramal-api-*`.                                                                                                                                                                                                                                                       |
+| `ramal-platforms` (plan)    | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `ramal-api-*`.                                                                                                                                                                                                                                                                |
+| `ramal-cloud-client` (plan) | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `ramal-api-*`: modela el contrato HTTP con sus propios tipos y lo protege con tests de contrato contra `apps/api/openapi.json`.                                                                                                                                               |
+| `ramal-ai` (plan)           | Biblioteca neutral                     | ninguno                                                                                                                                                 | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `ramal-*`. Es la unica pieza que usan los dos hexagonos, y solo puede serlo si no depende de ninguno.                                                                                                                                                                         |
 
 Reglas transversales:
 
@@ -810,7 +917,7 @@ Reglas transversales:
 | `@ramal/i18n`                              | nada                                                                                                                   | nada                                                                                                                                                                                                                                                             | `react`: el enlace React vive en `@ramal/ui`                                        |
 | `@ramal/bridge`                            | nada                                                                                                                   | nada                                                                                                                                                                                                                                                             | `@tauri-apps/*`, `vscode`, `acquireVsCodeApi`: los transportes viven en las apps    |
 | `@ramal/ui`                                | `@ramal/i18n`                                                                                                          | `react` y `react-dom` (peer), `react-aria-components` ([ADR 0011](adr/0011-ui-compartida-y-puente-tipado.md)), `lucide-react` (solo en `icons/lucide`), `@vscode/codicons` (solo en `icons/codicons`), `@fontsource/ibm-plex-sans` y `-mono` (solo en `themes/`) | `@ramal/bridge`, `@ramal/repo-view`, `@ramal/api-client`, `@tauri-apps/*`, `vscode` |
-| `@ramal/repo-view`                         | `@ramal/ui`, `@ramal/domain`, `@ramal/i18n`, `@ramal/bridge`                                                           | `react`, `@tanstack/react-query`, `@tanstack/react-virtual`                                                                                                                                                                                                      | `@tauri-apps/*`, `vscode`, `@ramal/api-client`, `fetch` o cualquier red             |
+| `@ramal/repo-view`                         | `@ramal/ui`, `@ramal/domain` (hoy no lo usa), `@ramal/i18n`, `@ramal/bridge`                                           | `react` y `@tanstack/react-query` (peer: la instancia la pone el host), `@tanstack/react-virtual`                                                                                                                                                                | `@tauri-apps/*`, `vscode`, `@ramal/api-client`, `fetch` o cualquier red             |
 | `@ramal/api-client`                        | nada                                                                                                                   | `openapi-fetch`                                                                                                                                                                                                                                                  | Todo lo demas                                                                       |
 | `apps/web/src/domain`                      | `src/domain`, `@ramal/domain`                                                                                          | nada                                                                                                                                                                                                                                                             |                                                                                     |
 | `apps/web/src/application`                 | `src/domain`, `src/application`, `@ramal/domain`                                                                       | nada: ni `react` ni `zod`                                                                                                                                                                                                                                        |                                                                                     |
@@ -818,7 +925,7 @@ Reglas transversales:
 | `apps/web/src/ui`                          | `src/domain`, `src/application`, `src/ui`, `@ramal/ui`, `@ramal/i18n`, `@ramal/domain`                                 | `react`, `react-router`                                                                                                                                                                                                                                          | `src/infrastructure`, `src/app`, `@ramal/api-client`, `zod`                         |
 | `apps/web/src/app`                         | Todas las capas y paquetes de arriba                                                                                   | `react`, `react-dom`, `react-router`                                                                                                                                                                                                                             |                                                                                     |
 | `apps/desktop/src/application`             | `src/application`, `@ramal/domain`, tipos de `@ramal/bridge`                                                           | nada                                                                                                                                                                                                                                                             |                                                                                     |
-| `apps/desktop/src/infrastructure`          | `src/application`, `src/infrastructure`, `@ramal/bridge`, `@ramal/domain`                                              | `@tauri-apps/api`, `@tauri-apps/plugin-*`                                                                                                                                                                                                                        | `src/ui`, `src/app`, `react`                                                        |
+| `apps/desktop/src/infrastructure`          | `src/application`, `src/infrastructure`, `@ramal/bridge`, `@ramal/domain`                                              | `@tauri-apps/api`; (plan) `@tauri-apps/plugin-*`                                                                                                                                                                                                                 | `src/ui`, `src/app`, `react`                                                        |
 | `apps/desktop/src/ui`                      | `src/application`, `src/ui`, `@ramal/ui`, `@ramal/repo-view`, `@ramal/i18n`, `@ramal/domain`, tipos de `@ramal/bridge` | `react`                                                                                                                                                                                                                                                          | `src/infrastructure`, `src/app`, `@tauri-apps/*`                                    |
 | `apps/desktop/src/app`                     | Todo lo anterior                                                                                                       | `react`, `react-dom`, `@tanstack/react-query`                                                                                                                                                                                                                    |                                                                                     |
 | `apps/vscode/src/shared`                   | tipos de `@ramal/bridge`                                                                                               | nada                                                                                                                                                                                                                                                             |                                                                                     |
@@ -830,34 +937,40 @@ Reglas transversales:
 | `apps/vscode/src/webview/app`              | `src/webview/*`, `src/shared`                                                                                          | `react`, `react-dom`, `@tanstack/react-query`                                                                                                                                                                                                                    | `src/extension`                                                                     |
 
 Reglas entre paquetes: un paquete nunca depende de una app, una app nunca depende de otra
-app, y todo `@ramal/*` se declara con `workspace:*`. La web no importa `@ramal/bridge` ni
+app, todo `@ramal/*` se declara con `workspace:*` y `@ramal/eslint-config` y `@ramal/tsconfig`
+solo van en `devDependencies`. La web no importa `@ramal/bridge` ni
 `@ramal/repo-view` mientras no exista la vista previa del producto en la landing
 (planificada, con un transporte en memoria y datos de demostracion); cuando llegue, se amplia
 la lista blanca del guardian en el mismo PR.
 
 ### 5.3 Como se fuerza, no solo se documenta
 
-| Regla                                                  | Rust                                                                                       | TypeScript                                                                                                |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| Capas dentro de una pieza                              | Un crate por capa. Tests de arquitectura que leen `Cargo.lock`, uno por hexagono           | `eslint-plugin-boundaries` con `default: "disallow"` y `checkAllOrigins`, un config por app y por paquete |
-| Dependencias externas por capa                         | Lista blanca directa en los nucleos y lista negra transitiva en todos                      | Politicas de `boundaries` por origen `external` y `core`                                                  |
-| Dependencias entre piezas                              | Tests de cruce de hexagonos en los dos tests de arquitectura                               | `tools/checks/package-graph.mjs` sobre los `package.json`, mas las project references de TypeScript       |
-| APIs de la biblioteca estandar prohibidas en el nucleo | `clippy.toml` propio en cada crate de nucleo con `disallowed-methods` y `disallowed-types` | `node:*` prohibido en `domain` y `application` por `boundaries`                                           |
-| Crates vetados en todo el repo                         | `cargo deny check bans`                                                                    | no aplica                                                                                                 |
+| Regla                                                  | Rust                                                                                                          | TypeScript                                                                                                |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Capas dentro de una pieza                              | Un crate por capa. Tests de arquitectura que leen `Cargo.lock`, uno por hexagono                              | `eslint-plugin-boundaries` con `default: "disallow"` y `checkAllOrigins`, un config por app y por paquete |
+| Dependencias externas por capa                         | Lista blanca directa en los nucleos y lista negra transitiva en todos                                         | Politicas de `boundaries` por origen `external` y `core`                                                  |
+| Dependencias entre piezas                              | Tests de cruce de hexagonos en los dos tests de arquitectura                                                  | `tools/checks/package-graph.mjs` sobre los `package.json`, mas las project references de TypeScript       |
+| APIs de la biblioteca estandar prohibidas en el nucleo | `clippy.toml` propio en cada crate de nucleo con `disallowed-methods` y `disallowed-types`                    | `node:*` prohibido en `domain` y `application` por `boundaries`                                           |
+| Crates vetados en todo el repo                         | `cargo deny check bans`                                                                                       | no aplica                                                                                                 |
+| Que todo pase por las reglas                           | `tools/checks/cargo-lints.mjs`: cada crate hereda `[workspace.lints]` y ningun `clippy.toml` afloja un umbral | `tools/checks/eslint-configs.mjs`: cada paquete con TypeScript trae su `eslint.config.js`                 |
 
 **Los tests de arquitectura de Rust.** Hay dos, uno por hexagono, en el crate que hace de
 composition root de cada uno:
 
-- `apps/api/crates/api/tests/architecture.rs` para el servidor.
-- `crates/engine/tests/architecture.rs` para el cliente.
+- `apps/api/crates/api/tests/architecture.rs` para el servidor (con `tests/support/lockfile.rs` y
+  `tests/support/clippy.rs`).
+- `crates/engine/tests/architecture.rs` para el cliente, mas `crates/engine/tests/core_purity.rs`
+  para los `clippy.toml` de los nucleos.
 
 Los dos leen el `Cargo.lock` de la raiz linea a linea, sin crate de TOML, como en Gastonomo,
 construyen el grafo de dependencias y comprueban tres cosas: las dependencias directas de los
 crates de nucleo son un subconjunto de su lista blanca; el cierre transitivo de cada crate no
 contiene nada de su lista negra; y ningun crate de una familia alcanza a la otra salvo
-`ramal-ai`. El del cliente comprueba tambien las dependencias directas de `ramal-desktop`, y
-puede hacerlo sin compilar Tauri porque `Cargo.lock` describe a todos los miembros del
-workspace, esten o no en `default-members`. Un test de cordura verifica que el parser ve
+`ramal-ai`. El del cliente comprueba tambien que los dos hosts (`ramal-desktop` y
+`ramal-vscode-engine`) no declaran `ramal-core-*` ni `ramal-git`, y puede mirar `ramal-desktop`
+sin compilar Tauri porque `Cargo.lock` describe a todos los miembros del workspace, esten o no en
+`default-members`. `Cargo.lock` incluye las dev-dependencies, asi que las reglas cubren tambien
+los tests: por eso los tests de endpoint de `ramal-api-http` no pueden usar PostgreSQL. Un test de cordura verifica que el parser ve
 aristas reales (que `ramal-git` alcanza `tokio`, que `ramal-api-http` alcanza `salvo`). El
 mensaje de fallo dice que crate alcanza que y termina con "the hexagon leaks: move that code
 to an adapter".
@@ -871,24 +984,34 @@ controla con la lista blanca directa, igual que en Gastonomo.
 **Sin procesos ni IO en el nucleo.** Prohibir `tokio` no basta, porque `std::process::Command`
 esta en la biblioteca estandar. Cada crate de nucleo (`ramal-core-domain`,
 `ramal-core-application`, `ramal-api-domain`, `ramal-api-application`) tiene su propio
-`clippy.toml` con `disallowed-types` (`std::process::Command`, `std::fs::File`,
-`std::net::TcpStream`, `std::net::TcpListener`, `std::net::UdpSocket`) y `disallowed-methods`
-(`std::process::Command::new`, `std::fs::read`, `std::fs::read_to_string`, `std::fs::write`,
-`std::env::var`, `std::env::var_os`, `std::time::SystemTime::now`, `std::thread::spawn`,
-`std::thread::sleep`). La hora de pared llega siempre por el puerto `Clock`; `Instant::now` si
-se permite, porque medir una latencia (la sonda de salud lo hace) no es leer la hora. Clippy
-usa el `clippy.toml` mas cercano sin fusionarlo con el de la raiz, asi que estos ficheros
-repiten los umbrales comunes, y el test de arquitectura comprueba que coinciden con los de la
-raiz.
+`clippy.toml` con `disallowed-types` y `disallowed-methods` que cubren cada puerta de entrada,
+no solo la mas comun (con solo `fs::read` y `File`, un `OpenOptions`, un `fs::read_dir` o un
+`path.exists()` pasaban clippy limpios): `Command` y `Command::new`, `process::exit` y `abort`,
+`File`, `OpenOptions`, `DirBuilder` y todo `std::fs`, los metodos de `Path` que tocan el disco
+(`exists`, `metadata`, `read_dir`, `canonicalize`...), sockets TCP, UDP y Unix y
+`ToSocketAddrs`, el entorno (`env::var`, `vars`, `args`, `current_dir`, `home_dir`,
+`temp_dir`...), `stdin`, `stdout` y `stderr`, `SystemTime` y `SystemTime::now`, y los hilos
+(`thread::Builder`, `thread::spawn`, `thread::sleep`). La hora de pared llega siempre por el
+puerto `Clock`; `Instant::now` si se permite, porque medir una latencia (la sonda de salud lo
+hace) no es leer la hora. Clippy usa el `clippy.toml` mas cercano sin fusionarlo con el de la
+raiz, asi que estos ficheros repiten los umbrales comunes. `core_purity.rs` comprueba que los
+cuatro repiten los umbrales de la raiz, que prohiben exactamente lo mismo (leyendo por seccion y
+sin comentarios: una entrada comentada no prohibe nada) y, como red de seguridad, que el codigo
+de los nucleos no nombra los modulos de IO.
 
 **El guardian del grafo de paquetes.** `tools/checks/package-graph.mjs` (Node, sin
-dependencias, como el resto de `tools/checks`) recorre `apps/*`, `packages/*` y `tools/*`,
-lee cada `package.json` y compara sus `dependencies`, `devDependencies` y `peerDependencies`
-sobre `@ramal/*` con la tabla de 5.2, que vive como constante en el propio script. Falla si
-aparece un paquete del workspace que no esta en la tabla, si `@ramal/domain`, `@ramal/i18n`
-o `@ramal/bridge` declaran cualquier dependencia de npm, si una app depende de otra app o si
-un `@ramal/*` no usa `workspace:*`. Corre en `just check`, en pre-commit cuando cambia un
-`package.json` y en CI.
+dependencias, como el resto de `tools/checks`) recorre los paquetes del workspace, lee cada
+`package.json` y compara sus `dependencies`, `devDependencies`, `peerDependencies` y
+`optionalDependencies` sobre `@ramal/*` con la matriz de 5.2, que vive como constante
+(`MATRIX`) en el propio script. Falla si aparece un paquete del workspace que no esta en la
+matriz o vive en otra carpeta, si `@ramal/domain`, `@ramal/i18n` o `@ramal/bridge` declaran una
+dependencia de npm en tiempo de ejecucion, si una app depende de otra app, si un `@ramal/*` no
+usa `workspace:*`, si la configuracion compartida no va en `devDependencies`, o si
+`ts_package_dirs` del `justfile` no nombra exactamente los paquetes compartidos de `packages/`
+(sin `eslint-config` ni `tsconfig`): `just packages-check`, lo unico que corre `packages.yml`,
+solo recorre esa lista, y un paquete que faltara se quedaria sin lint, tipos ni cobertura con la
+CI en verde. Corre en `just guard`, en pre-commit cuando cambia un `package.json`,
+`pnpm-workspace.yaml` o el `justfile`, y en CI.
 
 **Project references de TypeScript.** Cada paquete y cada app es un proyecto `composite` y
 solo referencia en su `tsconfig.json` los paquetes que 5.2 le permite. Los paquetes
@@ -899,13 +1022,16 @@ de la lista del proyecto). Es una segunda red, mas tosca que `boundaries`, que n
 que alguien haya configurado bien ESLint.
 
 **Limites de calidad.** Los mismos que Gastonomo y bloqueantes: fichero de codigo de 300
-lineas y de test de 400, cognitiva 15, ciclomatica 10 (solo TypeScript; clippy no tiene lint
-de ciclomatica y se documenta en el ADR de enforcement), funcion de 50 lineas, 5 parametros,
+lineas y de test de 400, cognitiva 15 y ciclomatica 10 (en TypeScript con ESLint; en Rust con
+`tools/rust-complexity`, porque clippy no mide ninguna de las dos como Sonar, ver
+[ADR 0005](adr/0005-enforcement-automatizado.md)), funcion de 50 lineas, 5 parametros,
 anidamiento 4, nada de codigo muerto, TODO solo con ticket (`TODO(RAM-123)` o `TODO(#123)`),
-nada de tests enfocados, cobertura del 80% en los nucleos (`ramal-core-*`, `ramal-api-domain`,
-`ramal-api-application`, `@ramal/domain`, `@ramal/i18n`, `domain` y `application` de la web y
-del extension host) y del 60% global. Los avisos son errores (`-D warnings`,
-`--max-warnings 0`). Se aplican en local (`just check`), en cada commit (lefthook) y en cada
+nada de tests enfocados ni apagados sin motivo, ningun limite apagado en linea
+(`tools/checks/no-limit-suppressions.mjs`), cobertura del 80% en los nucleos (`ramal-core-*`,
+`ramal-api-domain` y `ramal-api-application`, cada crate por separado; `@ramal/domain`,
+`@ramal/i18n`, `@ramal/bridge`, `domain` y `application` de la web, y `application` del
+escritorio y del extension host) y del 60% global, tambien en el host de Tauri. Los avisos son
+errores (`-D warnings`, `--max-warnings 0`). Se aplican en local (`just check`), en cada commit (lefthook) y en cada
 PR (`all-green`). Condicionan el diseno: por eso los modulos de este documento estan partidos
 en ficheros pequenos desde el principio.
 
@@ -925,7 +1051,8 @@ sequenceDiagram
     C->>B: call graph/window con repoId, offset y limit
     B->>T: request con un RpcRequest
     T->>H: invoke rpc
-    H->>E: handle(request)
+    H->>H: lista de la ventana (surfaces.rs)
+    H->>E: handle_with(request, webview)
     E->>E: deserializa params con deny_unknown_fields
     E->>U: execute
     U->>G: read_refs y read_log
@@ -956,7 +1083,7 @@ sequenceDiagram
     participant E as Engine<br/>ramal-engine
     W->>T: call graph/window
     T->>X: postMessage rpc/request con id del webview
-    X->>X: valida forma, tamano, metodo y superficie
+    X->>X: valida forma, tamano, metodo, superficie y repoId del panel
     X->>X: asigna id propio y guarda panel e id original
     X->>S: marco Content-Length con el RpcRequest reescrito
     S->>E: handle(request)
@@ -972,10 +1099,10 @@ repositorio (la carpeta del workspace, o un QuickPick si hay varias), llama el m
 `repo/open` y pasa el `repoId` al webview en el mensaje `init`. El webview nunca envia rutas
 del sistema de ficheros.
 
-Las peticiones nativas (dialogos, abrir fichero, copiar) viajan como `host/request` y las
-resuelve el extension host con la API de VS Code, sin pasar por el sidecar. Las
-notificaciones del motor llegan al extension host y este las reenvia a los webviews
-suscritos como `rpc/notification`.
+Las peticiones nativas viajan como `host/request` y las resuelve el extension host con la API
+de VS Code, sin pasar por el sidecar. En el primer corte solo existe `clipboard/writeText`; los
+dialogos y abrir un fichero llegan con `RepoViewHost`. Las notificaciones del motor llegan al
+extension host y este las reenvia a los webviews suscritos como `rpc/notification`.
 
 ### 6.3 Web
 
@@ -995,18 +1122,20 @@ sequenceDiagram
     HT->>CR: execute
     CR->>PG: check con timeout
     PG-->>CR: ok o error
-    CR-->>HT: HealthReport
-    HT-->>A: 200 o 503 con JSON
+    CR-->>HT: HealthReport con checkedAt del puerto Clock
+    HT-->>A: 200 o 503 con JSON, sin el detalle del fallo
     A-->>UC: HealthReport de dominio o fallo tipado
     UC-->>R: union de resultados, nunca lanza
 ```
 
-El gateway tiene un `location` por prefijo de la API (`/v1/`, `/health/`, `= /openapi.json`
-y, solo en desarrollo, `/swagger-ui`) antes del `location /` de la web. Las rutas son las mismas
-dentro y fuera del gateway: no hay prefijo `/api` que se quite por el camino
-([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). Cada prefijo nuevo necesita su `location` en
-los dos ficheros del gateway y una sonda en `tools/scripts/smoke-stack.sh`: en Gastonomo un
-prefijo olvidado mando 25 rutas a la SPA con todos los tests en verde.
+El gateway (`docker/gateway.dev.conf`; el de produccion todavia no existe) tiene un `location`
+por prefijo de la API (`/v1/`, `/health/`, `= /openapi.json` y `/swagger-ui`, que la API solo
+sirve con la bandera) antes del `location /` de la web. Las rutas son las mismas dentro y fuera
+del gateway: no hay prefijo `/api` que se quite por el camino
+([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). Cada prefijo nuevo necesita su
+`location` en el gateway (en los dos ficheros cuando exista el de produccion) y una sonda en
+`tools/scripts/smoke-stack.sh`: en Gastonomo un prefijo olvidado mando 25 rutas a la SPA con
+todos los tests en verde.
 
 ### 6.4 Del motor a la Ramal API y a las plataformas (planificado)
 
@@ -1034,22 +1163,24 @@ webview y extension host).
 ```jsonc
 // Peticion
 { "jsonrpc": "2.0", "id": 7, "method": "graph/window",
-  "params": { "repoId": "repo-1", "offset": 0, "limit": 200 } }
+  "params": { "repoId": "repo-3f2a9c41d7e0b5a8", "offset": 0, "limit": 200 } }
 
 // Respuesta correcta
 { "jsonrpc": "2.0", "id": 7, "result": { "...": "..." } }
 
 // Respuesta con error
 { "jsonrpc": "2.0", "id": 7,
-  "error": { "code": -32000, "message": "repository repo-9 is not open",
+  "error": { "code": -32000, "message": "repository repo-0123456789abcdef is not open",
              "data": { "kind": "repo_not_open" } } }
 
 // Notificacion (sin id); planificadas
-{ "jsonrpc": "2.0", "method": "repo/changed", "params": { "repoId": "repo-1" } }
+{ "jsonrpc": "2.0", "method": "repo/changed", "params": { "repoId": "repo-3f2a9c41d7e0b5a8" } }
 ```
 
 - `id` es un entero no negativo menor que 2^31, para que sea un `number` seguro en
   TypeScript. No se admiten ids de texto.
+- `repoId` es opaco para la interfaz: hoy es `repo-` mas 16 cifras hexadecimales que salen de la
+  raiz del repositorio (ver `ramal-core-application`).
 - `params` es siempre un objeto; los metodos sin parametros reciben `{}`.
 - Nombres de metodo `<area>/<verbo>` en camelCase (`graph/window`, `repo/open`,
   `engine/info`). Notificaciones de control con prefijo `$/` (`$/cancel`, `$/progress`,
@@ -1058,30 +1189,45 @@ webview y extension host).
   `deny_unknown_fields`. Un campo opcional se declara con
   `#[serde(default, skip_serializing_if = "Option::is_none")]` y `#[ts(optional)]`.
 - Nada de enteros de 64 bits en los DTOs: ts-rs los traduce a `bigint` y romperian el JSON
-  normal. Los instantes viajan como texto ISO 8601 con desplazamiento (lo que da `%aI`).
+  normal. Los instantes viajan como texto ISO 8601 estricto con desplazamiento. git se lee con
+  `--date=raw` (segundos y zona) y el dominio escribe el texto: `%aI` copiaba tal cual
+  desplazamientos o anios imposibles que un parser ISO no acepta.
 - Codigos: los estandar de JSON-RPC (-32700 parseo, -32600 peticion invalida, -32601 metodo
   inexistente, -32602 parametros invalidos, -32603 interno), -32800 cancelada (el de LSP) y
   -32000 para cualquier error del motor. Lo que la interfaz usa para decidir es
   `error.data.kind`, un enum cerrado (`ErrorKind`) que ts-rs exporta como union de literales:
   `invalid_params`, `repo_not_open`, `not_a_repository`, `git_not_found`,
-  `git_version_unsupported`, `git_failed`, `internal`, y mas adelante `cancelled`,
-  `not_signed_in`. `message` esta en ingles y es para el log; la interfaz traduce el `kind`
-  con `@ramal/i18n`. El extension host y el bridge anaden tres tipos que no vienen del motor:
-  `transport`, `timeout` y `engine_unavailable`.
-- Version: `PROTOCOL_VERSION` es una constante de `ramal-protocol`. `engine/info` la devuelve
-  y el extension host la compara al arrancar el sidecar con la que trae generada; como viajan
-  en la misma VSIX, una diferencia es un fallo de empaquetado y se muestra como tal. En
-  escritorio no puede haber diferencia: se compila todo junto.
+  `git_version_unsupported`, `git_failed`, `stale_window`, `internal`, y mas adelante
+  `cancelled` y `not_signed_in`. `message` esta en ingles y es para el log; la interfaz traduce
+  el `kind` con `@ramal/i18n`.
+- Un metodo que no existe (-32601), un JSON roto (-32700) y un sobre invalido (-32600) llevan
+  `kind: internal`: la interfaz solo llama a los metodos del mapa generado, asi que son fallos de
+  empaquetado. Un metodo del host pedido desde un webview se responde igual que uno que no
+  existe.
+- Tipos que no vienen del motor. El bridge anade `transport` y `timeout`. El extension host
+  genera `engine_unavailable` cuando el motor no esta y `repo_not_open` cuando un webview pide un
+  `repoId` que no es el de su panel; ademas, si el motor contesto `engine/info` con un error al
+  arrancar (`git_not_found`, por ejemplo), reenvia ese error al webview con su tipo en vez de
+  `engine_unavailable`. Cancelar una llamada con `signal` rechaza con `signal.reason`, como
+  `fetch`; todavia no hay tipo `cancelled`.
+- Version: `PROTOCOL_VERSION` es una constante de `ramal-protocol` (hoy 2). `engine/info` la
+  devuelve y el extension host la compara cada vez que arranca un proceso del sidecar con la
+  que trae generada; como viajan en la misma VSIX, una diferencia es un fallo de empaquetado y
+  se muestra como tal. En escritorio no puede haber diferencia: se compila todo junto.
 - Marcos del sidecar: `Content-Length: <bytes>\r\n\r\n` seguido de exactamente esos bytes de
   JSON en UTF-8. Se ignoran otras cabeceras. Un marco de mas de 32 MiB se rechaza y se cierra
   la conexion. El sidecar atiende peticiones en paralelo (una tarea por peticion) y una unica
   tarea escribe en stdout, para que dos respuestas no se mezclen.
 - Cliente del bridge: `client.call(method, params, { signal, timeoutMs })` con 30 segundos por
-  defecto. Rechaza con `BridgeError { kind, message, data }`. Las operaciones largas
-  (planificadas: fetch, push, clonado) informan por `$/progress` y no usan timeout.
-- **Metodos del host.** `define_methods!` marca los metodos que solo puede llamar un host
-  (`repo/open`, y los que se anadan con rutas absolutas o secretos). Los dos hosts los rechazan
-  cuando la peticion viene de un webview, y cada ventana o superficie tiene su lista generada.
+  defecto. Rechaza con `BridgeError { kind, message, data }`. Cancelar manda `$/cancel`, que el
+  motor del primer corte todavia ignora. Las operaciones largas (planificadas: fetch, push,
+  clonado) informan por `$/progress` y no usan timeout.
+- **Metodos del host.** `define_methods!` marca con `host_only` los metodos que solo puede llamar
+  un host (hoy `repo/open`, y los que se anadan con rutas absolutas o secretos). El motor los
+  rechaza cuando la llamada llega como de webview (`CallContext::webview()`), y cada host filtra
+  antes con su lista por ventana o superficie: `surfaces.rs` en escritorio, escrita a mano con
+  los marcadores de `define_methods!`, y `application/surfaces.ts` en VS Code, tipada contra la
+  lista generada. `engine/info` no es `host_only`, pero no esta en ninguna lista.
 - **Rutas en los parametros.** Ningun parametro que venga de un webview lleva una ruta absoluta.
   Las rutas relativas al repositorio (preparar, descartar, resolver con contenido) se rechazan si
   contienen `..` o NUL, o si despues de seguir enlaces simbolicos salen del arbol de trabajo.
@@ -1090,11 +1236,11 @@ webview y extension host).
 
 **Metodos del primer corte.**
 
-| Metodo         | Parametros                                          | Resultado                                                                                  | Quien lo llama                                                                                               |
-| -------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `engine/info`  | `{}`                                                | `EngineInfo { engineVersion, protocolVersion, git: GitInfo { path, version, supported } }` | Host de escritorio y extension host, al arrancar                                                             |
-| `repo/open`    | `{ path }`                                          | `RepoHandle { repoId, root, headRef, headSha, isDetached, isEmpty }`                       | Solo los hosts: el comando `repo_pick_and_open` en escritorio y el extension host en VS Code. Ningun webview |
-| `graph/window` | `{ repoId, offset, limit }`, `limit` entre 1 y 1000 | `GraphWindow { repoId, offset, rows, hasMore, laneCount }`                                 | `@ramal/repo-view`                                                                                           |
+| Metodo         | Parametros                                                     | Resultado                                                                                  | Quien lo llama                                                                                               |
+| -------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `engine/info`  | `{}`                                                           | `EngineInfo { engineVersion, protocolVersion, git: GitInfo { path, version, supported } }` | Host de escritorio (lo deja en el log) y extension host, al arrancar cada proceso                            |
+| `repo/open`    | `{ path }`                                                     | `RepoHandle { repoId, root, headRef?, headSha?, isDetached, isEmpty }`                     | Solo los hosts: el comando `repo_pick_and_open` en escritorio y el extension host en VS Code. Ningun webview |
+| `graph/window` | `{ repoId, offset, limit, snapshot? }`, `limit` entre 1 y 1000 | `GraphWindow { repoId, offset, rows, hasMore, laneCount, snapshot }`                       | `@ramal/repo-view`                                                                                           |
 
 ```
 GraphRow  { sha, shortSha, parents: string[], lane, edges: GraphEdge[], summary,
@@ -1106,9 +1252,24 @@ RefLabel  { name, fullName, kind: "localBranch" | "remoteBranch" | "tag", isHead
 
 `parentRow` es la fila absoluta del padre o `null` si queda fuera de lo cargado; la interfaz
 dibuja entonces la arista hasta el borde inferior en lugar de omitirla (el prototipo la
-omitia). Las puntas fijadas del algoritmo son, por orden, la rama por defecto (la que apunta
-`refs/remotes/origin/HEAD`, si no `main`, si no `master`) y nada mas en el primer corte. La
-fila WIP no la da `graph/window`: llegara con el estado del arbol de trabajo.
+omitia). La punta fijada del algoritmo es la rama por defecto, y nada mas en el primer corte:
+la rama local que corresponde a `refs/remotes/origin/HEAD`, si no esa rama remota, si no
+`main`, si no `master`. Es la local porque es la que mueve el usuario; si va por detras del
+remoto, el remoto sale como una rama mas que desemboca en ella. La fila WIP no la da
+`graph/window`: llegara con el estado del arbol de trabajo.
+
+Otros detalles de los resultados:
+
+- `engine/info` no falla con un git anterior a 2.34: devuelve `supported: false`. El minimo lo
+  aplica `repo/open`, que responde `git_version_unsupported`. Sin git, `engine/info` si falla
+  con `git_not_found`.
+- `headRef` es el nombre corto de la rama de HEAD (`main`) y falta con HEAD separado; `headSha`
+  falta si la rama todavia no tiene commits.
+- **`snapshot`.** Cada ventana lleva la huella opaca de las refs con las que se leyo. La interfaz
+  pide la pagina siguiente con esa huella, y si las refs cambiaron entre medias (un commit, un
+  fetch, un rebase) el motor responde `stale_window` sin leer el log, en vez de pegar filas de
+  dos historiales. La interfaz vuelve a empezar desde la fila 0. La primera pagina no lleva
+  `snapshot`.
 
 ### 6.6 Tipos de TypeScript generados con ts-rs
 
@@ -1122,8 +1283,9 @@ fila WIP no la da `graph/window`: llegara con el estado del arbol de trabajo.
 - ts-rs no genera valores ni el mapa de metodos, asi que la macro `define_methods!` de
   `src/methods.rs` declara cada metodo una vez (`"graph/window" => GraphWindowParams -> GraphWindow`)
   y el test `tests/export_bindings.rs` escribe dos ficheros mas: `methods.ts`, con el tipo
-  `EngineMethods` (metodo -> `{ params, result }`), la constante `ENGINE_METHODS` (la lista
-  que usa el extension host como lista blanca) y `PROTOCOL_VERSION`; e `index.ts`, que
+  `EngineMethods` (metodo -> `{ params, result }`), las constantes `ENGINE_METHODS` (la lista
+  que usa el extension host como lista blanca) y `HOST_METHODS` (los marcados `host_only`) y
+  `PROTOCOL_VERSION`; e `index.ts`, que
   reexporta todo con `export type *`. Los nombres de los tipos salen del trait `TS` de ts-rs,
   no de texto escrito a mano.
 - Lo generado se commitea: el TypeScript compila sin cargo. `generated/` esta fuera de ESLint,
@@ -1150,12 +1312,16 @@ ficheros), asi que se trata como un cliente hostil. El extension host es la fron
    `src/shared`: `webview/ready`, `rpc/request` (con un `RpcRequest` bien formado: id
    entero en rango, `method` texto, `params` objeto) y `host/request` (con `params` validado
    por un esquema zod por metodo del host). Lo que no encaja se descarta y se registra.
-4. **Metodo y superficie.** Un `rpc/request` solo pasa si el metodo esta en `ENGINE_METHODS`
-   (generado) y en la lista de su superficie (`application/surfaces.ts`). `repo/open` y
-   `engine/info` no estan en ninguna: solo los llama el host. En el primer corte la
-   superficie `graph` solo puede llamar a `graph/window`.
+4. **Metodo, superficie y repositorio.** Un `rpc/request` solo pasa si el metodo esta en
+   `ENGINE_METHODS` (generado), no es del host (`HOST_METHODS`, generado, mas `engine/info`) y
+   esta en la lista de su superficie (`application/surfaces.ts`). En el primer corte la
+   superficie `graph` solo puede llamar a `graph/window`. Ademas, si los parametros llevan
+   `repoId`, tiene que ser el del panel: asi un webview no puede leer otro repositorio que el
+   host haya abierto, ni usar un id de antes de reiniciar el motor. Si no lo es, el host responde
+   `repo_not_open` sin llamar al motor.
 5. **Ids propios.** El host reescribe el id hacia el sidecar con un contador propio y guarda
-   `(panel, id original)`. Un webview no puede chocar con otro ni cancelar peticiones ajenas.
+   `(panel, id original)`. Un webview no puede chocar con otro ni recibir la respuesta de otro.
+   Un webview solo manda peticiones con id: `$/cancel` no se reenvia todavia.
 6. **El motor vuelve a validar.** Los parametros se deserializan con `deny_unknown_fields` y
    los `repoId` se buscan en el registro del motor: un id inventado da `repo_not_open`. El
    motor es la autoridad; el host es la primera red.
@@ -1178,12 +1344,14 @@ form-action 'none';
 ```
 
 Las URLs de recursos pasan por `webview.asWebviewUri` y `localResourceRoots` se limita a
-`dist/webview`. No hace falta `'unsafe-inline'` en estilos porque ninguna pieza inyecta
-etiquetas `<style>` en tiempo de ejecucion (no hay CSS-in-JS) y las props `style` de React se
-aplican por CSSOM, que la CSP no bloquea. Si un avatar llega a mostrarse algun dia, lo
-descarga el motor y viaja como `data:`. En desarrollo, una CSP distinta permite el servidor
-de Vite en `http://localhost:<puerto>` y `ws:` para HMR, y solo se usa en
-`ExtensionMode.Development`.
+`dist/webview`. No hay CSS-in-JS y las props `style` de React se aplican por CSSOM, que la CSP
+no bloquea. La excepcion es `react-aria-components` 1.21, que inyecta un `<style>` fijo
+(`react-aria-pressable-style`, el `touch-action` de lo pulsable). En escritorio se permite por su
+hash (ver abajo); en los webviews de VS Code la CSP todavia no lleva ese hash, asi que el
+navegador descarta esa regla. Queda pendiente anadirlo igual que en escritorio, nunca con
+`'unsafe-inline'`. Si un avatar llega a mostrarse algun dia, lo descarga el motor y viaja como
+`data:`. En desarrollo, una CSP distinta permite el servidor de Vite (`http://127.0.0.1:5175`),
+su websocket para HMR y `'unsafe-inline'` en estilos, y solo se usa fuera de produccion.
 
 **Tauri.** En `tauri.conf.json`, `app.security`:
 
@@ -1191,7 +1359,7 @@ de Vite en `http://localhost:<puerto>` y `ws:` para HMR, y solo se usa en
 csp:
   default-src 'none';
   script-src 'self';
-  style-src 'self';
+  style-src 'self' 'sha256-...';   el <style> fijo de react-aria-components, por su hash
   font-src 'self';
   img-src 'self' data:;
   connect-src ipc: http://ipc.localhost;
@@ -1199,13 +1367,17 @@ csp:
   object-src 'none';
   base-uri 'none';
   form-action 'none'
-devCsp: lo mismo mas el servidor de Vite y ws: para HMR
+devCsp: lo mismo mas el servidor de Vite en http://localhost:1420, ws: para HMR y 'unsafe-inline'
 freezePrototype: true
 ```
 
 Y en `app`: `withGlobalTauri: false`. Tauri anade por su cuenta los hashes de sus scripts de
-inicializacion. El permiso del plugin opener se limita a URL `https:` y no incluye `open-path`. `connect-src` sin `https:` es lo que garantiza que el webview de escritorio
-no puede hablar con la red aunque alguien lo intente: toda salida pasa por el comando `rpc`.
+inicializacion. El hash de `style-src` es el del `<style>` que inyecta React Aria; si React
+Aria lo cambia, el E2E de Playwright lo ve, porque el preview de Vite sirve esta misma CSP y el
+test falla con cualquier violacion. Cuando llegue el plugin opener, su permiso se limitara a URL
+`https:` sin `open-path`. `connect-src` sin `https:` es lo que garantiza que el webview de
+escritorio no puede hablar con la red aunque alguien lo intente: toda salida pasa por el
+comando `rpc`.
 Las fuentes van empaquetadas (`@fontsource/ibm-plex-*`), nunca desde Google Fonts.
 
 **Web.** La CSP la pone el gateway como cabecera. React Router incrusta scripts de
@@ -1228,21 +1400,33 @@ es `'unsafe-inline'` en `script-src`. Ademas:
 
 Los componentes solo leen tokens semanticos, nunca un color literal:
 
-| Grupo              | Tokens                                                                                                          |
-| ------------------ | --------------------------------------------------------------------------------------------------------------- |
-| Superficies        | `--r-bg`, `--r-panel`, `--r-surface`, `--r-surface-hover`, `--r-border`                                         |
-| Texto              | `--r-text`, `--r-muted`, `--r-faint`                                                                            |
-| Acento y estados   | `--r-accent`, `--r-accent-ink`, `--r-accent-soft`, `--r-ok`, `--r-warn`, `--r-danger`, `--r-info`, `--r-merged` |
-| Diff               | `--r-add-bg`, `--r-del-bg`                                                                                      |
-| Estado de fichero  | `--r-status-m`, `--r-status-a`, `--r-status-d`, `--r-status-r`, `--r-status-c`                                  |
-| Carriles del grafo | `--r-lane-0` a `--r-lane-5`                                                                                     |
-| Tipografia         | `--r-font-ui`, `--r-font-code`, `--r-font-size-base`                                                            |
-| Forma              | `--r-radius-sm`, `--r-radius-md`, `--r-radius-lg`, `--r-radius-xl`, `--r-shadow-overlay`                        |
-| Densidad           | `--r-row-h`, `--r-menu-item-h`, `--r-sidebar-item-h`, `--r-toolbar-h`                                           |
+| Grupo              | Tokens                                                                                                                                    |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Superficies        | `--r-bg`, `--r-panel`, `--r-surface`, `--r-surface-hover`, `--r-border`                                                                   |
+| Texto              | `--r-text`, `--r-muted`, `--r-faint`                                                                                                      |
+| Acento y seleccion | `--r-accent`, `--r-accent-ink`, `--r-accent-soft`, `--r-selection`, `--r-selection-ink`                                                   |
+| Estados            | `--r-ok`, `--r-warn`, `--r-danger`, `--r-info`, `--r-merged` y sus fondos suaves `--r-*-soft` (tambien `--r-faint-soft`)                  |
+| Diff               | `--r-add-bg`, `--r-del-bg`                                                                                                                |
+| Estado de fichero  | `--r-status-m`, `--r-status-a`, `--r-status-d`, `--r-status-r`, `--r-status-c`                                                            |
+| Carriles del grafo | `--r-lane-0` a `--r-lane-5`, `--r-on-lane` (texto sobre un carril)                                                                        |
+| Interaccion        | `--r-focus`, `--r-backdrop`, `--r-knob`, `--r-hatch`, `--r-on-emphasis`                                                                   |
+| Alto contraste     | `--r-hc-border`, `--r-hc-active-border`                                                                                                   |
+| Marcas             | `--r-platform-github`, `--r-platform-gitlab`, `--r-platform-bitbucket`, `--r-platform-gitea`, `--r-platform-azure`, `--r-provider-google` |
+| Tipografia         | `--r-font-ui`, `--r-font-code`, `--r-font-size-base`                                                                                      |
+| Forma              | `--r-radius-sm`, `--r-radius-md`, `--r-radius-lg`, `--r-radius-xl`, `--r-shadow-overlay`                                                  |
+| Densidad           | `--r-row-h`, `--r-menu-item-h`, `--r-sidebar-item-h`, `--r-toolbar-h`                                                                     |
+
+La lista exacta vive en `packages/ui/src/tokens/tokens.ts` y un test comprueba que los dos temas
+dan valor a todos.
 
 - `packages/ui/src/themes/ramal.css`: los valores oklch del handoff para
-  `[data-theme="dark"]` y `[data-theme="light"]` sobre `<html>`. Lo usan escritorio y web.
-  La web sube `--r-font-size-base` de 13 a 14 px en su propia hoja.
+  `[data-theme="dark"]` y `[data-theme="light"]` sobre `<html>`. Lo usan escritorio y web. La
+  web pone ademas `data-host="web"`, y el mismo fichero sube con `[data-host="web"]`
+  `--r-font-size-base` de 13 a 14 px y aplica los matices del claro de su prototipo: no hay hoja
+  aparte. Los valores se escriben con la notacion de stylelint (`oklch(18.5% 0.01 230deg)`); son
+  los del handoff.
+- `packages/ui/src/themes/base.css`: los tokens que no cambian con el tema (carriles, marcas,
+  fondos `-soft`, alto contraste y densidades). Lo importan los dos temas.
 - `packages/ui/src/themes/vscode.css`: cada token apunta a una variable de VS Code
   (`--r-bg: var(--vscode-editor-background)`, `--r-panel: var(--vscode-sideBar-background)`,
   `--r-border: var(--vscode-panel-border)`, `--r-text: var(--vscode-foreground)`,
@@ -1251,7 +1435,9 @@ Los componentes solo leen tokens semanticos, nunca un color literal:
   `--r-font-ui: var(--vscode-font-family)`, `--r-font-code: var(--vscode-editor-font-family)`,
   y asi con el resto). El alto contraste (`body.vscode-high-contrast` y
   `body.vscode-high-contrast-light`) se trata aparte, con bordes de
-  `--vscode-contrastBorder`. El tema cambia solo cuando cambia el de VS Code, sin codigo.
+  `--vscode-contrastBorder`. El tema cambia solo cuando cambia el de VS Code, sin codigo. Este
+  fichero apaga la regla `custom-property-pattern` de stylelint, con el motivo escrito, porque
+  VS Code nombra sus variables en camelCase.
 - Los colores de carril son los mismos en todos los temas y en VS Code: el diseno lo pide.
 - La hoja de estilos de cada componente es un CSS Module (`*.module.css`) que solo usa
   tokens. Es CSS de coste cero en ejecucion, lo entiende Vite en los tres hosts y no choca
@@ -1302,28 +1488,39 @@ en el de escritorio. Los glifos Unicode del prototipo no se usan.
 `@ramal/i18n` es la unica fuente de textos de interfaz de las tres apps.
 
 ```
-src/locales/es/<espacio>.ts   Fuente de verdad: common, repos, graph, staging, diff, conflict,
-                              rebase, menu, dialog, toast, settings, ai, team, errors, vscode, web
-src/locales/en/<espacio>.ts   Tipado contra es: una clave que falta en ingles no compila
-src/translator.ts             createTranslator(locale): t(clave, params) con parametros tipados
-src/plural.ts                 Sufijos _one y _other resueltos con Intl.PluralRules
-src/format.ts                 formatRelativeTime, formatDate, formatShortcut
-src/locale.ts                 Locale ("es" | "en") y resolveLocale
-scripts/migrate-from-prototype.ts   Conversion unica de D y W del prototipo a espacios de nombres
-test/parity.test.ts           Paridad de claves, de parametros y de plurales entre es y en
+src/locales/es/<espacio>.json  Fuente de verdad: common, repos, graph, staging, diff, conflict,
+                               rebase, menu, dialog, toast, settings, ai, team, errors, vscode, web
+src/locales/en/<espacio>.json  Tipado contra es: una clave que falta o sobra en ingles no compila
+src/catalog.ts                 Importa los JSON; el tipo Catalog sale del castellano
+src/keys.ts                    Claves tipadas, plurales y parametros por clave
+src/generated/params.ts        Parametros de cada texto; lo escribe scripts/generate-params.mjs
+src/translator.ts              createTranslator(locale): t(clave, params) con parametros tipados
+src/plural.ts                  Sufijos _one y _other resueltos con Intl.PluralRules
+src/format.ts                  formatRelativeTime, formatDate, formatTimeZone, formatShortcut
+src/locale.ts                  Locale ("es" | "en") y resolveLocale
+test/parity.test.ts            Paridad de claves, de parametros y de plurales entre es y en
 ```
 
-- Semilla: el diccionario `D` de `ramal-data.js` (466 claves) y el `W` de la web (148) pasan
-  a espacios de nombres; `W` va entero a `web.*` porque 8 de sus claves chocan en texto con
-  `D`. Los parametros de una letra se renombran a nombres descriptivos (`{count}`,
-  `{branch}`, `{sha}`...), los recuentos pasan a plurales y los glifos y atajos salen de los
-  textos.
+- Los textos van en JSON, no en TypeScript: TypeScript tipa las claves de un JSON importado pero
+  no ve dentro de sus textos, asi que los parametros los genera `just i18n-gen` en
+  `src/generated/params.ts`, y el test de paridad falla si no esta al dia.
+- Semilla: el diccionario `D` de `ramal-data.js` (466 claves) y el `W` de la web (148) pasaron
+  a espacios de nombres con una conversion de un solo uso que no se conserva; `W` va entero a
+  `web.*` porque 8 de sus claves chocan en texto con `D`. Los parametros de una letra se
+  renombraron a nombres descriptivos (`{count}`, `{branch}`, `{sha}`...), los recuentos pasaron
+  a plurales y los glifos y atajos salieron de los textos. Se quitaron `D.accSub` (duplicada) y
+  `W.ownerTeam` y `W.teamAcc` (cuentas compartidas con el equipo, que ya no existen: gaps X-01);
+  el rol de propietario se llama "Titular" (gaps B-50).
+- `formatDate` tiene cuatro estilos: `date`, `dateTime`, `time` y `monthDayTime`, la columna de
+  fecha del grafo (el `MM-DD HH:mm` de los prototipos en el orden de cada idioma, con hora de 24
+  horas para que quepa en la columna de VS Code).
 - `t("toast.pushed", { branch: "main" })` compila; sin `branch`, o con otro nombre, no.
 - El enlace con React (`I18nProvider`, `useT`) vive en `@ramal/ui` para que `@ramal/i18n`
   siga sin dependencias; el extension host usa el traductor directamente.
 - **Rust no devuelve textos traducidos.** El motor devuelve `ErrorKind` y la interfaz lo
-  traduce con `errors.engine.<kind>`; la correspondencia es un `Record<ErrorKind, clave>` en
-  `@ramal/repo-view`, asi que un `kind` nuevo sin traduccion no compila. La API devuelve
+  traduce con `errors.engine.<kind>`; la correspondencia es un `Record<BridgeErrorKind, clave>`
+  (`ENGINE_ERROR_KEYS` en `@ramal/repo-view`, y otro en el extension host para sus avisos), asi
+  que un `kind` nuevo sin traduccion no compila. La API devuelve
   problem+json con mensajes en castellano y un `code` estable; la web traduce el `code` con
   `errors.api.<code>` y usa el mensaje en castellano solo si no conoce el codigo.
 
@@ -1539,8 +1736,8 @@ te lo va a decir antes que el reviewer. Recetas concretas por pieza:
 
 ### 9.1 Una operacion Git nueva (por ejemplo, listar stashes)
 
-1. `crates/core-domain/src/stash.rs`: `Stash` y sus reglas. Tests en el mismo modulo o en
-   `crates/core-domain/tests/`.
+1. `crates/core-domain/src/stash.rs`: `Stash` y sus reglas. Tests en `src/stash/tests.rs`
+   (con `#[cfg(test)] mod tests;`) o en `crates/core-domain/tests/`.
 2. Si es lectura, un metodo nuevo en `GitReader`; si escribe o toca la red, en `GitWriter`.
    Anade el metodo al fake de `testing/`.
 3. `crates/core-application/src/use_case/stash/list_stashes.rs` con su test sobre el fake.
@@ -1552,8 +1749,9 @@ te lo va a decir antes que el reviewer. Recetas concretas por pieza:
    caso de uso cableado en `builder.rs`. Test de dispatch en `crates/engine/tests/`.
 7. Si un webview debe llamarlo, anade el metodo a la superficie correspondiente en
    `apps/vscode/src/extension/application/surfaces.ts` y a la lista de la ventana en
-   `apps/desktop/src-tauri/src/surfaces.rs`. Si lleva rutas absolutas o devuelve algo secreto, se
-   marca como del host y no entra en ninguna lista.
+   `apps/desktop/src-tauri/src/surfaces.rs` (escrita a mano con el marcador del metodo). Si lleva
+   rutas absolutas o devuelve algo secreto, se marca `host_only = true` en `define_methods!` y no
+   entra en ninguna lista.
 8. Interfaz: un hook en `@ramal/repo-view` sobre `client.call("stash/list", ...)` con
    TanStack Query, y la clave de i18n de cualquier `kind` de error nuevo.
 
@@ -1564,11 +1762,14 @@ te lo va a decir antes que el reviewer. Recetas concretas por pieza:
 3. Caso de uso en `use_case/<contexto>/<verbo_nombre>.rs`, probado con el fake y `block_on`.
 4. `ramal-api-infrastructure`: adaptador de PostgreSQL con su migracion nueva y su test contra
    base de datos real.
-5. `ramal-api-http`: DTO, handler, ruta en `router/<contexto>.rs` y su test de endpoint.
-   Regenera `apps/api/openapi.json` (`just api-openapi`) y `@ramal/api-client` (`just api-client`).
+5. `ramal-api-http`: DTO, handler con `#[endpoint]`, ruta en `router/<contexto>.rs` y su test de
+   endpoint con fakes en `http/tests/`. El de punta a punta contra PostgreSQL va en
+   `crates/api/tests/`. Regenera `apps/api/openapi.json` (`just api-openapi`) y
+   `@ramal/api-client` (`just api-client`).
 6. `ramal-api`: `bootstrap/<contexto>.rs` construye las dependencias del contexto.
-7. Si es un prefijo nuevo: `location` en los dos ficheros del gateway y sonda en
-   `tools/scripts/smoke-stack.sh`. Y el endpoint documentado en api-surface.md.
+7. Si es un prefijo nuevo: `location` en `docker/gateway.dev.conf` (y en el de produccion
+   cuando exista) y sonda en `tools/scripts/smoke-stack.sh`. Y el endpoint documentado en
+   api-surface.md.
 
 ### 9.3 Una pantalla o funcion nueva en la web
 
@@ -1576,10 +1777,10 @@ te lo va a decir antes que el reviewer. Recetas concretas por pieza:
 2. Puerto en `src/application/ports/`.
 3. Caso de uso en `src/application/use-cases/`, que devuelve una union de resultados y nunca
    lanza, con test sobre un puerto escrito a mano.
-4. Adaptador en `src/infrastructure/http/` sobre `@ramal/api-client`, y su version en memoria
-   en `src/infrastructure/memory/`.
-5. Pantalla en `src/ui/<funcion>/` que recibe el puerto por contexto; test de componente con el
-   adaptador en memoria.
+4. Adaptador en `src/infrastructure/http/` sobre `@ramal/api-client` (o en la carpeta de su
+   tecnologia: `storage/`, `browser/`...).
+5. Pantalla en `src/ui/<funcion>/` que recibe el puerto por contexto (`UiPortsContext`); test de
+   componente con un puerto falso o el adaptador local.
 6. Adaptador en `src/app/composition-root.ts` y modulo de ruta en `src/app/routes/`.
 
 ### 9.4 Una pantalla propia de escritorio
@@ -1610,18 +1811,20 @@ capacidad toca rutas o abre algo del sistema, se resuelve con un comando de Rust
 
 ### 9.7 Un texto nuevo
 
-La clave en `packages/i18n/src/locales/es/<espacio>.ts` y su traduccion en `en/`. El test de
-paridad y el tipado impiden que falte una de las dos o que no coincidan los parametros. Nunca
-un texto literal en un componente.
+La clave en `packages/i18n/src/locales/es/<espacio>.json` y su traduccion en `en/`. Si lleva
+parametros, `just i18n-gen` regenera sus tipos. El test de paridad y el tipado impiden que falte
+una de las dos o que no coincidan los parametros. Nunca un texto literal en un componente.
 
 ### 9.8 Un paquete, una app o un crate nuevo
 
 - Crate: miembro del `Cargo.toml` raiz (y de `default-members` salvo que dependa de
-  webkit2gtk), su fila en las listas del test de arquitectura de su hexagono, su fila en 5.1
-  y, si es de nucleo, su `clippy.toml`.
-- Paquete o app TS: su fila en la tabla de `tools/checks/package-graph.mjs` y en 5.2, su
+  webkit2gtk), `[lints] workspace = true`, su fila en las listas del test de arquitectura de su
+  hexagono, su fila en 5.1 y, si es de nucleo, su `clippy.toml` (copiado de uno existente).
+  `just rust-complexity` lo mide solo si vive bajo `crates`, `apps` o `tools`.
+- Paquete o app TS: su fila en `MATRIX` de `tools/checks/package-graph.mjs` y en 5.2, su
   `eslint.config.js` con boundaries y su `tsconfig.json` con referencias; su referencia en el
-  `tsconfig.json` raiz.
+  `tsconfig.json` raiz. Si es un paquete compartido de `packages/`, tambien en `ts_package_dirs`
+  del `justfile`.
 - En los dos casos: recetas en el `justfile`, filtro de rutas en `.github/workflows/ci.yml` y
   entrada en `needs` de `all-green`.
 
@@ -1629,17 +1832,47 @@ un texto literal en un componente.
 
 El primer corte monta el esqueleto de todas las piezas con un unico caso real de extremo a
 extremo en el cliente, el grafo, y el minimo de la API para arrancar. No hay entidades
-inventadas: cuando llegue el dominio real, los huecos estan a la vista y ya tienen sitio.
+inventadas: cuando llegue el dominio real, los huecos estan a la vista y ya tienen sitio. Esta
+tabla dice lo que hay en `main`, no lo que se pidio.
 
-| Pieza      | Primer corte                                                                                                                                                                                                                                                                                                                                                                                                           | Planificado                                                                                                                                                                                                                                                                                |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Monorepo   | Workspace de Cargo, pnpm, `justfile`, lefthook, commitlint, `tools/checks` (tamano, tests enfocados, TODO con ticket, grafo de paquetes), `scan-staged.sh`, `smoke-stack.sh`, `ci.yml` con filtros por pieza y `all-green`                                                                                                                                                                                             | Workflow de release (Tauri, VSIX por plataforma, imagen de la API)                                                                                                                                                                                                                         |
-| API        | `/health/live`, `/health/ready` con sonda de PostgreSQL, `/openapi.json`, `/swagger-ui` (solo en desarrollo), problem+json con catcher, request id, configuracion `RAMAL__`, arranque de migraciones con la primera (`schema_metadata`), apagado ordenado, test de arquitectura, `openapi.json` versionado                                                                                                             | Auth, sesiones y dispositivos, organizaciones, workspaces y repositorios, documentos de ajustes, boveda, cuentas ligadas, llaves de IA de organizacion y proxy, broker OAuth de Bitbucket, releases y manifiesto del updater, limite de ritmo, idempotencia                                |
-| Motor      | `ramal-core-domain` (sha, repo, refs, commit, time, graph), `ramal-core-application` (`GitReader`, `DescribeEngine`, `OpenRepository`, `LoadGraphWindow`, registro de repos abiertos, fakes), `ramal-git` (version y capacidades, descubrimiento, refs, log), `ramal-protocol` (sobre, `engine/info`, `repo/open`, `graph/window`, exportacion ts-rs), `ramal-engine` (builder, dispatch, mapeo, test de arquitectura) | `GitWriter` y todas las escrituras, estado y staging, diff, conflictos, rebase, diario de deshacer, vigilancia de cambios, cancelacion y progreso, cache de disposicion por HEAD, `gix` en lecturas si un benchmark lo pide, crates `vault`, `keychain`, `platforms`, `ai`, `cloud-client` |
-| Escritorio | `ramal-desktop` con `rpc`, `repo_pick_and_open`, la lista de metodos por ventana y la CSP de 6.8; frontend con `TauriTransport`, `RepositoryPicker`, una ventana que abre una carpeta y pinta su grafo con `@ramal/repo-view`; Playwright con mockIPC                                                                                                                                                                  | Shell con pestanas, inicio, ajustes, `rpc_subscribe` y notificaciones, confianza de repositorios, updater, deep links, E2E real con WebdriverIO                                                                                                                                            |
-| VS Code    | Extension host con el comando "Ramal: Open Graph", supervision del sidecar, validacion de mensajes, panel `ramal.graph` con la CSP de 6.8; `ramal-vscode-engine` con framing y servidor; Playwright con acquireVsCodeApi falso; test de integracion de activacion                                                                                                                                                      | Vistas de arbol, vista Cambios, merge como editor personalizado, ajustes, barra de estado, `AuthenticationProvider`, peticiones inversas de secretos, VSIX por plataforma                                                                                                                  |
-| Web        | Landing prerenderizada en ES y EN, pantallas de login y registro con la validacion de `@ramal/domain`, ruta `/status` con `checkApiHealth`; el envio de login y registro va a un `AuthGateway` cuyo unico adaptador por ahora responde "no disponible todavia"                                                                                                                                                         | Auth real, panel (resumen, workspaces, repositorios, cuentas ligadas, equipo, ajustes en la nube), vista previa del producto en la landing, datos de descarga desde la API                                                                                                                 |
-| Paquetes   | `@ramal/ui` con tokens, los dos temas, las dos densidades, `DENSITIES` y los iconos que usa el corte; `@ramal/i18n` con la semilla de `D` y `W`; `@ramal/bridge` con cliente y tipos generados; `@ramal/repo-view` con el grafo; `@ramal/domain` con la validacion de auth y la deteccion de SO; `@ramal/api-client` generado; `@ramal/eslint-config`, `@ramal/tsconfig`                                               | El resto de `@ramal/domain` (resolver, rebase, filtros, PRs, tiempo relativo, llaves, commits) y de `@ramal/repo-view` (WIP, detalle, diff, resolver, rebase), `RepoViewHost`                                                                                                              |
+| Pieza      | Primer corte, en `main`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Planificado                                                                                                                                                                                                                                                                                                                                                           |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monorepo   | Workspace de Cargo, pnpm 11.18 por corepack, `justfile`, lefthook, commitlint, `tools/checks` (tamano de fichero, tests enfocados o apagados, TODO con ticket, grafo de paquetes, limites apagados en linea, lints heredados por crate, `eslint.config.js` por paquete, tests de Rust en su fichero y versiones de los Dockerfile), `tools/rust-complexity`, `scan-staged.sh`, `smoke-stack.sh`, la imagen de Linux con los requisitos de Tauri (`tools/docker`), `ci.yml` con filtros por pieza y `all-green`                                                                                                                               | Workflow de release (Tauri, VSIX por plataforma, imagen de la API), construir la imagen de Tauri en la CI, la licencia del proyecto (hoy no hay fichero `LICENSE` y la VSIX se empaqueta con `--skip-license`)                                                                                                                                                        |
+| API        | `/health/live` y `/health/ready` con `checkedAt` y una sonda de PostgreSQL que compara el esquema con la ultima migracion, `/openapi.json` (OpenAPI 3.1), `/swagger-ui/` solo con `RAMAL__SERVER__SWAGGER_UI=true`, problem+json con `code` en todo problema y catcher de 404 y 405, request id, configuracion `RAMAL__`, migraciones en segundo plano con reintento cada 10 segundos y la primera (`schema_metadata`), apagado ordenado, test de arquitectura, `openapi.json` versionado, imagen de produccion con su prueba de humo                                                                                                        | Auth, sesiones y dispositivos, organizaciones, workspaces y repositorios, documentos de ajustes, boveda, cuentas ligadas, llaves de IA de organizacion y proxy, broker OAuth de Bitbucket, releases y manifiesto del updater, limite de ritmo, idempotencia, limite de cuerpo, el check `secrets` de readiness, el gateway de produccion (`docker/gateway.prod.conf`) |
+| Motor      | `ramal-core-domain` (sha, repo, refs con su huella, commit, time, graph), `ramal-core-application` (`GitReader`, `DescribeEngine`, `OpenRepository` con el git minimo, `LoadGraphWindow` con `snapshot` y `stale_window`, registro de repos con ids derivados de la raiz, fakes), `ramal-git` (version y capacidades, descubrimiento, refs, log), `ramal-protocol` (sobre, `engine/info`, `repo/open`, `graph/window`, marca `host_only`, exportacion ts-rs, version 2), `ramal-engine` (builder, dispatch con `CallContext`, mapeo, tests de arquitectura y de pureza del nucleo); la suite corre en la CI con git 2.34 y con el del runner | `GitWriter` y todas las escrituras, estado y staging, diff, conflictos, rebase, diario de deshacer, vigilancia de cambios, cancelacion (atender `$/cancel`, tipo `cancelled`) y progreso, cache de disposicion por HEAD, confianza de repositorios, `gix` en lecturas si un benchmark lo pide, crates `vault`, `keychain`, `platforms`, `ai`, `cloud-client`          |
+| Escritorio | `ramal-desktop` con `rpc`, `repo_pick_and_open`, la lista de metodos por ventana, la CSP de 6.8 (con el hash del `<style>` de React Aria) y cobertura minima del 60%; frontend con `TauriTransport`, `RepositoryPicker`, barra de titulo con pestanas, Inicio, apariencia (tema e idioma) y la vista del repositorio de `@ramal/repo-view`; Playwright con mockIPC que falla con cualquier violacion de la CSP; E2E nativo con WebdriverIO y la feature `e2e`, que la CI corre en Linux                                                                                                                                                      | Ajustes, `rpc_subscribe` y notificaciones, confianza de repositorios, plugin opener, updater, deep links, single-instance, empaquetado (.deb, .rpm, .AppImage, .dmg, instaladores de Windows), E2E en Windows y macOS                                                                                                                                                 |
+| VS Code    | Extension host con el comando "Ramal: Open Graph" y la vista de bienvenida, supervision del sidecar (reinicios con espera creciente, version del protocolo en cada arranque, error de git sin bucle de reinicios, reapertura de los repos de los paneles), validacion de mensajes con el `repoId` de cada panel, panel `ramal.graph` con la CSP de 6.8, `clipboard/writeText`; `ramal-vscode-engine` con framing, mensajes y servidor; Playwright con acquireVsCodeApi falso; tests de integracion en un VS Code real; la VSIX de `linux-x64` en la CI                                                                                       | Vistas de arbol, vista Cambios, merge como editor personalizado, ajustes, barra de estado, `AuthenticationProvider`, peticiones inversas de secretos, reenviar `$/cancel`, el hash de React Aria en la CSP de los webviews, `package.nls*.json` generados desde `@ramal/i18n`, VSIX del resto de plataformas y publicacion                                            |
+| Web        | Landing prerenderizada en ES y EN con descargas (datos fijos) y preferencias de idioma y tema, pantallas de login y registro con la validacion de `@ramal/domain` (el envio va a un `AuthGateway` que responde "no disponible todavia"), ruta `/status` con `checkApiHealth`, imagen de produccion (nginx) con su prueba de humo, Playwright con la red simulada y contra la pila                                                                                                                                                                                                                                                            | Auth real, panel (resumen, workspaces, repositorios, cuentas ligadas, equipo, ajustes en la nube), vista previa del producto en la landing, datos de descarga desde la API, la CSP de la web en el gateway de produccion                                                                                                                                              |
+| Paquetes   | `@ramal/ui` con tokens, los dos temas, las dos densidades, `DENSITIES`, iconos y primitivas; `@ramal/i18n` con la semilla de `D` y `W` en JSON y los parametros generados; `@ramal/bridge` con cliente y tipos generados; `@ramal/repo-view` con el grafo; `@ramal/domain` con auth, descargas, resolver de conflictos, rebase, filtros y grupos de repos, PRs, tiempo relativo, llaves, commits, nombres de ref y plataformas; `@ramal/api-client` generado; `@ramal/eslint-config` (con sus reglas propias) y `@ramal/tsconfig`                                                                                                            | El resto de `@ramal/repo-view` (fila WIP, detalle, diff, resolver, rebase) y el puerto `RepoViewHost`                                                                                                                                                                                                                                                                 |
+
+**Que se verifico al cerrar el primer corte** (2026-10-01, en Linux, sobre `main` en `ff84876`):
+
+- `pnpm install --frozen-lockfile` y `just check` en limpio, con los tests de arquitectura y de
+  pureza del nucleo en verde.
+- `just protocol-check` y `just api-client-check`: los tipos generados estan al dia.
+- E2E de Playwright: `just web-e2e` (18 pasan; 3 se saltan con motivo, los que solo tienen
+  sentido con o sin la pila real), `just desktop-e2e` (11) y `just vscode-e2e` (8).
+- `just vscode-test-integration`: 6 tests en un VS Code real, con la pantalla de la maquina
+  (`DISPLAY=:0`), no bajo xvfb.
+- `just api-test-db`: 135 tests contra PostgreSQL.
+- `just stack-smoke`: una pila completa aparte, probada por el gateway.
+- `just desktop-docker-rust-check`: clippy, tests y cobertura del host de Tauri dentro de la
+  imagen de Linux, con un 83,93% de cobertura de lineas.
+
+**Lo que no se ha verificado todavia:**
+
+- La app de escritorio en Windows y en macOS: nadie la ha compilado ni arrancado ahi.
+- El empaquetado de escritorio: `just desktop-build` compila con `--no-bundle` y se para ahi. No
+  se ha generado ningun .deb, .rpm, .AppImage, .dmg ni instalador.
+- `just desktop-dev` (`tauri dev`) en una maquina de desarrollo. La maquina original no tiene
+  webkit2gtk y las recetas de Docker no cubren `tauri dev`.
+- El E2E nativo de escritorio fuera de la CI de Linux: la verificacion del cierre corrio el
+  chequeo nativo en Docker, no `just desktop-docker-e2e-native`.
+- Los webviews de VS Code con la CSP de produccion y el `<style>` de React Aria (ver 6.8), y las
+  VSIX de otras plataformas que `linux-x64`.
+
+**Abierto:** el gateway de produccion (`docker/gateway.prod.conf`, que tiene que dejar fuera
+`/swagger-ui`), construir la imagen de Tauri en la CI y la decision de la licencia.
 
 **Hecho significa:**
 
