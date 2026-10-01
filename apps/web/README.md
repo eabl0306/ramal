@@ -7,7 +7,8 @@ cuenta, y el estado del servicio (`/status`). React Router 8 en modo framework, 
 just web-dev        # Vite con HMR en http://localhost:5173 (proxy de la API a 127.0.0.1:8080)
 just web-check      # lint, tipos, cobertura y build
 just web-e2e        # Playwright contra el build, con la red de la API simulada
-just e2e-stack      # Playwright contra la pila Docker, entrando por el gateway
+just e2e-stack      # Playwright contra la pila Docker por el gateway (la deja arriba: just down)
+just web-docker-smoke  # imagen de produccion arrancada y probada
 ```
 
 ## Capas
