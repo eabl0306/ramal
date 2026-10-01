@@ -1,0 +1,106 @@
+{
+  "alias": {
+    "title": "Asignar alias",
+    "hint": "El alias solo cambia cómo se muestra en Ramal; la carpeta y el remoto no cambian."
+  },
+  "rename": {
+    "title": "Renombrar repositorio",
+    "info": "Renombra la carpeta del repositorio en disco."
+  },
+  "removeRepo": {
+    "title": "¿Quitar {name} de la lista?",
+    "info": "El repositorio seguirá en tu disco y en el remoto.",
+    "alsoDisk": "Además, mover la carpeta a la papelera"
+  },
+  "newWorkspace": {
+    "title": "Nuevo workspace"
+  },
+  "renameWorkspace": {
+    "title": "Renombrar workspace"
+  },
+  "deleteWorkspace": {
+    "title": "¿Eliminar el workspace {name}?",
+    "info": "Los repositorios no se eliminan; quedan sin workspace."
+  },
+  "merge": {
+    "title": "Merge",
+    "strategy": "Estrategia",
+    "strategyFastForward": "Fast-forward si es posible",
+    "strategyMergeCommit": "Crear commit de merge",
+    "strategySquash": "Squash",
+    "editMessage": "Editar el mensaje antes de confirmar"
+  },
+  "rebase": {
+    "title": "Rebase",
+    "autostash": "Autostash de cambios locales",
+    "interactive": "Rebase interactivo"
+  },
+  "cherryPick": {
+    "title": "Cherry-pick",
+    "appendSource": "Añadir \"(cherry picked from…)\" al mensaje",
+    "noCommit": "Aplicar sin crear commit"
+  },
+  "pullRequest": {
+    "title": "Crear pull request",
+    "account": "Cuenta",
+    "from": "Desde",
+    "to": "Hacia",
+    "titleField": "Título",
+    "description": "Descripción",
+    "reviewers": "Revisores",
+    "reviewersPlaceholder": "@usuario, @equipo",
+    "draft": "Crear como borrador"
+  },
+  "branch": {
+    "title": "Crear rama",
+    "name": "Nombre de la rama",
+    "checkoutAfter": "Hacer checkout después de crearla"
+  },
+  "renameBranch": {
+    "title": "Renombrar rama"
+  },
+  "tag": {
+    "title": "Crear tag",
+    "name": "Nombre del tag",
+    "message": "Mensaje (tag anotado)",
+    "pushToOrigin": "Hacer push del tag a origin"
+  },
+  "stash": {
+    "title": "Stash",
+    "message": "Mensaje",
+    "includeUntracked": "Incluir archivos sin seguimiento"
+  },
+  "account": {
+    "title": "Añadir cuenta"
+  },
+  "resetHard": {
+    "title": "¿Reset --hard a {sha}?",
+    "info": "Se perderán los cambios sin commit y los commits posteriores en la rama actual."
+  },
+  "discard": {
+    "title": "¿Descartar cambios?",
+    "info": "Esta acción no se puede deshacer."
+  },
+  "deleteBranch": {
+    "title": "¿Eliminar {branch}?",
+    "info": "La rama tiene commits que no están en otra rama.",
+    "force": "Forzar (-D)"
+  },
+  "clone": {
+    "title": "Clonar repositorio",
+    "url": "URL o owner/repo",
+    "destination": "Carpeta de destino"
+  },
+  "open": {
+    "title": "Abrir repositorio local",
+    "path": "Ruta"
+  },
+  "init": {
+    "title": "Iniciar repositorio",
+    "publish": "Publicar en una cuenta remota"
+  },
+  "forcePush": {
+    "title": "¿Force push a {branch}?",
+    "info": "Se usa --force-with-lease: falla si alguien ha hecho push desde tu último fetch."
+  }
+}

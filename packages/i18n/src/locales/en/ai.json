@@ -1,0 +1,46 @@
+{
+  "subtitle": "Add AI provider keys to generate commit messages and PR titles and descriptions. Keys are stored encrypted in the system keychain.",
+  "key": {
+    "title": "Keys",
+    "add": "Add key",
+    "editTitle": "Edit key",
+    "provider": "Provider",
+    "model": "Model",
+    "apiKey": "API key",
+    "baseUrl": "Base URL",
+    "scope": "Belongs to",
+    "scopePersonal": "Personal",
+    "scopeOrganization": "Organization",
+    "labelPlaceholder": "Personal, Team…",
+    "empty": "No keys yet. Add one to enable AI features.",
+    "none": "No key"
+  },
+  "features": {
+    "title": "Where to use AI",
+    "subtitle": "Turn each feature on and choose which key it uses.",
+    "commit": "Commit messages",
+    "commitDescription": "Generates summary and description from staged changes.",
+    "pullRequest": "Pull requests",
+    "pullRequestDescription": "Generates title and description when creating a PR.",
+    "summary": "Commit summaries",
+    "summaryDescription": "Explains what a commit does in the detail panel.",
+    "useDefaultKey": "Default key"
+  },
+  "prefs": {
+    "title": "Generation preferences",
+    "language": "Generated text language",
+    "languageApp": "Same as app",
+    "conventional": "Use Conventional Commits",
+    "conventionalDescription": "feat:, fix:, chore:… with optional scope",
+    "instructions": "Extra instructions",
+    "instructionsPlaceholder": "e.g. mention the JIRA ticket if it appears in the branch name",
+    "excludeSensitive": "Exclude sensitive files",
+    "excludeSensitiveDescription": "Never sends .env, *.pem or *.key to the provider."
+  },
+  "generate": "Generate with AI",
+  "generating": "Generating…",
+  "generatePullRequest": "Generate title and description with AI",
+  "noKey": "Set up an AI key in the AI section of Settings.",
+  "disabled": "This AI feature is disabled in Settings",
+  "nothingStaged": "Stage some files first"
+}

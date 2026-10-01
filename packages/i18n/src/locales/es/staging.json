@@ -1,0 +1,18 @@
+{
+  "unstaged": "Sin preparar",
+  "staged": "Preparados",
+  "stageAll": "Preparar todo",
+  "unstageAll": "Quitar todo",
+  "summary": "Resumen del commit",
+  "description": "Descripción (opcional)",
+  "amend": "Modificar el último commit (amend)",
+  "amendButton": "Modificar último commit",
+  "empty": "Sin cambios",
+  "partial": "Parcial",
+  "subtitle": "en {branch}",
+  "title_one": "{count} cambio",
+  "title_other": "{count} cambios",
+  "commitButton_one": "Commit de {count} archivo en {branch}",
+  "commitButton_other": "Commit de {count} archivos en {branch}",
+  "commitLabel": "Commit"
+}

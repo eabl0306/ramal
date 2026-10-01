@@ -1,0 +1,9 @@
+{
+  "backToGraph": "Graph",
+  "mode": {
+    "split": "Side by side",
+    "unified": "Unified"
+  },
+  "stageFile": "Stage file",
+  "unstageFile": "Unstage file"
+}

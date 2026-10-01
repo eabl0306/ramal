@@ -1,0 +1,44 @@
+{
+  "view": {
+    "changes": "Changes",
+    "merge": "Merge Changes",
+    "staged": "Staged Changes",
+    "branches": "Branches",
+    "remotes": "Remotes"
+  },
+  "scm": {
+    "messagePlaceholder": "Message ({shortcut} to commit on \"{branch}\")",
+    "commit": "Commit",
+    "commitAndPush": "Commit & Push",
+    "commitAmend": "Commit (Amend)"
+  },
+  "tab": {
+    "graph": "Ramal Graph",
+    "settings": "Ramal Settings"
+  },
+  "diff": {
+    "workingTree": "{file} (Working Tree)",
+    "index": "{file} (Index)",
+    "commit": "{file} ({sha})"
+  },
+  "commandPlaceholder": "Type a Ramal command",
+  "sourceRamal": "Source: Ramal",
+  "settings": {
+    "followsVsCode": "Theme and language follow your VS Code settings.",
+    "sync": "Sync settings from the cloud",
+    "syncDescription": "Use the linked accounts, AI keys and preferences from your Ramal account.",
+    "openDashboard": "Open web dashboard",
+    "openDesktop": "Open in Ramal Desktop",
+    "section": {
+      "account": "Ramal Account",
+      "platforms": "Git Platforms",
+      "ai": "AI",
+      "git": "Git"
+    },
+    "addAccount": "Add Account…",
+    "addKey": "Add Key…",
+    "aiKey": "Key used by AI features.",
+    "aiLanguage": "Language of generated text.",
+    "matchVsCode": "Match VS Code"
+  }
+}

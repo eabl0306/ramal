@@ -1,0 +1,35 @@
+{
+  "home": "Inicio",
+  "settings": "Configuración",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "remove": "Quitar",
+  "create": "Crear",
+  "delete": "Eliminar",
+  "copy": "Copiar",
+  "ok": "Aceptar",
+  "name": "Nombre",
+  "alias": "Alias",
+  "email": "Email",
+  "platform": "Plataforma",
+  "host": "Servidor",
+  "username": "Usuario",
+  "token": "Token de acceso",
+  "label": "Etiqueta",
+  "labelPlaceholder": "Trabajo, Personal…",
+  "off": "Desactivado",
+  "theme": {
+    "dark": "Oscuro",
+    "light": "Claro",
+    "system": "Sistema"
+  },
+  "close": "Cerrar",
+  "moreActions": "Más acciones",
+  "notifications": "Notificaciones",
+  "dismiss": "Descartar",
+  "loading": "Cargando…",
+  "language": {
+    "es": "Español",
+    "en": "Inglés"
+  }
+}

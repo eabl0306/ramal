@@ -1,0 +1,205 @@
+{
+  "nav": {
+    "features": "Features",
+    "download": "Download",
+    "vscode": "VS Code",
+    "login": "Log in",
+    "signup": "Sign up",
+    "openDashboard": "Open dashboard"
+  },
+  "hero": {
+    "tag": "Line-by-line conflict resolution",
+    "title": "A Git client for all your repositories and all your accounts",
+    "subtitle": "Ramal shows the history of every branch, resolves conflicts line by line and works with GitHub, GitLab, Bitbucket, Gitea and Azure DevOps at once, with several accounts on each platform.",
+    "downloadFor": "Download for {platform}",
+    "allPlatforms": "All platforms",
+    "vscodeLink": "Also available as a VS Code extension"
+  },
+  "features": {
+    "kicker": "FEATURES",
+    "title": "Everything you need to work with Git as a team",
+    "items": {
+      "graph": {
+        "title": "Graph of every branch",
+        "text": "Commits, branches, tags and stashes in one view. Right-click to checkout, merge, rebase, cherry-pick or reset."
+      },
+      "conflicts": {
+        "title": "Line-by-line conflicts",
+        "text": "Your version and the incoming one side by side, with the final result below. Add or remove each line with + and −."
+      },
+      "accounts": {
+        "title": "Several accounts per platform",
+        "text": "Personal, work and client accounts in one app. Each repository uses its own account for fetch, push and PRs."
+      },
+      "workspaces": {
+        "title": "Workspaces",
+        "text": "Group repos by project or team. A repo can belong to several workspaces, and you see all their pull requests together."
+      },
+      "ai": {
+        "title": "AI with your own key",
+        "text": "Connect Anthropic, OpenAI, Groq or another provider to draft commit messages and pull request descriptions."
+      },
+      "cloud": {
+        "title": "Your settings in the cloud",
+        "text": "Sign in and your workspaces, linked accounts and preferences follow you to every machine and to VS Code."
+      }
+    }
+  },
+  "vscode": {
+    "kicker": "EXTENSION",
+    "title": "Ramal inside VS Code",
+    "text": "The graph, pending changes, the conflict resolver and AI, for the repository you have open. It uses your editor theme and language and the same Ramal account.",
+    "install": "Install extension",
+    "requirement": "VS Code 1.90 or later"
+  },
+  "download": {
+    "kicker": "DOWNLOAD",
+    "title": "Download Ramal",
+    "version": "v{version} · {date}",
+    "yourSystem": "Your system",
+    "requirement": {
+      "mac": "macOS 12 or later",
+      "windows": "Windows 10 and 11",
+      "linux": "Ubuntu 20.04+, Fedora 38+, Debian 11+"
+    },
+    "started": "Download started: {file}"
+  },
+  "cta": {
+    "title": "Create your Ramal account",
+    "text": "With an account your workspaces, linked accounts and preferences sync between the desktop app and VS Code, and you can manage your team from the web."
+  },
+  "footer": {
+    "docs": "Docs",
+    "releaseNotes": "Release notes",
+    "status": "Status",
+    "privacy": "Privacy"
+  },
+  "auth": {
+    "loginTitle": "Log in",
+    "loginSubtitle": "Access your settings and your team.",
+    "signupTitle": "Create account",
+    "signupSubtitle": "Sync Ramal across your machines and work as a team.",
+    "continueWith": "Continue with {provider}",
+    "orEmail": "or with email",
+    "email": "Email",
+    "password": "Password",
+    "forgot": "Forgot it?",
+    "name": "Name",
+    "organization": "Organization (optional)",
+    "passwordHint": "At least 8 characters",
+    "passwordOk": "Valid password",
+    "terms": "I accept the terms of service and privacy policy.",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "error": {
+      "email": "Enter a valid email.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "name": "Enter your name.",
+      "terms": "You must accept the terms.",
+      "passwordRequired": "Enter your password."
+    },
+    "resetSent": "We sent you a password reset link.",
+    "welcome": "Signed in as {email}"
+  },
+  "dashboard": {
+    "nav": {
+      "overview": "Overview",
+      "workspaces": "Workspaces",
+      "repos": "Repositories",
+      "accounts": "Linked accounts",
+      "team": "Team",
+      "sync": "Cloud settings"
+    },
+    "hello": "Hi, {name}",
+    "overviewSubtitle": "This is what syncs to your devices.",
+    "devices": "Synced devices",
+    "syncedAgo": "Synced {time}",
+    "now": "just now"
+  },
+  "workspaces": {
+    "subtitle": "Workspaces group repositories. Shared ones show up for the whole team.",
+    "new": "New workspace",
+    "shared": "Shared with {org}",
+    "onlyYou": "Only you",
+    "empty": "No repositories",
+    "label": "Workspaces"
+  },
+  "repos": {
+    "subtitle": "Repositories linked to your account. Local ones only exist on the device where they were added.",
+    "searchPlaceholder": "Search repository, account or workspace…",
+    "column": {
+      "repo": "Repository",
+      "source": "Source",
+      "workspaces": "Workspaces",
+      "updated": "Updated"
+    },
+    "localOn": "Local · {device}"
+  },
+  "accounts": {
+    "subtitle": "Git platform accounts connected to Ramal. Tokens are stored encrypted.",
+    "connect": "Connect",
+    "usedIn_one": "{count} repo",
+    "usedIn_other": "{count} repos",
+    "ownerYou": "Yours",
+    "disconnect": "Disconnect…",
+    "testConnection": "Test connection",
+    "unlink": "Unlink from account…",
+    "platform": "Platform",
+    "host": "Host",
+    "user": "Username",
+    "token": "Access token"
+  },
+  "team": {
+    "subtitle": "Members of {org}, their roles and invitations.",
+    "invite": "Invite member",
+    "seats_one": "{used} of {count} seat used",
+    "seats_other": "{used} of {count} seats used",
+    "addSeats": "Add seats",
+    "pending": "Invitation pending",
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member"
+    },
+    "roleLabel": "Role",
+    "invited": "Invitation sent to {email}",
+    "resend": "Resend invitation"
+  },
+  "sync": {
+    "subtitle": "What is stored in your account and applied on each device when you sign in.",
+    "profile": "Profile",
+    "what": "What syncs",
+    "workspaces": "Workspaces and repositories",
+    "accounts": "Linked accounts",
+    "accountsDescription": "End-to-end encrypted tokens",
+    "aiPrefs": "AI preferences",
+    "aiKeys": "AI keys",
+    "aiKeysDescription": "Off: each device keeps its own keys",
+    "git": "Git preferences",
+    "appearance": "Appearance",
+    "appearanceDescription": "VS Code always uses the editor theme",
+    "data": "Data",
+    "export": "Export settings",
+    "exportDescription": "Download a JSON with everything synced",
+    "deleteAccount": "Delete account…",
+    "deleteAccountDescription": "Deletes your account and cloud settings",
+    "deleteConfirm": "This cannot be undone. Repositories on disk are not touched."
+  },
+  "common": {
+    "copy": "Copy",
+    "copied": "Copied: {text}",
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "remove": "Remove",
+    "rename": "Rename…",
+    "delete": "Delete",
+    "saved": "Changes saved",
+    "signOut": "Sign out",
+    "signedOut": "Signed out",
+    "done": "Done: {text}",
+    "signOutDevice": "Sign out on this device",
+    "newOrganization": "Create organization…",
+    "personal": "Personal"
+  }
+}

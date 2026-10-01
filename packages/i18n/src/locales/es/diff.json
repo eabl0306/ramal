@@ -1,0 +1,9 @@
+{
+  "backToGraph": "Grafo",
+  "mode": {
+    "split": "Lado a lado",
+    "unified": "Unificada"
+  },
+  "stageFile": "Preparar archivo",
+  "unstageFile": "Quitar de preparados"
+}

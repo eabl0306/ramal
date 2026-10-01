@@ -1,0 +1,46 @@
+{
+  "subtitle": "Añade llaves de proveedores de IA para generar mensajes de commit y títulos y descripciones de PR. Las llaves se guardan cifradas en el llavero del sistema.",
+  "key": {
+    "title": "Llaves",
+    "add": "Añadir llave",
+    "editTitle": "Editar llave",
+    "provider": "Proveedor",
+    "model": "Modelo",
+    "apiKey": "API key",
+    "baseUrl": "URL base",
+    "scope": "Pertenece a",
+    "scopePersonal": "Personal",
+    "scopeOrganization": "Organización",
+    "labelPlaceholder": "Personal, Equipo…",
+    "empty": "Aún no hay llaves. Añade una para activar las funciones de IA.",
+    "none": "Sin llave"
+  },
+  "features": {
+    "title": "Dónde usar la IA",
+    "subtitle": "Activa cada función y elige qué llave usa.",
+    "commit": "Mensajes de commit",
+    "commitDescription": "Genera resumen y descripción a partir de los cambios preparados.",
+    "pullRequest": "Pull requests",
+    "pullRequestDescription": "Genera título y descripción al crear un PR.",
+    "summary": "Resumen de commits",
+    "summaryDescription": "Explica qué hace un commit en el panel de detalle.",
+    "useDefaultKey": "Llave predeterminada"
+  },
+  "prefs": {
+    "title": "Preferencias de generación",
+    "language": "Idioma del texto generado",
+    "languageApp": "Igual que la app",
+    "conventional": "Usar Conventional Commits",
+    "conventionalDescription": "feat:, fix:, chore:… con ámbito opcional",
+    "instructions": "Instrucciones adicionales",
+    "instructionsPlaceholder": "Ej. menciona el ticket de JIRA si aparece en el nombre de la rama",
+    "excludeSensitive": "Excluir archivos sensibles",
+    "excludeSensitiveDescription": "Nunca envía .env, *.pem ni *.key al proveedor."
+  },
+  "generate": "Generar con IA",
+  "generating": "Generando…",
+  "generatePullRequest": "Generar título y descripción con IA",
+  "noKey": "Configura una llave de IA en la sección IA de Configuración.",
+  "disabled": "Esta función de IA está desactivada en Configuración",
+  "nothingStaged": "Prepara algún archivo primero"
+}

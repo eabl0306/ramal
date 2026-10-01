@@ -1,0 +1,79 @@
+{
+  "title": "Repositories",
+  "subtitle": "Recently opened repositories linked to your accounts.",
+  "workspaces": "Workspaces",
+  "accounts": "Accounts",
+  "open": "Open",
+  "init": "Init",
+  "clone": "Clone",
+  "searchPlaceholder": "Search by name, alias, path or account…",
+  "noResults": "No repositories match the filters.",
+  "localOnly": "Local only",
+  "noRemote": "No remote configured",
+  "lastCommit": "last commit",
+  "results_one": "{count} repository",
+  "results_other": "{count} repositories",
+  "card": {
+    "changes_one": "{count} change",
+    "changes_other": "{count} changes",
+    "openPrs_one": "{count} open PR",
+    "openPrs_other": "{count} open PRs"
+  },
+  "filter": {
+    "kind": {
+      "all": "All",
+      "local": "Local",
+      "remote": "Remote",
+      "label": "Type"
+    },
+    "platform": "Platform",
+    "account": "Account",
+    "workspace": "Workspace",
+    "group": "Group",
+    "groupNone": "None",
+    "groupByWorkspace": "Group by workspace",
+    "allPlatforms": "All",
+    "any": "Any",
+    "anyAccount": "Any account",
+    "anyWorkspace": "Any workspace",
+    "noWorkspace": "No workspace",
+    "clear": "Clear filters"
+  },
+  "workspace": {
+    "new": "New workspace",
+    "repos": "Repositories",
+    "fetchAll": "Fetch all",
+    "openAll": "Open all",
+    "repoCount_one": "{count} repository",
+    "repoCount_other": "{count} repositories",
+    "openPrCount_one": "{count} open PR",
+    "openPrCount_other": "{count} open PRs"
+  },
+  "pr": {
+    "title": "Pull requests",
+    "empty": "No pull requests with this state.",
+    "state": {
+      "all": "All",
+      "open": "Open",
+      "draft": "Draft",
+      "approved": "Approved",
+      "changes": "Changes requested",
+      "merged": "Merged",
+      "closed": "Closed"
+    },
+    "checks": {
+      "pass": "Passing",
+      "fail": "Failing",
+      "pending": "Running"
+    },
+    "column": {
+      "repo": "Repository",
+      "pullRequest": "Pull request",
+      "author": "Author",
+      "state": "State",
+      "checks": "Checks",
+      "reviews": "Reviews",
+      "updated": "Updated"
+    }
+  }
+}

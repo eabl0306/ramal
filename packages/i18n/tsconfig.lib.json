@@ -1,0 +1,15 @@
+// Codigo de produccion. Los JSON de los diccionarios tienen que estar en
+// `include`: un proyecto composite no admite ficheros que no liste.
+{
+  "extends": "@ramal/tsconfig/library.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/lib",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/lib.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "include": ["src", "src/**/*.json"],
+  "exclude": ["src/**/*.test.ts"]
+}

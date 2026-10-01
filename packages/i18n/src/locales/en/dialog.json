@@ -1,0 +1,106 @@
+{
+  "alias": {
+    "title": "Set alias",
+    "hint": "The alias only changes how Ramal displays it; folder and remote stay the same."
+  },
+  "rename": {
+    "title": "Rename repository",
+    "info": "Renames the repository folder on disk."
+  },
+  "removeRepo": {
+    "title": "Remove {name} from the list?",
+    "info": "The repository stays on your disk and remote.",
+    "alsoDisk": "Also move the folder to trash"
+  },
+  "newWorkspace": {
+    "title": "New workspace"
+  },
+  "renameWorkspace": {
+    "title": "Rename workspace"
+  },
+  "deleteWorkspace": {
+    "title": "Delete workspace {name}?",
+    "info": "Repositories are kept, without a workspace."
+  },
+  "merge": {
+    "title": "Merge",
+    "strategy": "Strategy",
+    "strategyFastForward": "Fast-forward if possible",
+    "strategyMergeCommit": "Create merge commit",
+    "strategySquash": "Squash",
+    "editMessage": "Edit message before committing"
+  },
+  "rebase": {
+    "title": "Rebase",
+    "autostash": "Autostash local changes",
+    "interactive": "Interactive rebase"
+  },
+  "cherryPick": {
+    "title": "Cherry-pick",
+    "appendSource": "Append \"(cherry picked from…)\" to message",
+    "noCommit": "Apply without committing"
+  },
+  "pullRequest": {
+    "title": "Create pull request",
+    "account": "Account",
+    "from": "From",
+    "to": "Into",
+    "titleField": "Title",
+    "description": "Description",
+    "reviewers": "Reviewers",
+    "reviewersPlaceholder": "@user, @team",
+    "draft": "Create as draft"
+  },
+  "branch": {
+    "title": "Create branch",
+    "name": "Branch name",
+    "checkoutAfter": "Checkout after creating"
+  },
+  "renameBranch": {
+    "title": "Rename branch"
+  },
+  "tag": {
+    "title": "Create tag",
+    "name": "Tag name",
+    "message": "Message (annotated tag)",
+    "pushToOrigin": "Push tag to origin"
+  },
+  "stash": {
+    "title": "Stash",
+    "message": "Message",
+    "includeUntracked": "Include untracked files"
+  },
+  "account": {
+    "title": "Add account"
+  },
+  "resetHard": {
+    "title": "Reset --hard to {sha}?",
+    "info": "Uncommitted changes and later commits on the current branch will be lost."
+  },
+  "discard": {
+    "title": "Discard changes?",
+    "info": "This cannot be undone."
+  },
+  "deleteBranch": {
+    "title": "Delete {branch}?",
+    "info": "The branch may contain commits not on other branches.",
+    "force": "Force (-D)"
+  },
+  "clone": {
+    "title": "Clone repository",
+    "url": "URL or owner/repo",
+    "destination": "Destination folder"
+  },
+  "open": {
+    "title": "Open local repository",
+    "path": "Path"
+  },
+  "init": {
+    "title": "Initialize repository",
+    "publish": "Publish to a remote account"
+  },
+  "forcePush": {
+    "title": "Force push to {branch}?",
+    "info": "Uses --force-with-lease: fails if someone pushed since your last fetch."
+  }
+}
