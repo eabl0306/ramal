@@ -151,3 +151,44 @@ async fn an_empty_repository_has_no_history() {
 
     assert!(log(&repo, 10).await.is_empty());
 }
+
+#[tokio::test]
+async fn refs_the_graph_cannot_label_are_not_walked() {
+    let repo = FixtureRepo::new();
+    let one = repo.commit("one");
+    let old = repo.commit("two");
+    repo.git(&[
+        "commit",
+        "--quiet",
+        "--amend",
+        "--allow-empty",
+        "-m",
+        "two amended",
+    ]);
+    let tree = repo.rev("HEAD:");
+    let upstream = repo.git(&[
+        "commit-tree",
+        "-p",
+        &one,
+        "-m",
+        "prefetched upstream work",
+        &tree,
+    ]);
+    repo.git(&["update-ref", "refs/original/refs/heads/main", &old]);
+    repo.git(&["update-ref", "refs/prefetch/remotes/origin/main", &upstream]);
+    repo.git(&["update-ref", "refs/jj/keep/1", &upstream]);
+
+    assert_eq!(
+        summaries(&log(&repo, 100).await),
+        vec!["two amended", "one"]
+    );
+}
+
+#[tokio::test]
+async fn an_unborn_head_next_to_other_branches_still_reads_them() {
+    let repo = FixtureRepo::new();
+    repo.commit("one");
+    repo.git(&["checkout", "--quiet", "--orphan", "fresh"]);
+
+    assert_eq!(summaries(&log(&repo, 100).await), vec!["one"]);
+}
