@@ -4,6 +4,7 @@
 {
   "files": [],
   "references": [
+    { "path": "./packages/bridge" },
     { "path": "./packages/domain" },
     { "path": "./packages/i18n" },
     { "path": "./packages/ui" }
