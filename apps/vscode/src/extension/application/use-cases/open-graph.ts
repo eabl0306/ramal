@@ -40,6 +40,7 @@ export async function openGraph(deps: OpenGraphDeps): Promise<OpenGraphResult> {
     deps.panels.show({
       surface: 'graph',
       repoId: handle.repoId,
+      root: handle.root,
       title: deps.translate('vscode.tab.graph'),
     });
     return { outcome: 'opened', repoId: handle.repoId };

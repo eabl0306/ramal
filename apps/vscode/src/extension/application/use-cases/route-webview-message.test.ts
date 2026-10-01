@@ -129,6 +129,29 @@ describe('router de los mensajes de los webviews', () => {
     expect(routed).toEqual([{ panelId: 'panel-1', method: 'repo/open', outcome: 'rejected' }]);
   });
 
+  it('rechaza sin llegar al motor una peticion con el repoId de otro panel', async () => {
+    const { router, engine, routed } = setup();
+    const panel = fakeChannel('panel-1', 'graph', 'repo-2');
+    router.attach(panel);
+    await router.receive('panel-1', { type: 'rpc/request', request: windowRequest(6) });
+    expect(engine.requests).toEqual([]);
+    expect(panel.posted).toEqual([
+      {
+        type: 'rpc/response',
+        response: {
+          jsonrpc: '2.0',
+          id: 6,
+          error: {
+            code: -32_000,
+            message: 'graph/window asks for a repository that is not the one of panel-1',
+            data: { kind: 'repo_not_open' },
+          },
+        },
+      },
+    ]);
+    expect(routed).toEqual([{ panelId: 'panel-1', method: 'graph/window', outcome: 'rejected' }]);
+  });
+
   it('si el motor no esta, el webview recibe engine_unavailable con su id', async () => {
     const { router, engine, routed } = setup();
     engine.respond = () => Promise.reject(new EngineUnavailableError('the engine is waiting'));

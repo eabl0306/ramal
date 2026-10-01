@@ -98,12 +98,27 @@ export class FakeDialogs implements Dialogs {
   }
 }
 
-/** Paneles falsos: guarda que se pidio ensenar. */
+/** Paneles falsos: guarda que se pidio ensenar, volver a enlazar y cerrar. */
 export class FakePanels implements WebviewSurface {
   readonly shown: ShowSurfaceRequest[] = [];
+  readonly rebound: { readonly root: string; readonly repoId: string }[] = [];
+  readonly closed: string[] = [];
 
   show(request: ShowSurfaceRequest): void {
     this.shown.push(request);
+  }
+
+  openRoots(): readonly string[] {
+    const roots = this.shown.map((request) => request.root);
+    return [...new Set(roots)].filter((root) => !this.closed.includes(root));
+  }
+
+  rebind(root: string, repoId: string): void {
+    this.rebound.push({ root, repoId });
+  }
+
+  close(root: string): void {
+    this.closed.push(root);
   }
 }
 

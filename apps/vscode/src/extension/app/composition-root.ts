@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import type { Logger } from '../application/ports/logger';
 import { type HostProbe, createHostProbe } from '../application/use-cases/host-probe';
 import { type OpenGraphDeps, openGraph } from '../application/use-cases/open-graph';
+import { reopenRepositories } from '../application/use-cases/reopen-repositories';
 import {
   type WebviewRouter,
   createWebviewRouter,
@@ -53,10 +54,21 @@ export function composeExtension(context: vscode.ExtensionContext): HostProbe | 
     protocolVersion: runtime.protocolVersion,
   });
   const panels = webviewPanels(context, mode, runtime, router, logger);
+  // Los paneles nacen despues que el motor, asi que el gancho se engancha aqui.
+  const stopReopening = runtime.engine.onRestarted((connection) =>
+    reopenRepositories(connection, {
+      ids: runtime.ids,
+      panels,
+      notifications: vscodeNotifications,
+      translate: runtime.translate,
+      logger,
+    }),
+  );
   const graphDeps = openGraphDeps(runtime, panels, logger);
   const commands = registerCommands({ openGraph: () => openGraph(graphDeps) }, logger);
   context.subscriptions.push(hostLog, engineLog, panels, registerWelcomeView(), ...commands, {
     dispose: () => {
+      stopReopening();
       router.dispose();
       runtime.engine.stop();
     },
