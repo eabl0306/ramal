@@ -113,7 +113,7 @@ tauri-plugin-wdio-webdriver = "1.4.0"
 # Solo tools/rust-complexity: lee los fuentes de Rust para medir su complejidad.
 # Sin las features por defecto, que traen el soporte de macros procedurales.
 proc-macro2 = { version = "1.0.107", default-features = false, features = ["span-locations"] }
-syn = { version = "2.0.119", default-features = false, features = ["full", "parsing", "visit"] }
+syn = { version = "3.0.6", default-features = false, features = ["full", "parsing", "visit"] }
 
 # Solo tests.
 pretty_assertions = "1.4.1"
