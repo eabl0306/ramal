@@ -658,14 +658,22 @@ ps:
 smoke url="":
     bash tools/scripts/smoke-stack.sh {{ if url == "" { "http://127.0.0.1:${GATEWAY_PORT:-8090}" } else { url } }}
 
-# Levanta la pila completa, le pasa la prueba de humo y la tumba.
+# Corre en su propio proyecto de compose (ramal-smoke) y con puertos que elige
+# Docker (el 0), asi que no toca la pila de desarrollo: ni sus contenedores, ni
+# sus puertos, ni sus volumenes. Antes compartia el proyecto `ramal`, y su
+# `down -v` borraba la base local y la cache de cargo de la API en cada
+# `just ci`. El entorno del shell gana a .env y al `name:` de compose.yaml.
 [group('docker')]
+[doc('Levanta una pila completa aparte, le pasa la prueba de humo y la tumba.')]
 stack-smoke:
     #!/usr/bin/env bash
     set -euo pipefail
+    export COMPOSE_PROJECT_NAME=ramal-smoke RAMAL_BIND_IP=127.0.0.1
+    export POSTGRES_PORT=0 API_PORT=0 WEB_PORT=0 GATEWAY_PORT=0
+    export MAILPIT_WEB_PORT=0 MAILPIT_SMTP_PORT=0
     trap '{{compose_full}} down -v >/dev/null 2>&1 || true' EXIT
     {{compose_full}} up -d --build --wait
-    bash tools/scripts/smoke-stack.sh "http://127.0.0.1:${GATEWAY_PORT:-8090}"
+    bash tools/scripts/smoke-stack.sh "http://$({{compose_full}} port gateway 8080)"
 
 # Levanta solo Postgres y espera a que responda.
 [group('docker')]
