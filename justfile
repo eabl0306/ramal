@@ -606,6 +606,11 @@ vscode-test-integration: vscode-engine-build vscode-build
 # .exe en Windows), la ruta fija que ejecuta la extension instalada
 # (architecture.md 4.4), y el script `package` de la extension recibe --target con
 # la plataforma de vsce. Un .vsix por plataforma, porque lleva un binario nativo.
+#
+# El script `package` lleva --skip-license a proposito: la licencia del proyecto es
+# una decision abierta del propietario y no hay fichero LICENSE que meter en la
+# VSIX. Cuando la elija, se anade el fichero (y `license` en package.json) y se
+# quita la bandera.
 [group('vscode')]
 [doc('Empaqueta la extension (.vsix) para esta plataforma, con el binario del motor dentro.')]
 vscode-package: vscode-engine-build vscode-build
