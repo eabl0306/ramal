@@ -6,5 +6,11 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+# Lista blanca estricta: solo thiserror. Ni serde (la forma del JSON la decide
+# ramal-protocol) ni dev-dependencies, porque Cargo.lock las apunta igual y el
+# test de arquitectura de ramal-engine las cuenta como dependencias directas.
+[dependencies]
+thiserror = { workspace = true }
+
 [lints]
 workspace = true
