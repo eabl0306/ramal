@@ -15,7 +15,29 @@ const devProxy = Object.fromEntries(
   API_PREFIXES.map((prefix) => [prefix, { target: API_TARGET, changeOrigin: true }]),
 );
 
+/**
+ * Dependencias que Vite preempaqueta al arrancar. Sin la lista, las descubre en
+ * la primera visita, recarga la pagina a mitad de la carga y los e2e contra la
+ * pila de desarrollo (just e2e-stack) fallan la primera vez en cada contenedor.
+ * Las de los paquetes compartidos se nombran a traves del paquete (`a > b`):
+ * con pnpm no estan en los node_modules de la web.
+ */
+const PREBUNDLED = [
+  '@ramal/ui > react-aria-components',
+  '@ramal/ui > lucide-react',
+  '@ramal/api-client > openapi-fetch',
+  'zod',
+];
+
 export default defineConfig({
   plugins: [reactRouter()],
-  server: { host: true, port: DEV_PORT, strictPort: true, proxy: devProxy },
+  optimizeDeps: { include: PREBUNDLED },
+  server: {
+    host: true,
+    port: DEV_PORT,
+    strictPort: true,
+    proxy: devProxy,
+    // Transforma la app al arrancar, no en la primera peticion.
+    warmup: { clientFiles: ['./src/app/root.tsx', './src/app/routes/*.tsx'] },
+  },
 });

@@ -87,12 +87,22 @@ services:
     depends_on:
       api:
         condition: service_started
+    environment:
+      # Entrando por el gateway no hace falta; entrando directo al 5173, el proxy de
+      # Vite manda la API al servicio api en vez de a 127.0.0.1.
+      VITE_DEV_API_TARGET: http://api:8080
     ports:
       - '${WEB_PORT:-5173}:5173'
     volumes:
-      # Solo el codigo fuente. node_modules se queda el del contenedor.
-      - ./apps/web/app:/repo/apps/web/app
-      - ./packages:/repo/packages
+      # Solo el codigo fuente, carpeta a carpeta. Montar packages/ entero taparia
+      # los node_modules de cada paquete con los del host, que son de otra
+      # plataforma (glibc fuera, musl dentro). La configuracion (vite.config.ts,
+      # react-router.config.ts) va en la imagen: si cambia, `just up` reconstruye.
+      - ./apps/web/src:/repo/apps/web/src
+      - ./packages/domain/src:/repo/packages/domain/src
+      - ./packages/i18n/src:/repo/packages/i18n/src
+      - ./packages/ui/src:/repo/packages/ui/src
+      - ./packages/api-client/src:/repo/packages/api-client/src
     healthcheck:
       test: ['CMD-SHELL', 'wget --quiet --tries=1 --spider http://127.0.0.1:5173/ || exit 1']
       interval: 10s
