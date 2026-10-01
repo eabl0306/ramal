@@ -1,0 +1,129 @@
+# La web (apps/web): lint con las capas hexagonales, tipos, tests con sus
+# umbrales de cobertura, build con el prerender de la landing, cliente de la API
+# al dia con openapi.json, e2e de Playwright con la red simulada e imagen de
+# produccion arrancada y probada. Lo llama ci.yml cuando cambia apps/web, un
+# paquete compartido o el contrato de la API. Usa las mismas recetas que `just`
+# en local.
+name: web
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CI: 'true'
+  # El justfile usa `corepack pnpm` por defecto; aqui pnpm ya lo instala la
+  # action con la version de packageManager.
+  PNPM: pnpm
+
+jobs:
+  verify:
+    name: lint, tipos, cobertura y build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint, tipos, cobertura y build (just web-check)
+        run: just web-check
+
+      # El cliente se genera desde el documento versionado, no desde la API en
+      # marcha: si openapi.json cambio y nadie regenero, esto se pone en rojo.
+      - name: Cliente de la API al dia (just api-client-check)
+        run: just api-client-check
+
+      - name: Subir informe de cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-coverage
+          path: apps/web/coverage
+          if-no-files-found: ignore
+
+  e2e:
+    name: e2e con la red simulada
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache de navegadores de Playwright
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Instalar chromium (just web-e2e-install)
+        run: just web-e2e-install
+
+      # playwright.config.ts construye la web y la sirve como nginx en el 4173.
+      # Los tests interceptan la red: no hacen falta ni API ni PostgreSQL.
+      - name: E2E (just web-e2e)
+        run: just web-e2e
+
+      - name: Subir el informe
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-playwright-report
+          path: apps/web/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+  image:
+    name: imagen docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      # El mismo Dockerfile y el mismo contexto que `just web-docker`, con la
+      # cache de capas de GitHub.
+      - name: Construir la imagen
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          push: false
+          load: true
+          tags: ramal-web:ci
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+
+      # Construir no prueba nada: un nginx.conf roto compila igual de bien. Se
+      # arranca y se comprueba lo que sirve (just web-docker-smoke en local).
+      - name: Prueba de humo de la imagen
+        run: bash apps/web/scripts/smoke-image.sh ramal-web:ci

@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1
+
+# Imagen de DESARROLLO de la web: el servidor de Vite con HMR. La usa el
+# servicio `web` de compose.yaml (perfil full), detras del gateway.
+#
+#   docker compose --profile full up web
+#
+# El contexto es la raiz (apps/web/Dockerfile.dev.dockerignore decide que entra).
+# compose monta encima solo el codigo fuente; node_modules es el del contenedor,
+# instalado para Linux y musl, que no tiene por que coincidir con el del host.
+
+# Va a la par que .nvmrc: se suben juntos.
+ARG NODE_VERSION=24
+
+FROM node:${NODE_VERSION}-alpine AS base
+ENV PNPM_HOME=/pnpm \
+    PATH=/pnpm:$PATH \
+    COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable
+WORKDIR /repo
+
+# Mismo truco que el Dockerfile de produccion: todos los package.json, para que
+# la capa de install solo se rehaga cuando cambie algun manifiesto.
+FROM base AS manifests
+COPY . /src
+RUN mkdir /manifests \
+ && cd /src \
+ && find . -name package.json -not -path '*/node_modules/*' | tar -cf - -T - | tar -xf - -C /manifests \
+ && cp pnpm-lock.yaml pnpm-workspace.yaml /manifests/
+
+FROM base
+COPY --from=manifests /manifests/ ./
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile --filter "@ramal/web..."
+COPY packages/ packages/
+COPY apps/web/ apps/web/
+
+EXPOSE 5173
+# vite.config.ts ya escucha en 0.0.0.0 y en el 5173.
+CMD ["pnpm", "--filter", "@ramal/web", "dev"]

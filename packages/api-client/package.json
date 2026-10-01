@@ -1,0 +1,32 @@
+{
+  "name": "@ramal/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cliente HTTP de la Ramal API para la web: tipos generados de apps/api/openapi.json y un envoltorio fino de openapi-fetch.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "generate": "openapi-typescript ../../apps/api/openapi.json --output src/generated/schema.ts"
+  },
+  "dependencies": {
+    "openapi-fetch": "0.17.0"
+  },
+  "devDependencies": {
+    "@ramal/eslint-config": "workspace:*",
+    "@ramal/tsconfig": "workspace:*",
+    "@types/node": "24.19.0",
+    "@vitest/coverage-v8": "5.0.2",
+    "eslint": "10.11.0",
+    "openapi-typescript": "7.13.0",
+    "typescript": "6.0.3",
+    "vitest": "5.0.2"
+  }
+}

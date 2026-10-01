@@ -21,3 +21,7 @@ peerDependencyRules:
     # funcionan (comprobado en Gastonomo con jsx-a11y/alt-text). Se acepta
     # explicitamente en lugar de dejar el aviso suelto en cada instalacion.
     eslint-plugin-jsx-a11y>eslint: "10"
+    # openapi-typescript 7.13.0 declara typescript ^5.x, pero solo usa la API
+    # estable del compilador para imprimir el esquema, que no cambia en la 6.
+    # Lo genera @ramal/api-client y `just api-client` comprueba que sale igual.
+    openapi-typescript>typescript: "6"

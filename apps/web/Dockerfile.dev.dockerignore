@@ -1,0 +1,26 @@
+# Contexto de apps/web/Dockerfile.dev, el mismo que el de produccion. BuildKit
+# usa este fichero en lugar del .dockerignore de la raiz con ese Dockerfile.
+#
+# Lista blanca: los manifiestos de pnpm, los paquetes compartidos, las apps de
+# TypeScript (solo se compila la web, pero pnpm necesita ver sus package.json)
+# y tools/, que tambien es un paquete del workspace.
+
+*
+
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!packages
+!apps/web
+!apps/desktop/package.json
+!apps/vscode/package.json
+!tools
+
+**/node_modules
+**/build
+**/dist
+**/coverage
+**/.react-router
+**/playwright-report
+**/test-results
+**/*.tsbuildinfo

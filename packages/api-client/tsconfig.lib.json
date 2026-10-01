@@ -1,0 +1,17 @@
+// Codigo de produccion de @ramal/api-client. Corre en el navegador, asi que ve
+// la lib DOM (fetch, Request, Response) pero no los tipos de Node. No referencia
+// ningun paquete del workspace: architecture.md 5.2 solo le deja openapi-fetch.
+{
+  "extends": "@ramal/tsconfig/library.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/lib",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/lib.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts"]
+}

@@ -1,0 +1,78 @@
+# La pila compuesta, entrando por la puerta (ADR 0007). Existe por un fallo
+# real de Gastonomo: el gateway no enrutaba /v1 y las rutas de la API acababan
+# en la SPA con todos los tests en verde, porque api.yml y web.yml prueban cada
+# imagen por separado y ninguno mira como encajan.
+#
+# En el primer corte es la pila de desarrollo (compose.yaml, perfil full). Cuando
+# existan infra/compose.smoke.yaml y el gateway de produccion, este job pasa a
+# esa pila, que es la que se despliega.
+name: stack
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CI: 'true'
+  PNPM: pnpm
+
+jobs:
+  smoke:
+    name: prueba de humo y e2e por el gateway
+    runs-on: ubuntu-latest
+    # La primera compilacion de la API dentro de su contenedor tarda varios minutos.
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+
+      # Las credenciales de la pila se generan aqui y mueren con el job. Un
+      # literal con pinta de secreto en un workflow hace saltar a gitleaks, con
+      # razon: no se distingue de uno de verdad.
+      - name: Generar credenciales efimeras
+        run: echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Instalar chromium (just web-e2e-install)
+        run: just web-e2e-install
+
+      # Levanta la pila con --wait y corre Playwright contra el gateway con la
+      # API y PostgreSQL de verdad. La pila se queda arriba para la sonda.
+      - name: E2E contra la pila (just e2e-stack)
+        run: just e2e-stack
+
+      - name: Prueba de humo por el gateway (just smoke)
+        run: just smoke
+
+      - name: Logs si algo fallo
+        if: failure()
+        run: docker compose --profile full logs --tail 200
+
+      - name: Subir el informe
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: stack-playwright-report
+          path: apps/web/playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Tumbar la pila (just down)
+        if: always()
+        run: just down
