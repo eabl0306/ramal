@@ -26,8 +26,10 @@ export const IGNORED_DIRS = new Set([
 /**
  * Ambitos del monorepo que se revisan a fondo. Los ficheros sueltos de la raiz
  * se barren aparte, sin recursion, para no entrar en directorios de datos.
+ * docker/ guarda la configuracion del gateway de desarrollo: sin el, sus
+ * ficheros no los miraba ninguna comprobacion.
  */
-export const SCAN_ROOTS = ['.github', 'apps', 'crates', 'packages', 'tools'];
+export const SCAN_ROOTS = ['.github', 'apps', 'crates', 'docker', 'packages', 'tools'];
 
 export const SOURCE_EXTENSIONS = new Set([
   '.cjs',
@@ -40,6 +42,13 @@ export const SOURCE_EXTENSIONS = new Set([
   '.ts',
   '.tsx',
 ]);
+
+/**
+ * Hojas de estilo. No son codigo fuente para las reglas de tests, pero si para
+ * el tamano de fichero y los marcadores: ADR 0005 pone el CSS bajo el mismo
+ * limite de 300 lineas y stylelint no tiene regla de tamano.
+ */
+export const STYLE_EXTENSIONS = new Set(['.css']);
 
 const EXCLUDED_PATTERNS = [
   /\.min\.(js|css)$/u,
@@ -56,7 +65,10 @@ const EXCLUDED_PATTERNS = [
 
 const TEST_PATTERNS = [
   /\.(test|spec)\.[cm]?[jt]sx?$/u,
-  /(^|\/)(e2e|tests?)\//u,
+  // Las specs nativas de WebdriverIO (apps/desktop/wdio/specs/*.e2e.ts) no viven
+  // en una carpeta e2e/: sin este patron nadie miraba si llevaban un .skip.
+  /\.e2e\.[cm]?[jt]sx?$/u,
+  /(^|\/)(e2e|tests?|wdio)\//u,
   // Modulos de test de Rust partidos en su propio fichero (foo/tests.rs).
   /(^|\/)tests\.rs$/u,
 ];
@@ -71,6 +83,10 @@ export function toPosix(relativePath) {
 
 export function isSourceFile(relativePath) {
   return SOURCE_EXTENSIONS.has(path.extname(relativePath));
+}
+
+export function isStyleFile(relativePath) {
+  return STYLE_EXTENSIONS.has(path.extname(relativePath));
 }
 
 export function isExcluded(relativePath) {

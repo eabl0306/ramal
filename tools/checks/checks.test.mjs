@@ -9,6 +9,12 @@ const FOCUS = '.on' + 'ly(';
 const SHORTHAND = 'f' + 'it(';
 const MARKER = 'TO' + 'DO';
 const ODD = 'XX' + 'X';
+const SKIP = '.sk' + 'ip';
+const RUN_IF = '.run' + 'If';
+const FIX_LATER = '.fix' + 'me';
+const PENDING = '.to' + 'do';
+const X_IT = 'x' + 'it(';
+const X_DESCRIBE = 'x' + 'describe(';
 
 after(removeSandboxes);
 
@@ -49,6 +55,17 @@ describe('file-size', () => {
     assert.match(output, /b\.test\.tsx/u);
     assert.doesNotMatch(output, /a\.test\.tsx/u);
     assert.doesNotMatch(output, /status\.rs/u);
+  });
+
+  it('rechaza un CSS de mas de 300 lineas y acepta uno de 300', () => {
+    const root = sandbox({
+      'apps/web/src/a.module.css': '.a { color: red; }\n'.repeat(301),
+      'packages/ui/src/b.module.css': '.b { color: red; }\n'.repeat(300),
+    });
+    const { code, output } = runCheck('file-size.mjs', root);
+    assert.equal(code, 1);
+    assert.match(output, /apps\/web\/src\/a\.module\.css/u);
+    assert.doesNotMatch(output, /b\.module\.css/u);
   });
 
   it('ignora lo generado, los artefactos y lo que no es codigo fuente', () => {
@@ -96,6 +113,60 @@ describe('no-focused-tests', () => {
     assert.equal(runCheck('no-focused-tests.mjs', root).code, 1);
   });
 
+  it('rechaza cualquier forma de apagar un test sin motivo', () => {
+    const cases = [
+      `it${SKIP}If(true)('x', () => {});`,
+      `it${RUN_IF}(false)('x', () => {});`,
+      `describe${SKIP}If(true)('x', () => {});`,
+      `${X_IT}'x', () => {});`,
+      `${X_DESCRIBE}'x', () => {});`,
+      `test${FIX_LATER}('x', async () => {});`,
+      `test.describe${SKIP}('x', () => {});`,
+      `it${PENDING}('desde 12 caracteres, "pendiente"');`,
+      `it${SKIP}('a, "b"', () => {});`,
+      `test${SKIP}(true, '');`,
+    ];
+    const root = sandbox({ 'packages/domain/src/a.test.ts': `${cases.join('\n')}\n` });
+    const { code, output } = runCheck('no-focused-tests.mjs', root);
+    assert.equal(code, 1);
+    for (const [index] of cases.entries()) {
+      assert.match(output, new RegExp(`a\\.test\\.ts:${String(index + 1)}\\s`, 'u'));
+    }
+  });
+
+  it('revisa las specs nativas de WebdriverIO', () => {
+    const root = sandbox({
+      'apps/desktop/wdio/specs/open.e2e.ts': `it${SKIP}('abre un repositorio', () => {});\n`,
+      'apps/desktop/wdio/support/fixture.ts': `${X_IT}'x', () => {});\n`,
+    });
+    const { code, output } = runCheck('no-focused-tests.mjs', root);
+    assert.equal(code, 1);
+    assert.match(output, /open\.e2e\.ts:1/u);
+    assert.match(output, /fixture\.ts:1/u);
+  });
+
+  it('acepta el motivo como argumento de Playwright', () => {
+    const root = sandbox({
+      'apps/web/e2e/a.spec.ts': [
+        `test${SKIP}(isWebkit, 'WebKit no soporta el portapapeles en CI');`,
+        `test${FIX_LATER}(browserName === 'firefox', 'el arrastre falla en Firefox');`,
+        '',
+      ].join('\n'),
+    });
+    assert.equal(runCheck('no-focused-tests.mjs', root).code, 0);
+  });
+
+  it('acepta un todo o un fixme justificado con un comentario al lado', () => {
+    const root = sandbox({
+      'apps/web/src/a.test.ts': [
+        `it${PENDING}('x'); // falta el endpoint de ramas`,
+        `test${FIX_LATER}('y', () => {}); // espera al arreglo de Playwright`,
+        '',
+      ].join('\n'),
+    });
+    assert.equal(runCheck('no-focused-tests.mjs', root).code, 0);
+  });
+
   it('acepta un salto justificado con un comentario', () => {
     const root = sandbox({
       'apps/web/src/a.test.ts':
@@ -139,6 +210,36 @@ describe('todo-without-ticket', () => {
     assert.match(output, /deploy\.sh:1/u);
     assert.match(output, /web\.yml:1/u);
     assert.match(output, /^ {2}Cargo\.toml:1/mu);
+  });
+
+  it('revisa el justfile, los Dockerfile, nginx y el gateway de docker/', () => {
+    const root = sandbox({
+      justfile: `# ${MARKER}: quitar esta receta\n`,
+      'apps/api/Dockerfile': `# ${MARKER}: imagen mas pequena\n`,
+      'apps/web/Dockerfile.dev': `# ${ODD}: revisar\n`,
+      'apps/web/Dockerfile.dockerignore': `# ${MARKER}: ignorar mas\n`,
+      'apps/web/nginx.conf': `# ${MARKER}: cabeceras\n`,
+      'docker/gateway.dev.conf': `# ${MARKER}: rutas\n`,
+      '.gitignore': `# ${MARKER}: limpiar\n`,
+    });
+    const { code, output } = runCheck('todo-without-ticket.mjs', root);
+    assert.equal(code, 1);
+    for (const file of [
+      'justfile',
+      'apps/api/Dockerfile',
+      'apps/web/Dockerfile.dev',
+      'apps/web/Dockerfile.dockerignore',
+      'apps/web/nginx.conf',
+      'docker/gateway.dev.conf',
+      '.gitignore',
+    ]) {
+      assert.match(output, new RegExp(`^ {2}${file.replaceAll('.', '\\.')}:1\\s`, 'mu'));
+    }
+  });
+
+  it('acepta un marcador con ticket en el justfile', () => {
+    const root = sandbox({ justfile: `# ${MARKER}(RAM-12): quitar esta receta\n` });
+    assert.equal(runCheck('todo-without-ticket.mjs', root).code, 0);
   });
 
   it('no confunde la palabra castellana todo con un marcador', () => {

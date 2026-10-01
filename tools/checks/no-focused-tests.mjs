@@ -5,8 +5,22 @@ import { hasNearbyComment, readLines } from './lib/text.mjs';
 
 const FOCUSED_JS = /(?:\bdescribe|\bit|\btest|\bsuite|\bbench)(?:\.\w+)*\.only\s*\(/u;
 const FOCUSED_SHORTHAND = /\bf(?:describe|it)\s*\(/u;
-const SKIPPED_JS = /(?:\bdescribe|\bit|\btest|\bsuite)(?:\.\w+)*\.(?:skip|todo)\s*\(/u;
-const SKIPPED_JS_WITH_REASON = /\.(?:skip|todo)\s*\([^)]*,\s*['"`]/u;
+/**
+ * Todas las formas de apagar un test en Vitest, Playwright y mocha (WebdriverIO):
+ * skip, skipIf y runIf con su condicion, todo, fixme y los atajos xit/xdescribe.
+ * Antes solo se miraban .skip y .todo, y un it.skipIf(true) pasaba en verde.
+ */
+const SKIPPED_JS =
+  /(?:\bdescribe|\bit|\btest|\bsuite)(?:\.\w+)*\.(?:skip|skipIf|runIf|todo|fixme)\s*\(/u;
+const SKIPPED_SHORTHAND = /\bx(?:describe|it|test)\s*\(/u;
+/**
+ * El motivo como argumento solo existe en Playwright: test.skip(condicion,
+ * 'motivo') y test.fixme(condicion, 'motivo'). El primer argumento no puede
+ * empezar por comilla (seria el titulo del test, no una condicion) y el motivo
+ * no puede ir vacio. Un `, "` dentro del titulo ya no cuenta como motivo.
+ */
+const SKIPPED_JS_WITH_REASON =
+  /\.(?:skip|fixme)\s*\(\s*(?![\x27"`])[^,()]*,\s*[\x27"`]\s*[^\s\x27"`]/u;
 // Un #[ignore = ""] tampoco vale: el motivo tiene que decir algo.
 const RUST_IGNORE = /#\[\s*ignore\s*(?:=\s*"\s*"\s*)?\]/u;
 
@@ -23,9 +37,10 @@ function jsViolations(lines, file) {
       });
       return;
     }
-    if (!SKIPPED_JS.test(line)) return;
+    const skipped = SKIPPED_JS.exec(line) ?? SKIPPED_SHORTHAND.exec(line);
+    if (skipped === null) return;
     if (SKIPPED_JS_WITH_REASON.test(line)) return;
-    if (hasNearbyComment(lines, index, '.skip')) return;
+    if (hasNearbyComment(lines, index, skipped[0])) return;
     found.push({
       file,
       line: index + 1,
