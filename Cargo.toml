@@ -90,7 +90,10 @@ tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
 # Genera los tipos de TypeScript del protocolo (packages/bridge) desde los tipos
 # de Rust: `just protocol-gen` los escribe y `just protocol-check` vigila que esten al dia.
-ts-rs = { version = "12.0.1", features = ["serde-compat", "uuid-impl", "chrono-impl"] }
+# Solo lo usa ramal-protocol. `serde-json-impl` traduce el `params` del sobre
+# (serde_json::Value). Sin uuid ni chrono: el protocolo no lleva esos tipos (los
+# instantes viajan como texto ISO 8601) y no hace falta arrastrarlos al cierre.
+ts-rs = { version = "12.0.1", features = ["serde-compat", "serde-json-impl"] }
 uuid = { version = "1.26.1", features = ["v4", "v7"] }
 
 # Escritorio. Las versiones de los plugins van a la par que sus paquetes de npm
