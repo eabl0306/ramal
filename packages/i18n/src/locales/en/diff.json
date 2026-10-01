@@ -5,5 +5,12 @@
     "unified": "Unified"
   },
   "stageFile": "Stage file",
-  "unstageFile": "Unstage file"
+  "unstageFile": "Unstage file",
+  "status": {
+    "modified": "Modified",
+    "added": "Added",
+    "deleted": "Deleted",
+    "renamed": "Renamed",
+    "copied": "Copied"
+  }
 }

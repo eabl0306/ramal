@@ -1,4 +1,6 @@
 import { readdirSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
@@ -14,6 +16,8 @@ import { flattenTree } from '../src/messages';
  * Mac y datos simulados dentro de los textos, gaps B-43 y B-46).
  */
 
+// Ruta construida a mano: Vite reescribe `new URL(..., import.meta.url)` como un asset.
+const LOCALES_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src', 'locales');
 const es = flattenTree(CATALOGS.es);
 const en = flattenTree(CATALOGS.en);
 const PLURAL = new RegExp(`_(${PLURAL_SUFFIXES.join('|')})$`, 'u');
@@ -114,7 +118,7 @@ describe('contenido de los textos', () => {
 describe('ficheros de los diccionarios', () => {
   it('cada JSON de cada idioma esta conectado al catalogo', () => {
     for (const locale of ['es', 'en']) {
-      const files = readdirSync(new URL(`../src/locales/${locale}`, import.meta.url))
+      const files = readdirSync(path.join(LOCALES_DIR, locale))
         .filter((name) => name.endsWith('.json'))
         .map((name) => name.replace(/\.json$/u, ''))
         .sort();
