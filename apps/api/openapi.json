@@ -1,0 +1,254 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Ramal API",
+    "description": "API de Ramal. Todo lo de dominio va bajo /v1. Los errores salen en application/problem+json (RFC 9457) con title y detail en castellano y un code estable, tambien en los 404 y 405 del transporte. Cada respuesta lleva x-request-id.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "El proceso esta vivo",
+        "description": "Responde 200 mientras el proceso atienda, sin consultar ninguna dependencia.\n`checks` siempre va vacio.",
+        "operationId": "checkLiveness",
+        "responses": {
+          "200": {
+            "description": "El proceso atiende.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "El servicio puede recibir trafico",
+        "description": "200 con `status: ok` cuando todos los componentes responden; 503 con\n`status: degraded` en cuanto uno falla. El motivo del fallo queda en el log\ndel servidor y no viaja en la respuesta.",
+        "operationId": "checkReadiness",
+        "responses": {
+          "200": {
+            "description": "Todos los componentes responden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Algun componente no responde.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CheckState": {
+        "type": "string",
+        "description": "Estado de un componente.",
+        "enum": [
+          "ok",
+          "error"
+        ]
+      },
+      "FieldProblem": {
+        "type": "object",
+        "description": "Error de un campo concreto del cuerpo.",
+        "required": [
+          "field",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo estable del motivo.",
+            "examples": [
+              "too_long"
+            ]
+          },
+          "field": {
+            "type": "string",
+            "description": "Nombre del campo, en camelCase.",
+            "examples": [
+              "name"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Motivo en castellano.",
+            "examples": [
+              "El nombre no puede pasar de 60 caracteres."
+            ]
+          }
+        }
+      },
+      "HealthCheck": {
+        "type": "object",
+        "description": "Lectura de un componente. El motivo de un fallo no viaja: queda en el log.",
+        "required": [
+          "name",
+          "status",
+          "latencyMs"
+        ],
+        "properties": {
+          "latencyMs": {
+            "type": "integer",
+            "format": "uint64",
+            "description": "Cuanto tardo en responder, en milisegundos.",
+            "examples": [
+              3
+            ],
+            "minimum": 0
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre del componente (`database`).",
+            "examples": [
+              "database"
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CheckState"
+              },
+              {
+                "description": "Estado del componente."
+              }
+            ]
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "description": "Respuesta de `/health/live` y `/health/ready`.",
+        "required": [
+          "status",
+          "checks",
+          "version",
+          "checkedAt"
+        ],
+        "properties": {
+          "checkedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Instante de la comprobacion.",
+            "examples": [
+              "2026-09-30T10:00:00Z"
+            ]
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HealthCheck"
+            },
+            "description": "Una lectura por componente comprobado; vacio en liveness."
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/HealthState"
+              },
+              {
+                "description": "Estado global."
+              }
+            ]
+          },
+          "version": {
+            "type": "string",
+            "description": "Version del servicio que responde.",
+            "examples": [
+              "0.1.0"
+            ]
+          }
+        }
+      },
+      "HealthState": {
+        "type": "string",
+        "description": "Estado global del servicio.",
+        "enum": [
+          "ok",
+          "degraded"
+        ]
+      },
+      "Problem": {
+        "type": "object",
+        "description": "Cuerpo de error del contrato publico.",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "detail",
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Codigo estable que distingue el motivo.",
+            "examples": [
+              "route_not_found"
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "description": "Detalle de esta ocurrencia, en castellano.",
+            "examples": [
+              "La ruta solicitada no existe en esta API."
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldProblem"
+            },
+            "description": "Errores por campo. Solo aparece en los errores de validacion."
+          },
+          "status": {
+            "type": "integer",
+            "format": "uint16",
+            "description": "Codigo de estado HTTP, repetido en el cuerpo como pide la RFC.",
+            "examples": [
+              404
+            ],
+            "minimum": 0
+          },
+          "title": {
+            "type": "string",
+            "description": "Resumen en castellano, siempre el mismo para un `type`.",
+            "examples": [
+              "No encontrado"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "URI que identifica el tipo de problema.",
+            "examples": [
+              "https://ramal.dev/problems/not-found"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

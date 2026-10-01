@@ -6,5 +6,18 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[features]
+# Expone los dobles de test (modulo `testing`) a los tests de los adaptadores.
+# Nunca se activa en el binario: solo la encienden las dev-dependencies.
+testing = []
+
+[dependencies]
+# Lista blanca fijada por apps/api/crates/api/tests/architecture.rs: el dominio,
+# async-trait para usar los puertos como objetos de trait, y librerias puras.
+async-trait = { workspace = true }
+chrono = { workspace = true }
+ramal-api-domain = { workspace = true }
+thiserror = { workspace = true }
+
 [lints]
 workspace = true

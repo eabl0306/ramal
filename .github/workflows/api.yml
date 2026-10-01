@@ -1,0 +1,111 @@
+# La API (apps/api): clippy, tests, cobertura con sus umbrales, tests contra un
+# PostgreSQL de verdad, documento OpenAPI al dia e imagen de produccion
+# arrancada y probada. Lo llama ci.yml cuando cambia apps/api o el workspace de
+# Cargo. Usa las mismas recetas que `just` en local.
+name: api
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  # Sin la informacion de depuracion completa la cache ocupa menos y compila antes;
+  # los backtraces siguen diciendo fichero y linea.
+  CARGO_PROFILE_DEV_DEBUG: line-tables-only
+  CARGO_PROFILE_TEST_DEBUG: line-tables-only
+
+jobs:
+  verify:
+    name: tests, cobertura y contrato
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: ramal
+          POSTGRES_PASSWORD: ramal
+          POSTGRES_DB: ramal
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ramal -d ramal"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      # Con la base obligatoria, los tests de PostgreSQL no se pueden saltar: si
+      # el servicio no arranca, el job se pone en rojo. Puesta para todo el job,
+      # la cobertura mide tambien los adaptadores de verdad.
+      RAMAL_TEST_DATABASE_URL: postgres://ramal:ramal@127.0.0.1:5432/ramal
+      RAMAL_TEST_REQUIRE_DATABASE: '1'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Hacer sitio en el disco
+        working-directory: /
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+            /usr/local/share/boost /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      # Sin argumentos, rustup instala el toolchain que fija rust-toolchain.toml,
+      # con llvm-tools-preview para la cobertura.
+      - name: Instalar el toolchain de rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just,cargo-llvm-cov
+
+      - name: Clippy, tests y cobertura (just api-check)
+        run: just api-check
+
+      # Usa el servicio de arriba: con RAMAL_TEST_DATABASE_URL puesta, la receta
+      # no levanta compose.
+      - name: Tests contra PostgreSQL (just api-test-db)
+        run: just api-test-db
+
+      - name: El documento OpenAPI versionado esta al dia (just api-openapi)
+        run: |
+          set -euo pipefail
+          just api-openapi
+          if ! git diff --exit-code -- apps/api/openapi.json; then
+            echo "::error::apps/api/openapi.json no coincide con el router. Ejecuta just api-openapi y commitea."
+            exit 1
+          fi
+
+      - name: Build de release (just api-build)
+        run: just api-build
+
+  image:
+    name: imagen docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      # El mismo Dockerfile y el mismo contexto que `just api-docker`, con la cache
+      # de capas de GitHub para no compilar todas las dependencias en cada PR.
+      - name: Construir la imagen
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          push: false
+          load: true
+          tags: ramal-api:ci
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+
+      # Construir no prueba nada: se arranca sin base (viva pero no lista) y con
+      # PostgreSQL 18 (migra, queda lista, el HEALTHCHECK la marca sana y SIGTERM
+      # la para con 0).
+      - name: Prueba de humo de la imagen
+        run: bash apps/api/scripts/smoke-image.sh ramal-api:ci

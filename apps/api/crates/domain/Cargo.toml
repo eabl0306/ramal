@@ -6,5 +6,12 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[dependencies]
+# Librerias puras: ni runtime, ni IO, ni framework. La lista blanca la fija
+# apps/api/crates/api/tests/architecture.rs (thiserror, uuid y chrono). uuid
+# entra con la primera entidad que tenga identificador.
+chrono = { workspace = true }
+thiserror = { workspace = true }
+
 [lints]
 workspace = true

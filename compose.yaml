@@ -39,19 +39,24 @@ services:
     profiles: [full]
     build:
       # Contexto en la raiz: el workspace de Cargo y el Cargo.lock viven aqui, no
-      # en apps/api.
+      # en apps/api. La imagen de desarrollo no copia nada (su
+      # Dockerfile.dev.dockerignore deja el contexto vacio): el codigo va montado.
       context: .
       dockerfile: apps/api/Dockerfile.dev
+      args:
+        CARGO_BUILD_JOBS: ${CARGO_BUILD_JOBS:-default}
+    # Solo lo que la API usa hoy. Cuando mande correo (verificacion,
+    # recuperacion), vuelve aqui `mailpit: condition: service_healthy`.
     depends_on:
       db:
-        condition: service_healthy
-      mailpit:
         condition: service_healthy
     environment:
       RAMAL__SERVER__HOST: 0.0.0.0
       RAMAL__SERVER__PORT: '8080'
       RAMAL__DATABASE__URL: postgres://${POSTGRES_USER:-ramal}:${POSTGRES_PASSWORD:-ramal}@db:5432/${POSTGRES_DB:-ramal}
       RAMAL__TELEMETRY__LOG_LEVEL: ${RAMAL__TELEMETRY__LOG_LEVEL:-debug}
+      # Hilos de cargo dentro del contenedor; "default" son todos los nucleos.
+      CARGO_BUILD_JOBS: ${CARGO_BUILD_JOBS:-default}
       # Fuera del bind mount a proposito. Si el directorio de compilacion cuelga
       # del codigo montado, docker lo crea en el repositorio del host como root
       # cada vez que se levanta la pila, y ahi se queda: git lo ve, los guards lo

@@ -1,0 +1,49 @@
+# syntax=docker/dockerfile:1
+
+# Imagen de DESARROLLO de la API, con recarga en caliente. La usa el servicio
+# `api` de compose.yaml (perfil full); el codigo no se copia, se monta en /app.
+#
+#   docker compose --profile full up api
+#
+# El primer arranque tarda varios minutos: compila ramal-api con todas sus
+# dependencias. Despues la cache vive en los volumenes de compose.
+
+# Va a la par que rust-toolchain.toml: se suben juntos.
+ARG RUST_VERSION=1.98.1
+
+FROM rust:${RUST_VERSION}-slim-trixie
+ARG RUST_VERSION
+ARG CARGO_WATCH_VERSION=8.5.3
+# Hilos de compilacion de `cargo install`; "default" son todos los nucleos.
+ARG CARGO_BUILD_JOBS=default
+
+RUN apt-get update \
+ && apt-get install --no-install-recommends --yes build-essential pkg-config curl \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN cargo install cargo-watch --locked --version ${CARGO_WATCH_VERSION}
+
+WORKDIR /app
+
+# CARGO_TARGET_DIR fuera del codigo montado: si colgara de /app, docker crearia
+# en el repositorio del host un directorio de root que no se borra sin sudo.
+# RUSTUP_TOOLCHAIN gana al rust-toolchain.toml montado, que haria a rustup
+# descargar componentes que aqui no se usan.
+ENV RAMAL__SERVER__HOST=0.0.0.0 \
+    RAMAL__SERVER__PORT=8080 \
+    RAMAL__TELEMETRY__LOG_LEVEL=debug \
+    CARGO_TARGET_DIR=/cargo-target \
+    RUSTUP_TOOLCHAIN=${RUST_VERSION}
+
+EXPOSE 8080
+
+# Solo se vigila lo que puede cambiar el binario. Los directorios de compilacion
+# quedan fuera: si no, cada escritura de cargo dispararia otra compilacion y el
+# bucle no acabaria nunca (le paso a Gastonomo).
+CMD ["cargo", "watch", "--why", \
+     "--watch", "apps/api", \
+     "--watch", "Cargo.toml", \
+     "--watch", "Cargo.lock", \
+     "--ignore", "target/**", \
+     "--ignore", "**/target/**", \
+     "--exec", "run --bin ramal-api"]

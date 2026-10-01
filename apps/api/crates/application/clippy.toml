@@ -1,0 +1,34 @@
+# Clippy usa el clippy.toml mas cercano y no lo fusiona con el de la raiz, asi que
+# los umbrales comunes se repiten aqui. apps/api/crates/api/tests/architecture.rs
+# comprueba que siguen siendo iguales a los de la raiz.
+cognitive-complexity-threshold = 15
+too-many-arguments-threshold = 5
+too-many-lines-threshold = 50
+type-complexity-threshold = 250
+excessive-nesting-threshold = 4
+avoid-breaking-exported-api = false
+
+# El nucleo no lanza procesos, no toca ficheros ni red, no lee el entorno y no
+# lee la hora de pared: todo eso entra por un puerto. Prohibir tokio en el
+# Cargo.toml no basta, porque esto vive en la biblioteca estandar. Instant::now
+# si se permite: medir una latencia no es leer la hora.
+disallowed-types = [
+  { path = "std::process::Command", reason = "the core never spawns processes: declare a port" },
+  { path = "std::fs::File", reason = "the core never touches the filesystem: declare a port" },
+  { path = "std::net::TcpStream", reason = "the core never opens sockets: declare a port" },
+  { path = "std::net::TcpListener", reason = "the core never opens sockets: declare a port" },
+  { path = "std::net::UdpSocket", reason = "the core never opens sockets: declare a port" },
+]
+disallowed-methods = [
+  { path = "std::process::Command::new", reason = "the core never spawns processes: declare a port" },
+  { path = "std::fs::read", reason = "the core never touches the filesystem: declare a port" },
+  { path = "std::fs::read_to_string", reason = "the core never touches the filesystem: declare a port" },
+  { path = "std::fs::write", reason = "the core never touches the filesystem: declare a port" },
+  { path = "std::env::var", reason = "configuration reaches the core already parsed" },
+  { path = "std::env::var_os", reason = "configuration reaches the core already parsed" },
+  { path = "std::time::SystemTime::now", reason = "wall-clock time comes from the Clock port" },
+  { path = "chrono::Utc::now", reason = "wall-clock time comes from the Clock port" },
+  { path = "chrono::Local::now", reason = "wall-clock time comes from the Clock port" },
+  { path = "std::thread::spawn", reason = "the core does not manage threads" },
+  { path = "std::thread::sleep", reason = "the core never blocks waiting for time to pass" },
+]

@@ -6,5 +6,21 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[[bin]]
+name = "ramal-api"
+path = "src/main.rs"
+
+[dependencies]
+ramal-api-application = { workspace = true }
+ramal-api-domain = { workspace = true }
+ramal-api-http = { workspace = true }
+ramal-api-infrastructure = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
 [lints]
 workspace = true
