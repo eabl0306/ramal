@@ -41,9 +41,13 @@ jobs:
       stack: ${{ steps.filter.outputs.stack }}
     steps:
       - uses: actions/checkout@v7
-      # Los anclajes (&cargo, &node) son las piezas comunes: el workspace de
-      # Cargo afecta a todo lo que es Rust, y el de pnpm a todo lo que es
-      # TypeScript. Cambiar ci.yml lo ejecuta todo.
+      # Los anclajes son las piezas comunes. &cargo: el workspace de Cargo y su
+      # entorno (.cargo/) afectan a todo lo que es Rust. &node: el workspace de
+      # pnpm y la version de Node (.nvmrc) afectan a todo lo que es TypeScript.
+      # &recipes: el justfile define los gates de todos los workflows que
+      # corren `just <receta>`; sin el, un PR que solo baja un umbral o rompe
+      # una receta saldria en verde con esos jobs saltados. Cambiar ci.yml lo
+      # ejecuta todo.
       - uses: dorny/paths-filter@v4
         id: filter
         with:
@@ -55,13 +59,19 @@ jobs:
               - 'clippy.toml'
               - 'rustfmt.toml'
               - 'deny.toml'
+              - '.cargo/**'
               - '.github/workflows/ci.yml'
             node: &node
               - 'package.json'
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
+              - '.nvmrc'
               - 'packages/**'
               - '.github/workflows/ci.yml'
+            recipes: &recipes
+              - 'justfile'
+              - '.github/workflows/ci.yml'
+            # rust.yml llama a cargo directamente, sin just.
             rust:
               - *cargo
               - 'crates/**'
@@ -71,19 +81,25 @@ jobs:
               - '.github/workflows/rust.yml'
             api:
               - *cargo
+              - *recipes
               - 'apps/api/**'
               - '.github/workflows/api.yml'
+            # El job del puente instala Node con .nvmrc.
             engine:
               - *cargo
+              - *recipes
+              - '.nvmrc'
               - 'crates/**'
               - 'apps/vscode-engine/**'
               - 'packages/bridge/**'
               - '.github/workflows/engine.yml'
             packages:
               - *node
+              - *recipes
               - '.github/workflows/packages.yml'
             web:
               - *node
+              - *recipes
               - 'apps/web/**'
               # El contrato de la API: @ramal/api-client se genera de el y la web
               # comprueba que el cliente commiteado sigue al dia.
@@ -92,22 +108,24 @@ jobs:
             desktop:
               - *cargo
               - *node
+              - *recipes
               - 'crates/**'
               - 'apps/desktop/**'
               - '.github/workflows/desktop.yml'
             vscode:
               - *cargo
               - *node
+              - *recipes
               - 'crates/**'
               - 'apps/vscode/**'
               - 'apps/vscode-engine/**'
               - '.github/workflows/vscode.yml'
             stack:
+              - *recipes
               - 'compose.yaml'
               - 'docker/**'
               - 'tools/scripts/smoke-stack.sh'
               - '.github/workflows/stack.yml'
-              - '.github/workflows/ci.yml'
 
   quality:
     name: calidad
