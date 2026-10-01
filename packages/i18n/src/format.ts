@@ -16,10 +16,12 @@ export function formatRelativeTime(value: number, unit: RelativeTimeUnit, locale
   return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(value, unit);
 }
 
-export type DateStyle = 'date' | 'dateTime' | 'time';
+/** `short` es la fecha numerica corta (30/9/26) de las columnas estrechas, como la del grafo. */
+export type DateStyle = 'date' | 'short' | 'dateTime' | 'time';
 
 const DATE_OPTIONS: Readonly<Record<DateStyle, Intl.DateTimeFormatOptions>> = {
   date: { dateStyle: 'medium' },
+  short: { dateStyle: 'short' },
   dateTime: { dateStyle: 'medium', timeStyle: 'short' },
   time: { timeStyle: 'short' },
 };

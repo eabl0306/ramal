@@ -24,8 +24,27 @@
     "refs": "Branch / tag",
     "graph": "Graph",
     "message": "Message",
+    "author": "Author",
     "date": "Date",
     "sha": "SHA"
+  },
+  "view": {
+    "label": "Commit history",
+    "empty": "This repository has no commits yet.",
+    "error": "The history could not be loaded.",
+    "retry": "Retry",
+    "loadingMore": "Loading more commits…"
+  },
+  "refs": {
+    "more": "+{count}",
+    "moreLabel_one": "{count} more reference: {names}",
+    "moreLabel_other": "{count} more references: {names}",
+    "kind": {
+      "localBranch": "Local branch",
+      "remoteBranch": "Remote branch",
+      "tag": "Tag",
+      "head": "Current branch"
+    }
   },
   "wip": {
     "changes_one": "WIP · {count} changed file",

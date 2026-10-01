@@ -26,11 +26,13 @@ describe('formatDate', () => {
     expect(formatDate(instant, 'en', { timeZone: 'UTC' })).toBe('Sep 30, 2026');
   });
 
-  it('admite fecha con hora y solo hora', () => {
+  it('admite fecha con hora, solo hora y fecha corta', () => {
     expect(formatDate(instant, 'es', { style: 'dateTime', timeZone: 'UTC' })).toBe(
       '30 sept 2026, 10:05',
     );
     expect(formatDate(new Date(instant), 'es', { style: 'time', timeZone: 'UTC' })).toBe('10:05');
+    expect(formatDate(instant, 'es', { style: 'short', timeZone: 'UTC' })).toBe('30/9/26');
+    expect(formatDate(instant, 'en', { style: 'short', timeZone: 'UTC' })).toBe('9/30/26');
     expect(formatDate(instant, 'en')).toMatch(/2026/u);
   });
 });
