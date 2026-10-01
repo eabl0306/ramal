@@ -130,41 +130,56 @@ async fn output_over_the_limit_is_rejected() {
     assert!(matches!(error, RunError::OutputTooLarge(4)));
 }
 
-/// Un "git" falso escrito como script de shell, para forzar casos que el git real
-/// no da (colgarse, inundar stderr).
+/// Un "git" falso, para forzar casos que el git real no da (colgarse, inundar
+/// stderr). Son scripts versionados con el bit de ejecucion en `fixtures/`.
+///
+/// Existe por un fallo real: antes se escribian en un tempdir y se lanzaban en
+/// seguida. Si otro test del mismo binario hacia fork mientras el script seguia
+/// abierto para escritura, el hijo heredaba ese descriptor y el exec fallaba con
+/// ETXTBSY ("Text file busy"); la CI se ponia roja una vez de cada diez. Un
+/// fichero que nadie abre para escribir no puede provocarlo.
 #[cfg(unix)]
-fn fake_git(script: &str) -> (tempfile::TempDir, PathBuf) {
+fn fake_git(name: &str) -> PathBuf {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("src/cli/runner/fixtures")
+        .join(name);
+    assert!(path.is_file(), "missing fixture {}", path.display());
+    path
+}
+
+#[cfg(unix)]
+#[test]
+fn the_fake_gits_are_checked_in_as_executables() {
     use std::os::unix::fs::PermissionsExt;
-    let dir = tempfile::tempdir().unwrap();
-    let path = dir.path().join("git");
-    std::fs::write(&path, format!("#!/bin/sh\n{script}\n")).unwrap();
-    std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o755)).unwrap();
-    (dir, path)
+    for name in ["hang.sh", "flood-stderr.sh"] {
+        let mode = std::fs::metadata(fake_git(name))
+            .unwrap()
+            .permissions()
+            .mode();
+        assert_eq!(mode & 0o111, 0o111, "{name} must be executable");
+    }
 }
 
 #[cfg(unix)]
 #[tokio::test]
 async fn a_git_that_hangs_is_killed_at_the_timeout() {
-    let (_dir, path) = fake_git("exec sleep 30");
     let limits = RunLimits {
         timeout: Duration::from_millis(200),
         max_output_bytes: 1024,
     };
 
-    let error = GitRunner::new(path, limits)
+    let error = GitRunner::new(fake_git("hang.sh"), limits)
         .run(None, &GitCommand::new("version"))
         .await
         .unwrap_err();
 
-    assert!(matches!(error, RunError::TimedOut(_)));
+    assert!(matches!(error, RunError::TimedOut(_)), "{error:?}");
 }
 
 #[cfg(unix)]
 #[tokio::test]
 async fn a_flood_of_stderr_is_drained_and_truncated() {
-    let (_dir, path) = fake_git("head -c 200000 /dev/zero | tr '\\0' 'x' >&2\nexit 3");
-
-    let output = GitRunner::new(path, RunLimits::default())
+    let output = GitRunner::new(fake_git("flood-stderr.sh"), RunLimits::default())
         .run(None, &GitCommand::new("version"))
         .await
         .unwrap();

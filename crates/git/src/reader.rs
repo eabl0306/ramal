@@ -12,7 +12,7 @@ use ramal_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot, Sha}
 
 use crate::cli::version::{capabilities_for, parse_version};
 use crate::cli::{GitBinary, GitCommand, GitRunner, RunError, RunLimits, RunOutput};
-use crate::parse::log::{LOG_FORMAT, parse_log};
+use crate::parse::log::{LOG_DATE, LOG_FORMAT, parse_log};
 use crate::parse::refs::{REFS_FORMAT, parse_refs};
 
 /// Configuracion del lector.
@@ -130,19 +130,31 @@ impl GitReader for GitCliReader {
         repo: &RepoRoot,
         query: &LogQuery,
     ) -> Result<Vec<CommitRecord>, GitReadError> {
-        // Los stashes y las notas no son historia del proyecto: los stashes se
-        // ensenan en su propia seccion.
+        // Solo las refs que el grafo sabe etiquetar (las mismas que read_refs)
+        // mas HEAD, para que un HEAD separado siga saliendo. Con --all salian
+        // como ramas sin nombre refs/original (filter-branch), refs/prefetch
+        // (git maintenance), refs/jj, refs/pull o refs/bisect, y tras un
+        // filter-branch el historial viejo entero aparecia duplicado. Stash y
+        // notas tampoco son historia del proyecto. --ignore-missing evita que un
+        // HEAD sin nacer (rama huerfana en un repo con commits) haga fallar el
+        // log. Los HEAD separados de otros worktrees quedan fuera a proposito
+        // hasta que los worktrees tengan sus propias refs.
         let command = GitCommand::new("log")
             .arg("--topo-order")
-            .arg("--exclude=refs/stash")
-            .arg("--exclude=refs/notes/*")
-            .arg("--all")
+            .arg("--branches")
+            .arg("--remotes")
+            .arg("--tags")
+            .arg("--ignore-missing")
             .arg("-z")
             .arg("--no-color")
             .arg("--no-show-signature")
             .arg("--encoding=UTF-8")
+            .arg(LOG_DATE)
             .arg(LOG_FORMAT)
-            .max_count(query.max_count);
+            .max_count(query.max_count)
+            // Tiene que ir lo ultimo: revisions() escribe --end-of-options y lo
+            // que venga detras ya no se lee como opcion.
+            .revisions(["HEAD"]);
         let output = self.run(repo.as_path(), &command).await?;
         if !output.success() {
             return Err(failed("log", &output));

@@ -181,6 +181,48 @@ impl FixtureRepo {
         self.git(&["rev-parse", "--verify", revision])
     }
 
+    /// Escribe un commit a mano sobre `parent`, con la linea `author` tal cual
+    /// (`Nombre <correo> segundos zona`), y devuelve su sha. Va por
+    /// `hash-object --literally` para saltarse las comprobaciones de `git
+    /// commit`: asi se reproducen commits que git acepta de importadores,
+    /// libgit2 o JGit pero que no deja crear desde la linea de comandos.
+    pub fn raw_commit(&self, parent: &str, author: &str, message: &str) -> String {
+        use std::io::Write as _;
+        use std::process::Stdio;
+
+        // `HEAD:` es el arbol de HEAD (ruta vacia).
+        let tree = self.rev("HEAD:");
+        let body = format!(
+            "tree {tree}\nparent {parent}\nauthor {author}\n\
+             committer Ana Ruiz <ana@example.com> {FIRST_COMMIT_SECONDS} +0200\n\n{message}\n"
+        );
+        let args = [
+            "hash-object",
+            "-t",
+            "commit",
+            "-w",
+            "--stdin",
+            "--literally",
+        ];
+        let mut child = self
+            .command(&args)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("git must be installed to run these tests");
+        child
+            .stdin
+            .take()
+            .expect("stdin is piped")
+            .write_all(body.as_bytes())
+            .expect("could not write the commit to git");
+        let output = child.wait_with_output().expect("git hash-object failed");
+        assert!(output.status.success(), "git hash-object failed");
+        String::from_utf8_lossy(&output.stdout)
+            .trim_end()
+            .to_owned()
+    }
+
     /// Repositorio con historia: `main` con dos commits y un tag, una rama
     /// `feature` que sale del primero y vuelve con un merge.
     pub fn with_merged_feature() -> Self {

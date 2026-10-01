@@ -18,6 +18,7 @@ const KINDS: Readonly<Record<BridgeErrorKind, true>> = {
   git_not_found: true,
   git_version_unsupported: true,
   git_failed: true,
+  stale_window: true,
   internal: true,
   transport: true,
   timeout: true,

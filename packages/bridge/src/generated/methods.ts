@@ -7,7 +7,7 @@ import type { OpenRepoParams } from "./OpenRepoParams";
 import type { RepoHandle } from "./RepoHandle";
 
 /** Version del protocolo del motor. */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 /** Cada metodo del motor con sus parametros y su resultado. */
 export type EngineMethods = {

@@ -9,6 +9,7 @@ const WINDOW: GraphWindow = {
   offset: 0,
   hasMore: false,
   laneCount: 1,
+  snapshot: 'snap-1',
   rows: [
     {
       sha: 'a'.repeat(40),

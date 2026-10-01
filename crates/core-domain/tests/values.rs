@@ -1,4 +1,5 @@
-//! Tipos de valor del dominio: sha, forma corta, tiempo de git, refs y repos.
+//! Tipos de valor del dominio: sha, forma corta, refs y repos. El tiempo de git
+//! tiene su propio fichero, `git_time.rs`.
 
 #![allow(
     unused_crate_dependencies,
@@ -12,8 +13,8 @@
 mod support;
 
 use ramal_core_domain::{
-    CommitNode, GitTime, Head, RefError, RefKind, RefName, RefSnapshot, RepoId, RepoRoot, Sha,
-    ShaError, ShortSha, TimeError,
+    CommitNode, Head, RefError, RefKind, RefName, RefSnapshot, RepoId, RepoRoot, Sha, ShaError,
+    ShortSha,
 };
 use support::{git_ref, sha};
 
@@ -50,76 +51,6 @@ fn a_short_sha_accepts_four_to_forty_hex_characters() {
     assert!(ShortSha::parse(HEX).is_ok());
     assert!(ShortSha::parse("abc").is_err());
     assert_eq!(ShortSha::parse("abcz"), Err(ShaError::InvalidCharacter));
-}
-
-#[test]
-fn git_time_reads_the_strict_iso_format_of_git() {
-    let time = GitTime::parse_iso8601("2026-09-30T11:42:00+02:00").unwrap();
-
-    assert_eq!(time.seconds(), 1_790_761_320);
-    assert_eq!(time.offset_minutes(), 120);
-    assert_eq!(time.to_iso8601(), "2026-09-30T11:42:00+02:00");
-}
-
-#[test]
-fn git_time_accepts_z_and_negative_offsets() {
-    let utc = GitTime::parse_iso8601("1970-01-01T00:00:00Z").unwrap();
-    assert_eq!(utc.seconds(), 0);
-    assert_eq!(utc.to_string(), "1970-01-01T00:00:00+00:00");
-
-    let west = GitTime::parse_iso8601("2000-02-29T23:30:15-05:30").unwrap();
-    assert_eq!(west.offset_minutes(), -330);
-    assert_eq!(west.seconds(), 951_886_815);
-    assert_eq!(west.to_string(), "2000-02-29T23:30:15-05:30");
-}
-
-#[test]
-fn git_time_round_trips_dates_before_the_epoch_and_far_ahead() {
-    for text in [
-        "1969-12-31T23:59:59+00:00",
-        "1900-03-01T12:00:00+01:00",
-        "2400-02-29T00:00:00-11:00",
-        "9999-12-31T23:59:59+14:00",
-    ] {
-        assert_eq!(GitTime::parse_iso8601(text).unwrap().to_string(), text);
-    }
-    assert_eq!(GitTime::new(-1, 0).to_string(), "1969-12-31T23:59:59+00:00");
-}
-
-#[test]
-fn git_time_rejects_malformed_text() {
-    for text in [
-        "",
-        "2026-09-30",
-        "2026-09-30 11:42:00+02:00",
-        "2026-09-30T11:42:00",
-        "2026-09-30T11:42:00+0200",
-        "2026-09-30T11:42:00+02-00",
-        "+026-09-30T11:42:00Z",
-        "2026-09-30T11:42:00Y",
-        "2026-09-30T11:42:00+02:60",
-    ] {
-        assert!(
-            matches!(GitTime::parse_iso8601(text), Err(TimeError::Malformed(_))),
-            "{text}"
-        );
-    }
-}
-
-#[test]
-fn git_time_rejects_fields_out_of_range() {
-    for text in [
-        "2026-13-01T00:00:00Z",
-        "2026-04-31T00:00:00Z",
-        "2026-02-29T00:00:00Z",
-        "2026-01-01T24:00:00Z",
-        "2026-01-01T00:60:00Z",
-        "2026-01-01T00:00:60Z",
-    ] {
-        let error = GitTime::parse_iso8601(text).unwrap_err();
-        assert!(matches!(error, TimeError::OutOfRange(_)), "{text}");
-        assert!(error.to_string().contains(text));
-    }
 }
 
 #[test]

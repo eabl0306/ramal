@@ -67,7 +67,26 @@ fn params_use_camel_case() {
 
     assert_eq!(params.repo_id, "repo-1");
     assert_eq!(params.offset, 200);
+    assert_eq!(params.snapshot, None);
     assert!(serde_json::from_value::<EngineInfoParams>(json!({})).is_ok());
+}
+
+#[test]
+fn the_window_snapshot_is_optional_in_params_and_omitted_when_missing() {
+    let next: GraphWindowParams = serde_json::from_value(
+        json!({ "repoId": "repo-1", "offset": 200, "limit": 100, "snapshot": "ab12" }),
+    )
+    .unwrap();
+    assert_eq!(next.snapshot.as_deref(), Some("ab12"));
+
+    let first = GraphWindowParams {
+        snapshot: None,
+        ..next
+    };
+    assert_eq!(
+        serde_json::to_value(&first).unwrap(),
+        json!({ "repoId": "repo-1", "offset": 200, "limit": 100 })
+    );
 }
 
 #[test]

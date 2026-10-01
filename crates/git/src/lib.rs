@@ -3,8 +3,9 @@
 //!
 //! Reglas que evitan los errores clasicos de envolver una CLI:
 //!
-//! - Formatos de maquina siempre (`-z`, `--format` con `%x00` y `%x1f`), mas
-//!   `--no-pager`, sin color y `-c core.quotepath=off`.
+//! - Formatos de maquina siempre (`-z`, `--format` con separadores que el dato
+//!   no puede contener, como NUL o el salto de linea), mas `--no-pager`, sin
+//!   color y `-c core.quotepath=off`.
 //! - Entorno fijo: `LC_ALL=C`, `GIT_TERMINAL_PROMPT=0` y, en las lecturas,
 //!   `GIT_OPTIONAL_LOCKS=0`. Se borran las variables que redirigirian git a otro
 //!   repositorio (`GIT_DIR` y familia): un hook que lanzara el motor las heredaria.

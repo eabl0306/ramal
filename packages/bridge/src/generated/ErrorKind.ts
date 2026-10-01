@@ -4,4 +4,4 @@
  * Lo que la interfaz usa para decidir ante un error. Es una lista cerrada: un
  * `kind` nuevo sin traduccion en `@ramal/repo-view` no compila.
  */
-export type ErrorKind = "invalid_params" | "repo_not_open" | "not_a_repository" | "git_not_found" | "git_version_unsupported" | "git_failed" | "internal";
+export type ErrorKind = "invalid_params" | "repo_not_open" | "not_a_repository" | "git_not_found" | "git_version_unsupported" | "git_failed" | "stale_window" | "internal";

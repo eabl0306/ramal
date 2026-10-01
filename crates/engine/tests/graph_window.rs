@@ -194,6 +194,84 @@ async fn an_unknown_repo_id_is_not_open() {
     assert_eq!(error.message, "repository repo-99 is not open");
 }
 
+/// Pagina siguiente con la huella de la anterior, como la pide la interfaz.
+async fn next_page(
+    engine: &Engine,
+    repo_id: &str,
+    previous: &GraphWindow,
+    limit: u32,
+) -> Result<GraphWindow, RpcError> {
+    let offset = previous.offset + u32::try_from(previous.rows.len()).unwrap();
+    let params = json!({
+        "repoId": repo_id, "offset": offset, "limit": limit, "snapshot": previous.snapshot
+    });
+    call(engine, "graph/window", params)
+        .await
+        .map(|value| serde_json::from_value(value).unwrap())
+}
+
+#[tokio::test]
+async fn pages_of_an_unchanged_repository_share_the_snapshot() {
+    let repo = FixtureRepo::new();
+    for index in 1..=6 {
+        repo.commit(&format!("c{index}"));
+    }
+    let (engine, repo_id) = opened(&repo).await;
+
+    let first = window(&engine, &repo_id, 0, 3).await;
+    let second = next_page(&engine, &repo_id, &first, 3).await.unwrap();
+
+    assert_eq!(first.snapshot.len(), 32);
+    assert_eq!(second.snapshot, first.snapshot);
+    let summaries: Vec<&str> = first
+        .rows
+        .iter()
+        .chain(&second.rows)
+        .map(|row| row.summary.as_str())
+        .collect();
+    assert_eq!(summaries, vec!["c6", "c5", "c4", "c3", "c2", "c1"]);
+}
+
+#[tokio::test]
+async fn a_commit_between_two_pages_makes_the_next_page_stale() {
+    // El fallo real: c1..c6, pagina (0, 3), commit desde la terminal, pagina
+    // (3, 3). Se unian ['c6', 'c5', 'c4', 'c4', 'c3', 'c2'], con c4 repetido.
+    let repo = FixtureRepo::new();
+    for index in 1..=6 {
+        repo.commit(&format!("c{index}"));
+    }
+    let (engine, repo_id) = opened(&repo).await;
+    let first = window(&engine, &repo_id, 0, 3).await;
+
+    repo.commit("c7");
+    let error = next_page(&engine, &repo_id, &first, 3).await.unwrap_err();
+
+    assert_eq!(error.data.unwrap().kind, ErrorKind::StaleWindow);
+    assert_eq!(error.code, error_code::ENGINE_ERROR);
+    let again = window(&engine, &repo_id, 0, 3).await;
+    let rest = next_page(&engine, &repo_id, &again, 10).await.unwrap();
+    assert_ne!(again.snapshot, first.snapshot);
+    let summaries: Vec<&str> = again
+        .rows
+        .iter()
+        .chain(&rest.rows)
+        .map(|row| row.summary.as_str())
+        .collect();
+    assert_eq!(summaries, vec!["c7", "c6", "c5", "c4", "c3", "c2", "c1"]);
+}
+
+#[tokio::test]
+async fn checking_out_another_branch_also_makes_the_next_page_stale() {
+    let repo = FixtureRepo::with_merged_feature();
+    let (engine, repo_id) = opened(&repo).await;
+    let first = window(&engine, &repo_id, 0, 1).await;
+
+    repo.checkout("feature");
+    let error = next_page(&engine, &repo_id, &first, 1).await.unwrap_err();
+
+    assert_eq!(error.data.unwrap().kind, ErrorKind::StaleWindow);
+}
+
 #[tokio::test]
 async fn a_limit_outside_one_to_a_thousand_is_invalid() {
     let repo = FixtureRepo::with_merged_feature();

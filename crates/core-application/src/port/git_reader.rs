@@ -75,8 +75,10 @@ impl GitVersionInfo {
 
 /// Que commits leer para el grafo.
 ///
-/// El adaptador lee siempre todas las refs (menos stash y notas) en orden
-/// topologico; aqui solo se dice cuantos commits como maximo.
+/// El adaptador recorre siempre las mismas refs que devuelve `read_refs` (ramas,
+/// ramas remotas y tags) mas HEAD, en orden topologico; aqui solo se dice cuantos
+/// commits como maximo. Asi cada fila del grafo cuelga de algo que se puede
+/// etiquetar, y la huella de esas refs basta para saber si el historial cambio.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LogQuery {
     /// Maximo de commits.
@@ -115,7 +117,8 @@ pub trait GitReader: Send + Sync {
     /// Refs y estado de HEAD.
     async fn read_refs(&self, repo: &RepoRoot) -> Result<RefSnapshot, GitReadError>;
 
-    /// Commits de todas las refs en orden topologico, hijos antes que padres.
+    /// Commits de las ramas, ramas remotas, tags y HEAD en orden topologico,
+    /// hijos antes que padres.
     async fn read_log(
         &self,
         repo: &RepoRoot,

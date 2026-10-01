@@ -117,6 +117,9 @@ pub enum ErrorKind {
     GitVersionUnsupported,
     /// git fallo; el detalle solo esta en el log del motor.
     GitFailed,
+    /// La pagina pedida de `graph/window` llevaba el `snapshot` de unas refs que
+    /// ya no son las del repositorio. La interfaz vuelve a pedir desde la fila 0.
+    StaleWindow,
     /// Fallo inesperado del motor, o una peticion que no deberia existir.
     Internal,
 }

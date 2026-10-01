@@ -14,6 +14,9 @@ export const ENGINE_ERROR_KEYS: Readonly<Record<BridgeErrorKind, PlainKey>> = {
   git_not_found: 'errors.engine.git_not_found',
   git_version_unsupported: 'errors.engine.git_version_unsupported',
   git_failed: 'errors.engine.git_failed',
+  // useGraphWindow no lo ensena nunca: vuelve a pedir desde la fila 0. Si
+  // llegara a la pantalla seria un fallo de la vista, asi que cuenta como interno.
+  stale_window: 'errors.engine.internal',
   internal: 'errors.engine.internal',
   transport: 'errors.engine.transport',
   timeout: 'errors.engine.timeout',

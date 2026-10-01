@@ -1,4 +1,4 @@
-import type { RpcNotification } from '@ramal/bridge';
+import { PROTOCOL_VERSION, type RpcNotification } from '@ramal/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { FakeLauncher, infoResponder, ok } from '../../../test/engine-fakes';
@@ -36,7 +36,7 @@ function harness(): Harness {
     launcher,
     timer,
     logger,
-    handshake: (connection) => checkEngineProtocol(connection, ids, 1),
+    handshake: (connection) => checkEngineProtocol(connection, ids, PROTOCOL_VERSION),
     onGiveUp: (retry) => giveUps.push(retry),
     onProtocolMismatch: (mismatch) => mismatches.push(mismatch),
   });
@@ -111,11 +111,14 @@ describe('supervision del motor', () => {
 
   it('un motor con otro protocolo no se reintenta y se avisa una vez', async () => {
     const h = harness();
-    h.launcher.responder = infoResponder(2);
+    const other = PROTOCOL_VERSION + 1;
+    h.launcher.responder = infoResponder(other);
     await expect(h.engine.request(WINDOW_REQUEST)).rejects.toBeInstanceOf(EngineUnavailableError);
     expect(h.engine.state).toBe('failed');
     expect(h.launcher.last.stopped).toBe(true);
-    expect(h.mismatches).toEqual([{ outcome: 'mismatch', engineVersion: 2, expected: 1 }]);
+    expect(h.mismatches).toEqual([
+      { outcome: 'mismatch', engineVersion: other, expected: PROTOCOL_VERSION },
+    ]);
     h.launcher.last.exit();
     await flush();
     expect(h.timer.pending).toEqual([]);

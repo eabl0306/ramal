@@ -64,7 +64,7 @@ fn it_reads_up_to_one_commit_past_the_window_and_cuts_it() {
             .with_log(Ok(linear(10))),
     );
 
-    let window = block_on(s.use_case.execute(&s.id, 2, 3)).unwrap();
+    let window = block_on(s.use_case.execute(&s.id, 2, 3, None)).unwrap();
 
     assert_eq!(s.git.last_log_query(), Some(LogQuery { max_count: 6 }));
     assert_eq!(window.offset, 2);
@@ -83,7 +83,7 @@ fn the_head_commit_carries_its_branch_label() {
             .with_log(Ok(linear(3))),
     );
 
-    let window = block_on(s.use_case.execute(&s.id, 0, 10)).unwrap();
+    let window = block_on(s.use_case.execute(&s.id, 0, 10, None)).unwrap();
 
     assert!(window.rows[0].is_head);
     assert_eq!(window.rows[0].refs[0].name.as_str(), "refs/heads/main");
@@ -95,7 +95,7 @@ fn the_head_commit_carries_its_branch_label() {
 fn an_empty_repository_gives_an_empty_window_without_reading_the_log() {
     let s = setup(FakeGitReader::new());
 
-    let window = block_on(s.use_case.execute(&s.id, 0, 200)).unwrap();
+    let window = block_on(s.use_case.execute(&s.id, 0, 200, None)).unwrap();
 
     assert!(window.rows.is_empty());
     assert!(!window.has_more);
@@ -107,7 +107,7 @@ fn an_empty_repository_gives_an_empty_window_without_reading_the_log() {
 fn an_unknown_repo_id_is_not_open() {
     let s = setup(FakeGitReader::new());
 
-    let result = block_on(s.use_case.execute(&RepoId::new("repo-9"), 0, 10));
+    let result = block_on(s.use_case.execute(&RepoId::new("repo-9"), 0, 10, None));
 
     assert_eq!(
         result,
@@ -123,7 +123,7 @@ fn a_limit_out_of_range_is_rejected_before_any_git_call() {
     let s = setup(FakeGitReader::new());
 
     for limit in [0, 1001] {
-        let result = block_on(s.use_case.execute(&s.id, 0, limit));
+        let result = block_on(s.use_case.execute(&s.id, 0, limit, None));
         assert_eq!(
             result,
             Err(EngineError::InvalidWindow(WindowError::LimitOutOfRange {
@@ -144,13 +144,62 @@ fn a_git_failure_reading_the_log_is_reported() {
         },
     )));
 
-    let result = block_on(s.use_case.execute(&s.id, 0, 10));
+    let result = block_on(s.use_case.execute(&s.id, 0, 10, None));
 
     assert_eq!(
         result,
         Err(EngineError::GitFailed {
             detail: "fatal: corrupt object".to_owned()
         })
+    );
+}
+
+#[test]
+fn every_window_carries_the_fingerprint_of_the_refs_it_was_read_with() {
+    let s = setup(
+        FakeGitReader::new()
+            .with_refs(Ok(on_main(1)))
+            .with_log(Ok(linear(10))),
+    );
+
+    let window = block_on(s.use_case.execute(&s.id, 0, 3, None)).unwrap();
+
+    assert_eq!(window.snapshot, on_main(1).fingerprint());
+}
+
+#[test]
+fn the_next_page_with_the_same_fingerprint_is_served() {
+    let s = setup(
+        FakeGitReader::new()
+            .with_refs(Ok(on_main(1)))
+            .with_log(Ok(linear(10))),
+    );
+    let first = block_on(s.use_case.execute(&s.id, 0, 3, None)).unwrap();
+
+    let next = block_on(s.use_case.execute(&s.id, 3, 3, Some(&first.snapshot))).unwrap();
+
+    assert_eq!(next.rows[0].commit.node.sha, sha(4));
+    assert_eq!(next.snapshot, first.snapshot);
+}
+
+#[test]
+fn a_page_asked_with_an_old_fingerprint_is_stale_and_skips_the_log() {
+    let s = setup(
+        FakeGitReader::new()
+            .with_refs(Ok(on_main(1)))
+            .with_log(Ok(linear(10))),
+    );
+    let first = block_on(s.use_case.execute(&s.id, 0, 3, None)).unwrap();
+    // Alguien hace un commit desde la terminal: main avanza.
+    s.git.set_refs(on_main(11));
+
+    let result = block_on(s.use_case.execute(&s.id, 3, 3, Some(&first.snapshot)));
+
+    assert_eq!(result, Err(EngineError::StaleWindow));
+    assert_eq!(s.git.calls().read_log, 1);
+    assert_eq!(
+        EngineError::StaleWindow.to_string(),
+        "the graph changed since the first page was read"
     );
 }
 

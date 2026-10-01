@@ -36,8 +36,14 @@ describe('BridgeError', () => {
 
 describe('isBridgeErrorKind', () => {
   it('reconoce los kinds del motor y los tres del puente', () => {
-    expect(BRIDGE_ERROR_KINDS).toHaveLength(10);
-    for (const kind of ['repo_not_open', 'transport', 'timeout', 'engine_unavailable']) {
+    expect(BRIDGE_ERROR_KINDS).toHaveLength(11);
+    for (const kind of [
+      'repo_not_open',
+      'stale_window',
+      'transport',
+      'timeout',
+      'engine_unavailable',
+    ]) {
       expect(isBridgeErrorKind(kind)).toBe(true);
     }
   });
@@ -73,6 +79,6 @@ describe('tipos generados', () => {
   it('exponen la lista de metodos, los del host y la version del protocolo', () => {
     expect(ENGINE_METHODS).toEqual(['engine/info', 'repo/open', 'graph/window']);
     expect(HOST_METHODS).toEqual(['repo/open']);
-    expect(PROTOCOL_VERSION).toBe(1);
+    expect(PROTOCOL_VERSION).toBe(2);
   });
 });
