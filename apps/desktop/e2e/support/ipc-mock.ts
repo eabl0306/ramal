@@ -27,9 +27,7 @@ function record(call: E2eCall): void {
 function pickAndOpen({ pick }: E2eScenario): unknown {
   if (pick.outcome === 'opened') return pick.repo;
   if (pick.outcome === 'cancelled') return null;
-  // Como Tauri: el comando rechaza con el RpcError serializado del motor, un
-  // objeto plano y no un Error.
-  // eslint-disable-next-line @typescript-eslint/only-throw-error
+  // eslint-disable-next-line @typescript-eslint/only-throw-error -- como Tauri: el comando rechaza con el RpcError serializado del motor, un objeto plano y no un Error
   throw pick.error;
 }
 

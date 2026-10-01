@@ -3464,6 +3464,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ramal-rust-complexity"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "syn 2.0.119",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "ramal-vscode-engine"
 version = "0.1.0"
 dependencies = [

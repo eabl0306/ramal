@@ -31,13 +31,21 @@ pub const E2E_FOLDER_ENV_VAR: &str = "RAMAL_E2E_FOLDER";
 /// El error de Tauri si no puede crear la ventana o el runtime.
 pub fn run() -> tauri::Result<()> {
     init_tracing();
-    let engine = Arc::new(build_engine());
-    configure(with_plugins(tauri::Builder::default()), engine)
-        .setup(|app| {
-            setup(app);
-            Ok(())
-        })
-        .run(context())
+    assemble(tauri::Builder::default(), Arc::new(build_engine())).run(context())
+}
+
+/// Todo el arranque menos el bucle de eventos.
+///
+/// Plugins, motor, comandos y el `setup` que registra el selector de carpetas y
+/// deja en el log la version del motor. Existe aparte de `run` para que el test
+/// de arranque lo construya sobre el runtime simulado y la cobertura llegue al
+/// composition root (ADR 0006).
+#[must_use]
+pub fn assemble<R: Runtime>(builder: Builder<R>, engine: Arc<Engine>) -> Builder<R> {
+    configure(with_plugins(builder), engine).setup(|app| {
+        setup(app);
+        Ok(())
+    })
 }
 
 /// El motor con la configuracion del escritorio. El binario de git es el del
@@ -125,3 +133,6 @@ fn init_tracing() {
         .with_env_filter(filter)
         .try_init();
 }
+
+#[cfg(test)]
+mod tests;

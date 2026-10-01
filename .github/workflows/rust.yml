@@ -1,5 +1,5 @@
-# Lo comun a todo el Rust del workspace: formato, clippy estricto y auditoria de
-# dependencias. Los tests y la cobertura de cada parte viven en api.yml y
+# Lo comun a todo el Rust del workspace: formato, clippy estricto, complejidad y
+# auditoria de dependencias. Los tests y la cobertura de cada parte viven en api.yml y
 # engine.yml; el crate de escritorio, en desktop.yml.
 name: rust
 
@@ -29,7 +29,7 @@ jobs:
 
       - uses: taiki-e/install-action@v2
         with:
-          tool: cargo-deny
+          tool: cargo-deny,just
 
       - name: Formato
         run: cargo fmt --all --check
@@ -38,6 +38,11 @@ jobs:
       # necesita webkit2gtk y tiene su propio job en desktop.yml.
       - name: Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
+
+      # Cognitiva al estilo Sonar (15) y ciclomatica (10): clippy no mide ninguna
+      # de las dos. Lee los fuentes, asi que cubre tambien el crate de escritorio.
+      - name: Complejidad (just rust-complexity)
+        run: just rust-complexity
 
       - name: Dependencias (cargo deny)
         run: cargo deny check

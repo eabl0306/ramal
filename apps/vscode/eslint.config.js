@@ -119,6 +119,7 @@ export default [
   ...nodeConfig({ files: [...HOST_FILES, 'src/shared/**/*.ts'] }),
   ...reactConfig({ files: WEBVIEW_FILES, componentFiles: ['src/webview/**/*.tsx'] }),
   ...boundariesConfig({
+    rootPath: tsconfigRootDir,
     files: ['src/**/*.{ts,tsx}'],
     elements,
     fileCategories,

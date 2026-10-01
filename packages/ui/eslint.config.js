@@ -101,6 +101,7 @@ export default [
   ...qualityConfig(),
   ...reactConfig({ componentFiles: ['src/**/*.tsx'] }),
   ...boundariesConfig({
+    rootPath: tsconfigRootDir,
     files: ['src/**/*.{ts,tsx}'],
     elements,
     fileCategories,

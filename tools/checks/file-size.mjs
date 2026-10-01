@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { report, run } from './lib/cli.mjs';
-import { collectFiles, isExcluded, isSourceFile, isTestFile } from './lib/scan.mjs';
+import { collectFiles, isExcluded, isSourceFile, isStyleFile, isTestFile } from './lib/scan.mjs';
 
 export const LIMITS = { code: 300, test: 400 };
 
@@ -15,9 +15,10 @@ function countLines(absolutePath) {
   return lines.length;
 }
 
+// El CSS entra con el limite del codigo: ADR 0005 lo pone bajo el mismo script.
 export function checkFileSize({ root, staged }) {
   const files = collectFiles({ root, staged }).filter(
-    (file) => isSourceFile(file) && !isExcluded(file),
+    (file) => (isSourceFile(file) || isStyleFile(file)) && !isExcluded(file),
   );
   const violations = [];
   for (const file of files) {

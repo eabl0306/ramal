@@ -2,7 +2,7 @@
 import path from 'node:path';
 
 import { report, run } from './lib/cli.mjs';
-import { collectFiles, isExcluded, isSourceFile } from './lib/scan.mjs';
+import { collectFiles, isExcluded, isSourceFile, isStyleFile } from './lib/scan.mjs';
 import { readLines } from './lib/text.mjs';
 
 /**
@@ -22,13 +22,26 @@ const EXAMPLE = `${WORDS[0]}(#123) o ${WORDS[0]}(RAM-123)`;
 /**
  * Ademas del codigo fuente, los ficheros con comentarios que ni ESLint ni este
  * script verian si no: el CSS de las apps, los scripts de shell y la
- * configuracion (Cargo, compose, workflows, lefthook). Sin ellos, un marcador en
- * un .css pasa en verde por todas las comprobaciones.
+ * configuracion (Cargo, compose, workflows, lefthook, nginx y el gateway). Sin
+ * ellos, un marcador en un .css pasa en verde por todas las comprobaciones.
  */
-const EXTRA_EXTENSIONS = new Set(['.css', '.sh', '.toml', '.yaml', '.yml']);
+const EXTRA_EXTENSIONS = new Set(['.conf', '.sh', '.toml', '.yaml', '.yml']);
+
+/**
+ * Ficheros de configuracion sin extension que sirva: el justfile, los
+ * Dockerfile (tambien Dockerfile.dev), sus .dockerignore y los dotfiles de la
+ * raiz. Filtrar solo por extension los dejaba fuera a todos.
+ */
+const CONFIG_BASENAMES =
+  /^(?:justfile|Dockerfile(?:\..+)?|.*\.dockerignore|\.(?:env\.example|editorconfig|gitattributes|gitignore|prettierignore))$/u;
 
 function isMarkerCandidate(file) {
-  return isSourceFile(file) || EXTRA_EXTENSIONS.has(path.extname(file));
+  return (
+    isSourceFile(file) ||
+    isStyleFile(file) ||
+    EXTRA_EXTENSIONS.has(path.extname(file)) ||
+    CONFIG_BASENAMES.test(path.basename(file))
+  );
 }
 
 export function checkTodos({ root, staged }) {

@@ -68,6 +68,7 @@ jobs:
               - 'apps/api/**'
               - 'apps/vscode-engine/**'
               - 'apps/desktop/src-tauri/**'
+              - 'tools/rust-complexity/**'
               - '.github/workflows/rust.yml'
             api:
               - *cargo

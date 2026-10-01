@@ -10,7 +10,7 @@
 use std::path::PathBuf;
 
 use tauri::{AppHandle, Manager as _, Runtime};
-use tauri_plugin_dialog::DialogExt as _;
+use tauri_plugin_dialog::{DialogExt as _, FilePath};
 use tokio::sync::oneshot;
 
 use crate::surfaces::MAIN_WINDOW;
@@ -53,13 +53,17 @@ impl<R: Runtime> FolderPicker for DialogFolderPicker<R> {
             dialog = dialog.set_parent(&window);
         }
         dialog.pick_folder(move |folder| {
-            // En escritorio el dialogo siempre da una ruta; una URL no es una carpeta.
-            let folder = folder.and_then(|picked| picked.into_path().ok());
             // Si nadie espera ya la respuesta, no hay nada que hacer con ella.
-            let _ = sender.send(folder);
+            let _ = sender.send(chosen_folder(folder));
         });
         receiver
     }
+}
+
+/// Lo que contesta el dialogo, como carpeta. En escritorio siempre da una ruta;
+/// una URL que no es de fichero no es una carpeta y cuenta como cancelar.
+fn chosen_folder(picked: Option<FilePath>) -> Option<PathBuf> {
+    picked.and_then(|folder| folder.into_path().ok())
 }
 
 /// Una respuesta fija: la carpeta que se le dio, o cancelar si no se le dio
@@ -93,3 +97,6 @@ impl FolderPicker for FixedFolderPicker {
         receiver
     }
 }
+
+#[cfg(test)]
+mod tests;

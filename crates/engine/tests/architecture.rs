@@ -6,8 +6,8 @@
 //! contiene nada de su lista negra, que los hosts solo hablan con el motor y que
 //! ninguna familia (cliente y API) alcanza a la otra salvo `ramal-ai`. Puede mirar
 //! `ramal-desktop` sin compilar Tauri porque `Cargo.lock` describe a todos los
-//! miembros del workspace. Tambien vigila que los `clippy.toml` de los nucleos
-//! repitan los umbrales de la raiz (clippy no los fusiona).
+//! miembros del workspace. Los `clippy.toml` de los nucleos (umbrales y APIs de IO
+//! prohibidas) los vigila tests/core_purity.rs.
 
 #![allow(
     clippy::unwrap_used,
@@ -55,27 +55,6 @@ const CORE_FORBIDDEN: &[&str] = &[
 
 const DOMAIN_ALLOWED: &[&str] = &["thiserror"];
 const APPLICATION_ALLOWED: &[&str] = &["ramal-core-domain", "async-trait", "thiserror"];
-
-/// Umbrales de clippy que los nucleos repiten de la raiz.
-const THRESHOLDS: &[&str] = &[
-    "cognitive-complexity-threshold",
-    "too-many-arguments-threshold",
-    "too-many-lines-threshold",
-    "type-complexity-threshold",
-    "excessive-nesting-threshold",
-    "avoid-breaking-exported-api",
-];
-
-/// APIs de la biblioteca estandar que los nucleos tienen prohibidas.
-const DISALLOWED_IN_CORE: &[&str] = &[
-    "std::process::Command::new",
-    "std::fs::read_to_string",
-    "std::env::var",
-    "std::time::SystemTime::now",
-    "std::thread::spawn",
-    "std::fs::File",
-    "std::net::TcpStream",
-];
 
 fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
@@ -270,50 +249,5 @@ fn the_client_and_the_server_never_reach_each_other() {
     }
     if graph.contains_key("ramal-ai") {
         assert_never_reaches(&graph, "ramal-ai", |name| name.starts_with("ramal-"));
-    }
-}
-
-fn thresholds(path: &str) -> BTreeMap<String, String> {
-    let text = std::fs::read_to_string(root().join(path)).expect("clippy.toml should exist");
-    text.lines()
-        .filter_map(|line| line.split_once('='))
-        .map(|(key, value)| (key.trim().to_owned(), value.trim().to_owned()))
-        .filter(|(key, _)| THRESHOLDS.contains(&key.as_str()))
-        .collect()
-}
-
-#[test]
-fn the_core_clippy_files_repeat_the_root_thresholds() {
-    let expected = thresholds("clippy.toml");
-    assert_eq!(
-        expected.len(),
-        THRESHOLDS.len(),
-        "the root clippy.toml lost a threshold"
-    );
-    for core in [
-        "crates/core-domain/clippy.toml",
-        "crates/core-application/clippy.toml",
-    ] {
-        assert_eq!(
-            thresholds(core),
-            expected,
-            "{core} drifted from the root clippy.toml"
-        );
-    }
-}
-
-#[test]
-fn the_core_clippy_files_forbid_io_in_the_standard_library() {
-    for core in [
-        "crates/core-domain/clippy.toml",
-        "crates/core-application/clippy.toml",
-    ] {
-        let text = std::fs::read_to_string(root().join(core)).unwrap();
-        for path in DISALLOWED_IN_CORE {
-            assert!(
-                text.contains(&format!("\"{path}\"")),
-                "{core} does not forbid {path}"
-            );
-        }
     }
 }

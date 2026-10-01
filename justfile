@@ -40,6 +40,10 @@ database_url := "postgres://" + pg_user + ":${POSTGRES_PASSWORD:-ramal}@127.0.0.
 # Crates de cada area, para pasarlos a cargo con -p.
 api_crates := "-p ramal-api-domain -p ramal-api-application -p ramal-api-infrastructure -p ramal-api-http -p ramal-api"
 engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protocol -p ramal-git -p ramal-engine -p ramal-vscode-engine"
+# Fakes y ayudas de test de los nucleos (src/testing/): se compilan con los
+# tests y se ejercitan solos, asi que contarlos como cubiertos inflaba la cifra.
+# Los tests.rs y tests/ ya los deja fuera cargo-llvm-cov por defecto.
+cov_ignore := "--ignore-filename-regex '/src/testing/'"
 # Carpetas de los paquetes de TypeScript compartidos; cada una es @ramal/<carpeta>.
 ts_package_dirs := "domain i18n ui repo-view bridge api-client"
 protocol_out := "packages/bridge/src/generated"
@@ -87,7 +91,7 @@ doctor:
 
 # Todo el enforcement del monorepo, igual que la CI pero en local.
 [group('monorepo')]
-check: guard root-lint lint-css fmt-check tools-test knip rust-lint rust-test api-check engine-check packages-check web-check desktop-check vscode-check
+check: guard root-lint lint-css fmt-check tools-test knip rust-lint rust-complexity rust-test api-check engine-check packages-check web-check desktop-check vscode-check
 
 # Lo mismo que check mas lo que la CI corre aparte: auditoria, protocolo, e2e, builds y la pila.
 [group('monorepo')]
@@ -107,13 +111,14 @@ fmt-check:
 
 # Lint de todo: raiz, CSS, Rust, paquetes y apps.
 [group('monorepo')]
-lint: root-lint lint-css rust-lint packages-lint web-lint desktop-lint vscode-lint
+lint: root-lint lint-css rust-lint rust-complexity packages-lint web-lint desktop-lint vscode-lint
 
 # Tests unitarios de todo.
 [group('monorepo')]
 test: tools-test rust-test packages-test web-test desktop-test vscode-test
 
-# Cobertura de todo, con sus umbrales.
+# Cobertura de todo, con sus umbrales. La del host de Tauri (desktop-rust-cov)
+# necesita webkit2gtk y la corre desktop-rust-check.
 [group('monorepo')]
 cov: api-cov engine-cov packages-cov web-cov desktop-cov vscode-cov
 
@@ -125,8 +130,11 @@ e2e: web-e2e desktop-e2e vscode-e2e vscode-test-integration api-test-db
 [group('monorepo')]
 build: api-build web-build desktop-web-build vscode-build
 
-# Reglas comunes a todos los lenguajes: tamano, tests apagados, marcadores sin ticket y grafo de paquetes.
+# Los scripts de tools/checks: tamano de fichero, tests apagados, marcadores sin
+# ticket, grafo de paquetes, limites apagados en linea, lints heredados por cada
+# crate, eslint.config.js por paquete y tests de Rust fuera de linea.
 [group('monorepo')]
+[doc('Reglas comunes a todos los lenguajes (tools/checks).')]
 guard:
     {{pnpm}} run check:quality
 
@@ -169,6 +177,14 @@ rust-fmt:
 [group('rust')]
 rust-lint:
     cargo clippy --all-targets --all-features -- -D warnings
+
+# clippy no mide ni la cognitiva al estilo Sonar ni la ciclomatica: su
+# cognitive_complexity es un conteo plano. tools/rust-complexity las mide con syn
+# sobre los fuentes, sin compilar, asi que cubre tambien ramal-desktop.
+[group('rust')]
+[doc('Complejidad cognitiva (15) y ciclomatica (10) de cada funcion de Rust.')]
+rust-complexity:
+    cargo run --quiet -p ramal-rust-complexity -- crates apps tools
 
 # Tests de Rust de default-members (todo menos el escritorio).
 [group('rust')]
@@ -217,11 +233,18 @@ api-test-db:
     fi
     RAMAL_TEST_REQUIRE_DATABASE=1 cargo test {{api_crates}} --tests -- --nocapture
 
-# Cobertura de la API: 80% en el nucleo (dominio y aplicacion) y 60% global.
+# El nucleo se mide con sus propios tests y cada crate por separado (`report -p`
+# reaprovecha esa ejecucion). Medir dominio y aplicacion juntos dejaba que el
+# dominio, grande y al 100%, tapara una aplicacion con sus casos de uso al 0%; y
+# medirlos con los tests de los adaptadores contaria como cubierto un caso de
+# uso que solo se ejecuta de rebote. El global corre todos los tests.
 [group('api')]
+[doc('Cobertura de la API: 80% en dominio y en aplicacion, cada uno, y 60% global.')]
 api-cov:
-    cargo llvm-cov -p ramal-api-domain -p ramal-api-application --summary-only --fail-under-lines 80
-    cargo llvm-cov {{api_crates}} --summary-only --fail-under-lines 60
+    cargo llvm-cov -p ramal-api-domain -p ramal-api-application {{cov_ignore}} --summary-only
+    cargo llvm-cov report -p ramal-api-domain {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov report -p ramal-api-application {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov {{api_crates}} {{cov_ignore}} --summary-only --fail-under-lines 60
 
 # Arranca la API en local contra el Postgres de docker compose.
 [group('api')]
@@ -282,11 +305,15 @@ engine-check:
 engine-test:
     cargo test {{engine_crates}}
 
-# Cobertura del motor: 80% en el nucleo (dominio y aplicacion) y 60% global.
+# Igual que api-cov: el nucleo con sus propios tests, un informe por crate, y el
+# global con todos.
 [group('engine')]
+[doc('Cobertura del motor: 80% en dominio y en aplicacion, cada uno, y 60% global.')]
 engine-cov:
-    cargo llvm-cov -p ramal-core-domain -p ramal-core-application --summary-only --fail-under-lines 80
-    cargo llvm-cov {{engine_crates}} --summary-only --fail-under-lines 60
+    cargo llvm-cov -p ramal-core-domain -p ramal-core-application {{cov_ignore}} --summary-only
+    cargo llvm-cov report -p ramal-core-domain {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov report -p ramal-core-application {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov {{engine_crates}} {{cov_ignore}} --summary-only --fail-under-lines 60
 
 # ts-rs escribe los tipos cuando corren sus tests `export_bindings_*`. La carpeta
 # se borra antes para que un tipo eliminado en Rust desaparezca tambien en TS.
@@ -484,11 +511,20 @@ desktop-e2e:
 desktop-e2e-install:
     {{pnpm_filter}} @ramal/desktop exec playwright install --with-deps chromium
 
-# Clippy y tests del lado nativo. Necesita webkit2gtk (libwebkit2gtk-4.1-dev).
+# Clippy, tests y cobertura del lado nativo. Necesita webkit2gtk (libwebkit2gtk-4.1-dev).
 [group('desktop')]
 desktop-rust-check:
     cargo clippy -p ramal-desktop --all-targets --all-features -- -D warnings
     cargo test -p ramal-desktop
+    @just desktop-rust-cov
+
+# No se llama desktop-cov: ese nombre es la cobertura de Vitest del frontend. No
+# entra en `just cov` porque necesita webkit2gtk; la corre desktop-rust-check, en
+# local, en la CI y en la imagen de Tauri.
+[group('desktop')]
+[doc('Cobertura del host de Tauri (ramal-desktop): 60% global (ADR 0006).')]
+desktop-rust-cov:
+    cargo llvm-cov -p ramal-desktop --summary-only --fail-under-lines 60
 
 # El empaquetado (.deb, .AppImage, .dmg, instaladores) llega con el workflow de
 # release; hasta entonces el build compila el binario con el frontend embebido y
@@ -521,7 +557,7 @@ desktop-e2e-native:
 desktop-docker-image:
     docker build -f tools/docker/tauri-linux.Dockerfile -t {{tauri_image}} tools/docker
 
-# Clippy y tests de ramal-desktop dentro de la imagen de Tauri.
+# Clippy, tests y cobertura de ramal-desktop dentro de la imagen de Tauri.
 [group('desktop')]
 desktop-docker-rust-check: desktop-docker-image
     @just _desktop-docker desktop-rust-check

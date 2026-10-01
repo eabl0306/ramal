@@ -23,7 +23,11 @@ pre-commit:
         jobs:
           # ESLint 10 busca la configuracion desde el directorio de cada fichero,
           # asi que un solo job cubre la raiz, los paquetes y las apps, cada uno
-          # con su eslint.config.js.
+          # con su eslint.config.js. Las reglas de capas (eslint-plugin-boundaries)
+          # resuelven sus rutas desde el directorio de trabajo salvo que se les
+          # de `boundaries/root-path`; por eso boundariesConfig exige rootPath y
+          # este job, lanzado desde la raiz, las aplica igual que el lint de cada
+          # paquete.
           - name: eslint
             glob: '*.{ts,tsx,mts,cts,js,mjs,cjs}'
             # --no-warn-ignored: lefthook pasa los ficheros por glob, asi que puede
@@ -65,6 +69,28 @@ pre-commit:
           - name: todo-without-ticket
             run: node tools/checks/todo-without-ticket.mjs --staged
 
+          # Un limite de tamano o complejidad apagado en linea (eslint-disable o
+          # #[allow(clippy::...)]) no entra: el limite se cambia en equipo.
+          - name: limit-suppressions
+            run: node tools/checks/no-limit-suppressions.mjs --staged
+
+          # Un mod tests en linea cuenta como codigo cubierto: van en su tests.rs.
+          - name: rust-test-modules
+            glob: '*.rs'
+            run: node tools/checks/rust-test-modules.mjs --staged
+
+          # Un crate que no hereda [workspace.lints] o un clippy.toml que no
+          # repite los umbrales dejan a clippy sin limites y en verde.
+          - name: cargo-lints
+            glob: '{Cargo.toml,**/Cargo.toml,clippy.toml,**/clippy.toml,.cargo/*}'
+            run: node tools/checks/cargo-lints.mjs
+
+          # Un paquete con TypeScript y sin eslint.config.js propio no lo linta
+          # nadie: la configuracion de la raiz ignora apps/ y packages/.
+          - name: eslint-configs
+            glob: '{*.ts,*.tsx,*.mts,*.cts,**/eslint.config.*,**/package.json,pnpm-workspace.yaml}'
+            run: node tools/checks/eslint-configs.mjs
+
           # El grafo de paquetes solo cambia cuando cambia un package.json.
           - name: package-graph
             glob: '{package.json,**/package.json,pnpm-workspace.yaml}'
@@ -83,10 +109,11 @@ pre-push:
   parallel: true
   jobs:
     # Sin --workspace: los default-members dejan fuera el escritorio, que
-    # necesita webkit2gtk.
+    # necesita webkit2gtk. La complejidad (just rust-complexity) si lo mide: lee
+    # los fuentes sin compilarlos.
     - name: rust
       glob: '*.{rs,toml}'
-      run: cargo clippy --all-targets --all-features -- -D warnings && cargo test
+      run: cargo clippy --all-targets --all-features -- -D warnings && just rust-complexity && cargo test
 
     - name: typescript
       glob: '*.{ts,tsx,mts,cts}'

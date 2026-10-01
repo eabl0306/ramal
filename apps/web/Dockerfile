@@ -19,7 +19,7 @@ ENV PNPM_HOME=/pnpm \
 RUN corepack enable
 WORKDIR /repo
 
-# Los package.json de TODO el workspace, sin codigo. `--frozen-lockfile` necesita
+# Los package.json de todo el workspace, sin codigo. `--frozen-lockfile` necesita
 # ver cada paquete que nombra el lockfile, y copiarlos uno a uno se queda viejo
 # en cuanto alguien anade un paquete. Esta etapa se rehace con cualquier cambio,
 # pero su resultado solo cambia con los manifiestos, y la capa de install queda
