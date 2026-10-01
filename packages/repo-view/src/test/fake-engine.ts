@@ -20,7 +20,9 @@ const ENGINE_ERROR_CODE = -32_000;
 /**
  * Motor falso detras de un Transport de verdad: el cliente del bridge que usa la
  * vista es el real, asi los tests cubren tambien el sobre JSON-RPC, los ids y la
- * conversion de errores. Sirve `graph/window` recortando un historial fijo.
+ * conversion de errores. Sirve `graph/window` recortando un historial y, como el
+ * motor real, responde `stale_window` si la peticion trae la huella de un
+ * historial que ya no es el actual.
  */
 export class FakeEngine implements Transport {
   /** Parametros de cada `graph/window` recibido, en orden. */
@@ -29,12 +31,24 @@ export class FakeEngine implements Transport {
   laneCount = 1;
   /** Mientras es verdadero, las respuestas esperan a `release()`. */
   holding = false;
-  readonly #history: readonly GraphRow[];
+  #history: readonly GraphRow[];
+  #version = 1;
   readonly #failures = new Map<number, ErrorKind | BridgeErrorKind>();
   readonly #held: (() => void)[] = [];
 
   constructor(history: readonly GraphRow[]) {
     this.#history = history;
+  }
+
+  /** Huella del historial actual, como la que manda el motor en cada ventana. */
+  get snapshot(): string {
+    return `snap-${String(this.#version)}`;
+  }
+
+  /** El repositorio cambia desde fuera (un commit, un fetch): otro historial y otra huella. */
+  rewrite(history: readonly GraphRow[]): void {
+    this.#history = history;
+    this.#version += 1;
   }
 
   /** La proxima peticion con este offset falla con el `kind` dado. */
@@ -57,6 +71,9 @@ export class FakeEngine implements Transport {
       this.#failures.delete(params.offset);
       return failure(request, kind);
     }
+    if (params.snapshot !== undefined && params.snapshot !== this.snapshot) {
+      return failure(request, 'stale_window');
+    }
     return { jsonrpc: '2.0', id: request.id ?? null, result: this.window(params) };
   }
 
@@ -76,7 +93,7 @@ export class FakeEngine implements Transport {
       rows,
       hasMore: offset + limit < this.#history.length,
       laneCount: this.laneCount,
-      snapshot: 'snap-1',
+      snapshot: this.snapshot,
     };
   }
 }

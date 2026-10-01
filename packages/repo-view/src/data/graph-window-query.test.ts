@@ -6,11 +6,14 @@ import { graphWindow, linearRows } from '../test/fixtures';
 
 import { ENGINE_ERROR_KEYS, engineErrorKey } from './engine-error';
 import {
+  FIRST_PAGE,
   MAX_TRANSIENT_RETRIES,
   graphWindowKey,
+  isStaleWindow,
   mergePages,
-  nextOffset,
+  nextPageParam,
   shouldRetry,
+  windowParams,
 } from './graph-window-query';
 import { createRepoViewQueryClient } from './query-client';
 
@@ -19,13 +22,30 @@ describe('paginas de graph/window', () => {
     expect(graphWindowKey('repo-1', 200)).toEqual(['repo-view', 'graph-window', 'repo-1', 200]);
   });
 
-  it('pide la pagina siguiente justo despues de la ultima fila recibida', () => {
-    expect(nextOffset(graphWindow(linearRows(20), 40, true))).toBe(60);
+  it('pide la pagina siguiente justo despues de la ultima fila con la huella recibida', () => {
+    expect(nextPageParam(graphWindow(linearRows(20), 40, true))).toEqual({
+      offset: 60,
+      snapshot: 'snap-1',
+    });
   });
 
   it('no pide mas al final del historial ni tras una pagina vacia', () => {
-    expect(nextOffset(graphWindow(linearRows(5), 40, false))).toBeUndefined();
-    expect(nextOffset(graphWindow([], 40, true))).toBeUndefined();
+    expect(nextPageParam(graphWindow(linearRows(5), 40, false))).toBeUndefined();
+    expect(nextPageParam(graphWindow([], 40, true))).toBeUndefined();
+  });
+
+  it('la primera pagina va sin huella y las siguientes la repiten', () => {
+    expect(windowParams('repo-1', 200, FIRST_PAGE)).toStrictEqual({
+      repoId: 'repo-1',
+      offset: 0,
+      limit: 200,
+    });
+    expect(windowParams('repo-1', 200, { offset: 200, snapshot: 'abc' })).toStrictEqual({
+      repoId: 'repo-1',
+      offset: 200,
+      limit: 200,
+      snapshot: 'abc',
+    });
   });
 
   it('une las paginas en filas absolutas y se queda con el mayor numero de carriles', () => {
@@ -50,7 +70,17 @@ describe('shouldRetry', () => {
 
   it('no reintenta un error del motor ni algo que no es un BridgeError', () => {
     expect(shouldRetry(0, new BridgeError('repo_not_open', 'x'))).toBe(false);
+    expect(shouldRetry(0, new BridgeError('stale_window', 'x'))).toBe(false);
     expect(shouldRetry(0, new Error('boom'))).toBe(false);
+  });
+});
+
+describe('isStaleWindow', () => {
+  it('reconoce solo el aviso de que el historial cambio entre dos paginas', () => {
+    expect(isStaleWindow(new BridgeError('stale_window', 'x'))).toBe(true);
+    expect(isStaleWindow(new BridgeError('git_failed', 'x'))).toBe(false);
+    expect(isStaleWindow(new Error('stale_window'))).toBe(false);
+    expect(isStaleWindow(null)).toBe(false);
   });
 });
 
