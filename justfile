@@ -500,15 +500,16 @@ desktop-build:
 
 # El binario del E2E se compila con la feature `e2e`, que mete el servidor
 # WebDriver embebido y deja elegir la carpeta por variable de entorno (el dialogo
-# del sistema no se puede manejar con WebDriver). Sin DISPLAY (CI, SSH, Docker)
-# se arranca un servidor X virtual con xvfb-run.
+# del sistema no se puede manejar con WebDriver). En Linux sin DISPLAY (CI, SSH,
+# Docker) se arranca un servidor X virtual con xvfb-run. En macOS y Windows no
+# hay X ni xvfb-run: la app abre su ventana sin mas.
 [group('desktop')]
-[doc('E2E nativos con WebdriverIO y la app real. Necesita webkit2gtk.')]
+[doc('E2E nativos con WebdriverIO y la app real. En Linux necesita webkit2gtk.')]
 desktop-e2e-native:
     #!/usr/bin/env bash
     set -euo pipefail
     {{pnpm_filter}} @ramal/desktop exec tauri build --debug --no-bundle --features e2e
-    if [ -n "${DISPLAY:-}" ]; then
+    if [ "$(uname -s)" != Linux ] || [ -n "${DISPLAY:-}" ]; then
       {{pnpm_filter}} @ramal/desktop e2e:native
     else
       xvfb-run -a {{pnpm_filter}} @ramal/desktop e2e:native
@@ -589,14 +590,15 @@ vscode-build:
 vscode-e2e:
     {{pnpm_filter}} ramal e2e
 
-# Sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run. Necesita
-# el sidecar compilado (lo ejecuta de verdad) y el build de la extension.
+# En Linux sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run;
+# en macOS y Windows VS Code abre su ventana sin mas. Necesita el sidecar
+# compilado (lo ejecuta de verdad) y el build de la extension.
 [group('vscode')]
 [doc('Tests de integracion dentro de un VS Code de verdad (@vscode/test-cli).')]
 vscode-test-integration: vscode-engine-build vscode-build
     #!/usr/bin/env bash
     set -euo pipefail
-    if [ -n "${DISPLAY:-}" ]; then
+    if [ "$(uname -s)" != Linux ] || [ -n "${DISPLAY:-}" ]; then
       {{pnpm_filter}} ramal test:integration
     else
       xvfb-run -a {{pnpm_filter}} ramal test:integration
