@@ -1,0 +1,47 @@
+// Tests de integracion con @vscode/test-cli: descargan un VS Code de verdad (en
+// .vscode-test/), cargan la extension en modo test y corren
+// out/test/integration con mocha. Sin pantalla, se lanzan con `xvfb-run -a`
+// (lo hace `just vscode-test-integration`).
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { defineConfig } from '@vscode/test-cli';
+
+import { createFixtureRepo } from './scripts/fixture-repo.mjs';
+
+const root = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * El sidecar que se prueba: el de RAMAL_ENGINE_PATH o el que compilo cargo, con
+ * release primero porque es lo que construye `just vscode-engine-build`.
+ */
+function engineBinary() {
+  const explicit = process.env['RAMAL_ENGINE_PATH'];
+  if (explicit !== undefined && explicit !== '') return explicit;
+  const name = process.platform === 'win32' ? 'ramal-vscode-engine.exe' : 'ramal-vscode-engine';
+  const found = ['release', 'debug']
+    .map((profile) => path.join(root, '..', '..', 'target', profile, name))
+    .find((candidate) => existsSync(candidate));
+  if (found === undefined) {
+    throw new Error('no ramal-vscode-engine binary: run `just vscode-engine-build` first');
+  }
+  return found;
+}
+
+export default defineConfig({
+  label: 'integration',
+  files: 'out/test/integration/**/*.test.cjs',
+  // La minima que declara engines.vscode: si funciona aqui, funciona en las nuevas.
+  version: '1.138.0',
+  extensionDevelopmentPath: root,
+  workspaceFolder: createFixtureRepo(),
+  launchArgs: [
+    '--disable-extensions',
+    '--disable-workspace-trust',
+    '--skip-welcome',
+    '--skip-release-notes',
+  ],
+  env: { RAMAL_ENGINE_PATH: engineBinary() },
+  mocha: { ui: 'tdd', timeout: 60_000 },
+});

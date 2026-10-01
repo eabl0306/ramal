@@ -23,6 +23,14 @@
     },
     "apps/web": {},
     "apps/desktop": {},
-    "apps/vscode": {}
+    "apps/vscode": {
+      "entry": [
+        "src/extension/app/extension.ts",
+        "src/webview/app/entries/*.tsx",
+        "scripts/*.mjs",
+        "test/integration/**/*.test.ts"
+      ],
+      "ignoreDependencies": ["@vscode/test-electron"]
+    }
   }
 }
