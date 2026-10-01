@@ -52,6 +52,7 @@ tiene que valer igual para los dos, lo cubren scripts de Node sin dependencias e
 | Tests de Rust en su fichero  | `tools/checks/rust-test-modules.mjs`: `mod tests;` mas `tests.rs`, nunca en linea                                                                                | no aplica                                                                                             | no aplica                                                                                                                              |
 | Lints heredados por crate    | `tools/checks/cargo-lints.mjs`: `[lints] workspace = true` y ningun `clippy.toml` anidado que afloje un umbral                                                   | `tools/checks/eslint-configs.mjs`: todo paquete con TypeScript trae su `eslint.config.js`             | no aplica                                                                                                                              |
 | Versiones de los Dockerfile  | `tools/checks/toolchain-versions.mjs`: el `ARG RUST_VERSION` va a la par de `rust-toolchain.toml`                                                                | el mismo script, con `.nvmrc` y el `packageManager`                                                   | no aplica                                                                                                                              |
+| Contexto de las imagenes     | `tools/checks/docker-context.mjs`: la lista blanca del contexto de la imagen de la API readmite a todos los miembros del workspace                               | no aplica                                                                                             | no aplica                                                                                                                              |
 | Tipos generados al dia       | `just protocol-check` y el test de `openapi.json`                                                                                                                | `git diff --exit-code` sobre las carpetas `generated/`                                                | no aplica                                                                                                                              |
 | Cobertura                    | `cargo-llvm-cov` con umbral                                                                                                                                      | cobertura v8 de Vitest con umbrales por glob                                                          | no aplica                                                                                                                              |
 
@@ -118,6 +119,11 @@ con el mismo rustc. Se sube a mano o con Dependabot, en un PR propio que arregla
 los lints nuevos y mueve a la vez el `ARG RUST_VERSION` de los Dockerfile.
 `tools/checks/toolchain-versions.mjs` falla si no van a la par, y hace lo mismo con Node
 (`.nvmrc`) y pnpm (`packageManager`): Dependabot sube el fichero y no el `ARG`.
+
+El contexto de la imagen de la API es una lista blanca, y cargo necesita el manifiesto de todos
+los miembros del workspace para resolverlo aunque solo compile `ramal-api`. Un crate nuevo sin su
+linea en `apps/api/Dockerfile.dockerignore` pasaba `just check` y rompia la imagen solo en la CI
+(paso con `tools/rust-complexity`). `tools/checks/docker-context.mjs` lo comprueba en `just guard`.
 
 ### Tres momentos
 
