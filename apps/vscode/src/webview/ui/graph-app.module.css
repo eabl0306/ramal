@@ -1,0 +1,16 @@
+/*
+ * El grafo ocupa todo el panel y desplaza por dentro: GraphView toma el alto de
+ * su contenedor. El webview no tiene mas cromo que el de VS Code.
+ */
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--r-bg);
+}
+
+.screen > * {
+  flex: 1;
+  min-height: 0;
+}
