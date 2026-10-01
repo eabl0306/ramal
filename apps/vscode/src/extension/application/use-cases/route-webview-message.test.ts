@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { IdentifiedRpcRequest } from '../../../shared/messages';
 import { FakeEngine, ok } from '../../../test/engine-fakes';
 import { RecordingLogger, fakeChannel, flush } from '../../../test/host-fakes';
-import { EngineUnavailableError } from '../engine-errors';
+import { EngineCallError, EngineUnavailableError } from '../engine-errors';
 import type { HostRequests } from '../ports/host-requests';
 import { createRequestIds } from '../request-ids';
 
@@ -148,6 +148,23 @@ describe('router de los mensajes de los webviews', () => {
           },
         },
       },
+    ]);
+    expect(routed[0]?.outcome).toBe('unavailable');
+  });
+
+  it('si el motor contesto con error al arrancar (sin git), el webview recibe ese tipo', async () => {
+    const { router, engine, routed } = setup();
+    const error = {
+      code: -32_000,
+      message: 'git executable not found',
+      data: { kind: 'git_not_found' },
+    } as const;
+    engine.respond = () => Promise.reject(new EngineCallError(error));
+    const panel = fakeChannel('panel-1');
+    router.attach(panel);
+    await router.receive('panel-1', { type: 'rpc/request', request: windowRequest(9) });
+    expect(panel.posted).toEqual([
+      { type: 'rpc/response', response: { jsonrpc: '2.0', id: 9, error } },
     ]);
     expect(routed[0]?.outcome).toBe('unavailable');
   });

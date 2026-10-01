@@ -8,7 +8,7 @@ import type {
   WebviewLocale,
   WebviewToHostMessage,
 } from '../../../shared/messages';
-import { describeError } from '../engine-errors';
+import { EngineCallError, describeError } from '../engine-errors';
 import type { EngineConnection, Unsubscribe } from '../ports/engine-connection';
 import type { HostRequests } from '../ports/host-requests';
 import type { Logger } from '../ports/logger';
@@ -149,7 +149,7 @@ class Router implements WebviewRouter {
       response = await this.#deps.engine.request({ ...request, id: hostId });
     } catch (error) {
       this.#deps.logger.warn(`${request.method} failed: ${describeError(error)}`);
-      this.#deliver(hostId, unavailable(hostId, error));
+      this.#deliver(hostId, failure(hostId, error));
       this.#emit({ panelId: panel.id, method: request.method, outcome: 'unavailable' });
       return;
     }
@@ -187,6 +187,16 @@ function notAllowed(request: IdentifiedRpcRequest, surface: string): RpcResponse
     id: request.id,
     error: { code: METHOD_NOT_FOUND, message: `${request.method} is not allowed on ${surface}` },
   };
+}
+
+/**
+ * La respuesta cuando la peticion no llego al motor. Si el motor contesto con
+ * error al arrancar (sin git), el webview recibe ese error con su tipo: con
+ * `engine_unavailable` lo reintentaria en vano y ensenaria el texto equivocado.
+ */
+function failure(id: number, error: unknown): RpcResponse | HostFailureResponse {
+  if (error instanceof EngineCallError) return { jsonrpc: '2.0', id, error: error.rpc };
+  return unavailable(id, error);
 }
 
 function unavailable(id: number, error: unknown): HostFailureResponse {

@@ -1,7 +1,7 @@
 import type { RpcNotification, RpcResponse } from '@ramal/bridge';
 
 import type { IdentifiedRpcRequest } from '../../../shared/messages';
-import { EngineUnavailableError, describeError } from '../engine-errors';
+import { type EngineCallError, EngineUnavailableError, describeError } from '../engine-errors';
 import type { EngineConnection, Unsubscribe } from '../ports/engine-connection';
 import type { EngineExit, EngineLauncher, EngineProcess } from '../ports/engine-launcher';
 import type { Logger } from '../ports/logger';
@@ -137,26 +137,51 @@ class EngineSupervisor implements SupervisedEngine {
     if (!this.#isCurrent(process)) {
       throw new EngineUnavailableError('the engine stopped while starting');
     }
-    if (check.outcome === 'compatible') {
-      this.#state = { kind: 'running', process };
-      const { engineVersion, git } = check.info;
-      this.#deps.logger.info(`engine ${engineVersion} ready with git ${git.version}`);
-      return process.connection;
+    switch (check.outcome) {
+      case 'compatible': {
+        this.#state = { kind: 'running', process };
+        const { engineVersion, git } = check.info;
+        this.#deps.logger.info(`engine ${engineVersion} ready with git ${git.version}`);
+        return process.connection;
+      }
+      case 'mismatch':
+        throw this.#refuseMismatch(process, check);
+      case 'engine-error':
+        throw this.#refuseEngineError(process, check.error);
+      case 'failed':
+        // engine/info no llego a contestarse y el proceso sigue vivo: se para y
+        // su salida cuenta como una caida que pasa por la politica de reinicio.
+        this.#deps.logger.error(`engine handshake failed: ${describeError(check.error)}`);
+        process.stop();
+        throw new EngineUnavailableError('the engine did not answer engine/info');
     }
-    if (check.outcome === 'mismatch') {
-      this.#state = { kind: 'failed' };
-      process.stop();
-      this.#deps.logger.error(
-        `engine speaks protocol ${String(check.engineVersion)}, expected ${String(check.expected)}`,
-      );
-      this.#deps.onProtocolMismatch(check);
-      throw new EngineUnavailableError('the engine speaks another protocol version');
-    }
-    // Si engine/info fallo y el proceso sigue vivo, se para: su salida cuenta
-    // como una caida y pasa por la politica de reinicio.
-    this.#deps.logger.error(`engine handshake failed: ${describeError(check.error)}`);
+  }
+
+  /** Otra version del protocolo: fallo de empaquetado, no se reintenta. */
+  #refuseMismatch(process: EngineProcess, mismatch: Mismatch): Error {
+    this.#state = { kind: 'failed' };
     process.stop();
-    throw new EngineUnavailableError('the engine did not answer engine/info');
+    this.#deps.logger.error(
+      `engine speaks protocol ${String(mismatch.engineVersion)}, expected ${String(mismatch.expected)}`,
+    );
+    this.#deps.onProtocolMismatch(mismatch);
+    return new EngineUnavailableError('the engine speaks another protocol version');
+  }
+
+  /**
+   * El motor contesto engine/info con un error (sin git, un git que no
+   * arranca): el proceso esta sano y reiniciarlo no arregla nada. Existe por
+   * un fallo real: contarlo como caida metia el motor en el bucle de reinicios
+   * y el usuario veia "motor no disponible", nunca "no se encuentra Git". Se
+   * para sin contarlo (el estado cambia antes, asi su salida no es una caida),
+   * la peticion recibe el error del motor y la siguiente vuelve a probar con un
+   * proceso nuevo, que ya ve el arreglo (git instalado, otro `git.path`).
+   */
+  #refuseEngineError(process: EngineProcess, error: EngineCallError): Error {
+    this.#state = { kind: 'idle' };
+    process.stop();
+    this.#deps.logger.error(`the engine cannot work: ${describeError(error)}`);
+    return error;
   }
 
   #onExit(process: EngineProcess, exit: EngineExit): void {

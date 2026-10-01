@@ -79,4 +79,14 @@ describe('comprobacion del protocolo al arrancar', () => {
       error: gone,
     });
   });
+
+  it('separa el error que contesta el motor (sin git): el proceso no esta roto', async () => {
+    const engine = new FakeEngine();
+    engine.respond = (request) => Promise.resolve(fail(request, 'git_not_found'));
+    const check = await checkEngineProtocol(engine, createRequestIds(), 1);
+    expect(check.outcome).toBe('engine-error');
+    expect(errorKindOf(check.outcome === 'engine-error' ? check.error : null)).toBe(
+      'git_not_found',
+    );
+  });
 });

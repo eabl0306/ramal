@@ -1,9 +1,9 @@
 import type { RpcNotification } from '@ramal/bridge';
 import { describe, expect, it } from 'vitest';
 
-import { FakeLauncher, infoResponder, ok } from '../../../test/engine-fakes';
+import { FakeLauncher, fail, infoResponder, ok } from '../../../test/engine-fakes';
 import { FakeTimer, RecordingLogger, flush } from '../../../test/host-fakes';
-import { EngineUnavailableError } from '../engine-errors';
+import { EngineCallError, EngineUnavailableError, errorKindOf } from '../engine-errors';
 import { createRequestIds } from '../request-ids';
 
 import { checkEngineProtocol } from './check-engine-protocol';
@@ -137,6 +137,31 @@ describe('supervision del motor', () => {
     expect(h.launcher.last.stopped).toBe(true);
     await crash(h);
     expect(h.timer.pending).toEqual([1000]);
+  });
+
+  it('sin git, engine/info contesta con error: no hay reinicios y la peticion recibe ese error', async () => {
+    const h = harness();
+    h.launcher.responder = (request) => Promise.resolve(fail(request, 'git_not_found'));
+    const error = await h.engine.request(WINDOW_REQUEST).catch((caught: unknown) => caught);
+    expect(errorKindOf(error)).toBe('git_not_found');
+    expect(h.launcher.last.stopped).toBe(true);
+    h.launcher.last.exit({ code: 0, signal: null });
+    await flush();
+    expect(h.engine.state).toBe('idle');
+    expect(h.timer.pending).toEqual([]);
+    expect(h.giveUps).toHaveLength(0);
+    expect(h.launcher.processes).toHaveLength(1);
+    expect(h.logger.messages('warn')).toEqual([]);
+  });
+
+  it('tras ese error, la siguiente peticion prueba con un proceso nuevo', async () => {
+    const h = harness();
+    h.launcher.responder = (request) => Promise.resolve(fail(request, 'git_failed'));
+    await expect(h.engine.request(WINDOW_REQUEST)).rejects.toBeInstanceOf(EngineCallError);
+    h.launcher.responder = infoResponder(1);
+    await h.engine.request(WINDOW_REQUEST);
+    expect(h.launcher.processes).toHaveLength(2);
+    expect(h.engine.state).toBe('running');
   });
 
   it('una caida durante el arranque no deja la peticion colgada', async () => {

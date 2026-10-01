@@ -12,15 +12,18 @@ export class EngineUnavailableError extends Error {
   override readonly name = 'EngineUnavailableError';
 }
 
-/** Error que devolvio el motor a una peticion del propio host. */
+/**
+ * Error que devolvio el motor a una peticion del propio host. Guarda el error
+ * tal cual para poder reenviarlo a un webview con su tipo.
+ */
 export class EngineCallError extends Error {
   override readonly name = 'EngineCallError';
-  readonly code: number;
+  readonly rpc: RpcError;
   readonly kind: ErrorKind | undefined;
 
   constructor(error: RpcError) {
     super(error.message);
-    this.code = error.code;
+    this.rpc = error;
     this.kind = error.data?.kind;
   }
 }
