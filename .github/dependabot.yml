@@ -38,7 +38,10 @@ updates:
 
   # Version del compilador, en rust-toolchain.toml.
   # OJO: los Dockerfile fijan la misma version en `ARG RUST_VERSION` y dependabot
-  # no la toca, porque es un argumento y no una imagen. Tienen que subir juntas.
+  # no la toca, porque es un argumento y no una imagen. Su PR falla en
+  # check:quality (tools/checks/toolchain-versions.mjs) hasta que se sube a mano
+  # el ARG de apps/api/Dockerfile, apps/api/Dockerfile.dev y
+  # tools/docker/tauri-linux.Dockerfile en el mismo PR.
   - package-ecosystem: rust-toolchain
     directory: /
     schedule:

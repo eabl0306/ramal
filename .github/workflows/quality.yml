@@ -1,6 +1,7 @@
 # Reglas que valen para todo el repo, sin importar el lenguaje: formato,
 # mensajes de commit, tamano de fichero, tests apagados, marcadores sin ticket,
-# grafo de paquetes, codigo muerto y secretos. Corre siempre, en cualquier cambio.
+# grafo de paquetes, versiones de los Dockerfile, codigo muerto y secretos. Corre
+# siempre, en cualquier cambio.
 name: quality
 
 on:
@@ -40,7 +41,7 @@ jobs:
       - name: Formato (prettier)
         run: pnpm run format:check
 
-      - name: Reglas comunes (tamano, tests enfocados, marcadores, grafo de paquetes)
+      - name: Reglas comunes (tamano, tests enfocados, marcadores, paquetes, versiones)
         run: pnpm run check:quality
 
       # ESLint de la raiz: packages/eslint-config y tools/, que son JavaScript

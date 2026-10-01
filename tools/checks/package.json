@@ -8,7 +8,8 @@
     "check-file-size": "./file-size.mjs",
     "check-focused-tests": "./no-focused-tests.mjs",
     "check-todos": "./todo-without-ticket.mjs",
-    "check-package-graph": "./package-graph.mjs"
+    "check-package-graph": "./package-graph.mjs",
+    "check-toolchain-versions": "./toolchain-versions.mjs"
   },
   "scripts": {
     "test": "node --test \"*.test.mjs\""
