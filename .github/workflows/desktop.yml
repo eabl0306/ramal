@@ -3,7 +3,7 @@
 #   - frontend: lint con las reglas de capas, tipos, cobertura (80% en application,
 #     60% global), build de Vite y Playwright contra ese build con el IPC de Tauri
 #     simulado y la CSP de produccion.
-#   - nativo: en Linux con los requisitos de Tauri, clippy y tests de
+#   - nativo: en Ubuntu 22.04 con los requisitos de Tauri, clippy y tests de
 #     ramal-desktop (tauri::test), `tauri build` sin empaquetar y el E2E nativo
 #     con WebdriverIO bajo xvfb, con el binario real y git de verdad.
 #
@@ -26,7 +26,7 @@ env:
 jobs:
   frontend:
     name: frontend y Playwright
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -67,9 +67,12 @@ jobs:
 
   native:
     name: host de Tauri en Linux
-    # Version fija: el paquete de WebKitWebDriver cambia de nombre entre versiones
-    # de Ubuntu (webkit2gtk-driver en 24.04, webkitgtk-webdriver en 26.04).
-    runs-on: ubuntu-24.04
+    # Ubuntu 22.04 a proposito: es la Linux soportada mas antigua (ADR 0016) y
+    # la base de tools/docker/tauri-linux.Dockerfile. Compilar y probar aqui
+    # asegura que la app funciona con la glibc y el webkit2gtk mas viejos que se
+    # admiten; en una version mas nueva un simbolo nuevo de glibc pasaria la CI
+    # y romperia la app en 22.04.
+    runs-on: ubuntu-22.04
     env:
       CARGO_TERM_COLOR: always
       RUSTFLAGS: -D warnings
@@ -90,9 +93,12 @@ jobs:
       - name: Instalar el toolchain de rust-toolchain.toml
         run: rustup toolchain install
 
+      # La version de Ubuntu va en la clave porque rust-cache no la distingue:
+      # un target compilado en 24.04 tiene build scripts enlazados con una glibc
+      # mas nueva, que en 22.04 no arrancan.
       - uses: Swatinem/rust-cache@v2
         with:
-          key: desktop
+          key: desktop-ubuntu-22.04
 
       - uses: pnpm/action-setup@v6
         with:

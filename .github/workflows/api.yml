@@ -21,7 +21,7 @@ env:
 jobs:
   verify:
     name: tests, cobertura y contrato
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:18-alpine
@@ -91,7 +91,7 @@ jobs:
 
   image:
     name: imagen docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 

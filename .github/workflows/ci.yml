@@ -6,6 +6,12 @@
 # quality, rust, api, engine, packages, web, desktop, vscode y stack. Un job
 # que no toca porque su parte no cambio sale como "skipped", y all-green lo
 # cuenta como verde.
+#
+# Todos los runners llevan la version de Ubuntu fijada (ubuntu-24.04), nunca
+# ubuntu-latest: latest salta de version solo (a Ubuntu 26 el 2026-10-19) y
+# cambia de golpe paquetes, glibc y herramientas sin que nadie toque el repo.
+# La excepcion es el host de Tauri en desktop.yml, en ubuntu-22.04 a proposito.
+# Subir de version es un PR con su CI en verde.
 name: ci
 
 on:
@@ -26,7 +32,7 @@ concurrency:
 jobs:
   changes:
     name: que ha cambiado
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pull-requests: read
@@ -213,7 +219,7 @@ jobs:
     # la proteccion de rama es lo mismo que no haber pasado.
     if: always()
     needs: [changes, quality, rust, api, engine, packages, web, desktop, vscode, stack]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Comprobar que nada ha fallado
         run: |

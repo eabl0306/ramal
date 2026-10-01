@@ -17,7 +17,7 @@ permissions:
 jobs:
   checks:
     name: formato y reglas comunes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
@@ -66,7 +66,7 @@ jobs:
 
   secrets:
     name: secretos
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # gitleaks-action pide los commits del PR con
     # GET /repos/{owner}/{repo}/pulls/{n}/commits, asi que necesita
     # pull-requests: read. Sin el devuelve 403 en todos los pull request y se

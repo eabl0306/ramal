@@ -24,7 +24,7 @@ env:
 jobs:
   verify:
     name: motor con el git del runner
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -60,7 +60,7 @@ jobs:
 
   minimum-git:
     name: motor con git 2.34
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # Ubuntu 22.04 trae git 2.34.1, justo la minima. Se instala lo justo para
     # compilar y lanzar los tests; git va antes del checkout para que la accion
     # clone con git y no con la API.
@@ -96,7 +96,7 @@ jobs:
 
   bridge:
     name: '@ramal/bridge'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
