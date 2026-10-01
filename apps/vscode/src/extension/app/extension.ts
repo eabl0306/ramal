@@ -7,8 +7,10 @@ import { composeExtension } from './composition-root';
 /**
  * Entrada de la extension (`main` del manifiesto, empaquetada por esbuild en
  * `dist/extension.cjs`). Activar no arranca el motor: lo arranca la primera
- * peticion. La desactivacion la hace VS Code liberando `context.subscriptions`.
+ * peticion. Si espera al git de VS Code (API de `vscode.git`), que el motor
+ * necesita al lanzarse. La desactivacion la hace VS Code liberando
+ * `context.subscriptions`.
  */
-export function activate(context: vscode.ExtensionContext): HostProbe | undefined {
+export function activate(context: vscode.ExtensionContext): Promise<HostProbe | undefined> {
   return composeExtension(context);
 }

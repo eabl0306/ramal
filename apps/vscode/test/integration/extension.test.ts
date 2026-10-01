@@ -19,6 +19,21 @@ async function probe(): Promise<HostProbe> {
   return api;
 }
 
+/** Lo poco que se usa de la API de la extension integrada `vscode.git`. */
+interface GitExtension {
+  readonly enabled: boolean;
+  getAPI(version: 1): { readonly git: { readonly path: string } };
+}
+
+/** El git que usa VS Code, segun su extension integrada. */
+async function vscodeGitPath(): Promise<string> {
+  const extension = vscode.extensions.getExtension<GitExtension>('vscode.git');
+  assert.ok(extension, 'the built-in git extension is installed');
+  const git = await extension.activate();
+  assert.ok(git.enabled, 'the built-in git extension is enabled');
+  return git.getAPI(1).git.path;
+}
+
 function workspacePath(): string {
   const folder = vscode.workspace.workspaceFolders?.[0];
   assert.ok(folder, 'the tests open the fixture repository as workspace');
@@ -81,6 +96,16 @@ suite('Ramal dentro de un VS Code de verdad', () => {
     const info = await (await probe()).call('engine/info', {});
     assert.equal(info.protocolVersion, PROTOCOL_VERSION);
     assert.equal(info.git.supported, true);
+  });
+
+  test('el sidecar usa el git de VS Code, no el primero del PATH', async () => {
+    const info = await (await probe()).call('engine/info', {});
+    const expected = await vscodeGitPath();
+    // .vscode-test.mjs configura un git.path que no es el del PATH (salvo en
+    // Windows): si VS Code lo respeta, el sidecar solo lo ve si el host se lo pasa.
+    const configured = process.env['RAMAL_IT_GIT_PATH'] ?? '';
+    if (configured !== '') assert.equal(expected, configured);
+    assert.equal(info.git.path, expected);
   });
 
   test('el sidecar abre el repositorio de prueba y devuelve su grafo', async () => {
