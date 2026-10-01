@@ -62,7 +62,7 @@
     "requirement": {
       "mac": "macOS 12 o posterior",
       "windows": "Windows 10 y 11",
-      "linux": "Ubuntu 22.04+, Debian 12+, Fedora 38+. Los .deb y .rpm no se actualizan solos"
+      "linux": "Ubuntu 22.04+, Debian 12+. Los .deb y .rpm no se actualizan solos"
     },
     "started": "Descarga iniciada: {file}",
     "os": {
