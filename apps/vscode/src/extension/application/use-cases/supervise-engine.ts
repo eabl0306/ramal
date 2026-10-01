@@ -217,7 +217,8 @@ class EngineSupervisor implements SupervisedEngine {
    * y el usuario veia "motor no disponible", nunca "no se encuentra Git". Se
    * para sin contarlo (el estado cambia antes, asi su salida no es una caida),
    * la peticion recibe el error del motor y la siguiente vuelve a probar con un
-   * proceso nuevo, que ya ve el arreglo (git instalado, otro `git.path`).
+   * proceso nuevo, que ya ve el arreglo (un git recien instalado en el PATH; el
+   * `git.path` de VS Code se lee al activar la extension).
    */
   #refuseEngineError(process: EngineProcess, error: EngineCallError): Error {
     this.#state = { kind: 'idle' };
