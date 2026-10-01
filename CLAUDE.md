@@ -236,8 +236,10 @@ Los hooks se saltan con `LEFTHOOK=0` y solo en emergencias. La CI no se puede sa
   ignora en silencio claves de pnpm 11 (`allowBuilds`). Las recetas y los hooks llaman a
   `corepack pnpm` (o a `$PNPM`). Si hace falta: `npm rm -g pnpm && corepack enable pnpm`.
   `just doctor` falla si no es 11.18.
-- **La maquina de desarrollo no tiene webkit2gtk.** Sin el no compila `ramal-desktop`, y por eso
-  no esta en `default-members`. Las recetas `just desktop-docker-*` corren la receta de escritorio
+- **webkit2gtk puede faltar.** Sin el no compila `ramal-desktop`, y por eso no esta en
+  `default-members`: ni todas las maquinas ni los runners que no son de escritorio lo tienen. Con
+  los paquetes del README instalados, las recetas `desktop-*` funcionan en nativo, el E2E nativo
+  incluido. Sin ellos, las recetas `just desktop-docker-*` corren la receta de escritorio
   dentro de `tools/docker/tauri-linux.Dockerfile` (Ubuntu 22.04, la Linux soportada mas antigua).
   Montan el repo en la misma ruta y con tu uid, asi que antes hace falta `just setup` en la
   maquina. Cargo usa volumenes propios (`ramal-desktop-cargo`, `ramal-desktop-target`). `tauri dev`
@@ -276,7 +278,9 @@ Los hooks se saltan con `LEFTHOOK=0` y solo en emergencias. La CI no se puede sa
   compose. Una variable `RAMAL__` que la API no conozca hace fallar su arranque.
 - **knip no entiende WebdriverIO:** `@wdio/local-runner` y `@wdio/tauri-service` estan en su
   `ignoreDependencies`.
-- **Licencia sin decidir.** No hay `LICENSE`; la VSIX se empaqueta con `--skip-license`.
+- **La licencia es `FSL-1.1-ALv2`** ([ADR 0021](docs/adr/0021-licencia-fsl.md)). `LICENSE.md` es el texto
+  canonico y prettier no lo toca. La VSIX la lleva porque el script `package` de la extension la
+  copia de la raiz justo antes de llamar a vsce; esa copia no se versiona.
 - **La landing promete lo que dice el manifiesto.** Un test de la extension falla si
   `engines.vscode` y la tarjeta de VS Code de la web no dicen la misma version.
 
