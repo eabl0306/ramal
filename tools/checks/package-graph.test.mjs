@@ -47,7 +47,7 @@ describe('package-graph: lo que se acepta', () => {
         peerDependencies: { react: '^19.3.0' },
       }),
       'packages/repo-view/package.json': manifest('@ramal/repo-view', {
-        dependencies: w(['ui', 'domain', 'i18n']),
+        dependencies: w(['ui', 'domain', 'i18n', 'bridge']),
       }),
       'packages/api-client/package.json': manifest('@ramal/api-client', {
         dependencies: { 'openapi-fetch': '0.17.0' },
@@ -86,15 +86,28 @@ describe('package-graph: lo que se acepta', () => {
 });
 
 describe('package-graph: lo que se rechaza', () => {
-  it('rechaza que repo-view dependa de bridge', () => {
+  it('rechaza que repo-view dependa de api-client o de una app', () => {
     const root = workspace({
       'packages/repo-view/package.json': manifest('@ramal/repo-view', {
-        dependencies: { '@ramal/bridge': 'workspace:*' },
+        dependencies: { '@ramal/api-client': 'workspace:*', '@ramal/desktop': 'workspace:*' },
       }),
     });
     const { code, output } = check(root);
     assert.equal(code, 1);
-    assert.match(output, /"@ramal\/repo-view" no puede depender de "@ramal\/bridge"/u);
+    assert.match(output, /"@ramal\/repo-view" no puede depender de "@ramal\/api-client"/u);
+    assert.match(output, /"@ramal\/repo-view" no puede depender de "@ramal\/desktop"/u);
+  });
+
+  it('rechaza que ui dependa de bridge o de repo-view', () => {
+    const root = workspace({
+      'packages/ui/package.json': manifest('@ramal/ui', {
+        dependencies: { '@ramal/bridge': 'workspace:*', '@ramal/repo-view': 'workspace:*' },
+      }),
+    });
+    const { code, output } = check(root);
+    assert.equal(code, 1);
+    assert.match(output, /"@ramal\/ui" no puede depender de "@ramal\/bridge"/u);
+    assert.match(output, /"@ramal\/ui" no puede depender de "@ramal\/repo-view"/u);
   });
 
   it('rechaza dependencias externas en runtime en los paquetes puros', () => {
