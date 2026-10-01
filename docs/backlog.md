@@ -14,9 +14,12 @@ no tiene issue, es un fallo de este backlog y se corrige aqui.
 
 ## Estado
 
-- Fecha: 2026-09-30.
-- 33 epicas y 482 issues: 27 epicas y 410 issues en el hito MVP, y
-  72 issues en Post-MVP.
+- Fecha: 2026-10-01.
+- 33 epicas y 487 issues: 31 epicas y 459 issues en el hito MVP, y 2 epicas y 28 issues en
+  Post-MVP.
+- El 2026-10-01 se decidieron las preguntas de E01 (de E01-01 a E01-13). Q-01 metio equipos, IA
+  de organizacion y facturacion en el MVP: E27, E28, E29 y E30 pasaron enteras de Post-MVP a MVP.
+  Las decisiones crearon cinco issues nuevos: E12-14, E25-16, E26-16, E26-17 y E30-10.
 - La epica E00 describe el scaffold que se esta construyendo ahora. Sus issues son los primeros
   del proyecto y se cierran cuando el scaffold aterrice.
 - Cada fila de gaps.md (C, K, D, V, W, X, B y Q) esta en al menos un issue. El
@@ -44,14 +47,15 @@ no tiene issue, es un fallo de este backlog y se corrige aqui.
 ## Que es el MVP
 
 El MVP es la primera version publica y usable: alguien puede dejar su cliente Git actual y usar
-Ramal a diario, en escritorio o en VS Code, con o sin cuenta. En terminos de la API son las fases
-F0, F1 y F2 de api-surface.md, mas todo el cliente local.
+Ramal a diario, en escritorio o en VS Code, con o sin cuenta, y un equipo puede pagar Ramal Pro
+para trabajar junto. En terminos de la API son las fases F0 a F5 de api-surface.md, mas todo el
+cliente local. Equipos y facturacion entran porque asi lo decidio Q-01 (E01-01) el 2026-10-01.
 
 **Hecho significa:**
 
 - Ramal Desktop se instala firmado en macOS, Windows y Linux con los formatos de X-09, se
-  actualiza solo donde el formato lo permite, y la URL del actualizador apunta a la API desde el
-  primer build publico.
+  actualiza solo donde el formato lo permite, y la URL del actualizador apunta a la API
+  (`https://api.ramal.bahoque.com`, con `{{bundle_type}}`) desde el primer build publico.
 - Ramal for VS Code esta publicado en VS Code Marketplace y Open VSX, con una VSIX por plataforma
   que lleva su motor.
 - Sin cuenta de Ramal funciona todo lo local: abrir, iniciar y clonar; grafo fluido en repos de
@@ -65,25 +69,30 @@ F0, F1 y F2 de api-surface.md, mas todo el cliente local.
   apps por PKCE o device flow, sesiones y dispositivos, y sincronizacion personal de workspaces,
   repositorios, preferencias y cuentas de plataforma con la boveda de extremo a extremo (las
   llaves de IA personales, solo si el usuario lo activa).
-- La web tiene landing con descargas reales, toda la autenticacion, el panel personal y las
-  paginas legales y de error.
-- La API esta desplegada con copias de seguridad, observabilidad y alertas, y las suites E2E de
-  escritorio, VS Code y pila completa pasan en CI.
-- Todas las filas P0 y P1 de gaps.md tienen su issue cerrado, salvo las de equipos y
-  facturacion, y ningun bug B-xx del prototipo se ha copiado.
+- Con una organizacion: crearla, invitar al equipo, roles y asientos, workspaces compartidos y
+  llaves de IA de la organizacion que nunca salen del servidor y se usan a traves del proxy de la
+  API, con politica y cuotas (E27, E28 y E29).
+- Ramal Pro se cobra con Paddle como merchant of record (E30): un plan de organizacion por
+  asiento, a 8 USD al mes en pago anual (96 USD anuales) o 10 USD en pago mensual, con 14 dias de
+  prueba sin tarjeta y un asiento como minimo. Lo personal es gratis para siempre: todo Git local,
+  pull requests, IA con llave propia y sincronizacion personal de extremo a extremo, repos privados
+  incluidos.
+- La web tiene landing con descargas reales, toda la autenticacion, el panel personal, las
+  pantallas de equipo, la pagina de precios con el checkout y las paginas legales y de error.
+- La API y la web estan desplegadas en `https://api.ramal.bahoque.com` y
+  `https://ramal.bahoque.com`, con copias de seguridad, observabilidad y alertas, y las suites E2E
+  de escritorio, VS Code y pila completa pasan en CI.
+- Todas las filas P0 y P1 de gaps.md tienen su issue cerrado y ningun bug B-xx del prototipo se ha
+  copiado.
 
 **Queda fuera del MVP (hito Post-MVP):**
 
-- Organizaciones, equipo, invitaciones y asientos (E27 y E29), y llaves de IA de organizacion con
-  su proxy (E28). Si la decision Q-01 (E01-01) dice que entran, esas tres epicas pasan enteras a
-  MVP.
-- Facturacion (E30), que ademas espera a Q-02 y Q-03.
 - Las filas P2 de gaps.md y lo que api-surface.md lista en "Lo que no existe todavia" (E31 y
   E32).
 
 ## Orden recomendado
 
-Tres carriles que avanzan en paralelo:
+Cuatro carriles que avanzan en paralelo:
 
 1. **Transversal, desde el primer dia.** E00 (se cierra con el scaffold), E01 (decisiones y
    diseno: varias bloquean el release y la forma del producto) y E02 (los ADRs que faltan).
@@ -94,10 +103,18 @@ Tres carriles que avanzan en paralelo:
 3. **Nube:** E16, E17, E18, E19, E20, E21, E22, E23 y E24. E17 (descargas y actualizaciones)
    tiene que estar antes del primer build publico, porque la URL del actualizador queda grabada
    en cada instalacion y no se puede cambiar despues.
+4. **Equipos y facturacion:** E27, E28, E29 y E30. E27 empieza cuando la API tiene cuentas,
+   workspaces y feed (E16, E18 y E19); E28 necesita E27, la IA personal (E12) y el cliente de la
+   nube (E21), y E29 junta las dos en las pantallas. E30 solo espera a E27. E28 es lo mas
+   delicado del producto: es el unico sitio donde el servidor guarda secretos de terceros y por
+   donde pasa codigo del usuario, asi que conviene no dejarlo para el final.
 
 Al final llegan E25 (release y distribucion) y E26 (calidad y operacion). Los pasos lentos de E25
 (reservar nombres, certificados de Apple y de Windows) conviene empezarlos pronto: tardan semanas
-y bloquean la beta publica.
+y bloquean la beta publica. Lo mismo pasa con la cuenta de Paddle: se aprueba despues de revisar
+la landing con precios, terminos, privacidad y politica de reembolso, y al abrirla hay que
+confirmar el pais desde el que se factura (E30-10). El repo se hace publico al abrir la beta
+(E25-16), porque los releases se publican en el.
 
 Los puntos donde el carril local espera al de la nube:
 
@@ -107,8 +124,7 @@ Los puntos donde el carril local espera al de la nube:
 - Bitbucket: E11-04 espera al broker E20-08.
 - Actualizador: E13-14 espera a E17-05.
 
-Despues del MVP: E27 y E28 (API de equipos y de IA de organizacion), E29 (sus pantallas), E30
-(facturacion) y E31 y E32 (mejoras).
+Despues del MVP: E31 y E32 (mejoras).
 
 ## Dependencias entre epicas
 
@@ -126,7 +142,7 @@ Despues del MVP: E27 y E28 (API de equipos y de IA de organizacion), E29 (sus pa
 | E09 Motor: red y credenciales                                 | MVP      | 14     | E00, E05, E06, E10                                         |
 | E10 Motor: llavero y boveda                                   | MVP      | 10     | E00, E01, E20                                              |
 | E11 Motor: plataformas Git y pull requests                    | MVP      | 20     | E00, E06, E07, E09, E10, E12, E20                          |
-| E12 Motor: IA con llave personal                              | MVP      | 13     | E00, E01, E05, E10                                         |
+| E12 Motor: IA con llave personal                              | MVP      | 14     | E00, E01, E05, E10                                         |
 | E13 Escritorio: ajustes, sesion, bienvenida y actualizaciones | MVP      | 16     | E00, E01, E04, E05, E06, E10, E11, E12, E16, E17, E21, E23 |
 | E14 VS Code: superficies nativas y webviews                   | MVP      | 21     | E00, E05, E06, E07, E08, E09, E11, E12                     |
 | E15 VS Code: motor, sesion y distribucion                     | MVP      | 12     | E00, E01, E10, E21, E23                                    |
@@ -139,12 +155,12 @@ Despues del MVP: E27 y E28 (API de equipos y de IA de organizacion), E29 (sus pa
 | E22 Web: landing y descargas                                  | MVP      | 12     | E00, E01, E03, E04, E07, E17                               |
 | E23 Web: autenticacion                                        | MVP      | 12     | E00, E16, E20                                              |
 | E24 Web: panel personal                                       | MVP      | 14     | E00, E16, E18, E19, E20, E23                               |
-| E25 Release y distribucion                                    | MVP      | 15     | E00, E01, E13, E15, E17                                    |
-| E26 Calidad y operacion                                       | MVP      | 15     | E00, E01, E05, E08, E14, E15, E23, E24, E25                |
-| E27 API: organizaciones, equipo e invitaciones                | Post-MVP | 12     | E00, E01, E16, E18, E19                                    |
-| E28 API: IA de organizacion, llaves, politica y proxy         | Post-MVP | 10     | E00, E12, E21, E27                                         |
-| E29 Equipos e IA de organizacion en las apps                  | Post-MVP | 13     | E00, E24, E27, E28                                         |
-| E30 Facturacion                                               | Post-MVP | 9      | E00, E01, E27                                              |
+| E25 Release y distribucion                                    | MVP      | 16     | E00, E01, E13, E15, E17                                    |
+| E26 Calidad y operacion                                       | MVP      | 17     | E00, E01, E05, E08, E14, E15, E23, E24, E25                |
+| E27 API: organizaciones, equipo e invitaciones                | MVP      | 12     | E00, E01, E16, E18, E19                                    |
+| E28 API: IA de organizacion, llaves, politica y proxy         | MVP      | 10     | E00, E12, E21, E27                                         |
+| E29 Equipos e IA de organizacion en las apps                  | MVP      | 13     | E00, E24, E27, E28                                         |
+| E30 Facturacion                                               | MVP      | 10     | E00, E01, E27                                              |
 | E31 Despues del MVP: motor y apps                             | Post-MVP | 15     | E00, E26                                                   |
 | E32 Despues del MVP: cuenta, nube y web                       | Post-MVP | 13     | E00, E20, E27, E28                                         |
 
@@ -236,7 +252,7 @@ flowchart LR
     E26 --> E31
     E28 --> E32
     classDef post stroke-dasharray: 5 5
-    class E27,E28,E29,E30,E31,E32 post
+    class E31,E32 post
 ```
 
 ## Etiquetas
@@ -587,21 +603,30 @@ Hito: MVP. Area principal: `area:engine`. Depende de: E00, E01, E05, E10.
 
 Generar mensajes de commit, textos de PR y resumenes con la llave del usuario, llamando al proveedor desde el dispositivo. Es la unica forma de que funcione Ollama y de que el codigo no pase por Ramal.
 
-| Clave  | Issue                                                           | Etiquetas       | Depende de     |
-| ------ | --------------------------------------------------------------- | --------------- | -------------- |
-| E12-01 | feat(engine): crate ramal-ai con los proveedores                | engine, feature | -              |
-| E12-02 | feat(engine): llaves personales en el llavero                   | engine, feature | E12-01, E10-01 |
-| E12-03 | feat(engine): modelos desde la lista del proveedor              | engine, feature | E12-01, E01-06 |
-| E12-04 | feat(engine): URL base de proveedores                           | engine, feature | E12-01         |
-| E12-05 | feat(engine): probar una llave                                  | engine, feature | E12-01         |
-| E12-06 | feat(engine): filtro de archivos sensibles y recorte del diff   | engine, feature | E12-01         |
-| E12-07 | feat(engine): generar mensaje de commit                         | engine, feature | E12-06, E05-06 |
-| E12-08 | feat(engine): generar titulo y descripcion de PR                | engine, feature | E12-06         |
-| E12-09 | feat(engine): resumen de commit bajo demanda                    | engine, feature | E12-06, E05-05 |
-| E12-10 | feat(engine): respuesta en streaming y cancelar                 | engine, feature | E12-07, E05-18 |
-| E12-11 | feat(engine): errores de IA claros                              | engine, feature | E12-01         |
-| E12-12 | feat(engine): llave por funcion                                 | engine, feature | E12-02         |
-| E12-13 | test(engine): plantillas de prompt y secretos fuera de los logs | engine, test    | E12-07         |
+| Clave  | Issue                                                           | Etiquetas       | Depende de             |
+| ------ | --------------------------------------------------------------- | --------------- | ---------------------- |
+| E12-01 | feat(engine): crate ramal-ai con los proveedores                | engine, feature | -                      |
+| E12-02 | feat(engine): llaves personales en el llavero                   | engine, feature | E12-01, E10-01         |
+| E12-03 | feat(engine): modelos desde la lista del proveedor              | engine, feature | E12-01, E01-06, E12-14 |
+| E12-04 | feat(engine): URL base de proveedores                           | engine, feature | E12-01                 |
+| E12-05 | feat(engine): probar una llave                                  | engine, feature | E12-01                 |
+| E12-06 | feat(engine): filtro de archivos sensibles y recorte del diff   | engine, feature | E12-01                 |
+| E12-07 | feat(engine): generar mensaje de commit                         | engine, feature | E12-06, E05-06         |
+| E12-08 | feat(engine): generar titulo y descripcion de PR                | engine, feature | E12-06                 |
+| E12-09 | feat(engine): resumen de commit bajo demanda                    | engine, feature | E12-06, E05-05         |
+| E12-10 | feat(engine): respuesta en streaming y cancelar                 | engine, feature | E12-07, E05-18         |
+| E12-11 | feat(engine): errores de IA claros                              | engine, feature | E12-01                 |
+| E12-12 | feat(engine): llave por funcion                                 | engine, feature | E12-02                 |
+| E12-13 | test(engine): plantillas de prompt y secretos fuera de los logs | engine, test    | E12-07                 |
+| E12-14 | feat(api): modelos de IA recomendados en un fichero publico     | api, feature    | E00-05, E01-06         |
+
+E12-14 sale de la decision Q-06 (E01-06): un JSON publico y cacheable que sirve la API sin
+sesion, porque la IA con llave personal funciona sin cuenta. Lleva los ids de modelo por proveedor
+y nivel (rapido para mensajes de commit; equilibrado para PRs y resumenes de commit; siempre con
+el razonamiento al minimo) y se revisa cada trimestre. La app lo cruza con la lista viva del
+proveedor (E12-03); sin red ni copia en cache no recomienda nada y ensena solo esa lista. E12-12
+anade ademas un modelo opcional por funcion, porque hoy el modelo vive en la llave; con llaves de
+organizacion el modelo de cada funcion lo fija el admin. En la v1 no se ensena el coste.
 
 ### E13 Escritorio: ajustes, sesion, bienvenida y actualizaciones
 
@@ -880,7 +905,7 @@ Firmar, publicar y distribuir escritorio y la extension por todos los canales. E
 | E25-03 | chore(release): firma y notarizacion en macOS                  | release, chore | -                                      |
 | E25-04 | chore(release): firma en Windows                               | release, chore | -                                      |
 | E25-05 | ci(release): workflow de release de escritorio                 | release, chore | E25-02, E25-03, E25-04, E01-04, E13-15 |
-| E25-06 | ci(release): publicar en GitHub Releases y registrar en la API | release, chore | E25-05, E01-08, E17-02                 |
+| E25-06 | ci(release): publicar en GitHub Releases y registrar en la API | release, chore | E25-05, E01-08, E17-02, E25-16         |
 | E25-07 | ci(release): actualizador con respaldo estatico                | release, chore | E25-06, E17-07                         |
 | E25-08 | ci(release): VSIX por plataforma en Marketplace y Open VSX     | release, chore | E25-01, E15-11                         |
 | E25-09 | ci(release): winget                                            | release, chore | E25-06                                 |
@@ -890,6 +915,14 @@ Firmar, publicar y distribuir escritorio y la extension por todos los canales. E
 | E25-13 | ci(release): imagenes Docker de la API y la web                | release, chore | -                                      |
 | E25-14 | chore(release): versiones y notas por producto                 | release, chore | -                                      |
 | E25-15 | test(release): instalar y actualizar en cada plataforma        | release, test  | E25-07, E25-08                         |
+| E25-16 | chore(release): hacer publico eabl0306/ramal al abrir la beta  | release, chore | E01-08                                 |
+
+E25-16 sale de la decision Q-08 (E01-08): el repo del producto se queda en la cuenta personal
+`eabl0306`, privado hasta abrir la beta y publico desde entonces. No hay organizacion ni repo
+`ramal-releases`: los releases se publican en el propio `eabl0306/ramal` (E25-06), y como un
+release de un repo privado no se puede descargar, la primera build publica espera a E25-16. El
+actualizador consulta primero la API y usa como respaldo el `latest.json` de esos releases
+(E17-07 y E25-07).
 
 ### E26 Calidad y operacion
 
@@ -897,29 +930,38 @@ Hito: MVP. Area principal: `area:infra`. Depende de: E00, E01, E05, E08, E14, E1
 
 La capa fina de E2E real y el despliegue de la API. Mas lo necesario para operarla: observabilidad, alertas, copias y custodia de llaves.
 
-| Clave  | Issue                                                    | Etiquetas      | Depende de     |
-| ------ | -------------------------------------------------------- | -------------- | -------------- |
-| E26-01 | test(desktop): E2E real con WebdriverIO                  | desktop, test  | E08-07         |
-| E26-02 | test(vscode): E2E de webviews con acquireVsCodeApi falso | vscode, test   | E14-03         |
-| E26-03 | test(vscode): integracion con @vscode/test-cli bajo xvfb | vscode, test   | E15-01         |
-| E26-04 | test(web): Playwright con red simulada                   | web, test      | E23-01         |
-| E26-05 | test(infra): Playwright contra la pila completa          | infra, test    | E24-01, E00-13 |
-| E26-06 | test(engine): snapshots de contrato del protocolo        | engine, test   | E05-22         |
-| E26-07 | chore(infra): despliegue de la API y la web              | infra, chore   | E01-12, E25-13 |
-| E26-08 | feat(infra): observabilidad                              | infra, feature | E26-07         |
-| E26-09 | feat(infra): alertas en produccion                       | infra, feature | E26-08         |
-| E26-10 | chore(infra): copias de seguridad de PostgreSQL          | infra, chore   | E26-07         |
-| E26-11 | chore(infra): custodia de llaves                         | infra, chore   | E25-02         |
-| E26-12 | chore(infra): secretos de CI y produccion                | infra, chore   | -              |
-| E26-13 | test(infra): revision de seguridad                       | infra, test    | -              |
-| E26-14 | test(engine): rendimiento con repos grandes              | engine, test   | E05-02         |
-| E26-15 | chore(infra): dependencias al dia                        | infra, chore   | -              |
+| Clave  | Issue                                                                     | Etiquetas      | Depende de             |
+| ------ | ------------------------------------------------------------------------- | -------------- | ---------------------- |
+| E26-01 | test(desktop): E2E real con WebdriverIO                                   | desktop, test  | E08-07                 |
+| E26-02 | test(vscode): E2E de webviews con acquireVsCodeApi falso                  | vscode, test   | E14-03                 |
+| E26-03 | test(vscode): integracion con @vscode/test-cli bajo xvfb                  | vscode, test   | E15-01                 |
+| E26-04 | test(web): Playwright con red simulada                                    | web, test      | E23-01                 |
+| E26-05 | test(infra): Playwright contra la pila completa                           | infra, test    | E24-01, E00-13         |
+| E26-06 | test(engine): snapshots de contrato del protocolo                         | engine, test   | E05-22                 |
+| E26-07 | chore(infra): despliegue de la API y la web                               | infra, chore   | E01-12, E25-13, E26-17 |
+| E26-08 | feat(infra): observabilidad                                               | infra, feature | E26-07                 |
+| E26-09 | feat(infra): alertas en produccion                                        | infra, feature | E26-08                 |
+| E26-10 | chore(infra): copias de seguridad de PostgreSQL                           | infra, chore   | E26-07                 |
+| E26-11 | chore(infra): custodia de llaves                                          | infra, chore   | E25-02                 |
+| E26-12 | chore(infra): secretos de CI y produccion                                 | infra, chore   | -                      |
+| E26-13 | test(infra): revision de seguridad                                        | infra, test    | -                      |
+| E26-14 | test(engine): rendimiento con repos grandes                               | engine, test   | E05-02                 |
+| E26-15 | chore(infra): dependencias al dia                                         | infra, chore   | -                      |
+| E26-16 | fix(api): migraciones que aguantan volver a una version anterior          | api, chore     | -                      |
+| E26-17 | chore(infra): DNS de ramal.bahoque.com, rutas en Caddy y correo en Resend | infra, chore   | E01-12, E01-13         |
+
+E26-16 y E26-17 salen de las decisiones de despliegue y correo (E01-12 y E01-13). La API y la web
+van en la instancia de Lightsail que ya existe (`apps-01`), con el mismo patron que Gastonomo, y
+volver atras un despliegue no puede dejar a la API quejandose de migraciones que no conoce
+(E26-16). E26-17 da de alta `ramal.bahoque.com` y `api.ramal.bahoque.com` en el DNS y en el
+Caddy compartido, y el dominio de envio en un equipo de Resend propio de Ramal, con SPF, DKIM y
+DMARC por fases.
 
 ### E27 API: organizaciones, equipo e invitaciones
 
-Hito: Post-MVP. Area principal: `area:api`. Depende de: E00, E01, E16, E18, E19.
+Hito: MVP. Area principal: `area:api`. Depende de: E00, E01, E16, E18, E19.
 
-Organizaciones con miembros, roles, invitaciones y asientos, y workspaces compartidos (fase F3). Pasa a MVP si la decision Q-01 lo pide.
+Organizaciones con miembros, roles, invitaciones y asientos, y workspaces compartidos (fase F3). Entra en el MVP por la decision Q-01 (E01-01).
 
 | Clave  | Issue                                                     | Etiquetas    | Depende de     |
 | ------ | --------------------------------------------------------- | ------------ | -------------- |
@@ -938,9 +980,9 @@ Organizaciones con miembros, roles, invitaciones y asientos, y workspaces compar
 
 ### E28 API: IA de organizacion, llaves, politica y proxy
 
-Hito: Post-MVP. Area principal: `area:api`. Depende de: E00, E12, E21, E27.
+Hito: MVP. Area principal: `area:api`. Depende de: E00, E12, E21, E27.
 
-Llaves de IA de la organizacion que nunca salen del servidor, politica de uso y proxy de generacion (fase F4). Es la unica via por la que el codigo del usuario pasa por Ramal.
+Llaves de IA de la organizacion que nunca salen del servidor, politica de uso y proxy de generacion (fase F4). Es la unica via por la que el codigo del usuario pasa por Ramal. Entra en el MVP por la decision Q-01 (E01-01).
 
 | Clave  | Issue                                           | Etiquetas       | Depende de             |
 | ------ | ----------------------------------------------- | --------------- | ---------------------- |
@@ -957,9 +999,9 @@ Llaves de IA de la organizacion que nunca salen del servidor, politica de uso y 
 
 ### E29 Equipos e IA de organizacion en las apps
 
-Hito: Post-MVP. Area principal: `area:web`. Depende de: E00, E24, E27, E28.
+Hito: MVP. Area principal: `area:web`. Depende de: E00, E24, E27, E28.
 
-Las pantallas de equipo en web, escritorio y VS Code. Y las llaves de organizacion, de solo lectura, en las apps.
+Las pantallas de equipo en web, escritorio y VS Code. Y las llaves de organizacion, de solo lectura, en las apps. Entra en el MVP por la decision Q-01 (E01-01), y con ella las filas W-11 a W-16 y D-47 de gaps.md.
 
 | Clave  | Issue                                                           | Etiquetas        | Depende de                     |
 | ------ | --------------------------------------------------------------- | ---------------- | ------------------------------ |
@@ -979,21 +1021,22 @@ Las pantallas de equipo en web, escritorio y VS Code. Y las llaves de organizaci
 
 ### E30 Facturacion
 
-Hito: Post-MVP. Area principal: `area:api`. Depende de: E00, E01, E27.
+Hito: MVP. Area principal: `area:api`. Depende de: E00, E01, E27.
 
-Planes, suscripcion y asientos con el proveedor de pagos elegido (fase F5). Empieza cuando esten decididos Q-02 y Q-03.
+Planes, suscripcion y asientos con Paddle como merchant of record (fase F5), detras de un puerto `BillingProvider` para que otro proveedor sea solo otro adaptador (plan B: Polar). Paddle se ocupa del IVA y de los impuestos de ventas en todo el mundo. El webhook llega a `/v1/billing/webhooks/paddle`; el checkout es una pagina de la web con Paddle.js, y la CSP abre los dominios de Paddle solo en esa pagina; los E2E usan el sandbox de Paddle; los identificadores de Paddle se guardan en la organizacion. Ramal Pro es un plan de organizacion por asiento: 8 USD al mes en pago anual o 10 USD en pago mensual, 14 dias de prueba sin tarjeta y un asiento como minimo. Entra en el MVP por la decision Q-01 (E01-01), y con ella las filas W-17 y W-18 de gaps.md; Q-02 y Q-03 ya estan decididas.
 
-| Clave  | Issue                                          | Etiquetas        | Depende de     |
-| ------ | ---------------------------------------------- | ---------------- | -------------- |
-| E30-01 | docs(api): reglas de la facturacion            | api, decision    | E01-02, E01-03 |
-| E30-02 | feat(api): suscripcion de la organizacion      | api, feature     | E30-01, E27-01 |
-| E30-03 | feat(api): checkout, asientos y portal         | api, feature     | E30-02         |
-| E30-04 | feat(api): webhooks del proveedor              | api, feature     | E30-02         |
-| E30-05 | feat(api): limites del plan                    | api, feature     | E30-02         |
-| E30-06 | feat(web): pagina de precios                   | web, feature     | E30-01         |
-| E30-07 | feat(web): gestion de la suscripcion           | web, feature     | E30-03         |
-| E30-08 | feat(desktop): plan en escritorio y VS Code    | desktop, feature | E30-02         |
-| E30-09 | docs(web): condiciones de pago en los terminos | web, chore       | E30-01         |
+| Clave  | Issue                                                                    | Etiquetas        | Depende de     |
+| ------ | ------------------------------------------------------------------------ | ---------------- | -------------- |
+| E30-01 | docs(api): reglas de la facturacion                                      | api, decision    | E01-02, E01-03 |
+| E30-02 | feat(api): suscripcion de la organizacion                                | api, feature     | E30-01, E27-01 |
+| E30-03 | feat(api): checkout, asientos y portal                                   | api, feature     | E30-02         |
+| E30-04 | feat(api): webhooks del proveedor                                        | api, feature     | E30-02         |
+| E30-05 | feat(api): limites del plan                                              | api, feature     | E30-02         |
+| E30-06 | feat(web): pagina de precios                                             | web, feature     | E30-01         |
+| E30-07 | feat(web): gestion de la suscripcion                                     | web, feature     | E30-03         |
+| E30-08 | feat(desktop): plan en escritorio y VS Code                              | desktop, feature | E30-02         |
+| E30-09 | docs(web): condiciones de pago en los terminos                           | web, chore       | E30-01         |
+| E30-10 | docs(docs): decidir el pais de facturacion y los descuentos de Ramal Pro | design, decision | E01-02, E01-03 |
 
 ### E31 Despues del MVP: motor y apps
 
@@ -1046,10 +1089,13 @@ Mejoras de cuenta, API y web para despues de la primera version publica. Segundo
 No estaban fijadas en los documentos previos y se tomaron aqui. Cualquiera se puede cambiar; si
 se cambia, se mueven los issues afectados.
 
-1. **Equipos e IA de organizacion quedan fuera del MVP.** gaps.md supone que entran en la primera
-   version publica, pero la decision Q-01 sigue abierta y un cliente Git personal ya es usable sin
-   ellos. Las llaves de organizacion no tienen sentido sin equipos, asi que van juntas. Si Q-01
-   dice lo contrario, E27, E28 y E29 pasan a MVP enteras.
+1. **Equipos, IA de organizacion y facturacion entran en el MVP.** Al armar el backlog quedaron
+   fuera, porque Q-01 seguia abierta y un cliente Git personal ya es usable sin ellos. El
+   2026-10-01 Q-01 (E01-01) decidio lo que suponia gaps.md: todo sale en la primera version
+   publica. E27, E28, E29 y E30 pasaron enteras al hito MVP, juntas porque las llaves de
+   organizacion no tienen sentido sin equipos y los equipos son lo que se cobra. Lo personal es
+   gratis para siempre y Ramal Pro es un plan de organizacion por asiento (Q-03, E01-03), cobrado
+   con Paddle (Q-02, E01-02).
 2. **El estado y el reinicio de la boveda en la web entran en el MVP** (E24-10). gaps.md ya los
    pone en P1 (K-10): el reinicio (`DELETE /v1/vault`) solo existe en la web y es la unica salida
    de K-08.
@@ -1077,6 +1123,11 @@ se cambia, se mueven los issues afectados.
    producto, para que las epicas del MVP se lean limpias.
 10. **Escritorio y VS Code tienen dos epicas cada uno** (E08 y E13; E14 y E15) para no pasar de 25
     issues por epica.
+11. **Las decisiones de E01 se aplican sobre los issues que ya existen.** Lo que una decision
+    cambia en un issue se anota como comentario en ese issue, y solo se crea uno nuevo cuando
+    nada lo cubre. Asi salieron E12-14 (fichero de modelos recomendados), E25-16 (repo publico al
+    abrir la beta), E26-16 (migraciones que aguantan una vuelta atras), E26-17 (DNS, Caddy y
+    correo) y E30-10 (pais de facturacion y descuentos).
 
 ## Apendice: de gaps.md al backlog
 
@@ -1241,7 +1292,7 @@ Cada identificador de [design/gaps.md](design/gaps.md) y los issues que lo cubre
 - X-07: E01-17, E03-14, E11-02, E11-03, E13-07, E31-14
 - X-08: E01-17, E03-14, E11-04, E11-05
 - X-09: E01-07, E01-22, E13-14, E13-15, E22-02, E22-04, E25-12
-- X-10: E01-06, E01-19, E12-03, E12-04, E13-09, E14-13
+- X-10: E01-06, E01-19, E12-03, E12-04, E12-14, E13-09, E14-13
 - X-11: E01-20, E14-02, E14-08, E14-10, E14-13
 - X-12: E01-22, E22-06
 - X-13: E01-16, E01-17, E13-01
@@ -1314,10 +1365,10 @@ Cada identificador de [design/gaps.md](design/gaps.md) y los issues que lo cubre
 **Q: Decisiones abiertas.**
 
 - Q-01: E01-01
-- Q-02: E01-02
-- Q-03: E01-03
+- Q-02: E01-02, E30-10
+- Q-03: E01-03, E30-10
 - Q-04: E01-04
 - Q-05: E01-05, E16-13
-- Q-06: E01-06
+- Q-06: E01-06, E12-14
 - Q-07: E01-07, E22-04
-- Q-08: E01-08
+- Q-08: E01-08, E25-16
