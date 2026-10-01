@@ -2,10 +2,11 @@
 # api-client): lint con las reglas de arquitectura, tipos estrictos y tests con
 # sus umbrales de cobertura (80% en domain e i18n, 60% en el resto).
 #
-# Corre la misma receta que en local, `just packages-check`. La receta salta con
-# un aviso los paquetes cuya carpeta todavia no existe, pero falla si un paquete
-# que existe no cumple el contrato o si cualquiera de sus comprobaciones falla:
-# el detalle esta en el comentario de la receta en el justfile.
+# Corre la misma receta que en local, `just packages-check`. Falla si una
+# carpeta de su lista no existe, si un paquete no cumple el contrato o si
+# cualquiera de sus comprobaciones falla: el detalle esta en el comentario de la
+# receta en el justfile. Que la lista tenga todos los paquetes de packages/ lo
+# comprueba package-graph en quality.yml.
 name: packages
 
 on:

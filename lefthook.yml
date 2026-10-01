@@ -65,9 +65,10 @@ pre-commit:
           - name: todo-without-ticket
             run: node tools/checks/todo-without-ticket.mjs --staged
 
-          # El grafo de paquetes solo cambia cuando cambia un package.json.
+          # El grafo de paquetes solo cambia cuando cambia un package.json, o la
+          # lista de paquetes de just packages-check en el justfile.
           - name: package-graph
-            glob: '{package.json,**/package.json,pnpm-workspace.yaml}'
+            glob: '{package.json,**/package.json,pnpm-workspace.yaml,justfile}'
             run: node tools/checks/package-graph.mjs
 
           # Secretos, .env y ficheros enormes.

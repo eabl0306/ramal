@@ -41,6 +41,8 @@ database_url := "postgres://" + pg_user + ":${POSTGRES_PASSWORD:-ramal}@127.0.0.
 api_crates := "-p ramal-api-domain -p ramal-api-application -p ramal-api-infrastructure -p ramal-api-http -p ramal-api"
 engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protocol -p ramal-git -p ramal-engine -p ramal-vscode-engine"
 # Carpetas de los paquetes de TypeScript compartidos; cada una es @ramal/<carpeta>.
+# Tiene que nombrar todos los de packages/ salvo la configuracion (eslint-config,
+# tsconfig): tools/checks/package-graph.mjs falla si sobra o falta alguno.
 ts_package_dirs := "domain i18n ui repo-view bridge api-client"
 protocol_out := "packages/bridge/src/generated"
 # Imagen con los requisitos de Tauri en Linux (tools/docker/tauri-linux.Dockerfile).
@@ -342,12 +344,11 @@ packages-cov: (_packages-run "test:coverage")
 i18n-gen:
     {{pnpm_filter}} @ramal/i18n generate
 
-# Los paquetes compartidos llegan de varias ramas (bridge, repo-view y
-# api-client los montan otros), asi que una carpeta que todavia no existe se
-# salta con un aviso en vez de fallar. Lo que no se esconde: un paquete que
-# existe tiene que llamarse @ramal/<carpeta> y declarar el script del contrato
-# (si no, pnpm lo saltaria en silencio), y cualquier fallo de su script pone la
-# receta en rojo. Sin ningun paquete, falla.
+# Nada se salta en silencio: una carpeta de la lista que no existe (un paquete
+# renombrado o borrado) falla, cada paquete tiene que llamarse @ramal/<carpeta>
+# y declarar el script del contrato (si no, pnpm lo saltaria sin avisar), y
+# cualquier fallo de su script pone la receta en rojo. Que la lista no se deje
+# ningun paquete lo vigila tools/checks/package-graph.mjs.
 [private]
 _packages-run script:
     #!/usr/bin/env bash
@@ -356,8 +357,8 @@ _packages-run script:
     for dir in {{ts_package_dirs}}; do
       manifest="packages/${dir}/package.json"
       if [ ! -f "${manifest}" ]; then
-        echo "packages: packages/${dir} todavia no existe, se salta" >&2
-        continue
+        echo "packages: packages/${dir} esta en ts_package_dirs pero no existe" >&2
+        exit 1
       fi
       info="$(node -p "const p = require('./${manifest}'); [p.name, Boolean(p.scripts && p.scripts['{{script}}'])].join(' ')")"
       if [ "${info}" != "@ramal/${dir} true" ]; then

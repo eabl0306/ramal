@@ -21,8 +21,26 @@ function manifest(name, sections = {}) {
   return { name, version: '0.1.0', private: true, ...sections };
 }
 
-function workspace(packages) {
-  return sandbox({ 'pnpm-workspace.yaml': WORKSPACE, ...packages });
+const CONFIG_DIRS = new Set(['eslint-config', 'tsconfig']);
+
+/** La linea del justfile con las carpetas que recorre just packages-check. */
+function justfile(dirs) {
+  return `ts_package_dirs := "${dirs.join(' ')}"\n`;
+}
+
+function sharedDirs(packages) {
+  return Object.keys(packages)
+    .map((file) => /^packages\/([^/]+)\/package\.json$/u.exec(file)?.[1])
+    .filter((dir) => dir !== undefined && !CONFIG_DIRS.has(dir));
+}
+
+/**
+ * Por defecto el justfile lista justo los paquetes compartidos que hay, para que
+ * cada test mire solo su regla. `justfile: null` monta el repo sin justfile.
+ */
+function workspace(packages, { justfile: text = justfile(sharedDirs(packages)) } = {}) {
+  const files = { 'pnpm-workspace.yaml': WORKSPACE, ...packages };
+  return sandbox(text === null ? files : { ...files, justfile: text });
 }
 
 function check(root) {
@@ -197,5 +215,47 @@ describe('package-graph: lo que se rechaza', () => {
   it('falla si no hay pnpm-workspace.yaml', () => {
     const root = sandbox({ 'packages/domain/package.json': manifest('@ramal/domain') });
     assert.equal(check(root).code, 1);
+  });
+});
+
+describe('package-graph: la lista de paquetes de just packages-check', () => {
+  const domain = { 'packages/domain/package.json': manifest('@ramal/domain') };
+
+  it('acepta que la configuracion compartida no este en la lista', () => {
+    const root = workspace(
+      {
+        ...domain,
+        'packages/eslint-config/package.json': manifest('@ramal/eslint-config'),
+        'packages/tsconfig/package.json': manifest('@ramal/tsconfig'),
+      },
+      { justfile: justfile(['domain']) },
+    );
+    const { code, output } = check(root);
+    assert.equal(code, 0, output);
+  });
+
+  it('rechaza un paquete compartido que no esta en ts_package_dirs', () => {
+    const root = workspace(
+      { ...domain, 'packages/i18n/package.json': manifest('@ramal/i18n') },
+      { justfile: justfile(['domain']) },
+    );
+    const { code, output } = check(root);
+    assert.equal(code, 1);
+    assert.match(output, /packages\/i18n\/package\.json {2}no esta en ts_package_dirs/u);
+  });
+
+  it('rechaza una carpeta de la lista que no es un paquete (renombrado o borrado)', () => {
+    const root = workspace(domain, { justfile: justfile(['domain', 'renamed']) });
+    const { code, output } = check(root);
+    assert.equal(code, 1);
+    assert.match(output, /justfile {2}ts_package_dirs nombra packages\/renamed/u);
+  });
+
+  it('rechaza un justfile sin ts_package_dirs y un repo sin justfile', () => {
+    for (const text of ['default:\n    @just --list\n', null]) {
+      const { code, output } = check(workspace(domain, { justfile: text }));
+      assert.equal(code, 1);
+      assert.match(output, /justfile {2}falta ts_package_dirs/u);
+    }
   });
 });
