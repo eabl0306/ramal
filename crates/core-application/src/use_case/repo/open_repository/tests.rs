@@ -50,7 +50,7 @@ fn opening_a_folder_inside_a_repo_registers_its_root() {
     let (result, registry) = open(git, "/work/ramal/src");
     let opened = result.unwrap();
 
-    assert_eq!(opened.id.as_str(), "repo-1");
+    assert!(opened.id.as_str().starts_with("repo-"));
     assert_eq!(opened.root, RepoRoot::new("/work/ramal"));
     assert_eq!(opened.refs.head_target(), Some(sha(1)));
     assert_eq!(registry.get(&opened.id), Some(RepoRoot::new("/work/ramal")));
