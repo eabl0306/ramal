@@ -1,0 +1,109 @@
+/* Estado del servicio. No esta en el diseno: tarjeta de la familia de la de autenticacion. */
+.page {
+  display: grid;
+  place-items: start center;
+  min-height: calc(100vh - 64px);
+  padding: 56px 20px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 560px;
+  padding: 32px;
+  border: 1px solid var(--r-border);
+  border-radius: 18px;
+  background: var(--r-surface);
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.subtitle,
+.note {
+  margin: 0;
+  color: var(--r-muted);
+}
+
+.summary {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: var(--r-radius-md);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.summary[data-status='ok'] {
+  background: var(--r-ok-soft);
+  color: var(--r-ok);
+}
+
+.summary[data-status='degraded'] {
+  background: var(--r-warn-soft);
+  color: var(--r-warn);
+}
+
+.summary[data-status='unreachable'] {
+  background: var(--r-danger-soft);
+  color: var(--r-danger);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.section-title {
+  margin: 0;
+  color: var(--r-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.checks {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.check {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--r-border);
+}
+
+.check-state {
+  color: var(--r-ok);
+}
+
+.check[data-status='error'] .check-state {
+  color: var(--r-danger);
+}
+
+.latency,
+.meta {
+  color: var(--r-faint);
+  font-family: var(--r-font-code);
+  font-size: 12px;
+}
+
+.meta {
+  margin: 0;
+}

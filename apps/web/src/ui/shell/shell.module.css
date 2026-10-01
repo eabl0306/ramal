@@ -1,0 +1,124 @@
+/* Barra publica y pie de la landing. Medidas del prototipo web (inventario 1.1 y 2.3). */
+.header {
+  --web-header-bg: color-mix(in oklch, var(--r-bg) 88%, transparent);
+
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  height: 64px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--r-border);
+  background: var(--web-header-bg);
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  color: var(--r-text);
+}
+
+.logo:hover {
+  color: var(--r-text);
+}
+
+.logo-mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-radius-md);
+  background: var(--r-accent);
+  color: var(--r-accent-ink);
+  font-weight: 700;
+}
+
+.logo-name {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+  margin-left: 12px;
+}
+
+.nav-link {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--r-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  background: var(--r-surface-hover);
+  color: var(--r-text);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.text-link {
+  padding: 8px 12px;
+  color: var(--r-text);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 10px;
+  background: var(--r-accent);
+  color: var(--r-accent-ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cta-link:hover {
+  color: var(--r-accent-ink);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  max-width: 1216px;
+  margin: 0 auto;
+  padding: 28px;
+  border-top: 1px solid var(--r-border);
+  color: var(--r-faint);
+  font-size: 13px;
+}
+
+.footer-brand {
+  color: var(--r-text);
+  font-weight: 600;
+}
+
+.footer-link {
+  color: var(--r-faint);
+}
+
+/* Sin colapso movil en el diseno: en pantallas estrechas los enlaces de seccion se esconden. */
+@media (width <= 860px) {
+  .nav {
+    display: none;
+  }
+
+  .header {
+    gap: 10px;
+    padding: 0 16px;
+  }
+}

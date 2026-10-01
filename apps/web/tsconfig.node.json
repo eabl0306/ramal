@@ -1,0 +1,21 @@
+// Lo que corre en Node: la configuracion de Vite, Vitest, React Router y
+// Playwright, y los e2e. La lib DOM es por page.evaluate de Playwright. Las
+// rutas que se prerenderizan salen del dominio, por eso entran sus dos ficheros.
+{
+  "extends": "@ramal/tsconfig/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/node.tsbuildinfo",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": [
+    "vite.config.ts",
+    "vitest.config.ts",
+    "react-router.config.ts",
+    "playwright.config.ts",
+    "e2e",
+    "src/domain/preferences/page-preferences.ts",
+    "src/domain/preferences/preferences.ts"
+  ]
+}

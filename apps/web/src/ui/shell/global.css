@@ -1,0 +1,30 @@
+/*
+ * Estilos globales de la web, encima de @ramal/ui/themes/ramal.css. Solo lo que
+ * el prototipo web pone en el documento: desplazamiento suave hasta las
+ * secciones de la landing y el color de los enlaces.
+ */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+}
+
+a {
+  color: var(--r-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--r-text);
+}
+
+a:focus-visible {
+  border-radius: var(--r-radius-sm);
+  outline: 2px solid var(--r-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

@@ -1,0 +1,7 @@
+// Solucion de la web: la app (tsconfig.app.json, codigo del navegador y sus
+// tests) y lo que corre en Node (tsconfig.node.json: configuracion y e2e). Es una
+// hoja: nadie la referencia salvo el tsconfig raiz.
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+}
