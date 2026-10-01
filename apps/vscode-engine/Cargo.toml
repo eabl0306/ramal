@@ -1,10 +1,34 @@
 [package]
 name = "ramal-vscode-engine"
-description = "Sidecar de la extension de VS Code: el motor de Git servido por JSON-RPC sobre stdio."
+description = "Sidecar de la extension de VS Code: el motor de Git servido por JSON-RPC 2.0 sobre stdio."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+
+# El arranque es una funcion de biblioteca y main.rs es una llamada: asi los tests
+# (y cargo-llvm-cov) cubren tambien el composition root (ADR 0006).
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "ramal-vscode-engine"
+path = "src/main.rs"
+
+# Solo el motor y el protocolo del workspace: el host habla con el motor, no con
+# sus piezas (lo vigila crates/engine/tests/architecture.rs).
+[dependencies]
+ramal-engine = { workspace = true }
+ramal-protocol = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["io-std", "io-util", "sync"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+tempfile = { workspace = true }
 
 [lints]
 workspace = true
