@@ -1,12 +1,15 @@
 // E2E nativo con WebdriverIO: la configuracion (../wdio.conf.ts) y las specs, con
 // los globales de WebdriverIO y de Mocha, que no deben verse desde el resto del
-// frontend.
+// frontend. rootDir es la carpeta de la app porque la configuracion vive fuera
+// de wdio/: sin el, TypeScript 6 toma wdio/ como raiz y escribe wdio.conf.d.ts
+// junto al fuente en lugar de en outDir.
 {
   "extends": "@ramal/tsconfig/base.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,
     "emitDeclarationOnly": true,
+    "rootDir": "..",
     "outDir": "../node_modules/.tmp/tsc/wdio",
     "tsBuildInfoFile": "../node_modules/.tmp/tsc/wdio.tsbuildinfo",
     "lib": ["ES2023", "DOM"],
