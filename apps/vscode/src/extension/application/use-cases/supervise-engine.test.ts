@@ -162,7 +162,7 @@ describe('supervision del motor', () => {
     const h = harness();
     h.launcher.responder = (request) => Promise.resolve(fail(request, 'git_failed'));
     await expect(h.engine.request(WINDOW_REQUEST)).rejects.toBeInstanceOf(EngineCallError);
-    h.launcher.responder = infoResponder(1);
+    h.launcher.responder = infoResponder();
     await h.engine.request(WINDOW_REQUEST);
     expect(h.launcher.processes).toHaveLength(2);
     expect(h.engine.state).toBe('running');
