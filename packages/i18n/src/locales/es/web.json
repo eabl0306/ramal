@@ -50,7 +50,7 @@
     "title": "Ramal dentro de VS Code",
     "text": "El grafo, los cambios pendientes, el resolutor de conflictos y la IA, en el repositorio que tienes abierto. Usa el tema y el idioma de tu editor y la misma cuenta de Ramal.",
     "install": "Instalar extensión",
-    "requirement": "VS Code 1.90 o posterior",
+    "requirement": "VS Code 1.138 o posterior. No disponible en vscode.dev",
     "marketplace": "VS Code Marketplace",
     "openVsx": "Open VSX"
   },
@@ -62,7 +62,7 @@
     "requirement": {
       "mac": "macOS 12 o posterior",
       "windows": "Windows 10 y 11",
-      "linux": "Ubuntu 20.04+, Fedora 38+, Debian 11+"
+      "linux": "Ubuntu 22.04+, Debian 12+, Fedora 38+"
     },
     "started": "Descarga iniciada: {file}",
     "os": {
@@ -79,12 +79,19 @@
       "windowsX64Exe": "x64 (.exe)",
       "windowsArm64Exe": "ARM64 (.exe)",
       "windowsX64Msi": "x64 (.msi), sin actualizaciones automáticas",
-      "linuxDeb": "Debian / Ubuntu (.deb)",
-      "linuxRpm": "Fedora / RHEL (.rpm)",
+      "linuxDeb": "Debian / Ubuntu (.deb), sin actualizaciones automáticas",
+      "linuxRpm": "Fedora / RHEL (.rpm), sin actualizaciones automáticas",
       "linuxAppImage": "AppImage",
-      "linuxArm64Deb": "ARM64 (.deb)",
-      "vsix": ".vsix",
-      "flathub": "Flathub",
+      "linuxArm64Deb": "ARM64 (.deb), sin actualizaciones automáticas",
+      "vsixWin32X64": "Windows x64 (.vsix)",
+      "vsixWin32Arm64": "Windows ARM64 (.vsix)",
+      "vsixDarwinX64": "macOS Intel (.vsix)",
+      "vsixDarwinArm64": "macOS Apple Silicon (.vsix)",
+      "vsixLinuxX64": "Linux x64 (.vsix)",
+      "vsixLinuxArm64": "Linux ARM64 (.vsix)",
+      "vsixAlpineX64": "Alpine x64 (.vsix)",
+      "vsixAlpineArm64": "Alpine ARM64 (.vsix)",
+      "flathub": "Flathub (se actualiza con Flatpak)",
       "openVsx": "Open VSX (VSCodium, Cursor)"
     }
   },

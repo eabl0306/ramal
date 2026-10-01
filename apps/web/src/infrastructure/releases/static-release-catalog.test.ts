@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { recommendedFile, releaseFiles } from '../../domain/downloads/recommend';
+import { VSIX_TARGETS } from '../../domain/downloads/release';
 
 import { createStaticReleaseCatalog } from './static-release-catalog';
 
@@ -35,5 +36,18 @@ describe('createStaticReleaseCatalog', () => {
     expect(recommendedFile(release, { os: 'linux', arch: 'arm64' })?.file).toBe(
       'ramal_2.4.0_arm64.deb',
     );
+  });
+
+  it('VS Code ofrece un .vsix por cada destino de ADR 0010 y sin tamano inventado', async () => {
+    const release = await createStaticReleaseCatalog().latest();
+    const vscode = release.cards.find((card) => card.target === 'vscode');
+    const vsix = (vscode?.alternates ?? []).flatMap((entry) =>
+      entry.kind === 'file' ? [entry.file] : [],
+    );
+
+    expect(vsix.map((file) => file.file)).toEqual(
+      VSIX_TARGETS.map((target) => `ramal-${target}-1.3.0.vsix`),
+    );
+    expect(vsix.every((file) => file.sizeBytes === null && file.artifact === null)).toBe(true);
   });
 });

@@ -63,10 +63,33 @@ describe('LandingScreen', () => {
     await user.click(within(card).getByRole('button', { name: /Intel \(\.dmg\)/u }));
     expect(within(card).getByText('118 MB')).toBeInTheDocument();
     expect(await screen.findByText('Descarga iniciada: Ramal-2.4.0-x64.dmg')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Flathub' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^Flathub/u })).toHaveAttribute(
       'href',
       'https://flathub.org/apps/io.ramal.Ramal',
     );
+  });
+
+  it('ensena los requisitos reales de Linux y avisa de los formatos que no se actualizan', () => {
+    renderLanding({ os: 'linux', arch: 'x64' });
+
+    const card = screen.getByTestId('download-card-linux');
+    // Tauri 2 necesita webkit2gtk-4.1, que no existe en Ubuntu 20.04 ni Debian 11 (gaps X-09).
+    expect(card).toHaveTextContent('Ubuntu 22.04+, Debian 12+, Fedora 38+');
+    expect(card).not.toHaveTextContent('20.04');
+    for (const name of [/\(\.deb\), sin actualizaciones/u, /\(\.rpm\), sin actualizaciones/u]) {
+      expect(within(card).getAllByRole('button', { name }).length).toBeGreaterThan(0);
+    }
+    expect(within(card).getByRole('link', { name: /se actualiza con Flatpak/u })).toBeVisible();
+  });
+
+  it('la tarjeta de VS Code pide la version del motor y ofrece un .vsix por plataforma', () => {
+    renderLanding({ os: 'mac', arch: 'arm64' });
+
+    const card = screen.getByTestId('download-card-vscode');
+    expect(card).toHaveTextContent('VS Code 1.138 o posterior. No disponible en vscode.dev');
+    expect(within(card).getAllByRole('button', { name: /\(\.vsix\)$/u })).toHaveLength(8);
+    expect(within(card).getByRole('button', { name: 'Alpine ARM64 (.vsix)' })).toBeVisible();
+    expect(within(card).queryByText(/MB$/u)).not.toBeInTheDocument();
   });
 
   it('se pinta en ingles y recuerda el idioma de la pagina', () => {

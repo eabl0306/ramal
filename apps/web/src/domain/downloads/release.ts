@@ -7,6 +7,23 @@ import type { DesktopOs, DownloadArtifact } from '@ramal/domain';
  * (ADR 0016), igual que el comando sale de una tabla fija y no de un texto libre.
  */
 
+/**
+ * Destinos de `vsce package --target` (ADR 0010). La extension lleva el binario
+ * del motor, asi que hay un .vsix por plataforma y no uno universal (gaps X-09).
+ */
+export const VSIX_TARGETS = [
+  'win32-x64',
+  'win32-arm64',
+  'darwin-x64',
+  'darwin-arm64',
+  'linux-x64',
+  'linux-arm64',
+  'alpine-x64',
+  'alpine-arm64',
+] as const;
+
+export type VsixTarget = (typeof VSIX_TARGETS)[number];
+
 export type ArtifactLabel =
   | 'apple-silicon-dmg'
   | 'intel-dmg'
@@ -18,7 +35,7 @@ export type ArtifactLabel =
   | 'linux-rpm'
   | 'linux-appimage'
   | 'linux-arm64-deb'
-  | 'vsix';
+  | `vsix-${VsixTarget}`;
 
 export type StoreId = 'marketplace' | 'open-vsx' | 'flathub';
 
@@ -33,7 +50,7 @@ export interface DownloadFile {
   readonly file: string;
   /** null cuando no se conoce: la tarjeta no ensena tamano. */
   readonly sizeBytes: number | null;
-  /** Sistema, arquitectura y formato de un instalador de escritorio; null en el .vsix. */
+  /** Sistema, arquitectura y formato de un instalador de escritorio; null en los .vsix. */
   readonly artifact: DownloadArtifact | null;
 }
 

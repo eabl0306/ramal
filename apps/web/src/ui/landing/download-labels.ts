@@ -19,7 +19,14 @@ export const ARTIFACT_LABELS: Readonly<Record<ArtifactLabel, PlainKey>> = {
   'linux-rpm': 'web.download.artifact.linuxRpm',
   'linux-appimage': 'web.download.artifact.linuxAppImage',
   'linux-arm64-deb': 'web.download.artifact.linuxArm64Deb',
-  vsix: 'web.download.artifact.vsix',
+  'vsix-win32-x64': 'web.download.artifact.vsixWin32X64',
+  'vsix-win32-arm64': 'web.download.artifact.vsixWin32Arm64',
+  'vsix-darwin-x64': 'web.download.artifact.vsixDarwinX64',
+  'vsix-darwin-arm64': 'web.download.artifact.vsixDarwinArm64',
+  'vsix-linux-x64': 'web.download.artifact.vsixLinuxX64',
+  'vsix-linux-arm64': 'web.download.artifact.vsixLinuxArm64',
+  'vsix-alpine-x64': 'web.download.artifact.vsixAlpineX64',
+  'vsix-alpine-arm64': 'web.download.artifact.vsixAlpineArm64',
 };
 
 export const STORE_LABELS: Readonly<Record<StoreId, PlainKey>> = {
