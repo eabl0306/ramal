@@ -1,0 +1,15 @@
+// Tests y configuracion de Vitest. Referencia el codigo de produccion en vez de
+// incluirlo, asi cada fichero de src se comprueba una sola vez y con las reglas
+// de pureza de tsconfig.lib.json.
+{
+  "extends": "@ramal/tsconfig/node.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/test",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/test.tsbuildinfo"
+  },
+  "references": [{ "path": "./tsconfig.lib.json" }],
+  "include": ["src/**/*.test.ts", "src/test", "vitest.config.ts"]
+}

@@ -1,0 +1,8 @@
+// Solucion del paquete: no compila nada por si misma, solo reune los proyectos.
+// tsconfig.lib.json es el codigo que consumen las apps (sin DOM ni Node: la pureza
+// la comprueba el compilador); tsconfig.test.json son los tests y la config de
+// Vitest, que si pueden ver Node. Las apps referencian tsconfig.lib.json.
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.lib.json" }, { "path": "./tsconfig.test.json" }]
+}
