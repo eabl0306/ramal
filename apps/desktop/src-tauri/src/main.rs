@@ -1,10 +1,22 @@
-//! Lado nativo de la app de escritorio (Tauri 2): expone el motor de Git al
-//! frontend por los comandos de Tauri.
+//! Binario de Ramal Desktop. Todo el arranque vive en la biblioteca para que los
+//! tests lo cubran; aqui solo se llama y se traduce el resultado a un codigo de
+//! salida.
 
-// Clippy (nursery) propone `const fn` para un main vacio al compilar el arnes de
-// tests, pero Rust no deja que main sea const. El allow se va con el stub.
-#[allow(
-    clippy::missing_const_for_fn,
-    reason = "main cannot be const; this stub is empty until the binary is implemented"
+// En Windows, sin esto un build de release abre ademas una consola vacia.
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![allow(
+    unused_crate_dependencies,
+    reason = "the binary only calls the library, which is where the dependencies are used"
 )]
-fn main() {}
+
+use std::process::ExitCode;
+
+fn main() -> ExitCode {
+    match ramal_desktop::run() {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            tracing::error!(%error, "Ramal Desktop could not start");
+            ExitCode::FAILURE
+        }
+    }
+}

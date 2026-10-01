@@ -102,6 +102,9 @@ tauri = { version = "2.12.1", features = [] }
 tauri-build = { version = "2.7.1", features = [] }
 tauri-plugin-dialog = "2.8.0"
 tauri-plugin-opener = "2.7.0"
+# Servidor WebDriver embebido para el E2E nativo con @wdio/tauri-service. Solo
+# entra con la feature `e2e` de ramal-desktop, nunca en el binario publicado.
+tauri-plugin-wdio-webdriver = "1.4.0"
 
 # Solo tests.
 pretty_assertions = "1.4.1"

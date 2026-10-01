@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Fuente de los iconos de la app (tauri icon). El logo del diseno: cuadrado
+       redondeado con el acento oklch(74% 0.12 190) y la R en accent-ink
+       oklch(20% 0.03 190), convertidos a sRGB porque los iconos no leen tokens. -->
+  <rect width="1024" height="1024" rx="341" fill="#2ac3bb"/>
+  <path fill="#031a19" fill-rule="evenodd" d="M340 270H560C650 270 712 330 712 418C712 486 676 534 616 554L716 754H596L506 566H450V754H340ZM450 366V470H552C586 470 604 450 604 418C604 386 586 366 552 366Z"/>
+</svg>

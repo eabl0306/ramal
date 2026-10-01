@@ -1,10 +1,53 @@
 [package]
 name = "ramal-desktop"
-description = "Lado nativo de la app de escritorio (Tauri 2)."
+description = "Host de Ramal Desktop (Tauri 2): el motor de Git en proceso detras del comando rpc."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+# Fuera de default-members (Cargo.toml raiz): Tauri enlaza con webkit2gtk, que no
+# esta en todas las maquinas. Se compila con -p ramal-desktop o dentro de la imagen
+# de tools/docker (just desktop-docker-rust-check).
+
+# El arranque es una funcion de biblioteca y main.rs es una llamada: asi los tests
+# (y cargo-llvm-cov) llegan tambien al composition root (ADR 0006).
+[lib]
+name = "ramal_desktop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ramal-desktop"
+path = "src/main.rs"
+
+[features]
+# Solo para los builds del E2E nativo (just desktop-e2e-native): mete el servidor
+# WebDriver embebido de @wdio/tauri-service y deja que una variable de entorno
+# elija la carpeta en lugar del dialogo nativo, que WebDriver no puede manejar. El
+# binario que se publica nunca lleva un servidor de automatizacion dentro.
+e2e = ["dep:tauri-plugin-wdio-webdriver"]
+
+# Solo el motor y el protocolo del workspace: el host habla con el motor, no con
+# sus piezas (lo vigila crates/engine/tests/architecture.rs).
+[dependencies]
+ramal-engine = { workspace = true }
+ramal-protocol = { workspace = true }
+serde_json = { workspace = true }
+tauri = { workspace = true }
+tauri-plugin-dialog = { workspace = true }
+tauri-plugin-wdio-webdriver = { workspace = true, optional = true }
+tokio = { workspace = true, features = ["sync"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[build-dependencies]
+tauri-build = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+# El runtime simulado de Tauri: los tests invocan los comandos por IPC sin abrir
+# ninguna ventana (tauri::test).
+tauri = { workspace = true, features = ["test"] }
+tempfile = { workspace = true }
 
 [lints]
 workspace = true
