@@ -1,0 +1,32 @@
+# Clippy usa el clippy.toml mas cercano al crate y no lo fusiona con el de la
+# raiz, asi que los umbrales comunes se repiten aqui. El test de arquitectura de
+# ramal-engine (crates/engine/tests/architecture.rs) falla si dejan de coincidir.
+cognitive-complexity-threshold = 15
+too-many-arguments-threshold = 5
+too-many-lines-threshold = 50
+type-complexity-threshold = 250
+excessive-nesting-threshold = 4
+avoid-breaking-exported-api = false
+
+# El nucleo no lanza procesos, no toca el disco ni la red, no lee el entorno ni
+# la hora de pared. Prohibir tokio en Cargo.toml no basta: todo esto esta en la
+# biblioteca estandar. La hora llega por el puerto Clock; Instant::now si se
+# permite porque medir una latencia no es leer la hora.
+disallowed-types = [
+  { path = "std::process::Command", reason = "the core never spawns processes; use a port" },
+  { path = "std::fs::File", reason = "the core never touches the file system; use a port" },
+  { path = "std::net::TcpStream", reason = "the core never opens sockets; use a port" },
+  { path = "std::net::TcpListener", reason = "the core never opens sockets; use a port" },
+  { path = "std::net::UdpSocket", reason = "the core never opens sockets; use a port" },
+]
+disallowed-methods = [
+  { path = "std::process::Command::new", reason = "the core never spawns processes; use a port" },
+  { path = "std::fs::read", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::read_to_string", reason = "the core never touches the file system; use a port" },
+  { path = "std::fs::write", reason = "the core never touches the file system; use a port" },
+  { path = "std::env::var", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::env::var_os", reason = "configuration reaches the core as values, never from the environment" },
+  { path = "std::time::SystemTime::now", reason = "wall-clock time comes through the Clock port" },
+  { path = "std::thread::spawn", reason = "the host runtime owns threads" },
+  { path = "std::thread::sleep", reason = "the host runtime owns time; never block the core" },
+]
