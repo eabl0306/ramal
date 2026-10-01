@@ -3,7 +3,7 @@
 #
 # Lista blanca: solo entra el workspace de Rust. Un crate nuevo fuera de crates/
 # necesita aqui su linea, o cargo no podra resolver el workspace dentro de la
-# imagen.
+# imagen. tools/checks/docker-context.mjs lo comprueba en just guard.
 #
 # rust-toolchain.toml se queda fuera a proposito: la version ya la fija la
 # imagen base (ARG RUST_VERSION), y con el fichero dentro rustup intentaria
@@ -19,6 +19,7 @@
 !apps/api/migrations
 !apps/vscode-engine
 !apps/desktop/src-tauri
+!tools/rust-complexity
 
 **/target
 **/node_modules

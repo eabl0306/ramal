@@ -13,7 +13,8 @@
     "check-cargo-lints": "./cargo-lints.mjs",
     "check-eslint-configs": "./eslint-configs.mjs",
     "check-rust-test-modules": "./rust-test-modules.mjs",
-    "check-toolchain-versions": "./toolchain-versions.mjs"
+    "check-toolchain-versions": "./toolchain-versions.mjs",
+    "check-docker-context": "./docker-context.mjs"
   },
   "scripts": {
     "test": "node --test \"*.test.mjs\""

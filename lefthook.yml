@@ -85,6 +85,12 @@ pre-commit:
             glob: '{Cargo.toml,**/Cargo.toml,clippy.toml,**/clippy.toml,.cargo/*}'
             run: node tools/checks/cargo-lints.mjs
 
+          # Un miembro nuevo del workspace que la lista blanca del contexto de la
+          # imagen de la API no readmite rompe su build solo en la CI.
+          - name: docker-context
+            glob: '{Cargo.toml,**/Cargo.toml,**/*.dockerignore,**/Dockerfile*}'
+            run: node tools/checks/docker-context.mjs
+
           # Un paquete con TypeScript y sin eslint.config.js propio no lo linta
           # nadie: la configuracion de la raiz ignora apps/ y packages/.
           - name: eslint-configs

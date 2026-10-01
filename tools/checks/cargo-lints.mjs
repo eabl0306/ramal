@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { cargoMembers, readToml } from './lib/cargo.mjs';
 import { report, run } from './lib/cli.mjs';
-import { collectFiles, IGNORED_DIRS } from './lib/scan.mjs';
-import { parseTomlLite, tomlStrings, tomlValue } from './lib/toml.mjs';
+import { collectFiles } from './lib/scan.mjs';
+import { tomlValue } from './lib/toml.mjs';
 
 /**
  * Todos los crates del workspace pasan por los mismos lints y los mismos
@@ -21,21 +22,6 @@ import { parseTomlLite, tomlStrings, tomlValue } from './lib/toml.mjs';
  *   (CLIPPY_CONF_DIR) ni apaga lints con rustflags.
  */
 
-function readToml(root, relativePath) {
-  return parseTomlLite(readFileSync(path.join(root, relativePath), 'utf8'));
-}
-
-function expandMember(root, member) {
-  if (!member.endsWith('/*')) return [member];
-  const parent = member.slice(0, -2);
-  const absolute = path.join(root, parent);
-  if (!existsSync(absolute)) return [];
-  return readdirSync(absolute, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && !IGNORED_DIRS.has(entry.name))
-    .map((entry) => `${parent}/${entry.name}`)
-    .filter((dir) => existsSync(path.join(root, dir, 'Cargo.toml')));
-}
-
 function inheritsWorkspaceLints(entries) {
   if (tomlValue(entries, 'lints', 'workspace') === 'true') return true;
   if (tomlValue(entries, '', 'lints.workspace') === 'true') return true;
@@ -43,8 +29,7 @@ function inheritsWorkspaceLints(entries) {
 }
 
 function memberViolations(root) {
-  const members = tomlStrings(tomlValue(readToml(root, 'Cargo.toml'), 'workspace', 'members'));
-  const dirs = members.flatMap((member) => expandMember(root, member));
+  const dirs = cargoMembers(root);
   const violations = [];
   for (const dir of dirs) {
     const manifest = `${dir}/Cargo.toml`;
