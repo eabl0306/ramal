@@ -44,7 +44,7 @@ pub fn database_url() -> Option<String> {
 }
 
 /// Configuracion de pool para los tests.
-pub fn test_config(url: String) -> DatabaseConfig {
+pub const fn test_config(url: String) -> DatabaseConfig {
     DatabaseConfig {
         url,
         max_connections: 2,
