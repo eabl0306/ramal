@@ -35,12 +35,20 @@ pub fn dependencies(probes: Vec<Arc<dyn HealthProbe>>) -> RouterDependencies {
             liveness: Arc::new(CheckLiveness::new(version(), clock.clone())),
             readiness: Arc::new(CheckReadiness::new(version(), clock, probes)),
         },
+        swagger_ui: false,
     }
 }
 
 /// Servicio con una sonda de base de datos sana.
 pub fn healthy_service() -> salvo::Service {
     service(vec![Arc::new(FakeHealthProbe::healthy("database"))])
+}
+
+/// Servicio sano con Swagger UI encendida, como en la pila de desarrollo.
+pub fn service_with_swagger_ui() -> salvo::Service {
+    let mut dependencies = dependencies(vec![Arc::new(FakeHealthProbe::healthy("database"))]);
+    dependencies.swagger_ui = true;
+    build_service(&dependencies)
 }
 
 /// Servicio con las sondas dadas.

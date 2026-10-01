@@ -54,10 +54,28 @@ fn without_a_database_the_api_is_alive_but_not_ready() {
             .contains("content-type: application/problem+json")
     );
 
+    // Sin RAMAL__SERVER__SWAGGER_UI, como arranca la imagen de produccion.
+    let swagger = get(api.port(), "/swagger-ui/").expect("the api answers");
+    assert_eq!(swagger.status, 404);
+
     assert!(
         api.terminate().success(),
         "SIGTERM should end with exit code 0"
     );
+}
+
+#[test]
+fn swagger_ui_is_served_only_when_the_environment_asks_for_it() {
+    let api = ApiProcess::start_with(
+        UNREACHABLE_DATABASE,
+        &[("RAMAL__SERVER__SWAGGER_UI", "true")],
+    );
+
+    let swagger = get(api.port(), "/swagger-ui/").expect("the api answers");
+    assert_eq!(swagger.status, 200);
+    assert!(swagger.headers.contains("content-type: text/html"));
+
+    assert!(api.terminate().success());
 }
 
 #[test]

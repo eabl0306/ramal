@@ -84,9 +84,9 @@ async fn the_document_is_served_at_openapi_json() {
 }
 
 #[tokio::test]
-async fn swagger_ui_is_served_without_a_cdn() {
+async fn swagger_ui_is_served_without_a_cdn_when_enabled() {
     let mut response = TestClient::get("http://localhost/swagger-ui/")
-        .send(&support::healthy_service())
+        .send(&support::service_with_swagger_ui())
         .await;
 
     assert_eq!(response.status_code, Some(StatusCode::OK));
@@ -94,4 +94,16 @@ async fn swagger_ui_is_served_without_a_cdn() {
     let page = response.take_string().await.expect("html body");
     assert!(page.contains("/openapi.json"));
     assert!(!page.contains("cdn.jsdelivr.net"));
+}
+
+#[tokio::test]
+async fn swagger_ui_is_a_plain_404_when_disabled() {
+    let mut response = TestClient::get("http://localhost/swagger-ui/")
+        .send(&support::healthy_service())
+        .await;
+
+    assert_eq!(response.status_code, Some(StatusCode::NOT_FOUND));
+    assert!(support::content_type(&response).starts_with("application/problem+json"));
+    let body = response.take_string().await.expect("problem body");
+    assert!(!body.contains("<html"), "{body}");
 }

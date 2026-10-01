@@ -1,4 +1,4 @@
-//! Seccion `server`: donde escucha la API.
+//! Seccion `server`: donde escucha la API y que sirve ademas de las rutas.
 
 use std::net::{IpAddr, SocketAddr};
 
@@ -14,6 +14,12 @@ pub struct ServerConfig {
     pub host: String,
     /// Puerto de escucha.
     pub port: u16,
+    /// Sirve el visor Swagger UI en `/swagger-ui/`. Apagado por defecto: Swagger
+    /// UI ha tenido fallos de XSS, y en el dominio de produccion correria con las
+    /// cookies de sesion y la CSRF a su alcance. Lo encienden la pila de
+    /// desarrollo (`compose.yaml`) y `just api-run`; una imagen de produccion que
+    /// no lo pida no lo sirve aunque el gateway reenviara la ruta.
+    pub swagger_ui: bool,
 }
 
 impl Default for ServerConfig {
@@ -21,6 +27,7 @@ impl Default for ServerConfig {
         Self {
             host: "0.0.0.0".to_owned(),
             port: 8080,
+            swagger_ui: false,
         }
     }
 }
@@ -65,10 +72,15 @@ mod tests {
     }
 
     #[test]
+    fn swagger_ui_is_off_by_default() {
+        assert!(!ServerConfig::default().swagger_ui);
+    }
+
+    #[test]
     fn rejects_a_host_that_is_not_an_ip() {
         let server = ServerConfig {
             host: "not an ip".to_owned(),
-            port: 8080,
+            ..ServerConfig::default()
         };
         let error = server.socket_addr().expect_err("a name is not an ip");
         assert!(matches!(error, ConfigError::InvalidAddress { .. }));

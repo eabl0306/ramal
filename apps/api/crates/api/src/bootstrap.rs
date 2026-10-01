@@ -39,9 +39,10 @@ pub async fn serve(config: AppConfig) -> Result<(), StartupError> {
     let address = config.socket_addr()?;
     let wiring = Wiring::new(&config, version)?;
     migrations::spawn(wiring.pool.clone());
-    tracing::info!(%version, "ramal api is starting");
+    let swagger_ui = config.server.swagger_ui;
+    tracing::info!(%version, swagger_ui, "ramal api is starting");
     ramal_api_http::serve(
-        router_dependencies(&wiring),
+        router_dependencies(&wiring, &config),
         address,
         shutdown::signal(),
         shutdown::GRACE_PERIOD,
@@ -63,8 +64,9 @@ pub async fn serve(config: AppConfig) -> Result<(), StartupError> {
 ///
 /// Devuelve [`StartupError`] si el documento no se puede construir o escribir.
 pub fn write_openapi(path: &Path) -> Result<(), StartupError> {
-    let wiring = Wiring::new(&AppConfig::default(), service_version()?)?;
-    let document = ramal_api_http::document_json(&router_dependencies(&wiring))
+    let config = AppConfig::default();
+    let wiring = Wiring::new(&config, service_version()?)?;
+    let document = ramal_api_http::document_json(&router_dependencies(&wiring, &config))
         .map_err(|error| StartupError::OpenApi(error.to_string()))?;
     std::fs::write(path, document).map_err(|source| StartupError::WriteOpenApi {
         path: path.to_path_buf(),
@@ -74,10 +76,12 @@ pub fn write_openapi(path: &Path) -> Result<(), StartupError> {
     Ok(())
 }
 
-/// Reune las dependencias de todos los contextos.
-fn router_dependencies(wiring: &Wiring) -> RouterDependencies {
+/// Reune las dependencias de todos los contextos y lo que la configuracion
+/// decide del router.
+fn router_dependencies(wiring: &Wiring, config: &AppConfig) -> RouterDependencies {
     RouterDependencies {
         version: wiring.version,
         health: health::dependencies(wiring),
+        swagger_ui: config.server.swagger_ui,
     }
 }

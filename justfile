@@ -223,10 +223,12 @@ api-cov:
     cargo llvm-cov -p ramal-api-domain -p ramal-api-application --summary-only --fail-under-lines 80
     cargo llvm-cov {{api_crates}} --summary-only --fail-under-lines 60
 
-# Arranca la API en local contra el Postgres de docker compose.
+# Swagger UI va encendida salvo que .env diga otra cosa: la API la deja apagada
+# por defecto, que es como arranca la imagen de produccion.
 [group('api')]
+[doc('Arranca la API en local contra el Postgres de docker compose.')]
 api-run: db-up
-    RAMAL__DATABASE__URL="{{database_url}}" cargo run --bin ramal-api
+    RAMAL__DATABASE__URL="{{database_url}}" RAMAL__SERVER__SWAGGER_UI="${RAMAL__SERVER__SWAGGER_UI:-true}" cargo run --bin ramal-api
 
 # Compila el binario de la API en modo release.
 [group('api')]
