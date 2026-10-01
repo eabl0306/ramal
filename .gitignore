@@ -40,8 +40,7 @@ blob-report/
 .vscode-test/
 *.vsix
 # El binario del motor que `just vscode-package` copia dentro de la extension
-# antes de empaquetarla. Sale de cargo, no se versiona.
-apps/vscode/bin/
+# antes de empaquetarla va a apps/vscode/dist/bin/, que ya ignora `dist/`.
 
 # --- Rust ---
 target/

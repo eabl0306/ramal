@@ -5,6 +5,7 @@
   "files": [],
   "references": [
     { "path": "./apps/desktop" },
+    { "path": "./apps/vscode" },
     { "path": "./apps/web" },
     { "path": "./packages/api-client" },
     { "path": "./packages/bridge" },

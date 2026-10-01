@@ -1,0 +1,29 @@
+// Tests de Vitest de los dos lados y su configuracion. Ven Node y el DOM: los del
+// extension host corren en Node y los de los webviews en jsdom.
+{
+  "extends": "@ramal/tsconfig/react.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/test",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/test.tsbuildinfo",
+    "types": ["node", "vscode"]
+  },
+  "references": [
+    { "path": "./tsconfig.shared.json" },
+    { "path": "./tsconfig.extension.json" },
+    { "path": "./tsconfig.webview.json" },
+    { "path": "../../packages/bridge" },
+    { "path": "../../packages/i18n/tsconfig.lib.json" },
+    { "path": "../../packages/ui/tsconfig.lib.json" },
+    { "path": "../../packages/repo-view/tsconfig.lib.json" }
+  ],
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test",
+    "src/webview/css.d.ts",
+    "vitest.config.ts"
+  ]
+}

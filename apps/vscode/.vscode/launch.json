@@ -1,0 +1,17 @@
+// Lanzar la extension en un Extension Development Host. Antes, en una terminal:
+//   corepack pnpm --filter ramal dev
+// RAMAL_WEBVIEW_DEV_SERVER hace que los webviews se carguen desde Vite (solo en
+// modo desarrollo); el motor sale de target/ del monorepo (cargo build).
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "outFiles": ["${workspaceFolder}/dist/**/*.cjs"],
+      "env": { "RAMAL_WEBVIEW_DEV_SERVER": "http://127.0.0.1:5175" }
+    }
+  ]
+}

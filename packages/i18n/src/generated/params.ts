@@ -73,6 +73,7 @@ export const PARAMS = {
   'vscode.diff.commit': ['file', 'sha'],
   'vscode.diff.index': ['file'],
   'vscode.diff.workingTree': ['file'],
+  'vscode.host.protocolMismatch': ['engine', 'expected'],
   'vscode.scm.messagePlaceholder': ['branch', 'shortcut'],
   'web.accounts.usedIn': ['count'],
   'web.auth.continueWith': ['provider'],

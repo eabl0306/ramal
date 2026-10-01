@@ -40,5 +40,12 @@
     "aiKey": "Llave usada por las funciones de IA.",
     "aiLanguage": "Idioma del texto generado.",
     "matchVsCode": "Igual que VS Code"
+  },
+  "host": {
+    "noFolder": "Abre una carpeta con un repositorio Git para ver su grafo.",
+    "pickRepository": "Elige el repositorio que quieres abrir",
+    "engineStopped": "El motor de Ramal se ha detenido después de caerse varias veces.",
+    "retry": "Reintentar",
+    "protocolMismatch": "Esta instalación de Ramal está dañada: el motor usa la versión {engine} del protocolo y la extensión espera la {expected}. Reinstala la extensión."
   }
 }

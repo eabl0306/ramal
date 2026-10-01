@@ -1,0 +1,8 @@
+{
+  "extension.description": "El grafo de commits de tu repositorio, con el tema y el idioma de tu editor.",
+  "command.openGraph.title": "Abrir grafo",
+  "view.welcome.name": "Ramal",
+  "view.welcome.contents": "Mira el grafo de commits del repositorio que tienes abierto.\n[Abrir grafo](command:ramal.openGraph)",
+  "config.engine.path": "Ruta a un binario de `ramal-vscode-engine`. Solo se usa al desarrollar la extensión (Extension Development Host); la extensión instalada siempre ejecuta el motor que trae.",
+  "config.engine.logLevel": "Cuánto escribe el motor de Ramal en el canal de salida \"Ramal Engine\"."
+}

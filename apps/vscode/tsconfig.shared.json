@@ -1,0 +1,16 @@
+// Mensajes entre webview y extension host. Sin DOM ni Node: los importan los
+// dos lados. Solo ve los tipos de @ramal/bridge.
+{
+  "extends": "@ramal/tsconfig/library.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/shared",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/shared.tsbuildinfo",
+    "rootDir": "./src/shared"
+  },
+  "references": [{ "path": "../../packages/bridge" }],
+  "include": ["src/shared"],
+  "exclude": ["src/**/*.test.ts"]
+}

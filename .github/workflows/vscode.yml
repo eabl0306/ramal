@@ -1,0 +1,162 @@
+# Extension de VS Code (apps/vscode): lint con las capas, tipos, cobertura con
+# umbral y build; Playwright contra el bundle del webview; tests de integracion en
+# un VS Code de verdad bajo xvfb con el sidecar compilado; y la VSIX de linux-x64
+# con el motor dentro, como artefacto. Las mismas recetas que en local.
+name: vscode
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CI: 'true'
+  CARGO_TERM_COLOR: always
+  # El justfile usa `corepack pnpm` por defecto; aqui pnpm ya lo instala la
+  # action con la version de packageManager.
+  PNPM: pnpm
+
+jobs:
+  checks:
+    name: lint, tipos, cobertura y build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      # Lint (capas de architecture.md 5.2), tipos, cobertura (80% en la
+      # aplicacion del host, 60% global) y build del host y de los webviews.
+      - name: Extension (just vscode-check)
+        run: just vscode-check
+
+      - name: Subir informe de cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vscode-coverage
+          path: apps/vscode/coverage
+          if-no-files-found: ignore
+
+  e2e:
+    name: Playwright del webview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Instalar Chromium de Playwright
+        run: pnpm --fail-if-no-match --filter ramal exec playwright install --with-deps chromium
+
+      # El bundle de produccion con un acquireVsCodeApi falso y la CSP real.
+      - name: E2E del webview (just vscode-e2e)
+        run: just vscode-e2e
+
+      - name: Subir informe de Playwright
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vscode-playwright-report
+          path: apps/vscode/playwright-report
+          if-no-files-found: ignore
+
+  integration:
+    name: integracion bajo xvfb y VSIX
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Sin argumentos, rustup instala el toolchain que fija rust-toolchain.toml.
+      - name: Instalar el toolchain de rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: vscode-engine
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      # La imagen de ubuntu-latest trae xvfb; si algun dia no, se instala.
+      - name: Comprobar xvfb
+        run: command -v xvfb-run || (sudo apt-get update && sudo apt-get install -y xvfb)
+
+      # El VS Code que descargan los tests (la version de engines.vscode).
+      - name: Cache del VS Code de los tests
+        uses: actions/cache@v6
+        with:
+          path: apps/vscode/.vscode-test
+          key: vscode-test-${{ runner.os }}-1.138.0
+
+      # Compila el sidecar en release y la extension, y corre los tests de
+      # integracion: activacion, el comando abre el panel y el motor contesta
+      # engine/info y graph/window sobre un repo de prueba.
+      - name: Integracion (just vscode-test-integration)
+        run: just vscode-test-integration
+
+      # La VSIX de esta plataforma con el binario en dist/bin.
+      - name: VSIX (just vscode-package)
+        run: just vscode-package
+
+      - name: Comprobar el contenido de la VSIX
+        run: |
+          set -euo pipefail
+          vsix="$(ls apps/vscode/ramal-linux-x64-*.vsix)"
+          unzip -l "${vsix}"
+          unzip -l "${vsix}" | grep -q 'extension/dist/bin/ramal-vscode-engine$'
+          unzip -l "${vsix}" | grep -q 'extension/dist/extension.cjs$'
+          unzip -l "${vsix}" | grep -q 'extension/dist/webview/manifest.json$'
+          if unzip -l "${vsix}" | grep -q '\.map$'; then
+            echo "::error::la VSIX no debe llevar mapas de fuentes"
+            exit 1
+          fi
+
+      - name: Subir la VSIX
+        uses: actions/upload-artifact@v7
+        with:
+          name: ramal-vscode-linux-x64
+          path: apps/vscode/*.vsix
+          if-no-files-found: error
