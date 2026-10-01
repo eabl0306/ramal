@@ -1,0 +1,16 @@
+// E2E nativo con WebdriverIO: la configuracion (../wdio.conf.ts) y las specs, con
+// los globales de WebdriverIO y de Mocha, que no deben verse desde el resto del
+// frontend.
+{
+  "extends": "@ramal/tsconfig/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "../node_modules/.tmp/tsc/wdio",
+    "tsBuildInfoFile": "../node_modules/.tmp/tsc/wdio.tsbuildinfo",
+    "lib": ["ES2023", "DOM"],
+    "types": ["node", "@wdio/globals/types", "@wdio/mocha-framework"]
+  },
+  "include": ["**/*.ts", "../wdio.conf.ts"]
+}

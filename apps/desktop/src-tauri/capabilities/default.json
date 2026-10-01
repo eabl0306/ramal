@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Ventana principal: solo los dos comandos del host. Ningun permiso de core ni de plugins: el dialogo de carpetas lo abre Rust y el webview no habla con nada mas.",
+  "windows": ["main"],
+  "permissions": ["allow-rpc", "allow-repo-pick-and-open"]
+}

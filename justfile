@@ -43,6 +43,8 @@ engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protoc
 # Carpetas de los paquetes de TypeScript compartidos; cada una es @ramal/<carpeta>.
 ts_package_dirs := "domain i18n ui repo-view bridge api-client"
 protocol_out := "packages/bridge/src/generated"
+# Imagen con los requisitos de Tauri en Linux (tools/docker/tauri-linux.Dockerfile).
+tauri_image := "ramal-tauri-linux:local"
 
 # Lista todas las recetas.
 default:
@@ -477,28 +479,79 @@ desktop-web-build:
 desktop-e2e:
     {{pnpm_filter}} @ramal/desktop e2e
 
+# Descarga el navegador que usa Playwright.
+[group('desktop')]
+desktop-e2e-install:
+    {{pnpm_filter}} @ramal/desktop exec playwright install --with-deps chromium
+
 # Clippy y tests del lado nativo. Necesita webkit2gtk (libwebkit2gtk-4.1-dev).
 [group('desktop')]
 desktop-rust-check:
     cargo clippy -p ramal-desktop --all-targets --all-features -- -D warnings
     cargo test -p ramal-desktop
 
-# Empaqueta la app de escritorio (tauri build). Necesita webkit2gtk.
+# El empaquetado (.deb, .AppImage, .dmg, instaladores) llega con el workflow de
+# release; hasta entonces el build compila el binario con el frontend embebido y
+# se para ahi. Sin --no-bundle, la AppImage descargaria herramientas en cada build.
 [group('desktop')]
+[doc('Compila la app de escritorio (tauri build sin empaquetar). Necesita webkit2gtk.')]
 desktop-build:
-    {{pnpm_filter}} @ramal/desktop exec tauri build
+    {{pnpm_filter}} @ramal/desktop exec tauri build --no-bundle
 
-# Sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run.
+# El binario del E2E se compila con la feature `e2e`, que mete el servidor
+# WebDriver embebido y deja elegir la carpeta por variable de entorno (el dialogo
+# del sistema no se puede manejar con WebDriver). Sin DISPLAY (CI, SSH, Docker)
+# se arranca un servidor X virtual con xvfb-run.
 [group('desktop')]
-[doc('E2E nativos con WebdriverIO y la app real. Necesita webkit2gtk y WebKitWebDriver.')]
+[doc('E2E nativos con WebdriverIO y la app real. Necesita webkit2gtk.')]
 desktop-e2e-native:
     #!/usr/bin/env bash
     set -euo pipefail
+    {{pnpm_filter}} @ramal/desktop exec tauri build --debug --no-bundle --features e2e
     if [ -n "${DISPLAY:-}" ]; then
       {{pnpm_filter}} @ramal/desktop e2e:native
     else
       xvfb-run -a {{pnpm_filter}} @ramal/desktop e2e:native
     fi
+
+# La imagen trae webkit2gtk y el resto de requisitos de Tauri en Ubuntu 22.04,
+# la Linux soportada mas antigua. Sirve en maquinas sin esas librerias.
+[group('desktop')]
+[doc('Construye la imagen de Linux con los requisitos de Tauri (tools/docker).')]
+desktop-docker-image:
+    docker build -f tools/docker/tauri-linux.Dockerfile -t {{tauri_image}} tools/docker
+
+# Clippy y tests de ramal-desktop dentro de la imagen de Tauri.
+[group('desktop')]
+desktop-docker-rust-check: desktop-docker-image
+    @just _desktop-docker desktop-rust-check
+
+# tauri build sin empaquetar dentro de la imagen de Tauri.
+[group('desktop')]
+desktop-docker-build: desktop-docker-image
+    @just _desktop-docker desktop-build
+
+# E2E nativo bajo xvfb dentro de la imagen de Tauri.
+[group('desktop')]
+desktop-docker-e2e-native: desktop-docker-image
+    @just _desktop-docker desktop-e2e-native
+
+# Corre una receta de escritorio en la imagen de Tauri. El repo se monta en la
+# misma ruta que en la maquina (asi valen los enlaces de node_modules, que hay que
+# tener instalados con `just setup`) y con el uid del usuario, para que dist/ y
+# los esquemas de Tauri no queden de root. Cargo usa volumenes propios: su target
+# no se mezcla con el de la maquina, que se compila con otra glibc.
+[private]
+_desktop-docker recipe:
+    docker run --rm --init \
+      --user "$(id -u):$(id -g)" \
+      -v "{{justfile_directory()}}:{{justfile_directory()}}" \
+      -w "{{justfile_directory()}}" \
+      -v ramal-desktop-cargo:/cargo-home \
+      -v ramal-desktop-target:/cargo-target \
+      -e CARGO_BUILD_JOBS \
+      -e CI \
+      {{tauri_image}} just {{recipe}}
 
 # ------------------------------------------------------------------ vscode ---
 

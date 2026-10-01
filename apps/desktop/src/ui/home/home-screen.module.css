@@ -1,0 +1,35 @@
+/* Contenedor de Inicio del diseno (inventario 1.2): 1120 de ancho, 32/36/56 de aire. */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 36px 56px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.status {
+  color: var(--r-muted);
+}
+
+.error {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--r-danger);
+  border-radius: var(--r-radius-md);
+  background: var(--r-danger-soft);
+  color: var(--r-text);
+}
