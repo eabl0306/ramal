@@ -4,21 +4,21 @@ import { isValidEmail, passwordHint, validateLogin, validateSignup } from './aut
 
 const VALID_SIGNUP = {
   name: 'Marta Ruiz',
-  email: 'marta@ramal.dev',
+  email: 'marta@example.com',
   password: '12345678',
   termsAccepted: true,
 };
 
 describe('isValidEmail', () => {
   it('acepta lo que acepta el prototipo y recorta espacios', () => {
-    expect(isValidEmail('marta@ramal.dev')).toBe(true);
-    expect(isValidEmail('  marta@ramal.dev ')).toBe(true);
+    expect(isValidEmail('marta@example.com')).toBe(true);
+    expect(isValidEmail('  marta@example.com ')).toBe(true);
   });
 
   it('rechaza emails sin arroba, sin punto o con espacios dentro', () => {
-    expect(isValidEmail('marta.ramal.dev')).toBe(false);
+    expect(isValidEmail('marta.example.com')).toBe(false);
     expect(isValidEmail('marta@ramal')).toBe(false);
-    expect(isValidEmail('marta @ramal.dev')).toBe(false);
+    expect(isValidEmail('marta @example.com')).toBe(false);
     expect(isValidEmail('')).toBe(false);
   });
 });
@@ -59,7 +59,7 @@ describe('validateSignup', () => {
 
 describe('validateLogin', () => {
   it('no aplica el minimo de 8 caracteres al entrar', () => {
-    expect(validateLogin({ email: 'marta@ramal.dev', password: 'abc' })).toEqual({ ok: true });
+    expect(validateLogin({ email: 'marta@example.com', password: 'abc' })).toEqual({ ok: true });
   });
 
   it('pide un email valido y una contrasena no vacia', () => {

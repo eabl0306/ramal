@@ -17,7 +17,7 @@ function gatewayAnswering(result: AuthResult): AuthGateway {
 
 const VALID_SIGNUP = {
   name: ' Marta Ruiz ',
-  email: ' marta@ramal.dev ',
+  email: ' marta@example.com ',
   password: 'contrasena-larga',
   termsAccepted: true,
   organization: '  ',
@@ -40,17 +40,17 @@ describe('signIn', () => {
   });
 
   it('no exige la longitud minima al entrar y recorta el email', async () => {
-    const gateway = gatewayAnswering({ ok: true, session: { email: 'marta@ramal.dev' } });
+    const gateway = gatewayAnswering({ ok: true, session: { email: 'marta@example.com' } });
 
-    const attempt = await signIn(gateway, { email: ' marta@ramal.dev ', password: 'corta' });
+    const attempt = await signIn(gateway, { email: ' marta@example.com ', password: 'corta' });
 
-    expect(attempt).toEqual({ outcome: 'signed-in', session: { email: 'marta@ramal.dev' } });
-    expect(gateway.signIn).toHaveBeenCalledWith({ email: 'marta@ramal.dev', password: 'corta' });
+    expect(attempt).toEqual({ outcome: 'signed-in', session: { email: 'marta@example.com' } });
+    expect(gateway.signIn).toHaveBeenCalledWith({ email: 'marta@example.com', password: 'corta' });
   });
 
   it('devuelve el rechazo del adaptador tal cual', async () => {
     const attempt = await signIn(gatewayAnswering(UNAVAILABLE), {
-      email: 'marta@ramal.dev',
+      email: 'marta@example.com',
       password: 'x',
     });
 
@@ -63,7 +63,7 @@ describe('signIn', () => {
       signIn: () => Promise.reject(new Error('sin red')),
     };
 
-    const attempt = await signIn(gateway, { email: 'marta@ramal.dev', password: 'x' });
+    const attempt = await signIn(gateway, { email: 'marta@example.com', password: 'x' });
 
     expect(attempt).toEqual({ outcome: 'rejected', failure: 'network' });
   });
@@ -98,7 +98,7 @@ describe('signUp', () => {
 
     expect(gateway.signUp).toHaveBeenCalledWith({
       name: 'Marta Ruiz',
-      email: 'marta@ramal.dev',
+      email: 'marta@example.com',
       password: 'contrasena-larga',
       organization: null,
     });

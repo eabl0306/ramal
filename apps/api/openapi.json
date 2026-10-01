@@ -244,7 +244,7 @@
             "type": "string",
             "description": "URI que identifica el tipo de problema.",
             "examples": [
-              "https://ramal.dev/problems/not-found"
+              "https://ramal.bahoque.com/problems/not-found"
             ]
           }
         }

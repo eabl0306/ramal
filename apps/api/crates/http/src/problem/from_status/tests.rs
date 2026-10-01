@@ -12,7 +12,7 @@ fn a_missing_route_is_a_404_with_its_own_code() {
     let problem = problem_for_status(StatusCode::NOT_FOUND);
     assert_eq!(problem.status, 404);
     assert_eq!(problem.code, "route_not_found");
-    assert_eq!(problem.kind, "https://ramal.dev/problems/not-found");
+    assert_eq!(problem.kind, "https://ramal.bahoque.com/problems/not-found");
     assert_eq!(problem.detail, "La ruta solicitada no existe en esta API.");
 }
 

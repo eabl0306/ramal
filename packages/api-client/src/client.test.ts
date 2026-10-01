@@ -30,8 +30,12 @@ function recordingFetch(response: () => Response): {
 
 describe('normalizeBaseUrl', () => {
   it('quita las barras finales y los espacios', () => {
-    expect(normalizeBaseUrl(' https://ramal.dev/ ')).toBe('https://ramal.dev');
-    expect(normalizeBaseUrl('https://ramal.dev///')).toBe('https://ramal.dev');
+    expect(normalizeBaseUrl(' https://api.ramal.bahoque.com/ ')).toBe(
+      'https://api.ramal.bahoque.com',
+    );
+    expect(normalizeBaseUrl('https://api.ramal.bahoque.com///')).toBe(
+      'https://api.ramal.bahoque.com',
+    );
   });
 
   it('deja vacio el mismo origen', () => {
