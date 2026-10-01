@@ -1,0 +1,14 @@
+// Tests (colocalizados y en test/) y configuracion de Vitest. Pueden usar Node
+// para leer los diccionarios del disco en el test de paridad.
+{
+  "extends": "@ramal/tsconfig/node.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/test",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/test.tsbuildinfo"
+  },
+  "references": [{ "path": "./tsconfig.lib.json" }],
+  "include": ["src/**/*.test.ts", "test", "vitest.config.ts"]
+}

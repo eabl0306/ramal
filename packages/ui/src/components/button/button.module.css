@@ -1,0 +1,101 @@
+/* Boton de texto. Medidas del inventario del prototipo de escritorio (2.1). */
+.button {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-md);
+  outline: none;
+  background: var(--r-surface);
+  color: var(--r-text);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button[data-hovered] {
+  background: var(--r-surface-hover);
+}
+
+.button[data-focus-visible] {
+  outline: 2px solid var(--r-focus);
+  outline-offset: 2px;
+}
+
+.button[data-disabled] {
+  cursor: default;
+}
+
+.button[data-variant='primary'] {
+  border-color: var(--r-hc-border);
+  background: var(--r-accent);
+  color: var(--r-accent-ink);
+  font-weight: 600;
+}
+
+.button[data-variant='danger'] {
+  border-color: var(--r-hc-border);
+  background: var(--r-danger);
+  color: var(--r-on-emphasis);
+  font-weight: 600;
+}
+
+/* El primario deshabilitado del prototipo: fondo de hover y texto tenue. */
+.button[data-variant='primary'][data-disabled],
+.button[data-variant='danger'][data-disabled] {
+  background: var(--r-surface-hover);
+  color: var(--r-faint);
+}
+
+.button[data-variant='ghost'] {
+  border-color: var(--r-hc-border);
+  background: transparent;
+  color: var(--r-muted);
+}
+
+.button[data-variant='ghost'][data-hovered] {
+  background: var(--r-surface-hover);
+  color: var(--r-text);
+}
+
+.button[data-variant='secondary'][data-disabled],
+.button[data-variant='ghost'][data-disabled] {
+  background: transparent;
+  color: var(--r-faint);
+}
+
+.button[data-size='30'] {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--r-radius-sm);
+}
+
+.button[data-size='34'] {
+  height: 34px;
+  padding: 0 14px;
+}
+
+.button[data-size='38'] {
+  height: 38px;
+  padding: 0 18px;
+}
+
+.button[data-size='42'] {
+  height: 42px;
+  padding: 0 20px;
+  border-radius: var(--r-radius-lg);
+}
+
+.button[data-size='48'] {
+  height: 48px;
+  padding: 0 24px;
+  border-radius: var(--r-radius-lg);
+  font-size: 15px;
+}
+
+.button[data-block='true'] {
+  width: 100%;
+}

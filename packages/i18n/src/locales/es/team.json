@@ -1,0 +1,13 @@
+{
+  "members_one": "{count} miembro",
+  "members_other": "{count} miembros",
+  "invite": "Invitar miembro",
+  "inviteTitle": "Invitar a {org}",
+  "roleLabel": "Rol",
+  "roles": {
+    "owner": "Titular",
+    "admin": "Admin",
+    "member": "Miembro"
+  },
+  "pending": "Invitación pendiente"
+}

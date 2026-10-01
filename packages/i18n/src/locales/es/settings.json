@@ -1,0 +1,78 @@
+{
+  "group": {
+    "user": "Usuario",
+    "connections": "Conexiones",
+    "application": "Aplicación"
+  },
+  "section": {
+    "profile": "Perfil",
+    "account": "Cuenta y equipo",
+    "integrations": "Plataformas Git",
+    "ai": "Inteligencia artificial",
+    "git": "Git",
+    "appearance": "Apariencia"
+  },
+  "profile": {
+    "subtitle": "Tu identidad en Ramal. Es lo que ve tu equipo en invitaciones y actividad.",
+    "changePhoto": "Cambiar foto",
+    "fullName": "Nombre",
+    "username": "Usuario",
+    "timezone": "Zona horaria",
+    "saveChanges": "Guardar cambios"
+  },
+  "account": {
+    "subtitle": "Tu cuenta de Ramal, la suscripción y los miembros de tu organización.",
+    "plan": "Plan",
+    "planName": "Ramal Pro",
+    "planRenewal_one": "Se renueva el {date} · {count} asiento",
+    "planRenewal_other": "Se renueva el {date} · {count} asientos",
+    "manageSubscription": "Gestionar suscripción",
+    "session": "Sesión",
+    "signedInAs": "Sesión iniciada como",
+    "signOut": "Cerrar sesión",
+    "sessions": "Sesiones activas",
+    "thisDevice": "Este dispositivo",
+    "revokeSession": "Cerrar"
+  },
+  "accounts": {
+    "title": "Cuentas",
+    "subtitle": "Conecta varias cuentas por plataforma. Cada repositorio remoto usa una de ellas para fetch, push y pull requests.",
+    "add": "Añadir cuenta",
+    "default": "Predeterminada",
+    "makeDefault": "Hacer predeterminada",
+    "method": "Autenticación",
+    "scopes": "Permisos",
+    "usedIn_one": "Usada en {count} repositorio",
+    "usedIn_other": "Usada en {count} repositorios",
+    "addFor": "Añadir cuenta de {platform}",
+    "empty": "Sin cuentas conectadas"
+  },
+  "git": {
+    "subtitle": "Opciones globales que Ramal aplica a todos los repositorios.",
+    "identity": "Identidad",
+    "identityDescription": "Autor de tus commits (user.name / user.email).",
+    "defaultBranch": "Rama inicial por defecto",
+    "behavior": "Comportamiento",
+    "signCommits": "Firmar commits",
+    "signCommitsDescription": "Con tu llave SSH o GPG",
+    "autoFetch": "Fetch automático",
+    "everyMinutes": "Cada {minutes} min",
+    "pullDefault": "Pull por defecto",
+    "prune": "Podar ramas remotas al hacer fetch",
+    "sshKeys": "Llaves SSH",
+    "generateSshKey": "Generar llave SSH",
+    "usedBy": "Usada por {user}"
+  },
+  "appearance": {
+    "subtitle": "Tema, idioma y visualización del grafo.",
+    "theme": "Tema",
+    "language": "Idioma",
+    "graphNodes": "Nodos del grafo",
+    "nodeInitials": "Iniciales",
+    "nodeDot": "Punto",
+    "display": "Visualización",
+    "density": "Densidad",
+    "comfortable": "Cómoda",
+    "compact": "Compacta"
+  }
+}

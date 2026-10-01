@@ -1,0 +1,21 @@
+// Tests de componentes (Testing Library sobre jsdom) y configuracion de Vitest.
+// Ven Node porque el test de temas lee los CSS del disco.
+{
+  "extends": "@ramal/tsconfig/react.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/test",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/test.tsbuildinfo",
+    "types": ["node"]
+  },
+  "references": [{ "path": "./tsconfig.lib.json" }, { "path": "../i18n/tsconfig.lib.json" }],
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test",
+    "src/css-modules.d.ts",
+    "vitest.config.ts"
+  ]
+}

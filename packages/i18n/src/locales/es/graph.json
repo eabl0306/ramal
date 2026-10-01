@@ -1,0 +1,46 @@
+{
+  "toolbar": {
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "fetch": "Fetch",
+    "pull": "Pull",
+    "push": "Push",
+    "branch": "Rama",
+    "stash": "Stash",
+    "pop": "Pop",
+    "pullRequest": "PR"
+  },
+  "searchPlaceholder": "Buscar commits…",
+  "sidebar": {
+    "filterPlaceholder": "Filtrar ramas, tags…",
+    "local": "Local",
+    "remotes": "Remotos",
+    "pullRequests": "Pull requests",
+    "stashes": "Stashes",
+    "tags": "Tags",
+    "submodules": "Submódulos"
+  },
+  "column": {
+    "refs": "Rama / tag",
+    "graph": "Grafo",
+    "message": "Mensaje",
+    "date": "Fecha",
+    "sha": "SHA"
+  },
+  "wip": {
+    "changes_one": "WIP · {count} archivo con cambios",
+    "changes_other": "WIP · {count} archivos con cambios",
+    "merge": "Merge en curso · resuelve los conflictos"
+  },
+  "detail": {
+    "selectCommit": "Selecciona un commit para ver sus detalles.",
+    "parents": "Padres",
+    "author": "Autor",
+    "cherryPick": "Cherry-pick",
+    "revert": "Revert",
+    "createBranch": "Crear rama",
+    "files_one": "{count} archivo",
+    "files_other": "{count} archivos",
+    "noParents": "Sin padres"
+  }
+}

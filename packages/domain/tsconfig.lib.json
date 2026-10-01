@@ -1,0 +1,15 @@
+// Codigo de produccion del dominio. Emite solo declaraciones, fuera del arbol,
+// para que las project references de quien lo consume funcionen sin build.
+{
+  "extends": "@ramal/tsconfig/library.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/lib",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/lib.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/test"]
+}

@@ -1,0 +1,18 @@
+{
+  "unstaged": "Unstaged",
+  "staged": "Staged",
+  "stageAll": "Stage all",
+  "unstageAll": "Unstage all",
+  "summary": "Commit summary",
+  "description": "Description (optional)",
+  "amend": "Amend previous commit",
+  "amendButton": "Amend last commit",
+  "empty": "No changes",
+  "partial": "Partial",
+  "subtitle": "on {branch}",
+  "title_one": "{count} change",
+  "title_other": "{count} changes",
+  "commitButton_one": "Commit {count} file to {branch}",
+  "commitButton_other": "Commit {count} files to {branch}",
+  "commitLabel": "Commit"
+}

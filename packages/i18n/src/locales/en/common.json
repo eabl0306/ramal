@@ -1,0 +1,35 @@
+{
+  "home": "Home",
+  "settings": "Settings",
+  "cancel": "Cancel",
+  "save": "Save",
+  "remove": "Remove",
+  "create": "Create",
+  "delete": "Delete",
+  "copy": "Copy",
+  "ok": "OK",
+  "name": "Name",
+  "alias": "Alias",
+  "email": "Email",
+  "platform": "Platform",
+  "host": "Host",
+  "username": "Username",
+  "token": "Access token",
+  "label": "Label",
+  "labelPlaceholder": "Work, Personal…",
+  "off": "Off",
+  "theme": {
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
+  },
+  "close": "Close",
+  "moreActions": "More actions",
+  "notifications": "Notifications",
+  "dismiss": "Dismiss",
+  "loading": "Loading…",
+  "language": {
+    "es": "Spanish",
+    "en": "English"
+  }
+}

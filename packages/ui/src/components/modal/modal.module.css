@@ -1,0 +1,63 @@
+/* Modal del inventario 2.5: fondo oscurecido, panel de radio 16 y 90vh como mucho. */
+.overlay {
+  display: grid;
+  position: fixed;
+  z-index: 40;
+  inset: 0;
+  place-items: center;
+  padding: 24px;
+  background: var(--r-backdrop);
+}
+
+.modal {
+  display: flex;
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  border: 1px solid var(--r-border);
+  border-radius: var(--r-radius-xl);
+  background: var(--r-surface);
+  box-shadow: var(--r-shadow-overlay);
+}
+
+.modal[data-size='md'] {
+  max-width: 580px;
+}
+
+.dialog {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  outline: none;
+}
+
+.header {
+  padding: 20px 22px 4px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--r-muted);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 22px;
+  overflow: auto;
+}
+
+.footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 22px 20px;
+}

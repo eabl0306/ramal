@@ -1,0 +1,11 @@
+// Solo referencias a cada proyecto TypeScript del monorepo, para `tsc -b` desde
+// la raiz. Cada paquete y cada app anade aqui su linea al crearse
+// (architecture.md 9.8).
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/domain" },
+    { "path": "./packages/i18n" },
+    { "path": "./packages/ui" }
+  ]
+}

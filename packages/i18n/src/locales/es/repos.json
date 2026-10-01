@@ -1,0 +1,79 @@
+{
+  "title": "Repositorios",
+  "subtitle": "Repositorios abiertos recientemente y vinculados a tus cuentas.",
+  "workspaces": "Workspaces",
+  "accounts": "Cuentas",
+  "open": "Abrir",
+  "init": "Iniciar",
+  "clone": "Clonar",
+  "searchPlaceholder": "Buscar por nombre, alias, ruta o cuenta…",
+  "noResults": "Ningún repositorio coincide con los filtros.",
+  "localOnly": "Solo local",
+  "noRemote": "Sin remoto configurado",
+  "lastCommit": "último commit",
+  "results_one": "{count} repositorio",
+  "results_other": "{count} repositorios",
+  "card": {
+    "changes_one": "{count} cambio",
+    "changes_other": "{count} cambios",
+    "openPrs_one": "{count} PR abierto",
+    "openPrs_other": "{count} PR abiertos"
+  },
+  "filter": {
+    "kind": {
+      "all": "Todos",
+      "local": "Local",
+      "remote": "Remoto",
+      "label": "Tipo"
+    },
+    "platform": "Plataforma",
+    "account": "Cuenta",
+    "workspace": "Workspace",
+    "group": "Agrupar",
+    "groupNone": "Nada",
+    "groupByWorkspace": "Agrupar por workspace",
+    "allPlatforms": "Todas",
+    "any": "Cualquiera",
+    "anyAccount": "Cualquier cuenta",
+    "anyWorkspace": "Cualquier workspace",
+    "noWorkspace": "Sin workspace",
+    "clear": "Limpiar filtros"
+  },
+  "workspace": {
+    "new": "Nuevo workspace",
+    "repos": "Repositorios",
+    "fetchAll": "Fetch de todos",
+    "openAll": "Abrir todos",
+    "repoCount_one": "{count} repositorio",
+    "repoCount_other": "{count} repositorios",
+    "openPrCount_one": "{count} PR abierto",
+    "openPrCount_other": "{count} PRs abiertos"
+  },
+  "pr": {
+    "title": "Pull requests",
+    "empty": "No hay pull requests con este estado.",
+    "state": {
+      "all": "Todos",
+      "open": "Abierto",
+      "draft": "Borrador",
+      "approved": "Aprobado",
+      "changes": "Cambios solicitados",
+      "merged": "Fusionado",
+      "closed": "Cerrado"
+    },
+    "checks": {
+      "pass": "Correctos",
+      "fail": "Fallidos",
+      "pending": "En curso"
+    },
+    "column": {
+      "repo": "Repositorio",
+      "pullRequest": "Pull request",
+      "author": "Autor",
+      "state": "Estado",
+      "checks": "Checks",
+      "reviews": "Revisiones",
+      "updated": "Actualizado"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@ramal/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Textos de interfaz en castellano e ingles con claves y parametros tipados. Cero dependencias.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "generate": "node scripts/generate-params.mjs"
+  },
+  "devDependencies": {
+    "@ramal/eslint-config": "workspace:*",
+    "@ramal/tsconfig": "workspace:*",
+    "@types/node": "24.19.0",
+    "@vitest/coverage-v8": "5.0.2",
+    "eslint": "10.11.0",
+    "typescript": "6.0.3",
+    "vitest": "5.0.2"
+  }
+}

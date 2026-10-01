@@ -3,9 +3,9 @@
 # marca como required en la proteccion de rama.
 #
 # Cada parte del monorepo tiene su workflow reutilizable (on: workflow_call):
-# quality, rust, api, engine, web, desktop, vscode y stack. Un job que no toca
-# porque su parte no cambio sale como "skipped", y all-green lo cuenta como
-# verde.
+# quality, rust, api, engine, packages, web, desktop, vscode y stack. Un job
+# que no toca porque su parte no cambio sale como "skipped", y all-green lo
+# cuenta como verde.
 name: ci
 
 on:
@@ -34,6 +34,7 @@ jobs:
       rust: ${{ steps.filter.outputs.rust }}
       api: ${{ steps.filter.outputs.api }}
       engine: ${{ steps.filter.outputs.engine }}
+      packages: ${{ steps.filter.outputs.packages }}
       web: ${{ steps.filter.outputs.web }}
       desktop: ${{ steps.filter.outputs.desktop }}
       vscode: ${{ steps.filter.outputs.vscode }}
@@ -78,6 +79,9 @@ jobs:
               - 'apps/vscode-engine/**'
               - 'packages/bridge/**'
               - '.github/workflows/engine.yml'
+            packages:
+              - *node
+              - '.github/workflows/packages.yml'
             web:
               - *node
               - 'apps/web/**'
@@ -139,6 +143,14 @@ jobs:
     permissions:
       contents: read
 
+  packages:
+    name: paquetes
+    needs: changes
+    if: needs.changes.outputs.packages == 'true'
+    uses: ./.github/workflows/packages.yml
+    permissions:
+      contents: read
+
   web:
     name: web
     needs: changes
@@ -179,7 +191,7 @@ jobs:
     # "skipped" por la cadena de needs y este job se saltaria tambien, que para
     # la proteccion de rama es lo mismo que no haber pasado.
     if: always()
-    needs: [changes, quality, rust, api, engine, web, desktop, vscode, stack]
+    needs: [changes, quality, rust, api, engine, packages, web, desktop, vscode, stack]
     runs-on: ubuntu-latest
     steps:
       - name: Comprobar que nada ha fallado

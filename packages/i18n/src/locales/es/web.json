@@ -1,0 +1,205 @@
+{
+  "nav": {
+    "features": "Funciones",
+    "download": "Descargar",
+    "vscode": "VS Code",
+    "login": "Iniciar sesión",
+    "signup": "Crear cuenta",
+    "openDashboard": "Abrir panel"
+  },
+  "hero": {
+    "tag": "Conflictos resueltos línea a línea",
+    "title": "Un cliente de Git para todos tus repositorios y todas tus cuentas",
+    "subtitle": "Ramal muestra el historial de todas las ramas, resuelve conflictos línea a línea y trabaja con GitHub, GitLab, Bitbucket, Gitea y Azure DevOps a la vez, con varias cuentas en cada plataforma.",
+    "downloadFor": "Descargar para {platform}",
+    "allPlatforms": "Todas las plataformas",
+    "vscodeLink": "También como extensión para VS Code"
+  },
+  "features": {
+    "kicker": "FUNCIONES",
+    "title": "Todo lo que necesitas para trabajar con Git en equipo",
+    "items": {
+      "graph": {
+        "title": "Grafo de todas las ramas",
+        "text": "Commits, ramas, tags y stashes en una sola vista. Con clic derecho haces checkout, merge, rebase, cherry-pick o reset."
+      },
+      "conflicts": {
+        "title": "Conflictos línea a línea",
+        "text": "Tu versión y la entrante lado a lado, y debajo el resultado final. Añade o quita cada línea con + y −."
+      },
+      "accounts": {
+        "title": "Varias cuentas por plataforma",
+        "text": "Personal, trabajo y clientes en la misma app. Cada repositorio usa la cuenta que le corresponde para fetch, push y PRs."
+      },
+      "workspaces": {
+        "title": "Workspaces",
+        "text": "Agrupa repos por proyecto o por equipo. Un repo puede estar en varios workspaces y ves los pull requests de todos juntos."
+      },
+      "ai": {
+        "title": "IA con tu propia llave",
+        "text": "Conecta Anthropic, OpenAI, Groq u otro proveedor para redactar mensajes de commit y descripciones de pull requests."
+      },
+      "cloud": {
+        "title": "Tu configuración en la nube",
+        "text": "Inicia sesión y tus workspaces, cuentas vinculadas y preferencias te siguen a cada equipo y a VS Code."
+      }
+    }
+  },
+  "vscode": {
+    "kicker": "EXTENSIÓN",
+    "title": "Ramal dentro de VS Code",
+    "text": "El grafo, los cambios pendientes, el resolutor de conflictos y la IA, en el repositorio que tienes abierto. Usa el tema y el idioma de tu editor y la misma cuenta de Ramal.",
+    "install": "Instalar extensión",
+    "requirement": "VS Code 1.90 o posterior"
+  },
+  "download": {
+    "kicker": "DESCARGA",
+    "title": "Descargar Ramal",
+    "version": "v{version} · {date}",
+    "yourSystem": "Tu sistema",
+    "requirement": {
+      "mac": "macOS 12 o posterior",
+      "windows": "Windows 10 y 11",
+      "linux": "Ubuntu 20.04+, Fedora 38+, Debian 11+"
+    },
+    "started": "Descarga iniciada: {file}"
+  },
+  "cta": {
+    "title": "Crea tu cuenta de Ramal",
+    "text": "Con una cuenta tus workspaces, cuentas vinculadas y preferencias se sincronizan entre la app de escritorio y VS Code, y puedes gestionar tu equipo desde la web."
+  },
+  "footer": {
+    "docs": "Documentación",
+    "releaseNotes": "Notas de la versión",
+    "status": "Estado",
+    "privacy": "Privacidad"
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "loginSubtitle": "Accede a tu configuración y a tu equipo.",
+    "signupTitle": "Crear cuenta",
+    "signupSubtitle": "Sincroniza Ramal entre tus equipos y trabaja en equipo.",
+    "continueWith": "Continuar con {provider}",
+    "orEmail": "o con email",
+    "email": "Email",
+    "password": "Contraseña",
+    "forgot": "¿La olvidaste?",
+    "name": "Nombre",
+    "organization": "Organización (opcional)",
+    "passwordHint": "Mínimo 8 caracteres",
+    "passwordOk": "Contraseña válida",
+    "terms": "Acepto los términos del servicio y la política de privacidad.",
+    "noAccount": "¿No tienes cuenta?",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "error": {
+      "email": "Escribe un email válido.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "name": "Escribe tu nombre.",
+      "terms": "Debes aceptar los términos.",
+      "passwordRequired": "Escribe tu contraseña."
+    },
+    "resetSent": "Te enviamos un enlace para restablecer la contraseña.",
+    "welcome": "Sesión iniciada como {email}"
+  },
+  "dashboard": {
+    "nav": {
+      "overview": "Resumen",
+      "workspaces": "Workspaces",
+      "repos": "Repositorios",
+      "accounts": "Cuentas vinculadas",
+      "team": "Equipo",
+      "sync": "Configuración en la nube"
+    },
+    "hello": "Hola, {name}",
+    "overviewSubtitle": "Esto es lo que se sincroniza con tus dispositivos.",
+    "devices": "Dispositivos sincronizados",
+    "syncedAgo": "Sincronizado {time}",
+    "now": "ahora"
+  },
+  "workspaces": {
+    "subtitle": "Los workspaces agrupan repositorios. Los compartidos aparecen para todo el equipo.",
+    "new": "Nuevo workspace",
+    "shared": "Compartido con {org}",
+    "onlyYou": "Solo tú",
+    "empty": "Sin repositorios",
+    "label": "Workspaces"
+  },
+  "repos": {
+    "subtitle": "Repositorios vinculados a tu cuenta. Los locales solo existen en el dispositivo donde se añadieron.",
+    "searchPlaceholder": "Buscar repositorio, cuenta o workspace…",
+    "column": {
+      "repo": "Repositorio",
+      "source": "Origen",
+      "workspaces": "Workspaces",
+      "updated": "Actualizado"
+    },
+    "localOn": "Local · {device}"
+  },
+  "accounts": {
+    "subtitle": "Cuentas de plataformas Git conectadas a Ramal. Los tokens se guardan cifrados.",
+    "connect": "Conectar",
+    "usedIn_one": "{count} repo",
+    "usedIn_other": "{count} repos",
+    "ownerYou": "Tuya",
+    "disconnect": "Desconectar…",
+    "testConnection": "Probar conexión",
+    "unlink": "Quitar de la cuenta…",
+    "platform": "Plataforma",
+    "host": "Servidor",
+    "user": "Usuario",
+    "token": "Token de acceso"
+  },
+  "team": {
+    "subtitle": "Miembros de {org}, sus roles e invitaciones.",
+    "invite": "Invitar miembro",
+    "seats_one": "{used} de {count} asiento usado",
+    "seats_other": "{used} de {count} asientos usados",
+    "addSeats": "Añadir asientos",
+    "pending": "Invitación pendiente",
+    "roles": {
+      "owner": "Titular",
+      "admin": "Admin",
+      "member": "Miembro"
+    },
+    "roleLabel": "Rol",
+    "invited": "Invitación enviada a {email}",
+    "resend": "Reenviar invitación"
+  },
+  "sync": {
+    "subtitle": "Qué se guarda en tu cuenta y se aplica en cada dispositivo al iniciar sesión.",
+    "profile": "Perfil",
+    "what": "Qué se sincroniza",
+    "workspaces": "Workspaces y repositorios",
+    "accounts": "Cuentas vinculadas",
+    "accountsDescription": "Tokens cifrados de extremo a extremo",
+    "aiPrefs": "Preferencias de IA",
+    "aiKeys": "Llaves de IA",
+    "aiKeysDescription": "Desactivado: cada dispositivo guarda sus propias llaves",
+    "git": "Preferencias de Git",
+    "appearance": "Apariencia",
+    "appearanceDescription": "En VS Code se usa siempre el tema del editor",
+    "data": "Datos",
+    "export": "Exportar configuración",
+    "exportDescription": "Descarga un JSON con todo lo sincronizado",
+    "deleteAccount": "Eliminar cuenta…",
+    "deleteAccountDescription": "Borra tu cuenta y la configuración en la nube",
+    "deleteConfirm": "Esta acción es irreversible. Tus repositorios en disco no se tocan."
+  },
+  "common": {
+    "copy": "Copiar",
+    "copied": "Copiado: {text}",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "remove": "Quitar",
+    "rename": "Renombrar…",
+    "delete": "Eliminar",
+    "saved": "Cambios guardados",
+    "signOut": "Cerrar sesión",
+    "signedOut": "Sesión cerrada",
+    "done": "Listo: {text}",
+    "signOutDevice": "Cerrar sesión en este dispositivo",
+    "newOrganization": "Crear organización…",
+    "personal": "Personal"
+  }
+}

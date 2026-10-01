@@ -1,0 +1,78 @@
+{
+  "group": {
+    "user": "User",
+    "connections": "Connections",
+    "application": "Application"
+  },
+  "section": {
+    "profile": "Profile",
+    "account": "Account & team",
+    "integrations": "Git platforms",
+    "ai": "Artificial intelligence",
+    "git": "Git",
+    "appearance": "Appearance"
+  },
+  "profile": {
+    "subtitle": "Your Ramal identity. It is what your team sees in invitations and activity.",
+    "changePhoto": "Change photo",
+    "fullName": "Name",
+    "username": "Username",
+    "timezone": "Time zone",
+    "saveChanges": "Save changes"
+  },
+  "account": {
+    "subtitle": "Your Ramal account, subscription and organization members.",
+    "plan": "Plan",
+    "planName": "Ramal Pro",
+    "planRenewal_one": "Renews on {date} · {count} seat",
+    "planRenewal_other": "Renews on {date} · {count} seats",
+    "manageSubscription": "Manage subscription",
+    "session": "Session",
+    "signedInAs": "Signed in as",
+    "signOut": "Sign out",
+    "sessions": "Active sessions",
+    "thisDevice": "This device",
+    "revokeSession": "Revoke"
+  },
+  "accounts": {
+    "title": "Accounts",
+    "subtitle": "Connect several accounts per platform. Each remote repository uses one of them for fetch, push and pull requests.",
+    "add": "Add account",
+    "default": "Default",
+    "makeDefault": "Make default",
+    "method": "Authentication",
+    "scopes": "Scopes",
+    "usedIn_one": "Used in {count} repo",
+    "usedIn_other": "Used in {count} repos",
+    "addFor": "Add {platform} account",
+    "empty": "No connected accounts"
+  },
+  "git": {
+    "subtitle": "Global options Ramal applies to every repository.",
+    "identity": "Identity",
+    "identityDescription": "Author of your commits (user.name / user.email).",
+    "defaultBranch": "Default initial branch",
+    "behavior": "Behavior",
+    "signCommits": "Sign commits",
+    "signCommitsDescription": "With your SSH or GPG key",
+    "autoFetch": "Auto fetch",
+    "everyMinutes": "Every {minutes} min",
+    "pullDefault": "Default pull",
+    "prune": "Prune remote branches on fetch",
+    "sshKeys": "SSH keys",
+    "generateSshKey": "Generate SSH key",
+    "usedBy": "Used by {user}"
+  },
+  "appearance": {
+    "subtitle": "Theme, language and graph display.",
+    "theme": "Theme",
+    "language": "Language",
+    "graphNodes": "Graph nodes",
+    "nodeInitials": "Initials",
+    "nodeDot": "Dot",
+    "display": "Display",
+    "density": "Density",
+    "comfortable": "Comfortable",
+    "compact": "Compact"
+  }
+}

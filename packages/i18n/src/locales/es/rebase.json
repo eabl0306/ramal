@@ -1,0 +1,25 @@
+{
+  "title": "Rebase interactivo",
+  "orderHint": "Los commits se aplican de arriba a abajo. Arrastra para reordenar.",
+  "start": "Iniciar rebase",
+  "summary": "{pick} pick · {squash} squash/fixup · {drop} drop",
+  "action": {
+    "pick": "pick",
+    "reword": "reword",
+    "edit": "edit",
+    "squash": "squash",
+    "fixup": "fixup",
+    "drop": "drop"
+  },
+  "moveUp": "Subir",
+  "moveDown": "Bajar",
+  "newMessage": "Mensaje nuevo",
+  "issue": {
+    "empty": "No hay commits que reorganizar.",
+    "needsPreviousCommit": "El primer commit no puede ser squash ni fixup: no hay un commit anterior.",
+    "rewordWithoutMessage": "Escribe el mensaje nuevo de los commits marcados con reword.",
+    "dirtyTree": "Hay cambios sin commit. Activa el autostash o guárdalos antes.",
+    "allDropped": "Se descartan todos los commits: la rama quedará igual que la base.",
+    "needsForcePush": "Hay commits ya publicados: hará falta un force push con lease."
+  }
+}

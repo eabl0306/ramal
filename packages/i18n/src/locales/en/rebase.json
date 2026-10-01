@@ -1,0 +1,25 @@
+{
+  "title": "Interactive rebase",
+  "orderHint": "Commits are applied top to bottom. Drag to reorder.",
+  "start": "Start rebase",
+  "summary": "{pick} pick · {squash} squash/fixup · {drop} drop",
+  "action": {
+    "pick": "pick",
+    "reword": "reword",
+    "edit": "edit",
+    "squash": "squash",
+    "fixup": "fixup",
+    "drop": "drop"
+  },
+  "moveUp": "Move up",
+  "moveDown": "Move down",
+  "newMessage": "New message",
+  "issue": {
+    "empty": "There are no commits to rebase.",
+    "needsPreviousCommit": "The first commit cannot be squash or fixup: there is no previous commit.",
+    "rewordWithoutMessage": "Write the new message for the commits marked as reword.",
+    "dirtyTree": "There are uncommitted changes. Turn on autostash or save them first.",
+    "allDropped": "All commits are dropped: the branch will match the base.",
+    "needsForcePush": "Some commits are already pushed: a force push with lease will be needed."
+  }
+}

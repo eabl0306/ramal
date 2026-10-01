@@ -1,0 +1,16 @@
+{
+  "backToGraph": "Grafo",
+  "mode": {
+    "split": "Lado a lado",
+    "unified": "Unificada"
+  },
+  "stageFile": "Preparar archivo",
+  "unstageFile": "Quitar de preparados",
+  "status": {
+    "modified": "Modificado",
+    "added": "Añadido",
+    "deleted": "Eliminado",
+    "renamed": "Renombrado",
+    "copied": "Copiado"
+  }
+}

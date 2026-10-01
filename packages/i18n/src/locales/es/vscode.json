@@ -1,0 +1,44 @@
+{
+  "view": {
+    "changes": "Cambios",
+    "merge": "Cambios de merge",
+    "staged": "Cambios preparados",
+    "branches": "Ramas",
+    "remotes": "Remotos"
+  },
+  "scm": {
+    "messagePlaceholder": "Mensaje ({shortcut} para commit en \"{branch}\")",
+    "commit": "Commit",
+    "commitAndPush": "Commit y push",
+    "commitAmend": "Commit (amend)"
+  },
+  "tab": {
+    "graph": "Grafo de Ramal",
+    "settings": "Configuración de Ramal"
+  },
+  "diff": {
+    "workingTree": "{file} (Árbol de trabajo)",
+    "index": "{file} (Índice)",
+    "commit": "{file} ({sha})"
+  },
+  "commandPlaceholder": "Escribe un comando de Ramal",
+  "sourceRamal": "Origen: Ramal",
+  "settings": {
+    "followsVsCode": "El tema y el idioma siguen la configuración de VS Code.",
+    "sync": "Sincronizar configuración desde la nube",
+    "syncDescription": "Usa las cuentas vinculadas, llaves de IA y preferencias de tu cuenta de Ramal.",
+    "openDashboard": "Abrir panel web",
+    "openDesktop": "Abrir en Ramal Desktop",
+    "section": {
+      "account": "Cuenta de Ramal",
+      "platforms": "Plataformas Git",
+      "ai": "IA",
+      "git": "Git"
+    },
+    "addAccount": "Añadir cuenta…",
+    "addKey": "Añadir llave…",
+    "aiKey": "Llave usada por las funciones de IA.",
+    "aiLanguage": "Idioma del texto generado.",
+    "matchVsCode": "Igual que VS Code"
+  }
+}

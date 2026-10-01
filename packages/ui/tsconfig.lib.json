@@ -1,0 +1,17 @@
+// Codigo de produccion de @ramal/ui. Solo referencia @ramal/i18n, el unico
+// paquete del workspace que puede importar (architecture.md 5.2): importar otro
+// rompe `tsc -b` con TS6307 aunque ESLint no estuviera bien configurado.
+{
+  "extends": "@ramal/tsconfig/react.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/lib",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/lib.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "references": [{ "path": "../i18n/tsconfig.lib.json" }],
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test"]
+}

@@ -1,0 +1,70 @@
+/* Avisos del inventario 2.6: pila abajo a la derecha, entrada de .2s. */
+.region {
+  position: fixed;
+  z-index: 60;
+  right: 20px;
+  bottom: 20px;
+  pointer-events: none;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toast {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  max-width: 400px;
+  padding: 11px 16px;
+  border: 1px solid var(--r-border);
+  border-radius: 11px;
+  background: var(--r-surface);
+  box-shadow: var(--r-shadow-overlay);
+  color: var(--r-text);
+  pointer-events: auto;
+  animation: toast-in 0.2s ease-out;
+}
+
+.dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--r-ok);
+}
+
+.toast[data-kind='warn'] .dot {
+  background: var(--r-warn);
+}
+
+.toast[data-kind='error'] .dot {
+  background: var(--r-danger);
+}
+
+.toast[data-kind='info'] .dot {
+  background: var(--r-info);
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
