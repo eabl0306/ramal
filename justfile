@@ -125,7 +125,7 @@ e2e: web-e2e desktop-e2e vscode-e2e vscode-test-integration api-test-db
 [group('monorepo')]
 build: api-build web-build desktop-web-build vscode-build
 
-# Reglas comunes a todos los lenguajes: tamano, tests apagados, marcadores sin ticket y grafo de paquetes.
+# Reglas comunes a todos los lenguajes: tamano, tests apagados, marcadores sin ticket, grafo de paquetes y limites apagados en linea.
 [group('monorepo')]
 guard:
     {{pnpm}} run check:quality

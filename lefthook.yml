@@ -65,6 +65,11 @@ pre-commit:
           - name: todo-without-ticket
             run: node tools/checks/todo-without-ticket.mjs --staged
 
+          # Un limite de tamano o complejidad apagado en linea (eslint-disable o
+          # #[allow(clippy::...)]) no entra: el limite se cambia en equipo.
+          - name: limit-suppressions
+            run: node tools/checks/no-limit-suppressions.mjs --staged
+
           # El grafo de paquetes solo cambia cuando cambia un package.json.
           - name: package-graph
             glob: '{package.json,**/package.json,pnpm-workspace.yaml}'

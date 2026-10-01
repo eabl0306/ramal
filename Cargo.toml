@@ -136,6 +136,10 @@ excessive_nesting = "deny"
 too_many_lines = "deny"
 too_many_arguments = "deny"
 indexing_slicing = "deny"
+# Restriction lint, igual que excessive_nesting. Sin el, un #[allow(...)] sin
+# motivo pasaba en verde; con el, cada excepcion dice por que. Que no se apaguen
+# los umbrales lo vigila ademas tools/checks/no-limit-suppressions.mjs.
+allow_attributes_without_reason = "deny"
 # Allowed on purpose: these fight against module layout and DTO naming that we
 # want to keep explicit. Everything else in pedantic/nursery stays on.
 module_name_repetitions = "allow"

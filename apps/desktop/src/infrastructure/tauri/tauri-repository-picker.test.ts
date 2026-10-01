@@ -44,8 +44,7 @@ describe('createTauriRepositoryPicker', () => {
       message: 'not a repository',
       data: { kind: 'not_a_repository' },
     };
-    // Tauri rechaza invoke con el RpcError serializado: un objeto plano, no un Error.
-    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- Tauri rechaza invoke con el RpcError serializado: un objeto plano, no un Error
     const picker = createTauriRepositoryPicker(answering(Promise.reject(rejection)));
 
     await expect(picker.pickAndOpen()).resolves.toEqual({
