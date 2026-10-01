@@ -1,6 +1,7 @@
 {
   "name": "@ramal/checks",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "type": "module",
   "description": "Comprobaciones de calidad comunes a todo el monorepo. Node puro, sin dependencias.",

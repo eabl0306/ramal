@@ -1,6 +1,7 @@
 {
   "name": "@ramal/repo-view",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Vista de repositorio compartida por escritorio y VS Code: el grafo de commits sobre la ventana del motor.",
   "type": "module",

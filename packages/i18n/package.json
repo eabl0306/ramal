@@ -1,6 +1,7 @@
 {
   "name": "@ramal/i18n",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Textos de interfaz en castellano e ingles con claves y parametros tipados. Cero dependencias.",
   "type": "module",

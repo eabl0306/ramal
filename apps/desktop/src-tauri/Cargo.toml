@@ -5,6 +5,7 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+license.workspace = true
 # Fuera de default-members (Cargo.toml raiz): Tauri enlaza con webkit2gtk, que no
 # esta en todas las maquinas. Se compila con -p ramal-desktop o dentro de la imagen
 # de tools/docker (just desktop-docker-rust-check).

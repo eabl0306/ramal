@@ -1,6 +1,7 @@
 {
   "name": "@ramal/web",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Ramal Web: landing prerenderizada en castellano e ingles, entrar y crear cuenta, y el estado del servicio.",
   "type": "module",

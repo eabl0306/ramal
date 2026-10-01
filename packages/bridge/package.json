@@ -1,6 +1,7 @@
 {
   "name": "@ramal/bridge",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Puente tipado entre la interfaz y el motor: tipos generados del protocolo y cliente sobre un Transport.",
   "type": "module",

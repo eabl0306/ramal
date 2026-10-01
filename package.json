@@ -1,6 +1,7 @@
 {
   "name": "ramal-monorepo",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "type": "module",
   "description": "Monorepo de Ramal: cliente de Git con API en Rust, web, escritorio con Tauri y extension de VS Code.",

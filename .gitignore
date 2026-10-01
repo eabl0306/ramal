@@ -57,3 +57,7 @@ lcov.info
 # Worktrees que crean los agentes de Claude Code dentro del repo. Son copias
 # completas: sin esto, git, ESLint y prettier las verian como codigo propio.
 .claude/worktrees/
+
+# Copia de la licencia de la raiz que mete en la VSIX el script `package` de la
+# extension: la fuente es LICENSE.md de la raiz y no se versiona dos veces.
+apps/vscode/LICENSE.md

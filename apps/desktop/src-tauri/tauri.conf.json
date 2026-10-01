@@ -54,6 +54,8 @@
     "active": true,
     "targets": "all",
     "category": "DeveloperTool",
+    "license": "FSL-1.1-ALv2",
+    "licenseFile": "../../../LICENSE.md",
     "shortDescription": "Cliente de Git",
     "icon": [
       "icons/32x32.png",

@@ -1,6 +1,7 @@
 {
   "name": "@ramal/desktop",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Ramal Desktop: frontend React del host de Tauri que pinta el grafo con @ramal/repo-view.",
   "type": "module",

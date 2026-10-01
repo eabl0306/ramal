@@ -1,6 +1,7 @@
 {
   "name": "@ramal/domain",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Logica pura de estado de interfaz compartida por web, escritorio y VS Code. Cero dependencias.",
   "type": "module",

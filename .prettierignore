@@ -1,6 +1,9 @@
 # Prettier no formatea Rust: de eso vive rustfmt. Aqui solo se ignora lo que no
 # le toca: artefactos de build, informes y ficheros que escribe una herramienta.
 
+# El texto de la licencia es el canonico de fsl.software: no se reformatea.
+LICENSE.md
+
 # El prototipo de diseno es material de referencia tal cual llego. Si prettier
 # lo reescribe, deja de ser comparable con el original.
 docs/design/handoff/

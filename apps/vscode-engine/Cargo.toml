@@ -5,6 +5,7 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+license.workspace = true
 
 # El arranque es una funcion de biblioteca y main.rs es una llamada: asi los tests
 # (y cargo-llvm-cov) cubren tambien el composition root (ADR 0006).

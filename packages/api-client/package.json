@@ -1,6 +1,7 @@
 {
   "name": "@ramal/api-client",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Cliente HTTP de la Ramal API para la web: tipos generados de apps/api/openapi.json y un envoltorio fino de openapi-fetch.",
   "type": "module",

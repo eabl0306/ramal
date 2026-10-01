@@ -1,6 +1,7 @@
 {
   "name": "@ramal/tsconfig",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "private": true,
   "description": "Configuraciones base de TypeScript compartidas por el monorepo.",
   "type": "module",

@@ -3,6 +3,7 @@
   "displayName": "Ramal",
   "description": "%extension.description%",
   "version": "0.1.0",
+  "license": "FSL-1.1-ALv2",
   "publisher": "ramal",
   "private": true,
   "repository": {
@@ -111,7 +112,7 @@
     "e2e": "playwright test",
     "e2e:install": "playwright install chromium",
     "test:integration": "node scripts/build-integration.mjs && vscode-test",
-    "package": "vsce package --no-dependencies --skip-license"
+    "package": "node scripts/copy-license.mjs && vsce package --no-dependencies"
   },
   "dependencies": {
     "@ramal/bridge": "workspace:*",

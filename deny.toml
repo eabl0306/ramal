@@ -44,8 +44,9 @@ allow = [
   "Zlib",
 ]
 
-# Los crates del workspace no se publican (publish = false) y no declaran
-# licencia: no tiene sentido exigirsela a codigo que no sale del repositorio.
+# Los crates del workspace llevan la licencia del proyecto (FSL-1.1-ALv2, que no
+# esta en allow porque es nuestra y no de una dependencia) y no se publican
+# (publish = false): esta lista vigila lo que entra de fuera, no lo propio.
 [licenses.private]
 ignore = true
 
