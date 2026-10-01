@@ -40,5 +40,12 @@
     "aiKey": "Key used by AI features.",
     "aiLanguage": "Language of generated text.",
     "matchVsCode": "Match VS Code"
+  },
+  "host": {
+    "noFolder": "Open a folder with a Git repository to see its graph.",
+    "pickRepository": "Choose the repository to open",
+    "engineStopped": "The Ramal engine stopped after crashing several times.",
+    "retry": "Retry",
+    "protocolMismatch": "This Ramal installation is damaged: the engine uses protocol version {engine} and the extension expects {expected}. Reinstall the extension."
   }
 }
