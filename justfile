@@ -115,9 +115,9 @@ test: tools-test rust-test packages-test web-test desktop-test vscode-test
 [group('monorepo')]
 cov: api-cov engine-cov packages-cov web-cov desktop-cov vscode-cov
 
-# E2E: Playwright en web y escritorio, integracion de VS Code y la API contra Postgres.
+# E2E: Playwright en web, escritorio y el webview de VS Code, integracion de VS Code y la API contra Postgres.
 [group('monorepo')]
-e2e: web-e2e desktop-e2e vscode-test-integration api-test-db
+e2e: web-e2e desktop-e2e vscode-e2e vscode-test-integration api-test-db
 
 # Build de produccion de lo que se despliega o se distribuye.
 [group('monorepo')]
@@ -154,7 +154,7 @@ clean:
     cargo clean
     rm -rf apps/*/dist apps/*/build apps/*/coverage apps/*/playwright-report apps/*/test-results
     rm -rf packages/*/dist packages/*/coverage
-    rm -rf apps/vscode/out apps/vscode/.vscode-test apps/vscode/bin apps/vscode/*.vsix
+    rm -rf apps/vscode/out apps/vscode/.vscode-test apps/vscode/*.vsix
 
 # -------------------------------------------------------------------- rust ---
 
@@ -502,10 +502,16 @@ vscode-cov:
 vscode-build:
     {{pnpm_filter}} ramal build
 
-# Sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run.
+# E2E de Playwright contra el bundle del webview, con acquireVsCodeApi falso (puerto 4175).
+[group('vscode')]
+vscode-e2e:
+    {{pnpm_filter}} ramal e2e
+
+# Sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run. Necesita
+# el sidecar compilado (lo ejecuta de verdad) y el build de la extension.
 [group('vscode')]
 [doc('Tests de integracion dentro de un VS Code de verdad (@vscode/test-cli).')]
-vscode-test-integration:
+vscode-test-integration: vscode-engine-build vscode-build
     #!/usr/bin/env bash
     set -euo pipefail
     if [ -n "${DISPLAY:-}" ]; then
@@ -514,9 +520,10 @@ vscode-test-integration:
       xvfb-run -a {{pnpm_filter}} ramal test:integration
     fi
 
-# Contrato: el sidecar se copia a apps/vscode/bin/ (ramal-vscode-engine, con .exe
-# en Windows) y el script `package` de la extension recibe --target con la
-# plataforma de vsce. Un .vsix por plataforma, porque lleva un binario nativo.
+# Contrato: el sidecar se copia a apps/vscode/dist/bin/ (ramal-vscode-engine, con
+# .exe en Windows), la ruta fija que ejecuta la extension instalada
+# (architecture.md 4.4), y el script `package` de la extension recibe --target con
+# la plataforma de vsce. Un .vsix por plataforma, porque lleva un binario nativo.
 [group('vscode')]
 [doc('Empaqueta la extension (.vsix) para esta plataforma, con el binario del motor dentro.')]
 vscode-package: vscode-engine-build vscode-build
@@ -532,8 +539,8 @@ vscode-package: vscode-engine-build vscode-build
     esac
     binary=ramal-vscode-engine
     case "${target}" in win32-*) binary="${binary}.exe" ;; esac
-    mkdir -p apps/vscode/bin
-    cp "target/release/${binary}" "apps/vscode/bin/${binary}"
+    mkdir -p apps/vscode/dist/bin
+    cp "target/release/${binary}" "apps/vscode/dist/bin/${binary}"
     {{pnpm_filter}} ramal run package --target "${target}"
 
 # ------------------------------------------------------------------ docker ---

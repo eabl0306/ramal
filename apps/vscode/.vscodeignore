@@ -1,0 +1,18 @@
+# Que entra en la VSIX: lista blanca. vsce excluye lo que casa con una linea y
+# no casa con ninguna negacion (el orden da igual), asi que las negaciones
+# nombran los tipos de fichero exactos: el bundle del host, los webviews, el
+# binario del motor (dist/bin, lo copia `just vscode-package`), el icono y los
+# textos del manifiesto. Los mapas de fuentes se quedan fuera: suman megas y no
+# los usa nadie que instale la extension.
+**
+!dist/extension.cjs
+!dist/webview/manifest.json
+!dist/webview/assets/*.js
+!dist/webview/assets/*.css
+!dist/webview/assets/*.ttf
+!dist/bin/ramal-vscode-engine
+!dist/bin/ramal-vscode-engine.exe
+!media/ramal.svg
+!package.nls.json
+!package.nls.es.json
+!README.md
