@@ -69,6 +69,10 @@
   --r-status-r: var(--r-info);
   --r-status-c: var(--r-info);
   --r-focus: var(--r-accent);
+
+  /* La fila elegida de una lista con foco: en escritorio y web, el acento suave de siempre. */
+  --r-selection: var(--r-accent-soft);
+  --r-selection-ink: var(--r-text);
   --r-font-ui: 'IBM Plex Sans', system-ui, sans-serif;
   --r-font-code: 'IBM Plex Mono', ui-monospace, monospace;
   --r-font-size-base: 13px;

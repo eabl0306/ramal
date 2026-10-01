@@ -17,6 +17,8 @@ export const COLOR_TOKENS = [
   '--r-accent',
   '--r-accent-ink',
   '--r-accent-soft',
+  '--r-selection',
+  '--r-selection-ink',
   '--r-ok',
   '--r-warn',
   '--r-danger',

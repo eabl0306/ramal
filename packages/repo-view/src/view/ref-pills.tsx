@@ -33,6 +33,7 @@ export function RefPills({ refs, lane }: RefPillsProps): ReactElement {
           key={ref.fullName}
           className={css('ref')}
           data-head={ref.isHead}
+          data-kind={ref.kind}
           title={ref.fullName}
           style={cssVars({ '--rv-ref-color': refColor(ref, lane) })}
         >

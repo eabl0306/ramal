@@ -85,6 +85,11 @@ const policies = [
             '@ramal/ui/icons/lucide',
             '@ramal/ui/icons/codicons',
             '@tanstack/react-query',
+            // Solo para leer las hojas de src/view: jsdom no aplica los CSS Modules
+            // y el diseno (alto contraste, tintes) solo se comprueba en la regla.
+            'node:fs',
+            'node:path',
+            'node:url',
           ],
         },
       },

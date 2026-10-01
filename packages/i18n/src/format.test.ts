@@ -26,14 +26,20 @@ describe('formatDate', () => {
     expect(formatDate(instant, 'en', { timeZone: 'UTC' })).toBe('Sep 30, 2026');
   });
 
-  it('admite fecha con hora, solo hora y fecha corta', () => {
+  it('admite fecha con hora y solo hora', () => {
     expect(formatDate(instant, 'es', { style: 'dateTime', timeZone: 'UTC' })).toBe(
       '30 sept 2026, 10:05',
     );
     expect(formatDate(new Date(instant), 'es', { style: 'time', timeZone: 'UTC' })).toBe('10:05');
-    expect(formatDate(instant, 'es', { style: 'short', timeZone: 'UTC' })).toBe('30/9/26');
-    expect(formatDate(instant, 'en', { style: 'short', timeZone: 'UTC' })).toBe('9/30/26');
     expect(formatDate(instant, 'en')).toMatch(/2026/u);
+  });
+
+  it('la fecha del grafo es dia, mes y hora de 24 h, como el MM-DD HH:mm del prototipo', () => {
+    const graph = { style: 'monthDayTime', timeZone: 'UTC' } as const;
+    expect(formatDate(instant, 'es', graph)).toBe('30/9 10:05');
+    expect(formatDate(instant, 'en', graph)).toBe('09/30 10:05');
+    // Por la tarde, sin "PM": tiene que caber en la columna de 84 px de VS Code.
+    expect(formatDate(Date.UTC(2026, 3, 2, 15, 24), 'en', graph)).toBe('04/02 15:24');
   });
 });
 
