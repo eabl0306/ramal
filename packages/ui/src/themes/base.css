@@ -24,6 +24,9 @@
   --r-platform-gitea: oklch(60% 0.14 145deg);
   --r-platform-azure: oklch(58% 0.14 235deg);
 
+  /* Google no es una plataforma Git, solo un proveedor de identidad de la web. */
+  --r-provider-google: oklch(60% 0.15 255deg);
+
   /* Texto sobre un color saturado: distintivos de plataforma, boton de peligro. */
   --r-on-emphasis: oklch(100% 0 0deg);
 

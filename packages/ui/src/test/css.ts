@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * Un lector minimo de las hojas de temas: bloques de primer nivel y sus
- * propiedades personalizadas. Basta para los temas, que no anidan reglas; no es
+ * Un lector minimo de las hojas de temas y de componentes: bloques de primer
+ * nivel y sus declaraciones. Basta para estas hojas, que no anidan reglas; no es
  * un parser de CSS general.
  */
 
@@ -36,13 +36,14 @@ function splitDeclarations(body: string): string[] {
   return parts;
 }
 
-function parseDeclarations(body: string): Map<string, string> {
+/** Por defecto solo las propiedades personalizadas, que es lo que define un tema. */
+function parseDeclarations(body: string, onlyCustom = true): Map<string, string> {
   const declarations = new Map<string, string>();
   for (const part of splitDeclarations(body)) {
     const colon = part.indexOf(':');
     if (colon === -1) continue;
     const name = part.slice(0, colon).trim();
-    if (!name.startsWith('--')) continue;
+    if (onlyCustom && !name.startsWith('--')) continue;
     const value = part.slice(colon + 1).replace(/\s+/gu, ' ');
     declarations.set(name, value.trim());
   }
@@ -53,6 +54,27 @@ function parseDeclarations(body: string): Map<string, string> {
 export function readCss(relativeToThemes: string): string {
   const here = path.dirname(fileURLToPath(import.meta.url));
   return readFileSync(path.join(here, '..', 'themes', relativeToThemes), 'utf8');
+}
+
+/** Una hoja de src/, por ejemplo 'components/button/button.module.css'. */
+export function readSourceCss(relativeToSrc: string): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  return readFileSync(path.join(here, '..', relativeToSrc), 'utf8');
+}
+
+/**
+ * Todas las declaraciones de las reglas cuyo selector es exactamente el dado,
+ * en el orden de la hoja (la ultima gana, como en el navegador).
+ */
+export function ruleOf(css: string, selector: string): ReadonlyMap<string, string> {
+  const merged = new Map<string, string>();
+  for (const match of stripComments(css).matchAll(/([^{}]+)\{([^{}]*)\}/gu)) {
+    const selectors = (match[1] ?? '').split(',').map((part) => part.replace(/\s+/gu, ' ').trim());
+    if (!selectors.includes(selector)) continue;
+    for (const [name, value] of parseDeclarations(match[2] ?? '', false)) merged.set(name, value);
+  }
+  if (merged.size === 0) throw new Error(`no hay regla "${selector}"`);
+  return merged;
 }
 
 export function parseBlocks(css: string): CssBlock[] {

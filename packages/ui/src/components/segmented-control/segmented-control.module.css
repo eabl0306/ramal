@@ -41,16 +41,39 @@
   color: var(--r-accent-ink);
 }
 
-.group[data-variant='bar'] {
+/*
+ * Barra de titulo (bar) y cabecera de la web (nav), de sus prototipos: relleno de
+ * 2 px, esquinas de 8 y segmentos pegados. El relleno lateral es 8 y no 9 porque
+ * el borde de alto contraste (transparente fuera de el) ocupa 1 px: el texto
+ * queda a 9 px del borde, como en el diseno. Los de solo icono miden 30 de ancho.
+ */
+.group[data-variant='bar'],
+.group[data-variant='nav'] {
+  gap: 0;
   padding: 2px;
-  border-radius: var(--r-radius-sm);
+  border-radius: 8px;
 }
 
-.group[data-variant='bar'] .segment {
+.group[data-variant='nav'] {
+  background: transparent;
+}
+
+.group[data-variant='bar'] .segment,
+.group[data-variant='nav'] .segment {
   height: 24px;
-  padding: 0 9px;
+  padding: 0 8px;
   font-size: 11px;
   font-weight: 600;
+}
+
+.group[data-variant='nav'] .segment {
+  height: 26px;
+}
+
+.group[data-variant='bar'] .segment[data-icon-only],
+.group[data-variant='nav'] .segment[data-icon-only] {
+  width: 30px;
+  padding: 0;
 }
 
 .group[data-variant='field'] {

@@ -61,6 +61,7 @@ export const SHARED_TOKENS = [
   '--r-platform-bitbucket',
   '--r-platform-gitea',
   '--r-platform-azure',
+  '--r-provider-google',
   '--r-ok-soft',
   '--r-warn-soft',
   '--r-danger-soft',

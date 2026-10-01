@@ -54,11 +54,11 @@ describe('SegmentedControl', () => {
     expect(onChange).toHaveBeenCalledWith('unified');
   });
 
-  it('una opcion de solo icono usa su texto como nombre accesible', () => {
+  it('una opcion de solo icono usa su texto como nombre accesible y se marca para el CSS', () => {
     renderWithProviders(
       <SegmentedControl
         label="Tema"
-        variant="bar"
+        variant="nav"
         options={[
           { id: 'light', label: 'Claro', icon: 'theme-light', iconOnly: true },
           { id: 'dark', label: 'Oscuro', icon: 'theme-dark', iconOnly: true },
@@ -67,8 +67,27 @@ describe('SegmentedControl', () => {
         onChange={vi.fn()}
       />,
     );
+    expect(screen.getByRole('radiogroup', { name: 'Tema' })).toHaveAttribute('data-variant', 'nav');
     expect(screen.getByRole('radio', { name: 'Oscuro' })).toBeChecked();
-    expect(screen.getByRole('radio', { name: 'Claro' })).not.toHaveTextContent('Claro');
+    const light = screen.getByRole('radio', { name: 'Claro' });
+    expect(light).not.toHaveTextContent('Claro');
+    // El ancho fijo de 30 px de la barra solo es para los segmentos de solo icono.
+    expect(light.closest('[data-icon-only]')).not.toBeNull();
+  });
+
+  it('una opcion con texto no lleva la marca de solo icono', () => {
+    renderWithProviders(
+      <SegmentedControl
+        label="Idioma"
+        variant="bar"
+        options={options}
+        value="split"
+        onChange={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole('radio', { name: 'Lado a lado' }).closest('[data-icon-only]'),
+    ).toBeNull();
   });
 });
 
@@ -106,6 +125,19 @@ describe('TextField', () => {
     expect(input).toHaveAttribute('type', 'email');
     expect(screen.getByText('Escribe un email valido.')).toBeInTheDocument();
     expect(screen.getByText('El de tu cuenta')).toBeInTheDocument();
+  });
+
+  it('el tamano de 42 llega al CSS y el de 36 es el de siempre', () => {
+    const { container } = renderWithProviders(
+      <>
+        <TextField label="Email" value="" onChange={vi.fn()} size={42} />
+        <TextField label="Nombre" value="" onChange={vi.fn()} />
+      </>,
+    );
+    const sizes = [...container.querySelectorAll('[data-size]')].map((field) =>
+      field.getAttribute('data-size'),
+    );
+    expect(sizes).toEqual(['42', '36']);
   });
 
   it('con filas es un area de texto', () => {

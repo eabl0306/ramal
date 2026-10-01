@@ -9,10 +9,18 @@ import styles from './button.module.css';
 
 const css = moduleClasses(styles);
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+/**
+ * `outline` es el boton de proveedor de la tarjeta de entrar de la web: fondo de
+ * la pagina y borde que se enciende con el acento al pasar, sin cambiar el fondo.
+ */
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
 
-/** Las alturas del diseno: 30 (pequeno), 34, 36 (el comun), 38 (bloque), 42 y 48 (web). */
-export type ButtonSize = 30 | 34 | 36 | 38 | 42 | 48;
+/**
+ * Las alturas del diseno: 30 (pequeno), 34, 36 (el comun), 38 (bloque) y, solo en
+ * la web, 42 (descargas y proveedores), 44 (enviar en entrar y crear cuenta) y 48
+ * (portada).
+ */
+export type ButtonSize = 30 | 34 | 36 | 38 | 42 | 44 | 48;
 
 export interface ButtonProps extends Omit<AriaButtonProps, 'className' | 'style' | 'children'> {
   readonly variant?: ButtonVariant;
@@ -30,6 +38,7 @@ const ICON_SIZE: Readonly<Record<ButtonSize, number>> = {
   36: 16,
   38: 16,
   42: 17,
+  44: 17,
   48: 18,
 };
 
