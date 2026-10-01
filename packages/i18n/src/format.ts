@@ -16,14 +16,25 @@ export function formatRelativeTime(value: number, unit: RelativeTimeUnit, locale
   return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(value, unit);
 }
 
-/** `short` es la fecha numerica corta (30/9/26) de las columnas estrechas, como la del grafo. */
-export type DateStyle = 'date' | 'short' | 'dateTime' | 'time';
+/**
+ * `monthDayTime` es la columna de fecha del grafo: el `MM-DD HH:mm` de los
+ * prototipos en el orden de cada idioma ("30/9 08:05", "09/30 08:05"). Cabe en
+ * la columna de 84 px de VS Code y distingue dos commits del mismo dia.
+ */
+export type DateStyle = 'date' | 'monthDayTime' | 'dateTime' | 'time';
 
 const DATE_OPTIONS: Readonly<Record<DateStyle, Intl.DateTimeFormatOptions>> = {
   date: { dateStyle: 'medium' },
-  short: { dateStyle: 'short' },
+  monthDayTime: { month: '2-digit', day: '2-digit' },
   dateTime: { dateStyle: 'medium', timeStyle: 'short' },
   time: { timeStyle: 'short' },
+};
+
+/** Hora de 24 h: con el "AM"/"PM" del ingles la fecha del grafo no cabria en su columna. */
+const TIME_24H: Intl.DateTimeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
 };
 
 export interface DateFormatOptions {
@@ -37,9 +48,14 @@ export function formatDate(
   locale: Locale,
   options: DateFormatOptions = {},
 ): string {
-  const base = DATE_OPTIONS[options.style ?? 'date'];
+  const style = options.style ?? 'date';
   const zone = options.timeZone === undefined ? {} : { timeZone: options.timeZone };
-  return new Intl.DateTimeFormat(locale, { ...base, ...zone }).format(date);
+  const formatted = new Intl.DateTimeFormat(locale, { ...DATE_OPTIONS[style], ...zone }).format(
+    date,
+  );
+  if (style !== 'monthDayTime') return formatted;
+  // Dos formateadores y un espacio: con uno solo Intl separa fecha y hora con ", ".
+  return `${formatted} ${new Intl.DateTimeFormat(locale, { ...TIME_24H, ...zone }).format(date)}`;
 }
 
 /** "America/Buenos_Aires" a "America/Buenos Aires", con todos los guiones bajos (gaps B-49). */

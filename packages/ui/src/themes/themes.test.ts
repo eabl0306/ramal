@@ -152,5 +152,25 @@ describe('vscode.css', () => {
     expect(contrast.selector).toContain('body.vscode-high-contrast-light');
     expect(value(contrast, '--r-hc-border')).toBe('var(--vscode-contrastBorder)');
     expect(value(contrast, '--r-border')).toBe('var(--vscode-contrastBorder)');
+    expect(value(contrast, '--r-hc-active-border')).toContain('var(--vscode-contrastActiveBorder');
+  });
+
+  it('la fila elegida con foco usa la seleccion activa con su tinta y sin foco la inactiva', () => {
+    // El --sel del prototipo es list.activeSelectionBackground; --sel2, la inactiva.
+    expect(value(root, '--r-selection')).toBe('var(--vscode-list-activeSelectionBackground)');
+    expect(value(root, '--r-selection-ink')).toContain(
+      'var(--vscode-list-activeSelectionForeground',
+    );
+    expect(value(root, '--r-accent-soft')).toBe('var(--vscode-list-inactiveSelectionBackground)');
+    const contrast = blockWith(vscode, 'body.vscode-high-contrast');
+    expect(value(contrast, '--r-selection')).toBe('transparent');
+  });
+});
+
+describe('ramal.css: seleccion', () => {
+  it('en escritorio y web la seleccion con foco es el acento suave de siempre', () => {
+    const block = ramal.find((candidate) => candidate.declarations.has('--r-selection'));
+    expect(block?.declarations.get('--r-selection')).toBe('var(--r-accent-soft)');
+    expect(block?.declarations.get('--r-selection-ink')).toBe('var(--r-text)');
   });
 });

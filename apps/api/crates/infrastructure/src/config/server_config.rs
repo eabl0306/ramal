@@ -1,4 +1,4 @@
-//! Seccion `server`: donde escucha la API.
+//! Seccion `server`: donde escucha la API y que sirve ademas de las rutas.
 
 use std::net::{IpAddr, SocketAddr};
 
@@ -16,6 +16,12 @@ pub struct ServerConfig {
     pub host: String,
     /// Puerto de escucha.
     pub port: u16,
+    /// Sirve el visor Swagger UI en `/swagger-ui/`. Apagado por defecto: Swagger
+    /// UI ha tenido fallos de XSS, y en el dominio de produccion correria con las
+    /// cookies de sesion y la CSRF a su alcance. Lo encienden la pila de
+    /// desarrollo (`compose.yaml`) y `just api-run`; una imagen de produccion que
+    /// no lo pida no lo sirve aunque el gateway reenviara la ruta.
+    pub swagger_ui: bool,
 }
 
 impl Default for ServerConfig {
@@ -23,6 +29,7 @@ impl Default for ServerConfig {
         Self {
             host: "127.0.0.1".to_owned(),
             port: 8080,
+            swagger_ui: false,
         }
     }
 }

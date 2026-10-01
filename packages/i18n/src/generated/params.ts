@@ -2,7 +2,7 @@
 // corepack pnpm --filter @ramal/i18n generate
 export const PARAMS = {
   'conflict.count': ['count'],
-  'conflict.deduplicated': ['count'],
+  'conflict.duplicates': ['count'],
   'conflict.hunk': ['index'],
   'conflict.outputSubtitle': ['file'],
   'conflict.progress': ['count', 'resolved'],

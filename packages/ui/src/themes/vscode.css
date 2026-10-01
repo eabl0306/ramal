@@ -24,6 +24,14 @@
   --r-accent: var(--vscode-button-background);
   --r-accent-ink: var(--vscode-button-foreground);
   --r-accent-soft: var(--vscode-list-inactiveSelectionBackground);
+
+  /*
+   * Fila elegida con la lista enfocada (el --sel del prototipo). Va con su tinta:
+   * en Light+ el fondo es azul oscuro y el texto, blanco. Sin foco se queda
+   * --r-accent-soft, la seleccion inactiva, como en las listas de VS Code.
+   */
+  --r-selection: var(--vscode-list-activeSelectionBackground);
+  --r-selection-ink: var(--vscode-list-activeSelectionForeground, var(--vscode-foreground));
   --r-ok: var(--vscode-testing-iconPassed, var(--vscode-charts-green));
   --r-warn: var(--vscode-editorWarning-foreground);
   --r-danger: var(--vscode-errorForeground);
@@ -65,6 +73,7 @@ body.vscode-high-contrast-light {
   --r-border: var(--vscode-contrastBorder);
   --r-surface-hover: transparent;
   --r-accent-soft: transparent;
+  --r-selection: transparent;
   --r-shadow-overlay: none;
   --r-focus: var(--vscode-contrastActiveBorder, var(--vscode-focusBorder));
   --r-hc-border: var(--vscode-contrastBorder);

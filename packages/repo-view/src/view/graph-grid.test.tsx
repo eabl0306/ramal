@@ -47,7 +47,7 @@ describe('GraphView: filas', () => {
     expect(cells[2]?.querySelector('[data-head="true"]')).not.toBeNull();
     expect(cells[3]).toHaveTextContent('MRMarta Rios');
     expect(cells[3]).toHaveAttribute('title', 'marta@example.com');
-    const time = within(cells[4]!).getByText(/\/26$/u);
+    const time = within(cells[4]!).getByText(/^\d{1,2}\/\d{1,2} \d{2}:\d{2}$/u);
     expect(time.tagName).toBe('TIME');
     expect(time).toHaveAttribute('dateTime', '2026-04-12T10:24:00+02:00');
     expect(time.getAttribute('title')).toMatch(/2026/u);
@@ -68,6 +68,9 @@ describe('GraphView: filas', () => {
     expect(cell).toHaveTextContent('Rama remotaorigin/main');
     expect(cell).toHaveTextContent('+11 referencia más: v1.0');
     expect(cell.querySelector('[data-head="true"]')).toHaveAttribute('title', 'refs/heads/main');
+    // El tipo va en el DOM: VS Code esconde el glifo de las ramas locales por CSS.
+    expect(cell.querySelector('[data-head="true"]')).toHaveAttribute('data-kind', 'localBranch');
+    expect(cell.querySelector('[data-kind="remoteBranch"]')).toHaveTextContent('origin/main');
     expect(cell.querySelectorAll('svg')).toHaveLength(2);
   });
 

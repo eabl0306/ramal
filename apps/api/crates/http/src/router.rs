@@ -6,7 +6,7 @@
 //! /health/live      publico
 //! /health/ready     publico
 //! /openapi.json     publico
-//! /swagger-ui/      solo desarrollo: el gateway de produccion no lo enruta
+//! /swagger-ui/      solo si se pide (RAMAL__SERVER__SWAGGER_UI): desarrollo
 //! /v1/...           los contextos de dominio (ninguno en el primer corte)
 //! ```
 //!
@@ -36,6 +36,10 @@ pub struct RouterDependencies {
     pub version: ServiceVersion,
     /// Contexto `health`.
     pub health: HealthDependencies,
+    /// Monta `/swagger-ui/`. Sin el, la ruta es un 404 como cualquier otra que
+    /// no existe: produccion no depende de que el gateway se acuerde de no
+    /// reenviarla.
+    pub swagger_ui: bool,
 }
 
 /// Rutas documentadas de la API: las que entran en `openapi.json`.
@@ -55,10 +59,12 @@ pub fn api_router(dependencies: &RouterDependencies) -> Router {
 pub fn build_service(dependencies: &RouterDependencies) -> Service {
     let api = api_router(dependencies);
     let document = openapi::document(dependencies.version, &api);
-    let root = Router::new()
+    let mut root = Router::new()
         .push(api)
-        .push(Router::with_path("openapi.json").get(document))
-        .push(Router::with_path("swagger-ui/{**}").get(SwaggerUi::new("/openapi.json")));
+        .push(Router::with_path("openapi.json").get(document));
+    if dependencies.swagger_ui {
+        root = root.push(Router::with_path("swagger-ui/{**}").get(SwaggerUi::new("/openapi.json")));
+    }
     Service::new(root)
         .hoop(RequestId::new())
         .catcher(ProblemCatcher::catcher())

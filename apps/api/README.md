@@ -38,12 +38,12 @@ La imagen se prueba arrancada con `bash apps/api/scripts/smoke-image.sh`.
 
 ## Rutas
 
-| Ruta            | Respuesta                                                 |
-| --------------- | --------------------------------------------------------- |
-| `/health/live`  | 200 siempre, sin tocar dependencias                       |
-| `/health/ready` | 200 `ok` o 503 `degraded`, con cada componente y latencia |
-| `/openapi.json` | El documento OpenAPI                                      |
-| `/swagger-ui/`  | El visor, sin CDN. El gateway de produccion no lo enruta  |
+| Ruta            | Respuesta                                                    |
+| --------------- | ------------------------------------------------------------ |
+| `/health/live`  | 200 siempre, sin tocar dependencias                          |
+| `/health/ready` | 200 `ok` o 503 `degraded`, con cada componente y latencia    |
+| `/openapi.json` | El documento OpenAPI                                         |
+| `/swagger-ui/`  | El visor, sin CDN. Solo con `RAMAL__SERVER__SWAGGER_UI=true` |
 
 `/health/ready` pide que PostgreSQL responda y que su esquema este al dia con las
 migraciones del binario.

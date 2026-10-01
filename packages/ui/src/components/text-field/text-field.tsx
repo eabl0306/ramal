@@ -32,6 +32,8 @@ export interface TextFieldProps {
   readonly mono?: boolean;
   /** Varias lineas, con este numero de filas visibles. */
   readonly rows?: number;
+  /** Alto de la caja: 36 en modales y ajustes, 42 en la tarjeta de entrar de la web. */
+  readonly size?: 36 | 42;
   readonly name?: string;
   readonly autoComplete?: string;
   readonly isRequired?: boolean;
@@ -46,6 +48,7 @@ export function TextField({
   type = 'text',
   mono = false,
   rows,
+  size = 36,
   placeholder,
   ...field
 }: TextFieldProps): ReactElement {
@@ -58,6 +61,7 @@ export function TextField({
       type={type}
       isInvalid={invalid}
       data-mono={mono ? 'true' : undefined}
+      data-size={size}
     >
       <Label className={css('label')}>{label}</Label>
       {rows === undefined ? (

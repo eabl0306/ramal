@@ -88,6 +88,11 @@
   font-size: inherit;
 }
 
+/* El boton de la llamada final del prototipo lleva 24 px de relleno, no 22. */
+.cta .link-button {
+  padding: 0 24px;
+}
+
 .section {
   display: flex;
   flex-direction: column;

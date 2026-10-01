@@ -16,10 +16,15 @@ fn the_default_listens_only_on_loopback() {
 }
 
 #[test]
+fn swagger_ui_is_off_by_default() {
+    assert!(!ServerConfig::default().swagger_ui);
+}
+
+#[test]
 fn rejects_a_host_that_is_not_an_ip() {
     let server = ServerConfig {
         host: "not an ip".to_owned(),
-        port: 8080,
+        ..ServerConfig::default()
     };
     let error = server.socket_addr().expect_err("a name is not an ip");
     assert!(matches!(error, ConfigError::InvalidAddress { .. }));

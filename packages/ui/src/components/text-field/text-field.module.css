@@ -1,4 +1,7 @@
-/* Campo de texto de modales y ajustes: etiqueta de 12 px y caja de 36 px. */
+/*
+ * Campo de texto de modales y ajustes: etiqueta de 12 px y caja de 36 px. La
+ * tarjeta de entrar de la web usa la caja de 42 con esquinas de 10 px.
+ */
 .field {
   display: flex;
   flex-direction: column;
@@ -47,6 +50,11 @@ textarea.input {
 
 .field[data-mono='true'] .input {
   font-family: var(--r-font-code);
+}
+
+.field[data-size='42'] .input {
+  height: 42px;
+  border-radius: 10px;
 }
 
 .description {

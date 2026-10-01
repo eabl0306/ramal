@@ -75,9 +75,10 @@ function AuthorCell({ row }: { readonly row: GraphRow }): ReactElement {
 }
 
 /**
- * Fecha del autor en el formato corto del idioma (30/9/26), que cabe tambien en
- * la columna estrecha de VS Code; la fecha y la hora completas van en el title.
- * Si el motor mandara algo que no es una fecha, se ensena tal cual.
+ * Fecha del autor como el `MM-DD HH:mm` de los prototipos, en el orden del idioma
+ * y con hora de 24 h ("30/9 08:05"): cabe en la columna de 84 px de VS Code y
+ * separa dos commits del mismo dia. La fecha completa va en el title. Si el motor
+ * mandara algo que no es una fecha, se ensena tal cual.
  */
 function DateCell({ iso }: { readonly iso: string }): ReactElement {
   const locale = useLocale();
@@ -86,7 +87,7 @@ function DateCell({ iso }: { readonly iso: string }): ReactElement {
   return (
     <div role="gridcell" className={`${css('cell')} ${css('code')}`}>
       <time dateTime={iso} title={valid ? formatDate(time, locale, { style: 'dateTime' }) : iso}>
-        {valid ? formatDate(time, locale, { style: 'short' }) : iso}
+        {valid ? formatDate(time, locale, { style: 'monthDayTime' }) : iso}
       </time>
     </div>
   );

@@ -77,12 +77,28 @@
   cursor: pointer;
 }
 
+/*
+ * Pasar por encima y elegir. En alto contraste los temas de VS Code quitan los
+ * fondos (--r-surface-hover y --r-accent-soft son transparentes) y lo marcan
+ * con contrastActiveBorder: discontinuo al pasar y continuo en la elegida, como
+ * sus listas. Fuera de alto contraste el borde es transparente y no se ve.
+ */
 .row:hover {
+  outline: 1px dashed var(--r-hc-active-border);
+  outline-offset: -1px;
   background: var(--r-surface-hover);
 }
 
 .row[aria-selected='true'] {
+  outline: 1px solid var(--r-hc-active-border);
+  outline-offset: -1px;
   background: var(--r-accent-soft);
+}
+
+/* Con la tabla enfocada, la seleccion activa (en VS Code, list.activeSelectionBackground). */
+.grid:focus-within .row[aria-selected='true'] {
+  background: var(--r-selection);
+  color: var(--r-selection-ink);
 }
 
 .grid:focus-visible .row[aria-selected='true'] {

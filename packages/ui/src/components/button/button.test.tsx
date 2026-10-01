@@ -31,6 +31,18 @@ describe('Button', () => {
     expect(container.querySelector('svg')).toHaveAttribute('width', '16');
   });
 
+  it('el envio de 44 y el proveedor outline llegan al CSS con su icono', () => {
+    const { container } = renderWithProviders(
+      <Button variant="outline" size={44} icon="download">
+        Continuar
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: 'Continuar' });
+    expect(button).toHaveAttribute('data-variant', 'outline');
+    expect(button).toHaveAttribute('data-size', '44');
+    expect(container.querySelector('svg')).toHaveAttribute('width', '17');
+  });
+
   it('deshabilitado no avisa', async () => {
     const onPress = vi.fn();
     renderWithProviders(

@@ -6,7 +6,8 @@
 #
 # Dos fases, con nombres y puertos propios para no chocar con la pila de compose:
 #
-#   1. Sin base de datos: /health/live responde 200 y /health/ready 503 degradado.
+#   1. Sin base de datos: /health/live responde 200, /health/ready 503 degradado y
+#      /swagger-ui/ 404, porque la imagen no lo sirve si nadie lo pide.
 #      El proceso no muere por no tener base, que es lo que evita un bucle de
 #      reinicios en el orquestador.
 #   2. Con PostgreSQL 18: la API aplica las migraciones al arrancar, /health/ready
@@ -69,6 +70,9 @@ grep -q '"name":"database"' "${body}" || fail "/health/ready no lista la base"
 [ "$(status_of "http://127.0.0.1:${port_down}/v1/ruta-que-no-existe")" = 404 ] \
   || fail "una ruta de /v1 que no existe deberia ser 404"
 grep -q '"code":"route_not_found"' "${body}" || fail "el 404 no es problem+json"
+# La imagen de produccion no sirve Swagger UI si nadie lo pide (ADR 0007).
+[ "$(status_of "http://127.0.0.1:${port_down}/swagger-ui/")" = 404 ] \
+  || fail "/swagger-ui/ deberia ser 404 en la imagen de produccion"
 
 echo "smoke: fase 2, ${image} con PostgreSQL 18"
 docker network create "${network}" >/dev/null

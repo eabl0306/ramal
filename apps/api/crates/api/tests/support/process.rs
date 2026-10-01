@@ -53,8 +53,14 @@ pub struct ApiProcess {
 impl ApiProcess {
     /// Arranca el servidor en un puerto libre contra la base dada.
     pub fn start(database_url: &str) -> Self {
+        Self::start_with(database_url, &[])
+    }
+
+    /// Como [`Self::start`], con variables `RAMAL__` extra.
+    pub fn start_with(database_url: &str, extra: &[(&str, &str)]) -> Self {
         let port = free_port();
         let child = command()
+            .envs(extra.iter().copied())
             .env("RAMAL__SERVER__HOST", "127.0.0.1")
             .env("RAMAL__SERVER__PORT", port.to_string())
             .env("RAMAL__DATABASE__URL", database_url)

@@ -1,16 +1,19 @@
 import type { ReleaseCatalog } from '../../application/ports/release-catalog';
-import type {
-  ArtifactLabel,
-  DownloadEntry,
-  DownloadFile,
-  ReleaseInfo,
+import {
+  type ArtifactLabel,
+  type DownloadEntry,
+  type DownloadFile,
+  type ReleaseInfo,
+  VSIX_TARGETS,
 } from '../../domain/downloads/release';
 
 /**
  * Datos de descarga fijos del primer corte: la version, los ficheros y los
  * tamanos del diseno, con los cambios de gaps X-09 (sin el portable de Windows,
- * el universal de macOS como .dmg). Cuando la API sirva GET /v1/releases/latest
- * (ADR 0016) este adaptador se sustituye por uno HTTP en el composition root.
+ * el universal de macOS como .dmg, un .vsix por plataforma y sin tamano, porque
+ * los 6 MB del diseno eran de un .vsix sin el motor). Cuando la API sirva
+ * GET /v1/releases/latest (ADR 0016) este adaptador se sustituye por uno HTTP en
+ * el composition root.
  */
 
 const MB = 1_000_000;
@@ -33,6 +36,11 @@ function installer(
 ): DownloadEntry {
   return file(label, name, sizeMb, { id: label, ...target });
 }
+
+/** El nombre que da `vsce package --target`: <nombre>-<destino>-<version>.vsix. */
+const VSIX_FILES: readonly DownloadEntry[] = VSIX_TARGETS.map((target) =>
+  file(`vsix-${target}`, `ramal-${target}-1.3.0.vsix`, null, null),
+);
 
 const STATIC_RELEASE: ReleaseInfo = {
   version: '2.4.0',
@@ -110,7 +118,7 @@ const STATIC_RELEASE: ReleaseInfo = {
     {
       target: 'vscode',
       primary: { kind: 'store', store: 'marketplace' },
-      alternates: [{ kind: 'store', store: 'open-vsx' }, file('vsix', 'ramal-1.3.0.vsix', 6, null)],
+      alternates: [{ kind: 'store', store: 'open-vsx' }, ...VSIX_FILES],
       install: 'vscode',
     },
   ],

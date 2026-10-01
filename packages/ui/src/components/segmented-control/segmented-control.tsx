@@ -21,9 +21,10 @@ export interface SegmentOption<T extends string> {
 /**
  * Las cuatro variantes del inventario 2.8: `bar` (ES/EN y tema de la barra de
  * titulo), `row` (fila de ajustes), `field` (campo de un modal, a todo el ancho)
- * y `surface` (lado a lado o unificado del diff).
+ * y `surface` (lado a lado o unificado del diff). Mas `nav`, la cabecera publica
+ * de la web: como `bar`, pero de 26 px y sin fondo, como su prototipo.
  */
-export type SegmentedVariant = 'bar' | 'row' | 'field' | 'surface';
+export type SegmentedVariant = 'bar' | 'nav' | 'row' | 'field' | 'surface';
 
 export interface SegmentedControlProps<T extends string> {
   readonly options: readonly SegmentOption<T>[];
@@ -61,7 +62,9 @@ export function SegmentedControl<T extends string>({
           key={option.id}
           id={option.id}
           className={css('segment')}
-          {...(option.iconOnly === true ? { 'aria-label': option.label } : {})}
+          {...(option.iconOnly === true
+            ? { 'aria-label': option.label, 'data-icon-only': 'true' }
+            : {})}
         >
           {option.icon === undefined ? null : <Icon name={option.icon} size={14} />}
           {option.iconOnly === true ? null : option.label}

@@ -41,6 +41,6 @@
   "markersFound": "The text still has conflict markers.",
   "discardManualTitle": "Discard the manual edit?",
   "discardManualInfo": "Changing a choice discards the hand-edited text of this file.",
-  "deduplicated_one": "Removed {count} line repeated on both sides.",
-  "deduplicated_other": "Removed {count} lines repeated on both sides."
+  "duplicates_one": "{count} line appears on both sides: check the result.",
+  "duplicates_other": "{count} lines appear on both sides: check the result."
 }

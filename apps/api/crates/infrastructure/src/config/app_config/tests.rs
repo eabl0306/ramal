@@ -28,6 +28,7 @@ fn falls_back_to_defaults_when_the_environment_is_empty() {
         assert_eq!(config.server.port, 8080);
         assert_eq!(config.telemetry.log_level, "info");
         assert_eq!(config.database.max_connections, 5);
+        assert!(!config.server.swagger_ui);
         Ok(())
     });
 }
@@ -42,7 +43,9 @@ fn reads_nested_keys_from_double_underscore_variables() {
         jail.set_env("RAMAL__DATABASE__MAX_CONNECTIONS", "9");
         jail.set_env("RAMAL__DATABASE__ACQUIRE_TIMEOUT_MS", "1500");
         jail.set_env("RAMAL__TELEMETRY__LOG_LEVEL", "debug");
+        jail.set_env("RAMAL__SERVER__SWAGGER_UI", "true");
         let config = AppConfig::from_env().expect("environment should load");
+        assert!(config.server.swagger_ui);
         assert_eq!(config.database.url, "postgres://u:p@db:5432/x");
         assert_eq!(config.database.max_connections, 9);
         assert_eq!(config.database.acquire_timeout_ms, 1500);

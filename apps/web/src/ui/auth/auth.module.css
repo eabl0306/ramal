@@ -37,6 +37,24 @@
   gap: 8px;
 }
 
+/* El distintivo de Google, con las medidas del PlatformBadge de 20 px. */
+.google-badge {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--r-provider-google);
+  color: var(--r-on-emphasis);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.badge-slot {
+  display: inline-flex;
+}
+
 .divider {
   display: flex;
   gap: 10px;

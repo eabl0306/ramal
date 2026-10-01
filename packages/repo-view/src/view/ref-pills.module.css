@@ -1,8 +1,9 @@
 /*
  * Pildoras de refs: borde del color de la rama (o del tono de aviso en un tag) y
- * fondo del mismo color al 14% (32% la rama de HEAD), como el prototipo. El
- * tinte va en un ::before con opacidad porque fuera de los temas no se pueden
- * escribir funciones de color: el color llega en --rv-ref-color desde un token.
+ * fondo del mismo color al 14% (32% la rama de HEAD), como el prototipo de
+ * escritorio; el de VS Code (densidad compacta) tine al 12% y 30%. El tinte va en
+ * un ::before con opacidad porque fuera de los temas no se pueden escribir
+ * funciones de color: el color llega en --rv-ref-color desde un token.
  */
 .refs {
   display: flex;
@@ -65,7 +66,11 @@
   font-size: 11px;
 }
 
-/* VS Code: pildoras de 18 px con esquinas de 3 px. */
+/*
+ * VS Code: pildoras de 18 px con esquinas de 3 px, letra normal, sin glifo en las
+ * ramas locales (solo HEAD, remotas y tags lo llevan) y "+n" sobre la seleccion
+ * inactiva, el --sel2 de su prototipo.
+ */
 [data-density='compact'] .refs {
   gap: 3px;
   padding-left: 10px;
@@ -77,10 +82,24 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 3px;
+  font-weight: normal;
+}
+
+[data-density='compact'] .ref::before {
+  opacity: 0.12;
+}
+
+[data-density='compact'] .ref[data-head='true']::before {
+  opacity: 0.3;
+}
+
+[data-density='compact'] .ref[data-kind='localBranch']:not([data-head='true']) .ref-icon {
+  display: none;
 }
 
 [data-density='compact'] .more {
   height: 18px;
   padding: 0 4px;
   border-radius: 3px;
+  background: var(--r-accent-soft);
 }
