@@ -23,9 +23,9 @@ su grafo con `@ramal/repo-view`, con el motor de Git en el mismo proceso.
 ```sh
 just desktop-check          # lint, tipos, cobertura y build de Vite
 just desktop-e2e            # Playwright contra el build, con el IPC simulado
-just desktop-rust-check     # clippy y tests del host (necesita webkit2gtk)
+just desktop-rust-check     # clippy, tests y cobertura del host (necesita webkit2gtk)
 just desktop-build          # tauri build sin empaquetar
-just desktop-e2e-native     # la app real con WebdriverIO, bajo xvfb si no hay pantalla
+just desktop-e2e-native     # la app real con WebdriverIO; en Linux sin pantalla, bajo xvfb
 just desktop-dev            # tauri dev, con Vite en el puerto 1420
 ```
 
@@ -52,4 +52,9 @@ ruta dentro del contenedor.
   WebDriver no puede manejar el dialogo del sistema. El binario normal no lleva nada de esto.
 - **knip.** No entiende el `runner` ni los `services` de WebdriverIO, por eso
   `@wdio/local-runner` y `@wdio/tauri-service` estan en su `ignoreDependencies`.
+- **wdio y la ventana.** `@wdio/tauri-service` intenta reenfocar la ventana con la API global de
+  Tauri, que esta app no lleva (`withGlobalTauri: false`). `wdio.conf.ts` elige la ventana a mano
+  con `switchToWindow` y asi no espera 5 s en cada busqueda.
 - **Log.** El host escribe en stderr; `RAMAL_LOG=debug` sube el detalle.
+- **Sin verificar todavia:** Windows y macOS, el empaquetado (`desktop-build` usa `--no-bundle`)
+  y `tauri dev` en una maquina sin webkit2gtk (las recetas de Docker no lo cubren).

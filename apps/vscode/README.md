@@ -27,9 +27,9 @@ corepack pnpm --filter ramal dev      # host con esbuild en modo watch y Vite en
 Despues, "Run Extension" en `.vscode/launch.json` de esta carpeta: carga los webviews desde Vite
 con la CSP de desarrollo.
 
-| Receta                         | Que hace                                                         |
-| ------------------------------ | ---------------------------------------------------------------- |
-| `just vscode-check`            | Lint, tipos, cobertura (80% en `application`, 60% global), build |
-| `just vscode-e2e`              | Playwright contra el bundle del webview (puerto 4175)            |
-| `just vscode-test-integration` | VS Code de verdad bajo xvfb con el sidecar y un repo de prueba   |
-| `just vscode-package`          | VSIX de esta plataforma con el motor en `dist/bin`               |
+| Receta                         | Que hace                                                                              |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| `just vscode-check`            | Lint, tipos, cobertura (80% en `application`, 60% global), build                      |
+| `just vscode-e2e`              | Playwright contra el bundle del webview (puerto 4175)                                 |
+| `just vscode-test-integration` | VS Code de verdad con el sidecar y un repo de prueba; xvfb solo en Linux sin pantalla |
+| `just vscode-package`          | VSIX de esta plataforma con el motor en `dist/bin`                                    |

@@ -30,14 +30,15 @@ import { I18nProvider, IconProvider, ToastProvider } from '@ramal/ui';
 
 | Pieza      | Contenido                                                                                                                                                                                                           |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tokens     | `--r-*` semanticos (architecture.md 7.1), `cssVar`, `laneColor` (con modulo, gaps B-14)                                                                                                                             |
+| Tokens     | `--r-*` semanticos (architecture.md 7.1, lista en `tokens/tokens.ts`), `cssVar`, `laneColor` (con modulo, gaps B-14)                                                                                                |
 | Temas      | `themes/ramal.css` con los oklch del handoff y `themes/vscode.css` sobre `--vscode-*`                                                                                                                               |
 | Idioma     | `I18nProvider`, `useT` y `useLocale` sobre `@ramal/i18n`; tambien fija el idioma de React Aria                                                                                                                      |
 | Iconos     | `<Icon name>` con `IconName` cerrado; juegos en `icons/lucide` y `icons/codicons`                                                                                                                                   |
 | Primitivas | `Button`, `IconButton`, `Badge`, `PlatformBadge`, `PrStateBadge`, `FileStatusBadge`, `Chip`, `Toggle`, `SegmentedControl`, `TextField`, `Modal`, `ContextMenu` con `useContextMenu`, `ToastProvider` con `useToast` |
 
 Las primitivas estan hechas sobre React Aria Components (ADR 0011), que da teclado, foco y
-lectores de pantalla sin inyectar `<style>` (la CSP lo bloquearia). El aspecto va en CSS Modules
+lectores de pantalla. La version 1.21 inyecta un unico `<style>` fijo (el `touch-action` de lo
+pulsable): escritorio lo permite por su hash en la CSP; los webviews de VS Code todavia no. El aspecto va en CSS Modules
 que solo leen tokens: stylelint y `ramal/no-raw-colors` rechazan cualquier color fuera de
 `src/themes`, y `ramal/no-jsx-literal-text` cualquier texto visible que no venga de `@ramal/i18n`.
 

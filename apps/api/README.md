@@ -2,7 +2,8 @@
 
 API de Ramal en Rust: Salvo 1.0, PostgreSQL 18 con SQLx y arquitectura hexagonal.
 El primer corte trae la salud del servicio, el documento OpenAPI, errores en
-problem+json, request id, configuracion `RAMAL__` y migraciones al arrancar.
+problem+json, request id, configuracion `RAMAL__` y migraciones al arrancar, en segundo plano y
+con reintento cada 10 segundos.
 
 El porque de cada pieza esta en `docs/architecture.md` (seccion 4.5) y en los ADR
 0003, 0004 y 0007. El contrato HTTP, en `docs/api-surface.md`.
@@ -18,7 +19,12 @@ El porque de cada pieza esta en `docs/architecture.md` (seccion 4.5) y en los AD
 | `crates/api` (`ramal-api`)                           | Binario y composition root                                    |
 
 `crates/api/tests/architecture.rs` lee `Cargo.lock` y falla si una capa importa lo
-que no le toca.
+que no le toca. `ramal-api` no depende de Salvo: el servidor arranca dentro de
+`ramal-api-http`.
+
+Los tests de endpoint sin base de datos van en `crates/http/tests` con fakes. Los que necesitan
+PostgreSQL van en `crates/infrastructure/tests` y, de punta a punta con el binario, en
+`crates/api/tests`: `ramal-api-http` no puede alcanzar SQLx ni en sus tests.
 
 ## Uso
 
@@ -46,7 +52,9 @@ La imagen se prueba arrancada con `bash apps/api/scripts/smoke-image.sh`.
 | `/swagger-ui/`  | El visor, sin CDN. Solo con `RAMAL__SERVER__SWAGGER_UI=true` |
 
 `/health/ready` pide que PostgreSQL responda y que su esquema este al dia con las
-migraciones del binario.
+migraciones del binario. Las dos sondas llevan `checkedAt` y nunca el detalle de un fallo, que
+queda en el log. Todo error lleva un `code` estable (`route_not_found`,
+`method_not_allowed`...); la lista esta en `docs/api-surface.md`.
 
 ## Configuracion
 
