@@ -11,7 +11,8 @@
     "check-package-graph": "./package-graph.mjs",
     "check-limit-suppressions": "./no-limit-suppressions.mjs",
     "check-cargo-lints": "./cargo-lints.mjs",
-    "check-eslint-configs": "./eslint-configs.mjs"
+    "check-eslint-configs": "./eslint-configs.mjs",
+    "check-rust-test-modules": "./rust-test-modules.mjs"
   },
   "scripts": {
     "test": "node --test \"*.test.mjs\""

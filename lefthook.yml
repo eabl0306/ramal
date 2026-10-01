@@ -74,6 +74,11 @@ pre-commit:
           - name: limit-suppressions
             run: node tools/checks/no-limit-suppressions.mjs --staged
 
+          # Un mod tests en linea cuenta como codigo cubierto: van en su tests.rs.
+          - name: rust-test-modules
+            glob: '*.rs'
+            run: node tools/checks/rust-test-modules.mjs --staged
+
           # Un crate que no hereda [workspace.lints] o un clippy.toml que no
           # repite los umbrales dejan a clippy sin limites y en verde.
           - name: cargo-lints

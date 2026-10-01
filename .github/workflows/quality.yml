@@ -1,7 +1,6 @@
 # Reglas que valen para todo el repo, sin importar el lenguaje: formato,
-# mensajes de commit, tamano de fichero, tests apagados, marcadores sin ticket,
-# grafo de paquetes, limites apagados en linea, codigo muerto y secretos. Corre
-# siempre, en cualquier cambio.
+# mensajes de commit, las comprobaciones de tools/checks, codigo muerto y
+# secretos. Corre siempre, en cualquier cambio.
 name: quality
 
 on:
@@ -41,7 +40,9 @@ jobs:
       - name: Formato (prettier)
         run: pnpm run format:check
 
-      - name: Reglas comunes (tamano, tests, marcadores, grafo, limites apagados, lints de cargo, eslint)
+      # tools/checks: tamano, tests apagados, marcadores, grafo de paquetes, limites
+      # apagados, lints de cada crate, eslint por paquete y tests de Rust en linea.
+      - name: Reglas comunes (just guard)
         run: pnpm run check:quality
 
       # ESLint de la raiz: packages/eslint-config y tools/, que son JavaScript

@@ -40,6 +40,10 @@ database_url := "postgres://" + pg_user + ":${POSTGRES_PASSWORD:-ramal}@127.0.0.
 # Crates de cada area, para pasarlos a cargo con -p.
 api_crates := "-p ramal-api-domain -p ramal-api-application -p ramal-api-infrastructure -p ramal-api-http -p ramal-api"
 engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protocol -p ramal-git -p ramal-engine -p ramal-vscode-engine"
+# Fakes y ayudas de test de los nucleos (src/testing/): se compilan con los
+# tests y se ejercitan solos, asi que contarlos como cubiertos inflaba la cifra.
+# Los tests.rs y tests/ ya los deja fuera cargo-llvm-cov por defecto.
+cov_ignore := "--ignore-filename-regex '/src/testing/'"
 # Carpetas de los paquetes de TypeScript compartidos; cada una es @ramal/<carpeta>.
 ts_package_dirs := "domain i18n ui repo-view bridge api-client"
 protocol_out := "packages/bridge/src/generated"
@@ -125,8 +129,11 @@ e2e: web-e2e desktop-e2e vscode-e2e vscode-test-integration api-test-db
 [group('monorepo')]
 build: api-build web-build desktop-web-build vscode-build
 
-# Reglas comunes: tamano, tests apagados, marcadores, grafo de paquetes, limites apagados, lints de cargo y eslint por paquete.
+# Los scripts de tools/checks: tamano de fichero, tests apagados, marcadores sin
+# ticket, grafo de paquetes, limites apagados en linea, lints heredados por cada
+# crate, eslint.config.js por paquete y tests de Rust fuera de linea.
 [group('monorepo')]
+[doc('Reglas comunes a todos los lenguajes (tools/checks).')]
 guard:
     {{pnpm}} run check:quality
 
@@ -217,11 +224,18 @@ api-test-db:
     fi
     RAMAL_TEST_REQUIRE_DATABASE=1 cargo test {{api_crates}} --tests -- --nocapture
 
-# Cobertura de la API: 80% en el nucleo (dominio y aplicacion) y 60% global.
+# El nucleo se mide con sus propios tests y cada crate por separado (`report -p`
+# reaprovecha esa ejecucion). Medir dominio y aplicacion juntos dejaba que el
+# dominio, grande y al 100%, tapara una aplicacion con sus casos de uso al 0%; y
+# medirlos con los tests de los adaptadores contaria como cubierto un caso de
+# uso que solo se ejecuta de rebote. El global corre todos los tests.
 [group('api')]
+[doc('Cobertura de la API: 80% en dominio y en aplicacion, cada uno, y 60% global.')]
 api-cov:
-    cargo llvm-cov -p ramal-api-domain -p ramal-api-application --summary-only --fail-under-lines 80
-    cargo llvm-cov {{api_crates}} --summary-only --fail-under-lines 60
+    cargo llvm-cov -p ramal-api-domain -p ramal-api-application {{cov_ignore}} --summary-only
+    cargo llvm-cov report -p ramal-api-domain {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov report -p ramal-api-application {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov {{api_crates}} {{cov_ignore}} --summary-only --fail-under-lines 60
 
 # Arranca la API en local contra el Postgres de docker compose.
 [group('api')]
@@ -282,11 +296,15 @@ engine-check:
 engine-test:
     cargo test {{engine_crates}}
 
-# Cobertura del motor: 80% en el nucleo (dominio y aplicacion) y 60% global.
+# Igual que api-cov: el nucleo con sus propios tests, un informe por crate, y el
+# global con todos.
 [group('engine')]
+[doc('Cobertura del motor: 80% en dominio y en aplicacion, cada uno, y 60% global.')]
 engine-cov:
-    cargo llvm-cov -p ramal-core-domain -p ramal-core-application --summary-only --fail-under-lines 80
-    cargo llvm-cov {{engine_crates}} --summary-only --fail-under-lines 60
+    cargo llvm-cov -p ramal-core-domain -p ramal-core-application {{cov_ignore}} --summary-only
+    cargo llvm-cov report -p ramal-core-domain {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov report -p ramal-core-application {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov {{engine_crates}} {{cov_ignore}} --summary-only --fail-under-lines 60
 
 # ts-rs escribe los tipos cuando corren sus tests `export_bindings_*`. La carpeta
 # se borra antes para que un tipo eliminado en Rust desaparezca tambien en TS.
