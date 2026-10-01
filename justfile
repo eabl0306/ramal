@@ -40,8 +40,8 @@ database_url := "postgres://" + pg_user + ":${POSTGRES_PASSWORD:-ramal}@127.0.0.
 # Crates de cada area, para pasarlos a cargo con -p.
 api_crates := "-p ramal-api-domain -p ramal-api-application -p ramal-api-infrastructure -p ramal-api-http -p ramal-api"
 engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protocol -p ramal-git -p ramal-engine -p ramal-vscode-engine"
-# Paquetes de TypeScript compartidos, para pasarlos a pnpm.
-ts_packages := "--filter @ramal/domain --filter @ramal/i18n --filter @ramal/ui --filter @ramal/repo-view --filter @ramal/bridge --filter @ramal/api-client"
+# Carpetas de los paquetes de TypeScript compartidos; cada una es @ramal/<carpeta>.
+ts_package_dirs := "domain i18n ui repo-view bridge api-client"
 protocol_out := "packages/bridge/src/generated"
 
 # Lista todas las recetas.
@@ -298,23 +298,54 @@ packages-check: packages-lint packages-typecheck packages-cov
 
 # ESLint de los paquetes compartidos.
 [group('packages')]
-packages-lint:
-    {{pnpm}} --fail-if-no-match {{ts_packages}} run lint
+packages-lint: (_packages-run "lint")
 
 # TypeScript en modo estricto en los paquetes compartidos.
 [group('packages')]
-packages-typecheck:
-    {{pnpm}} --fail-if-no-match {{ts_packages}} run typecheck
+packages-typecheck: (_packages-run "typecheck")
 
 # Tests unitarios de los paquetes compartidos.
 [group('packages')]
-packages-test:
-    {{pnpm}} --fail-if-no-match {{ts_packages}} run test
+packages-test: (_packages-run "test")
 
 # Cobertura de los paquetes compartidos, con sus umbrales.
 [group('packages')]
-packages-cov:
-    {{pnpm}} --fail-if-no-match {{ts_packages}} run test:coverage
+packages-cov: (_packages-run "test:coverage")
+
+# Regenera los tipos de los parametros de @ramal/i18n desde el diccionario castellano.
+[group('packages')]
+i18n-gen:
+    {{pnpm_filter}} @ramal/i18n generate
+
+# Los paquetes compartidos llegan de varias ramas (bridge, repo-view y
+# api-client los montan otros), asi que una carpeta que todavia no existe se
+# salta con un aviso en vez de fallar. Lo que no se esconde: un paquete que
+# existe tiene que llamarse @ramal/<carpeta> y declarar el script del contrato
+# (si no, pnpm lo saltaria en silencio), y cualquier fallo de su script pone la
+# receta en rojo. Sin ningun paquete, falla.
+[private]
+_packages-run script:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    filters=()
+    for dir in {{ts_package_dirs}}; do
+      manifest="packages/${dir}/package.json"
+      if [ ! -f "${manifest}" ]; then
+        echo "packages: packages/${dir} todavia no existe, se salta" >&2
+        continue
+      fi
+      info="$(node -p "const p = require('./${manifest}'); [p.name, Boolean(p.scripts && p.scripts['{{script}}'])].join(' ')")"
+      if [ "${info}" != "@ramal/${dir} true" ]; then
+        echo "packages: ${manifest} incumple el contrato (nombre @ramal/${dir} y script {{script}}): ${info}" >&2
+        exit 1
+      fi
+      filters+=(--filter "@ramal/${dir}")
+    done
+    if [ "${#filters[@]}" -eq 0 ]; then
+      echo "packages: no hay ningun paquete compartido que comprobar" >&2
+      exit 1
+    fi
+    {{pnpm}} --fail-if-no-match "${filters[@]}" run {{script}}
 
 # --------------------------------------------------------------------- web ---
 
