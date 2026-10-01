@@ -33,6 +33,28 @@ describe('LoginScreen', () => {
     );
   });
 
+  it('tiene los controles del prototipo: proveedores con distintivo, campos de 42 y envio de 44', () => {
+    renderScreen(<LoginScreen />);
+
+    const github = screen.getByRole('button', { name: 'Continuar con GitHub' });
+    expect(github).toHaveAttribute('data-variant', 'outline');
+    expect(github).toHaveAttribute('data-size', '42');
+    // El distintivo es decorativo: no cambia el nombre accesible del boton.
+    expect(github).toHaveTextContent(/^GHContinuar con GitHub$/u);
+    expect(screen.getByRole('button', { name: 'Continuar con GitLab' })).toHaveTextContent(/^GL/u);
+    expect(screen.getByRole('button', { name: 'Continuar con Google' })).toHaveTextContent(/^G/u);
+    expect(screen.getByRole('button', { name: 'Iniciar sesión' })).toHaveAttribute(
+      'data-size',
+      '44',
+    );
+    for (const label of ['Email', 'Contraseña']) {
+      expect(screen.getByLabelText(label).closest('[data-size]')).toHaveAttribute(
+        'data-size',
+        '42',
+      );
+    }
+  });
+
   it('los proveedores contestan lo mismo que el formulario', async () => {
     const user = userEvent.setup();
     renderScreen(<LoginScreen />);

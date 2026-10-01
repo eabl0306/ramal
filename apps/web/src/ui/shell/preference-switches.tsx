@@ -34,7 +34,7 @@ export function LanguageSwitch(): ReactElement {
 
   return (
     <SegmentedControl
-      variant="bar"
+      variant="nav"
       label={t('settings.appearance.language')}
       value={locale}
       options={LANGUAGE_OPTIONS}
@@ -55,7 +55,7 @@ export function ThemeSwitch(): ReactElement {
 
   return (
     <SegmentedControl
-      variant="bar"
+      variant="nav"
       label={t('settings.appearance.theme')}
       value={theme}
       options={options}

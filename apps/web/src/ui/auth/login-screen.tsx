@@ -1,10 +1,11 @@
-import { TextField, useT } from '@ramal/ui';
+import { useT } from '@ramal/ui';
 import { type ReactElement, useState } from 'react';
 
 import { signIn, signInWithProvider } from '../../application/use-cases/authenticate';
 import { useUiPorts } from '../ports/ui-ports';
 
 import { AuthCard } from './auth-card';
+import { AuthField } from './auth-field';
 import { useAuthSubmit } from './use-auth-submit';
 
 /**
@@ -40,7 +41,7 @@ export function LoginScreen(): ReactElement {
       switchText={t('web.auth.noAccount')}
       switchLink={{ to: '/signup', label: t('web.nav.signup') }}
     >
-      <TextField
+      <AuthField
         label={t('web.auth.email')}
         type="email"
         name="email"
@@ -48,7 +49,7 @@ export function LoginScreen(): ReactElement {
         value={email}
         onChange={edit(setEmail)}
       />
-      <TextField
+      <AuthField
         label={t('web.auth.password')}
         type="password"
         name="password"

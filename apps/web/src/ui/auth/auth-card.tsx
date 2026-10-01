@@ -1,4 +1,5 @@
-import { Button, useT } from '@ramal/ui';
+import { PLATFORMS } from '@ramal/domain';
+import { Button, PlatformBadge, useT } from '@ramal/ui';
 import type { ReactElement, ReactNode, SubmitEvent } from 'react';
 import { Link } from 'react-router';
 
@@ -12,10 +13,62 @@ const css = moduleClasses(styles);
 
 /** Los proveedores de identidad del diseno; sus nombres son marcas y no se traducen. */
 const PROVIDERS: readonly { readonly id: OAuthProvider; readonly name: string }[] = [
-  { id: 'github', name: 'GitHub' },
-  { id: 'gitlab', name: 'GitLab' },
+  { id: 'github', name: PLATFORMS.github.label },
+  { id: 'gitlab', name: PLATFORMS.gitlab.label },
   { id: 'google', name: 'Google' },
 ];
+
+/** La letra del distintivo de Google en el prototipo; es una marca y no se traduce. */
+const GOOGLE_ABBR = 'G';
+
+/**
+ * El distintivo de 20 px de cada proveedor. Es decorativo: el nombre ya va en el
+ * texto del boton, y repetirlo haria que el lector de pantalla lo dijera dos veces.
+ */
+function ProviderBadge({ provider }: { readonly provider: OAuthProvider }): ReactElement {
+  if (provider === 'google') {
+    return (
+      <span className={css('google-badge')} aria-hidden="true">
+        {GOOGLE_ABBR}
+      </span>
+    );
+  }
+  const platform = PLATFORMS[provider];
+  return (
+    <span className={css('badge-slot')} aria-hidden="true">
+      <PlatformBadge platform={provider} abbr={platform.abbr} name={platform.label} size={20} />
+    </span>
+  );
+}
+
+interface ProviderButtonsProps {
+  readonly pending: boolean;
+  readonly onProvider: (provider: OAuthProvider) => void;
+}
+
+/** Los botones de proveedor del prototipo: fondo de la pagina, distintivo y borde de acento al pasar. */
+function ProviderButtons({ pending, onProvider }: ProviderButtonsProps): ReactElement {
+  const t = useT();
+  return (
+    <div className={css('providers')}>
+      {PROVIDERS.map((provider) => (
+        <Button
+          key={provider.id}
+          variant="outline"
+          size={42}
+          block
+          isDisabled={pending}
+          onPress={() => {
+            onProvider(provider.id);
+          }}
+        >
+          <ProviderBadge provider={provider.id} />
+          {t('web.auth.continueWith', { provider: provider.name })}
+        </Button>
+      ))}
+    </div>
+  );
+}
 
 export interface AuthCardProps {
   readonly title: string;
@@ -51,21 +104,7 @@ export function AuthCard(props: AuthCardProps): ReactElement {
           <h1 className={css('title')}>{props.title}</h1>
           <p className={css('subtitle')}>{props.subtitle}</p>
         </div>
-        <div className={css('providers')}>
-          {PROVIDERS.map((provider) => (
-            <Button
-              key={provider.id}
-              size={42}
-              block
-              isDisabled={submit.pending}
-              onPress={() => {
-                props.onProvider(provider.id);
-              }}
-            >
-              {t('web.auth.continueWith', { provider: provider.name })}
-            </Button>
-          ))}
-        </div>
+        <ProviderButtons pending={submit.pending} onProvider={props.onProvider} />
         <div className={css('divider')}>{t('web.auth.orEmail')}</div>
         <form className={css('form')} noValidate onSubmit={send}>
           {props.children}
@@ -74,7 +113,7 @@ export function AuthCard(props: AuthCardProps): ReactElement {
               {t(submit.message)}
             </div>
           )}
-          <Button type="submit" variant="primary" size={42} block isDisabled={submit.pending}>
+          <Button type="submit" variant="primary" size={44} block isDisabled={submit.pending}>
             {props.submitLabel}
           </Button>
         </form>

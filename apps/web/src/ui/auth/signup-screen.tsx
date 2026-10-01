@@ -1,5 +1,5 @@
 import { passwordHint } from '@ramal/domain';
-import { TextField, useT } from '@ramal/ui';
+import { useT } from '@ramal/ui';
 import { type ReactElement, useState } from 'react';
 
 import { signInWithProvider, signUp } from '../../application/use-cases/authenticate';
@@ -7,6 +7,7 @@ import { useUiPorts } from '../ports/ui-ports';
 import { moduleClasses } from '../shared/module-classes';
 
 import { AuthCard } from './auth-card';
+import { AuthField } from './auth-field';
 import styles from './auth.module.css';
 import { useAuthSubmit } from './use-auth-submit';
 
@@ -62,14 +63,14 @@ function SignupFieldset({
   const hintOk = passwordHint(fields.password) === 'ok';
   return (
     <>
-      <TextField
+      <AuthField
         label={t('web.auth.name')}
         name="name"
         autoComplete="name"
         value={fields.name}
         onChange={onEdit('name')}
       />
-      <TextField
+      <AuthField
         label={t('web.auth.email')}
         type="email"
         name="email"
@@ -77,7 +78,7 @@ function SignupFieldset({
         value={fields.email}
         onChange={onEdit('email')}
       />
-      <TextField
+      <AuthField
         label={t('web.auth.password')}
         type="password"
         name="password"
@@ -88,7 +89,7 @@ function SignupFieldset({
       <p className={css('hint')} data-ok={hintOk ? 'true' : 'false'}>
         {t(hintOk ? 'web.auth.passwordOk' : 'web.auth.passwordHint')}
       </p>
-      <TextField
+      <AuthField
         label={t('web.auth.organization')}
         name="organization"
         autoComplete="organization"
