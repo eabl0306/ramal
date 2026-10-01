@@ -1,0 +1,119 @@
+# Motor de Git del cliente (crates/*), sidecar de VS Code (apps/vscode-engine) y
+# @ramal/bridge: clippy, tests contra repos reales, cobertura con umbral, tipos
+# generados sin diff y los checks del paquete. Las mismas recetas que en local.
+#
+# La suite del motor corre dos veces: con el git del runner (el mas reciente) y
+# con git 2.34, la minima que admite Ramal (ADR 0009). Es la unica forma de que la
+# deteccion de capacidades y los formatos de salida se prueben de verdad.
+name: engine
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  # Solo tablas de lineas en los binarios de test: cargo llvm-cov no necesita mas,
+  # y target/ con instrumentacion de cobertura ocupa varios gigas menos.
+  CARGO_PROFILE_DEV_DEBUG: line-tables-only
+  CARGO_PROFILE_TEST_DEBUG: line-tables-only
+
+jobs:
+  verify:
+    name: motor con el git del runner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Sin argumentos, rustup instala el toolchain que fija rust-toolchain.toml.
+      - name: Instalar el toolchain de rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov,just
+
+      - name: Version de git
+        run: git --version
+
+      # Clippy, tests y cobertura (80% en el nucleo, 60% global) de crates/* y del
+      # sidecar, incluidos los tests de arquitectura del hexagono del cliente.
+      - name: Motor (just engine-check)
+        run: just engine-check
+
+      # Regenera packages/bridge/src/generated y falla si no coincide con lo
+      # commiteado: un DTO cambiado sin regenerar se ve aqui con su diff.
+      - name: Tipos generados del protocolo (just protocol-check)
+        run: just protocol-check
+
+      - name: Sidecar en release (just vscode-engine-build)
+        run: just vscode-engine-build
+
+  minimum-git:
+    name: motor con git 2.34
+    runs-on: ubuntu-latest
+    # Ubuntu 22.04 trae git 2.34.1, justo la minima. Se instala lo justo para
+    # compilar y lanzar los tests; git va antes del checkout para que la accion
+    # clone con git y no con la API.
+    container: ubuntu:22.04
+    steps:
+      - name: Paquetes del sistema
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends git curl ca-certificates build-essential
+
+      - uses: actions/checkout@v7
+
+      - name: Comprobar que es git 2.34
+        run: git --version | grep -q 'git version 2.34'
+
+      - name: Instalar rustup y el toolchain de rust-toolchain.toml
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+            | sh -s -- -y --profile minimal --default-toolchain none
+          echo "${HOME}/.cargo/bin" >> "${GITHUB_PATH}"
+          "${HOME}/.cargo/bin/rustup" toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: git-2.34
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Tests del motor (just engine-test)
+        run: just engine-test
+
+  bridge:
+    name: '@ramal/bridge'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # La misma version que `packageManager` en package.json.
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.18.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --fail-if-no-match --filter @ramal/bridge run lint
+
+      - name: Tipos
+        run: pnpm --fail-if-no-match --filter @ramal/bridge run typecheck
+
+      - name: Tests y cobertura (minimo 80%)
+        run: pnpm --fail-if-no-match --filter @ramal/bridge run test:coverage
