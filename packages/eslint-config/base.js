@@ -22,6 +22,8 @@ export const DEFAULT_IGNORES = [
   '**/.vite/**',
   '**/.vscode-test/**',
   '**/.react-router/**',
+  // Worktrees de los agentes: copias completas del repo con su propio codigo.
+  '**/.claude/worktrees/**',
   // Codigo generado: los tipos del protocolo (ts-rs) y el cliente de la API
   // (OpenAPI). Se corrigen en su generador, no a mano.
   '**/generated/**',

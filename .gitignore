@@ -55,3 +55,6 @@ apps/desktop/src-tauri/gen/schemas/
 .turbo/
 .cache/
 lcov.info
+# Worktrees que crean los agentes de Claude Code dentro del repo. Son copias
+# completas: sin esto, git, ESLint y prettier las verian como codigo propio.
+.claude/worktrees/
