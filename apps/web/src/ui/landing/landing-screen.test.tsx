@@ -76,9 +76,8 @@ describe('LandingScreen', () => {
     // Tauri 2 necesita webkit2gtk-4.1, que no existe en Ubuntu 20.04 ni Debian 11 (gaps X-09).
     expect(card).toHaveTextContent('Ubuntu 22.04+, Debian 12+, Fedora 38+');
     expect(card).not.toHaveTextContent('20.04');
-    for (const name of [/\(\.deb\), sin actualizaciones/u, /\(\.rpm\), sin actualizaciones/u]) {
-      expect(within(card).getAllByRole('button', { name }).length).toBeGreaterThan(0);
-    }
+    // El aviso va en el requisito: en el boton principal el texto no cabria.
+    expect(card).toHaveTextContent('Los .deb y .rpm no se actualizan solos');
     expect(within(card).getByRole('link', { name: /se actualiza con Flatpak/u })).toBeVisible();
   });
 

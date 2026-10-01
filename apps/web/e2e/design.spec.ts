@@ -70,6 +70,19 @@ test('la tarjeta de entrar tiene los controles del prototipo', async ({ page }) 
   await expect(submit).toHaveCSS('font-size', '15px');
 });
 
+test('ningun boton de las tarjetas de descarga corta su texto', async ({ page }) => {
+  await page.goto('/');
+  // Los botones no parten linea: un aviso largo en una etiqueta se saldria del boton.
+  const clipped = await page
+    .locator('[data-testid^="download-card"] button')
+    .evaluateAll((buttons) =>
+      buttons
+        .filter((button) => button.scrollWidth > button.clientWidth + 1)
+        .map((button) => button.textContent),
+    );
+  expect(clipped).toEqual([]);
+});
+
 test('el boton principal de cada descarga lleva las esquinas de 10 del prototipo', async ({
   page,
 }) => {
