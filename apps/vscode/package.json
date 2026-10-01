@@ -1,0 +1,145 @@
+{
+  "name": "ramal",
+  "displayName": "Ramal",
+  "description": "%extension.description%",
+  "version": "0.1.0",
+  "publisher": "ramal",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "vscode": "^1.138.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "Visualization"
+  ],
+  "keywords": [
+    "git",
+    "graph",
+    "history"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": false
+    }
+  },
+  "main": "./dist/extension.cjs",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ramal.openGraph",
+        "title": "%command.openGraph.title%",
+        "category": "Ramal",
+        "icon": "$(git-commit)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ramal",
+          "title": "Ramal",
+          "icon": "media/ramal.svg"
+        }
+      ]
+    },
+    "views": {
+      "ramal": [
+        {
+          "id": "ramal.welcome",
+          "name": "%view.welcome.name%",
+          "contextualTitle": "Ramal"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "ramal.welcome",
+        "contents": "%view.welcome.contents%"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "ramal.openGraph",
+          "when": "view == ramal.welcome",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Ramal",
+      "properties": {
+        "ramal.engine.path": {
+          "type": "string",
+          "default": "",
+          "scope": "application",
+          "markdownDescription": "%config.engine.path%"
+        },
+        "ramal.engine.logLevel": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warn",
+            "info",
+            "debug",
+            "trace"
+          ],
+          "default": "info",
+          "scope": "application",
+          "description": "%config.engine.logLevel%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc -b && node scripts/build-host.mjs && vite build",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix --max-warnings 0",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install chromium",
+    "test:integration": "node scripts/build-integration.mjs && vscode-test",
+    "package": "vsce package --no-dependencies --skip-license --allow-missing-repository"
+  },
+  "dependencies": {
+    "@ramal/bridge": "workspace:*",
+    "@ramal/i18n": "workspace:*",
+    "@ramal/repo-view": "workspace:*",
+    "@ramal/ui": "workspace:*",
+    "@tanstack/react-query": "5.104.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@ramal/eslint-config": "workspace:*",
+    "@ramal/tsconfig": "workspace:*",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@types/mocha": "10.0.10",
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/vscode": "1.138.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "@vitest/coverage-v8": "5.0.2",
+    "@vscode/test-cli": "0.0.15",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "4.0.0",
+    "esbuild": "0.28.2",
+    "eslint": "10.11.0",
+    "jsdom": "30.1.1",
+    "typescript": "6.0.3",
+    "vite": "8.3.1",
+    "vitest": "5.0.2"
+  }
+}

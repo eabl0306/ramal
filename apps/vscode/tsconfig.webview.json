@@ -1,0 +1,22 @@
+// Webviews: navegador con React, sin tipos de Node ni de VS Code (solo el global
+// acquireVsCodeApi, declarado en webview/infrastructure).
+{
+  "extends": "@ramal/tsconfig/react.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/webview",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/webview.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "./tsconfig.shared.json" },
+    { "path": "../../packages/bridge" },
+    { "path": "../../packages/i18n/tsconfig.lib.json" },
+    { "path": "../../packages/ui/tsconfig.lib.json" },
+    { "path": "../../packages/repo-view/tsconfig.lib.json" }
+  ],
+  "include": ["src/webview"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}

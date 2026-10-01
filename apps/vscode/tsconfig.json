@@ -1,0 +1,15 @@
+// Solucion de la extension: un proyecto por entorno, porque el extension host
+// (Node, sin DOM) y los webviews (navegador, React) no comparten tipos globales.
+// Cada proyecto solo referencia los paquetes que architecture.md 5.2 le permite:
+// importar otro rompe `tsc -b` con TS6307 aunque ESLint no estuviera bien
+// configurado.
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.shared.json" },
+    { "path": "./tsconfig.extension.json" },
+    { "path": "./tsconfig.webview.json" },
+    { "path": "./tsconfig.test.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}

@@ -12,6 +12,9 @@ engineStrict: true
 # nadie ha aprobado. Cada entrada nueva aqui es una decision: ese paquete puede
 # ejecutar codigo en `pnpm install`.
 allowBuilds:
+  # Denegado a proposito: su postinstall solo copia el binario de firma desde su
+  # paquete por plataforma, y `vsce package` (la VSIX de apps/vscode) no firma.
+  '@vscode/vsce-sign': false
   esbuild: true
   lefthook: true
   unrs-resolver: true
