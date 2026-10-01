@@ -1,0 +1,23 @@
+// Codigo de produccion del frontend. Solo referencia los paquetes que puede
+// importar (architecture.md 5.2): bridge, i18n, ui y repo-view. Importar otro
+// rompe `tsc -b` con TS6307 aunque ESLint no estuviera bien configurado.
+{
+  "extends": "@ramal/tsconfig/react.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/app",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/app.tsbuildinfo",
+    "rootDir": "./src",
+    "types": ["vite/client"]
+  },
+  "references": [
+    { "path": "../../packages/bridge" },
+    { "path": "../../packages/i18n/tsconfig.lib.json" },
+    { "path": "../../packages/ui/tsconfig.lib.json" },
+    { "path": "../../packages/repo-view/tsconfig.lib.json" }
+  ],
+  "include": ["src"],
+  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test"]
+}

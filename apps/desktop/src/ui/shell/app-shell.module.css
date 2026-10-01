@@ -1,0 +1,17 @@
+/* La ventana entera en columna, como el prototipo (100vh sin desplazamiento propio). */
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--r-bg);
+  color: var(--r-text);
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow: auto;
+}

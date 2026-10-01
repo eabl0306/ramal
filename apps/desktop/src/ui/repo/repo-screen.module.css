@@ -1,0 +1,7 @@
+/* GraphView ocupa el alto de su contenedor y desplaza por dentro. */
+.repo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}

@@ -1,0 +1,13 @@
+// Solucion del frontend de escritorio: el codigo (tsconfig.app.json), sus tests
+// (tsconfig.test.json), la configuracion y el E2E con Playwright
+// (tsconfig.node.json) y el E2E nativo con WebdriverIO (wdio/tsconfig.json), que
+// va aparte porque trae globales propios (browser, $, describe).
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.test.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./wdio/tsconfig.json" }
+  ]
+}

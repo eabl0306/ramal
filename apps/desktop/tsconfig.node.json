@@ -1,0 +1,17 @@
+// Lo que corre en Node: la configuracion de Vite y Playwright y el E2E de
+// Playwright. Lleva la lib DOM porque el E2E prepara el IPC simulado dentro de la
+// pagina.
+{
+  "extends": "@ramal/tsconfig/base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc/node",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsc/node.tsbuildinfo",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "references": [{ "path": "../../packages/bridge" }],
+  "include": ["vite.config.ts", "playwright.config.ts", "e2e"]
+}

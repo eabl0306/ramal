@@ -22,7 +22,10 @@
       "ignore": ["src/generated/**"]
     },
     "apps/web": {},
-    "apps/desktop": {},
+    "apps/desktop": {
+      "entry": ["wdio/specs/**/*.e2e.ts"],
+      "ignoreDependencies": ["@wdio/local-runner", "@wdio/tauri-service"]
+    },
     "apps/vscode": {}
   }
 }
