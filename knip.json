@@ -33,7 +33,8 @@
         "scripts/*.mjs",
         "test/integration/**/*.test.ts"
       ],
-      "ignoreDependencies": ["@vscode/test-electron"]
+      "ignoreDependencies": ["@vscode/test-electron"],
+      "ignoreBinaries": ["pgrep"]
     }
   }
 }
