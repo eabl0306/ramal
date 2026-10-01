@@ -1,7 +1,17 @@
-import { expect, test } from '@playwright/test';
+import { type Page, expect, test } from '@playwright/test';
+
+/**
+ * La landing llega prerenderizada y no responde a los clics hasta hidratar. El
+ * boton "Descargar para..." solo existe despues, porque el sistema se detecta en
+ * el navegador: es la senal de que ya se puede tocar la pagina.
+ */
+async function openLanding(page: Page, path: string): Promise<void> {
+  await page.goto(path);
+  await expect(page.getByRole('button', { name: /Descargar para|Download for/u })).toBeVisible();
+}
 
 test('cambiar a ingles lleva a /en/ y el idioma sigue en las paginas SPA', async ({ page }) => {
-  await page.goto('/');
+  await openLanding(page, '/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Un cliente de Git');
 
   await page.getByRole('radio', { name: 'EN' }).click();
@@ -29,13 +39,27 @@ test('en una pagina SPA el conmutador cambia el idioma sin cambiar de URL', asyn
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
 
-test('el tema claro se aplica y se recuerda al recargar', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+test.describe('tema', () => {
+  test.use({ colorScheme: 'dark' });
 
-  await page.getByRole('radio', { name: 'Claro' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  test('el claro se aplica y se recuerda al recargar', async ({ page }) => {
+    await openLanding(page, '/');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await page.getByRole('radio', { name: 'Claro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  });
+});
+
+test.describe('tema del sistema', () => {
+  test.use({ colorScheme: 'light' });
+
+  test('sin nada elegido sigue al sistema', async ({ page }) => {
+    await openLanding(page, '/');
+
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  });
 });

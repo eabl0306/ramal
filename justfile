@@ -89,7 +89,7 @@ check: guard root-lint lint-css fmt-check tools-test knip rust-lint rust-test ap
 
 # Lo mismo que check mas lo que la CI corre aparte: auditoria, protocolo, e2e, builds y la pila.
 [group('monorepo')]
-ci: check rust-deny protocol-check e2e build stack-smoke
+ci: check rust-deny protocol-check api-client-check e2e build stack-smoke
 
 # Formatea todo: prettier para JS, TS, CSS, JSON, YAML y Markdown; rustfmt para Rust.
 [group('monorepo')]
@@ -252,6 +252,20 @@ api-openapi:
 api-client:
     {{pnpm_filter}} @ramal/api-client generate
 
+# Falla si el cliente generado no coincide con el que esta en git.
+[group('api')]
+api-client-check: api-client
+    #!/usr/bin/env bash
+    set -euo pipefail
+    out=packages/api-client/src/generated
+    git diff --exit-code -- "${out}"
+    # git diff no ve los ficheros nuevos: un esquema nuevo sin commitear tiene que fallar igual.
+    if [ -n "$(git status --porcelain -- "${out}")" ]; then
+      git status --short -- "${out}"
+      echo "api-client-check: el cliente no esta al dia. Ejecuta just api-client y commitea." >&2
+      exit 1
+    fi
+
 # ------------------------------------------------------------------ engine ---
 
 # Todo el enforcement del motor de Git: clippy, tests y cobertura de crates/* y del sidecar.
@@ -402,10 +416,25 @@ web-e2e:
 web-e2e-install:
     {{pnpm_filter}} @ramal/web exec playwright install --with-deps chromium
 
+# Sin tocar la red real: la pila se levanta y se deja arriba para seguir
+# probando a mano; `just down` la tumba. Las rutas que Playwright pide son las
+# del gateway, asi que una ruta de la API que acabe en la SPA se ve aqui.
+[group('web')]
+[doc('E2E de Playwright contra la pila Docker, entrando por el gateway.')]
+e2e-stack:
+    {{compose_full}} up -d --build --wait
+    E2E_USE_REAL_API=1 E2E_BASE_URL="http://127.0.0.1:${GATEWAY_PORT:-8090}" \
+      {{pnpm_filter}} @ramal/web e2e
+
 # Construye la imagen de produccion de la web (contexto en la raiz).
 [group('web')]
 web-docker:
     docker build -f apps/web/Dockerfile -t ramal-web:local .
+
+# Construir no prueba nada: arranca la imagen y comprueba lo que sirve.
+[group('web')]
+web-docker-smoke: web-docker
+    bash apps/web/scripts/smoke-image.sh ramal-web:local
 
 # ----------------------------------------------------------------- desktop ---
 
