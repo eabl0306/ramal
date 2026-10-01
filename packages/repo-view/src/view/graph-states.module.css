@@ -1,0 +1,25 @@
+/* Estados de la vista sin filas que ensenar: cargando, vacio y error (gaps C-01, C-04, D-10). */
+.state {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 160px;
+  padding: 24px;
+  background: var(--r-bg);
+  color: var(--r-muted);
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  color: var(--r-text);
+  font-weight: 600;
+}
+
+.detail {
+  margin: 0;
+  font-size: 12px;
+}

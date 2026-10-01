@@ -12,9 +12,10 @@ import { workspaceGlobs, workspacePackages } from './lib/workspace.mjs';
  * runtime: el dominio, los textos y el protocolo tienen que poder usarse igual
  * en la web, en Tauri y en la extension sin arrastrar nada.
  *
- * repo-view no depende de bridge a proposito: define sus propios puertos y
- * modelos de vista, y cada app adapta el bridge a ellos. Asi la vista del
- * repositorio no sabe si habla con Tauri o con el host de VS Code.
+ * repo-view si depende de bridge (architecture.md 5.2): habla con el motor por
+ * el cliente tipado de @ramal/bridge, que solo conoce el puerto Transport. Asi la
+ * vista del repositorio no sabe si habla con Tauri o con el host de VS Code: el
+ * transporte concreto lo pone cada app.
  *
  * Anadir un paquete nuevo es anadir una linea aqui: un paquete que no esta en la
  * matriz hace fallar la comprobacion.
@@ -26,7 +27,7 @@ export const MATRIX = {
   '@ramal/ui': { dir: 'packages/ui', allowed: ['@ramal/i18n'] },
   '@ramal/repo-view': {
     dir: 'packages/repo-view',
-    allowed: ['@ramal/ui', '@ramal/domain', '@ramal/i18n'],
+    allowed: ['@ramal/ui', '@ramal/domain', '@ramal/i18n', '@ramal/bridge'],
   },
   '@ramal/api-client': { dir: 'packages/api-client', allowed: [] },
   '@ramal/web': {

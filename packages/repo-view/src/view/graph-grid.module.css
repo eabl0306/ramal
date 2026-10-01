@@ -1,0 +1,170 @@
+/*
+ * Tabla del grafo (vista de repositorio del handoff). Las columnas, el ancho
+ * minimo y el alto de la cabecera llegan como variables desde JavaScript
+ * (--rv-columns, --rv-min-width, --rv-header-h) porque el SVG necesita los
+ * mismos numeros; el alto de fila es el token de densidad --r-row-h.
+ */
+.grid {
+  position: relative;
+  height: 100%;
+  overflow: auto;
+  background: var(--r-bg);
+  color: var(--r-text);
+  outline: none;
+}
+
+.grid:focus-visible {
+  outline: 2px solid var(--r-focus);
+  outline-offset: -2px;
+}
+
+.header-group {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--r-bg);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: var(--rv-columns);
+  align-items: center;
+  min-width: var(--rv-min-width);
+  height: var(--rv-header-h);
+  padding-right: 12px;
+  border-bottom: 1px solid var(--r-border);
+  color: var(--r-faint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.header-cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-cell:first-child {
+  padding-left: 14px;
+}
+
+.header-cell:nth-child(2) {
+  padding-left: 8px;
+}
+
+.body {
+  position: relative;
+  min-width: var(--rv-min-width);
+}
+
+.rows {
+  position: absolute;
+  inset: 0;
+}
+
+.row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: var(--rv-columns);
+  align-items: center;
+  width: 100%;
+  height: var(--r-row-h);
+  padding-right: 12px;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--r-surface-hover);
+}
+
+.row[aria-selected='true'] {
+  background: var(--r-accent-soft);
+}
+
+.grid:focus-visible .row[aria-selected='true'] {
+  box-shadow: inset 0 0 0 1px var(--r-focus);
+}
+
+/* Sin hueco entre columnas (el SVG se alinea con sus anchos): el aire va dentro de la celda. */
+.cell {
+  min-width: 0;
+  padding-right: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message[data-head='true'] {
+  font-weight: 600;
+}
+
+.author {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--r-on-lane);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.author-name {
+  overflow: hidden;
+  color: var(--r-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+}
+
+.code {
+  color: var(--r-faint);
+  font-family: var(--r-font-code);
+  font-size: 11.5px;
+}
+
+.loader {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 8px;
+  align-items: center;
+  padding-left: 14px;
+  color: var(--r-muted);
+  font-size: 12px;
+}
+
+/* VS Code: filas de 28 px, letra algo menor y sin avatar en la columna de autor. */
+.grid[data-density='compact'] .row {
+  padding-right: 10px;
+  font-size: 12.5px;
+}
+
+.grid[data-density='compact'] .avatar {
+  display: none;
+}
+
+.grid[data-density='compact'] .code {
+  font-size: 11px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,43 @@
+/*
+ * SVG del grafo, encima de la columna del grafo. Los colores de carril llegan
+ * por la prop style (son tokens --r-lane-*); aqui solo va lo comun: trazo de 2,
+ * borde del nodo del color del fondo y las iniciales del autor.
+ */
+.graph {
+  position: absolute;
+  pointer-events: none;
+}
+
+.edge {
+  fill: none;
+  stroke-width: 2;
+}
+
+.node {
+  stroke: var(--r-bg);
+  stroke-width: 2;
+}
+
+.ring {
+  fill: none;
+  stroke-width: 2;
+  opacity: 0.55;
+}
+
+.initials {
+  fill: var(--r-on-lane);
+  font-family: var(--r-font-ui);
+  font-size: 7.5px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* VS Code: iniciales de 6.5 px y anillo algo mas visible, como su prototipo. */
+[data-density='compact'] .initials {
+  font-size: 6.5px;
+}
+
+[data-density='compact'] .ring {
+  opacity: 0.6;
+}

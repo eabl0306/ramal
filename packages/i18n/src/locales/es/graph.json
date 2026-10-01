@@ -24,8 +24,27 @@
     "refs": "Rama / tag",
     "graph": "Grafo",
     "message": "Mensaje",
+    "author": "Autor",
     "date": "Fecha",
     "sha": "SHA"
+  },
+  "view": {
+    "label": "Historial de commits",
+    "empty": "Este repositorio todavía no tiene commits.",
+    "error": "No se ha podido cargar el historial.",
+    "retry": "Reintentar",
+    "loadingMore": "Cargando más commits…"
+  },
+  "refs": {
+    "more": "+{count}",
+    "moreLabel_one": "{count} referencia más: {names}",
+    "moreLabel_other": "{count} referencias más: {names}",
+    "kind": {
+      "localBranch": "Rama local",
+      "remoteBranch": "Rama remota",
+      "tag": "Tag",
+      "head": "Rama actual"
+    }
   },
   "wip": {
     "changes_one": "WIP · {count} archivo con cambios",

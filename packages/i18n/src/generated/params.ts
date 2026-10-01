@@ -14,6 +14,8 @@ export const PARAMS = {
   'dialog.removeRepo.title': ['name'],
   'dialog.resetHard.title': ['sha'],
   'graph.detail.files': ['count'],
+  'graph.refs.more': ['count'],
+  'graph.refs.moreLabel': ['count', 'names'],
   'graph.wip.changes': ['count'],
   'menu.checkoutTrack': ['branch'],
   'menu.cherryPick': ['branch'],
