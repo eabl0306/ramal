@@ -2,7 +2,8 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
-- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte y para enlazar el
+  despliegue que decide [ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)
 
 ## Contexto
 
@@ -110,8 +111,9 @@ probar es la de produccion.
   prerenderizadas de la landing, el fallback de la SPA para el resto de rutas
   ([ADR 0015](0015-framework-web-con-prerender.md)), `no-store` para el HTML e `immutable` para
   los assets con hash. No hay servidor de Node.
-- **Gateway:** el unico servicio con puerto publicado. La web, la API y la base de datos solo se
-  alcanzan por la red interna. Pone las cabeceras de seguridad y la CSP de la web
+- **Gateway:** el unico servicio de la pila que se alcanza desde fuera; en produccion, a traves del
+  Caddy de la maquina ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)). La web, la API y la
+  base de datos solo se alcanzan por la red interna. Pone las cabeceras de seguridad y la CSP de la web
   ([ADR 0011](0011-ui-compartida-y-puente-tipado.md)), con `frame-ancestors 'none'` y
   `X-Frame-Options: DENY` en toda respuesta de la web y de la API para que ninguna pagina (la de
   autorizar una app, la de activar un codigo, el reinicio de la boveda o el borrado de la cuenta)
@@ -124,8 +126,11 @@ probar es la de produccion.
 - `restart: unless-stopped`, healthchecks y limites de CPU y memoria por servicio. La base de
   datos no publica puertos.
 
-Donde se despliega esa pila (instancia propia, compartida o un proveedor gestionado) queda para
-su propio ADR cuando se decida. Este fija las imagenes y la forma de la pila, no el destino.
+Este ADR fija las imagenes y la forma de la pila, no el destino. El destino lo decide
+[ADR 0023](0023-despliegue-en-apps-01-y-dominio.md): la instancia compartida `apps-01`, detras de su
+Caddy, con la web en `ramal.bahoque.com` y la API tambien en `api.ramal.bahoque.com` para los
+clientes nativos. La web sigue llamando a la API por su mismo origen, asi que nada de lo de arriba
+cambia.
 
 ## Consecuencias
 

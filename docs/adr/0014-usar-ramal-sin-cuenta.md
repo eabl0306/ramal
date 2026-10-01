@@ -2,6 +2,9 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, con la casilla del cierre de sesion
+  ([ADR 0012](0012-boveda-de-extremo-a-extremo.md)) y el fichero de modelos recomendados en lo que
+  sale del equipo sin cuenta ([ADR 0025](0025-recomendacion-de-modelos-de-ia.md))
 
 ## Contexto
 
@@ -89,9 +92,10 @@ dispositivo, tambien con cuenta: nunca llegan a la API.
 **Al cerrar sesion**, el motor borra la llave de la boveda en cache y las copias sincronizadas de
 los tokens y llaves que no se crearon en ese equipo. Lo que el usuario creo alli se queda en su
 llavero, porque sin cuenta Ramal sigue siendo un cliente Git que necesita esas credenciales para
-hacer push. Los repositorios, los ajustes locales y el historial no se tocan. La misma limpieza
-corre cuando un refresco recibe un 401 definitivo: un equipo revocado desde otro sitio limpia lo
-sincronizado aunque nadie pulse "Cerrar sesion".
+hacer push, salvo que el usuario marque "Borrar también las añadidas en este equipo", que viene
+apagada. Los repositorios, los ajustes locales y el historial no se tocan. La misma limpieza corre
+cuando un refresco recibe un 401 con el `code` `session_ended`: un equipo revocado desde otro sitio
+limpia lo sincronizado aunque nadie pulse "Cerrar sesion".
 
 ### Lo que sale del equipo sin cuenta
 
@@ -100,6 +104,8 @@ sincronizado aunque nadie pulse "Cerrar sesion".
   ([ADR 0016](0016-actualizaciones-y-descargas.md)). No identifica la instalacion, y la busqueda de
   actualizaciones se puede apagar en los ajustes.
 - Las llamadas del broker de OAuth si se conecta Bitbucket.
+- La descarga del fichero de modelos de IA recomendados, si se usa la IA con una llave propia. Es
+  publico, cacheable y sin ningun identificador del cliente.
 - Las llamadas a las plataformas Git y a los proveedores de IA que el propio usuario configura.
 
 No hay telemetria prevista. Si algun dia la hay, tendra su propio ADR y sera opcional.

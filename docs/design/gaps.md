@@ -1,6 +1,9 @@
 # Huecos del diseno
 
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01, con las decisiones que Ezequiel tomo ese dia: la
+  [seccion 4](#4-decisiones-abiertas-para-ezequiel) las resume y enlaza su ADR, y las filas que
+  cambiaban estan corregidas
 - Base: el handoff en [`handoff/`](handoff/README.md), es decir el README y los tres prototipos
   [`Ramal.dc.html`](handoff/Ramal.dc.html) (Desktop), [`Ramal VS Code.dc.html`](handoff/Ramal%20VS%20Code.dc.html)
   y [`Ramal Web.dc.html`](handoff/Ramal%20Web.dc.html), mas los datos de `ramal-data.js`. Donde el README y un
@@ -47,11 +50,10 @@ Prioridades:
 
 Dos supuestos que condicionan las prioridades:
 
-- **Equipos y facturacion quedan fuera de la primera version publica mientras
-  [Q-01](#4-decisiones-abiertas-para-ezequiel) no diga lo contrario**, igual que en el backlog. Las
-  filas de equipo y facturacion (W-11 a W-18) son P1 solo si Q-01 las mete en la primera version;
-  si no, se construyen despues. Las filas de esta tabla conservan la prioridad que tendrian dentro,
-  para no tener que reescribirlas cuando se decida.
+- **Equipos, IA de organizacion y facturacion entran en la primera version publica**
+  ([Q-01](#4-decisiones-abiertas-para-ezequiel), resuelta el 2026-10-01 por
+  [ADR 0026](../adr/0026-planes-y-precios.md)). Las filas de equipo y facturacion (W-11 a W-18) y
+  D-47 son del MVP con la prioridad que tienen.
 - **La web no edita valores de ajustes sincronizados** (preferencias de IA, de Git, apariencia). Solo decide
   que se sincroniza, como en el prototipo. Los valores se editan en Desktop o VS Code.
 
@@ -88,18 +90,18 @@ La frase no puede ser la contrasena por dos motivos: la contrasena la recibe el 
 asi que no protege nada frente al servidor; y quien entra con GitHub, GitLab o Google no tiene contrasena.
 Ninguna de estas pantallas existe en el diseno.
 
-| Id   | Vista o estado                                                                                                           | Prioridad | Por que                                                                                                      |
-| ---- | ------------------------------------------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------------------------ |
-| K-01 | Crear la frase de sincronizacion, con explicacion de por que no es la contrasena                                         | P0        | Sin frase no hay boveda, y sin boveda no se sincroniza ninguna cuenta de plataforma.                         |
-| K-02 | Mostrar el codigo de recuperacion una sola vez: copiar, descargar y confirmar que se guardo                              | P0        | Es la unica salida si se olvida la frase; si el usuario no lo guarda, pierde los secretos.                   |
-| K-03 | Desbloquear en un dispositivo nuevo con la frase o con el codigo de recuperacion                                         | P0        | Cada equipo nuevo necesita la llave de la boveda antes de usar las cuentas sincronizadas.                    |
-| K-04 | Boveda bloqueada en este equipo: cuentas sincronizadas visibles como metadatos con "Desbloquear para usar"               | P0        | Los metadatos llegan sin frase, los tokens no; hay que explicar por que una cuenta visible no funciona.      |
-| K-05 | Cuenta "Solo en este equipo" (secreto que no se sincroniza)                                                              | P0        | Quien dice "Ahora no" a la boveda, o no tiene cuenta de Ramal, sigue pudiendo anadir cuentas.                |
-| K-06 | Cambiar la frase de sincronizacion                                                                                       | P1        | Solo reenvuelve la llave; los demas dispositivos siguen funcionando y conviene decirlo.                      |
-| K-07 | Regenerar el codigo de recuperacion (invalida el anterior)                                                               | P1        | Si el codigo se pierde o se filtra, tiene que poder sustituirse sin rehacer la boveda.                       |
-| K-08 | Olvide la frase y el codigo: en Desktop y VS Code, "Olvide la frase" explica la situacion y enlaza al reinicio de la web | P1        | El reinicio solo existe en la web (ver K-10); el texto debe decir que Ramal no puede recuperar los secretos. |
-| K-09 | Efecto de cerrar sesion sobre los secretos de este equipo                                                                | P1        | El prototipo muestra "(simulado)". ADR 0012 ya lo decide; falta el texto que lo explique.                    |
-| K-10 | Web: estado de la boveda (configurada, desde cuando) y reinicio; es el unico sitio con reinicio                          | P1        | La web no puede descifrar nada, pero si puede mostrar si existe y borrarla, y es la salida de K-08.          |
+| Id   | Vista o estado                                                                                                           | Prioridad | Por que                                                                                                                                                                                                                     |
+| ---- | ------------------------------------------------------------------------------------------------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| K-01 | Crear la frase de sincronizacion, con explicacion de por que no es la contrasena                                         | P0        | Sin frase no hay boveda, y sin boveda no se sincroniza ninguna cuenta de plataforma.                                                                                                                                        |
+| K-02 | Mostrar el codigo de recuperacion una sola vez: copiar, descargar y confirmar que se guardo                              | P0        | Es la unica salida si se olvida la frase; si el usuario no lo guarda, pierde los secretos.                                                                                                                                  |
+| K-03 | Desbloquear en un dispositivo nuevo con la frase o con el codigo de recuperacion                                         | P0        | Cada equipo nuevo necesita la llave de la boveda antes de usar las cuentas sincronizadas.                                                                                                                                   |
+| K-04 | Boveda bloqueada en este equipo: cuentas sincronizadas visibles como metadatos con "Desbloquear para usar"               | P0        | Los metadatos llegan sin frase, los tokens no; hay que explicar por que una cuenta visible no funciona.                                                                                                                     |
+| K-05 | Cuenta "Solo en este equipo" (secreto que no se sincroniza)                                                              | P0        | Quien dice "Ahora no" a la boveda, o no tiene cuenta de Ramal, sigue pudiendo anadir cuentas.                                                                                                                               |
+| K-06 | Cambiar la frase de sincronizacion                                                                                       | P1        | Solo reenvuelve la llave; los demas dispositivos siguen funcionando y conviene decirlo.                                                                                                                                     |
+| K-07 | Regenerar el codigo de recuperacion (invalida el anterior)                                                               | P1        | Si el codigo se pierde o se filtra, tiene que poder sustituirse sin rehacer la boveda.                                                                                                                                      |
+| K-08 | Olvide la frase y el codigo: en Desktop y VS Code, "Olvide la frase" explica la situacion y enlaza al reinicio de la web | P1        | El reinicio solo existe en la web (ver K-10); el texto debe decir que Ramal no puede recuperar los secretos.                                                                                                                |
+| K-09 | Efecto de cerrar sesion sobre los secretos de este equipo                                                                | P1        | **Resuelta el 2026-10-01** ([ADR 0012](../adr/0012-boveda-de-extremo-a-extremo.md)): se borra lo que llego de otros equipos y lo creado aqui se queda, con la casilla "Borrar también las añadidas en este equipo" apagada. |
+| K-10 | Web: estado de la boveda (configurada, desde cuando) y reinicio; es el unico sitio con reinicio                          | P1        | La web no puede descifrar nada, pero si puede mostrar si existe y borrarla, y es la salida de K-08.                                                                                                                         |
 
 Comportamiento propuesto para estas pantallas, para que el disenador no tenga que adivinarlo:
 
@@ -122,10 +124,15 @@ Comportamiento propuesto para estas pantallas, para que el disenador no tenga qu
   ensenan "Rotar la llave de la boveda".
 - **Restablecer la contrasena de inicio de sesion no toca la boveda.** El texto de la pagina de
   restablecer contrasena (W-02) debe decirlo, porque el usuario espera lo contrario.
-- **Cerrar sesion borra de este equipo la llave de la boveda y las copias de secretos creados en otros
-  equipos; lo creado en este equipo se queda**, este sincronizado o no, porque sin cuenta Ramal sigue
-  siendo un cliente Git que lo necesita. Es lo que decide ADR 0012 para K-09. Lo mismo pasa cuando la
-  sesion se revoca desde otro sitio y el equipo lo descubre al refrescar.
+- **Cerrar sesion borra de este equipo la llave de la boveda y las copias de los tokens y las llaves
+  que llegaron de otros equipos; lo creado en este equipo se queda**, este sincronizado o no, porque
+  sin cuenta Ramal sigue siendo un cliente Git que lo necesita. Es lo que decide ADR 0012 para K-09,
+  ratificado el 2026-10-01. Para un ordenador compartido, el dialogo ofrece la casilla "Borrar
+  también las añadidas en este equipo", apagada por defecto. Texto propuesto: "Al cerrar sesión se
+  borran de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de otros equipos.
+  Las que añadiste aquí se quedan para que Git siga funcionando." Lo mismo pasa cuando la sesion se
+  revoca desde otro sitio y el equipo lo descubre al refrescar (un 401 con el `code`
+  `session_ended`).
 
 ### 1.3 Ramal Desktop
 
@@ -218,33 +225,33 @@ Comportamiento propuesto para estas pantallas, para que el disenador no tenga qu
 
 ### 1.4 Ramal for VS Code
 
-| Id   | Vista o estado                                                                                                                                          | Prioridad | Por que                                                                                                                  |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------ |
-| V-01 | Iniciar sesion en Ramal: proveedor de autenticacion, estado sin sesion en Ajustes y en la barra de estado, `viewsWelcome`; en curso, fallido y caducado | P0        | El diseno solo muestra la sesion iniciada; el flujo usa `UriHandler` y `asExternalUri`, y Git local funciona sin cuenta. |
-| V-02 | Sin carpeta abierta: `viewsWelcome` con "Abrir carpeta" y "Clonar repositorio"                                                                          | P0        | Sin esto las vistas de Ramal aparecen vacias.                                                                            |
-| V-03 | Carpeta que no es un repositorio: "Iniciar repositorio" y "Clonar"                                                                                      | P0        | Mismo motivo.                                                                                                            |
-| V-04 | Git no instalado o anterior a 2.34                                                                                                                      | P0        | La extension no puede hacer nada; necesita vista de bienvenida con enlace de instalacion.                                |
-| V-05 | Motor no disponible: el binario `ramal-vscode-engine` no arranca, se cae y se reinicia, o la plataforma no tiene VSIX propio                            | P0        | Con el motor como proceso aparte (decision 1), su caida es un estado real que el usuario tiene que ver.                  |
-| V-06 | Multi-root y varios repos en una carpeta (repos anidados, submodulos): selector de repo en el grafo, el titulo de la vista y la barra de estado         | P0        | El diseno asume un solo repo; en VS Code los espacios multi-root son habituales.                                         |
-| V-07 | Conflictos de pull, rebase, cherry-pick y revert en el editor de merge, con continuar, omitir y abortar; "Abortar merge"; "Editar a mano"               | P0        | Solo el merge esta dibujado, y en VS Code ni siquiera se puede abortar ni editar a mano.                                 |
-| V-08 | Carga y repos grandes: log paginado, filas virtualizadas, "cargar mas"                                                                                  | P0        | El prototipo carga todos los commits de golpe.                                                                           |
-| V-09 | Repositorio vacio y HEAD separado                                                                                                                       | P1        | El grafo vacio no tiene estado y HEAD separado es solo un toast.                                                         |
-| V-10 | Push rechazado, sin upstream y fallo de autenticacion: ofrecer pull, force-with-lease con confirmacion, establecer upstream, conectar cuenta            | P1        | Solo el camino feliz esta dibujado; Desktop ya tiene estas claves en el diccionario.                                     |
-| V-11 | Arbol sucio en checkout, merge o rebase: ofrecer stash o autostash                                                                                      | P1        | Hoy no se contempla.                                                                                                     |
-| V-12 | Staging parcial desde el diff nativo (comando sobre la seleccion)                                                                                       | P1        | En Desktop es P0; en VS Code el diff es nativo y hay que decidir como se ofrece.                                         |
-| V-13 | Historial de archivo (grafo filtrado por ruta o `TimelineProvider`)                                                                                     | P1        | El menu lo ofrece y es un stub.                                                                                          |
-| V-14 | Crear tag y menu de tag                                                                                                                                 | P1        | Falta en VS Code; se reutiliza el formulario de Desktop.                                                                 |
-| V-15 | Sin cuenta de plataforma para el remoto, o host desconocido: "Conectar una cuenta de X" en la vista de PRs                                              | P1        | Sin cuenta, la vista de PRs y la creacion de PR no funcionan y no dicen por que.                                         |
-| V-16 | Errores de la API de la plataforma (401, limite de peticiones, SSO requerido) y de la IA (red, llave invalida, cuota)                                   | P1        | Solo estan dibujados "IA desactivada", "sin llave" y "nada en staging".                                                  |
-| V-17 | Detalle de PR (o, como minimo, abrirlo en la plataforma)                                                                                                | P1        | Pulsar un PR no hace nada.                                                                                               |
-| V-18 | Ramal Desktop no instalado cuando se pulsa "Abrir en Ramal Desktop": ofrecer la descarga                                                                | P1        | El enlace profundo falla en silencio.                                                                                    |
-| V-19 | Recorrido de bienvenida (`contributes.walkthroughs`): iniciar sesion, conectar plataforma, anadir llave, abrir grafo                                    | P1        | Primera vez del usuario en la extension.                                                                                 |
-| V-20 | Confianza del espacio de trabajo (modo restringido), Remote Development, WSL y Codespaces; vscode.dev declarado no soportado                            | P1        | Ejecutar git en carpetas no confiables es un riesgo; en remoto el motor corre en el host remoto.                         |
-| V-21 | Convivencia con el Git integrado y con GitLens: ocultar duplicados de la barra de estado y del SCM                                                      | P1        | Sin esto el usuario ve dos ramas actuales y dos botones de commit.                                                       |
-| V-22 | Conflicto entre Settings Sync de VS Code y la nube de Ramal para los mismos ajustes                                                                     | P1        | Dos sistemas de sincronizacion sobre las mismas claves se pisan; hay que marcar cual manda.                              |
-| V-23 | Blame                                                                                                                                                   | P2        | Se solapa con GitLens; no es prioritario en VS Code.                                                                     |
-| V-24 | Rebase interactivo, deshacer, submodulos y gestion de remotos en VS Code (o derivar a Desktop)                                                          | P2        | Hoy son solo de Desktop.                                                                                                 |
-| V-25 | Temas de alto contraste                                                                                                                                 | P2        | No estan disenados; basta con bordes de contraste en el mapeo de tokens.                                                 |
+| Id   | Vista o estado                                                                                                                                          | Prioridad | Por que                                                                                                                                                                                                                                                        |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| V-01 | Iniciar sesion en Ramal: proveedor de autenticacion, estado sin sesion en Ajustes y en la barra de estado, `viewsWelcome`; en curso, fallido y caducado | P0        | El diseno solo muestra la sesion iniciada; el flujo usa `UriHandler` y `asExternalUri`, y Git local funciona sin cuenta.                                                                                                                                       |
+| V-02 | Sin carpeta abierta: `viewsWelcome` con "Abrir carpeta" y "Clonar repositorio"                                                                          | P0        | Sin esto las vistas de Ramal aparecen vacias.                                                                                                                                                                                                                  |
+| V-03 | Carpeta que no es un repositorio: "Iniciar repositorio" y "Clonar"                                                                                      | P0        | Mismo motivo.                                                                                                                                                                                                                                                  |
+| V-04 | Git no instalado o anterior a 2.34                                                                                                                      | P0        | La extension no puede hacer nada; necesita vista de bienvenida con enlace de instalacion.                                                                                                                                                                      |
+| V-05 | Motor no disponible: el binario `ramal-vscode-engine` no arranca, se cae y se reinicia, o la plataforma no tiene VSIX propio                            | P0        | Con el motor como proceso aparte (decision 1), su caida es un estado real que el usuario tiene que ver.                                                                                                                                                        |
+| V-06 | Multi-root y varios repos en una carpeta (repos anidados, submodulos): selector de repo en el grafo, el titulo de la vista y la barra de estado         | P0        | El diseno asume un solo repo; en VS Code los espacios multi-root son habituales.                                                                                                                                                                               |
+| V-07 | Conflictos de pull, rebase, cherry-pick y revert en el editor de merge, con continuar, omitir y abortar; "Abortar merge"; "Editar a mano"               | P0        | Solo el merge esta dibujado, y en VS Code ni siquiera se puede abortar ni editar a mano.                                                                                                                                                                       |
+| V-08 | Carga y repos grandes: log paginado, filas virtualizadas, "cargar mas"                                                                                  | P0        | El prototipo carga todos los commits de golpe.                                                                                                                                                                                                                 |
+| V-09 | Repositorio vacio y HEAD separado                                                                                                                       | P1        | El grafo vacio no tiene estado y HEAD separado es solo un toast.                                                                                                                                                                                               |
+| V-10 | Push rechazado, sin upstream y fallo de autenticacion: ofrecer pull, force-with-lease con confirmacion, establecer upstream, conectar cuenta            | P1        | Solo el camino feliz esta dibujado; Desktop ya tiene estas claves en el diccionario.                                                                                                                                                                           |
+| V-11 | Arbol sucio en checkout, merge o rebase: ofrecer stash o autostash                                                                                      | P1        | Hoy no se contempla.                                                                                                                                                                                                                                           |
+| V-12 | Staging parcial desde el diff nativo (comando sobre la seleccion)                                                                                       | P1        | En Desktop es P0; en VS Code el diff es nativo y hay que decidir como se ofrece.                                                                                                                                                                               |
+| V-13 | Historial de archivo (grafo filtrado por ruta o `TimelineProvider`)                                                                                     | P1        | El menu lo ofrece y es un stub.                                                                                                                                                                                                                                |
+| V-14 | Crear tag y menu de tag                                                                                                                                 | P1        | Falta en VS Code; se reutiliza el formulario de Desktop.                                                                                                                                                                                                       |
+| V-15 | Sin cuenta de plataforma para el remoto, o host desconocido: "Conectar una cuenta de X" en la vista de PRs                                              | P1        | Sin cuenta, la vista de PRs y la creacion de PR no funcionan y no dicen por que.                                                                                                                                                                               |
+| V-16 | Errores de la API de la plataforma (401, limite de peticiones, SSO requerido) y de la IA (red, llave invalida, cuota)                                   | P1        | Solo estan dibujados "IA desactivada", "sin llave" y "nada en staging".                                                                                                                                                                                        |
+| V-17 | Detalle de PR (o, como minimo, abrirlo en la plataforma)                                                                                                | P1        | Pulsar un PR no hace nada.                                                                                                                                                                                                                                     |
+| V-18 | Ramal Desktop no instalado cuando se pulsa "Abrir en Ramal Desktop": ofrecer la descarga                                                                | P1        | El enlace profundo falla en silencio.                                                                                                                                                                                                                          |
+| V-19 | Recorrido de bienvenida (`contributes.walkthroughs`): iniciar sesion, conectar plataforma, anadir llave, abrir grafo                                    | P1        | Primera vez del usuario en la extension.                                                                                                                                                                                                                       |
+| V-20 | Confianza del espacio de trabajo (modo restringido), Remote Development, WSL y Codespaces; vscode.dev declarado no soportado                            | P1        | Ejecutar git en carpetas no confiables es un riesgo; en remoto el motor corre en el host remoto.                                                                                                                                                               |
+| V-21 | Convivencia con el Git integrado y con GitLens: ocultar duplicados de la barra de estado y del SCM                                                      | P1        | Sin esto el usuario ve dos ramas actuales y dos botones de commit.                                                                                                                                                                                             |
+| V-22 | Conflicto entre Settings Sync de VS Code y la nube de Ramal para los mismos ajustes                                                                     | P1        | **Resuelta el 2026-10-01** ([ADR 0010](../adr/0010-un-motor-para-escritorio-y-vscode.md#ajustes-y-sincronizacion)): Git e IA viven en la nube de Ramal y se editan en el webview de ajustes; en `settings.json` solo lo de la maquina, con `scope: "machine"`. |
+| V-23 | Blame                                                                                                                                                   | P2        | Se solapa con GitLens; no es prioritario en VS Code.                                                                                                                                                                                                           |
+| V-24 | Rebase interactivo, deshacer, submodulos y gestion de remotos en VS Code (o derivar a Desktop)                                                          | P2        | Hoy son solo de Desktop.                                                                                                                                                                                                                                       |
+| V-25 | Temas de alto contraste                                                                                                                                 | P2        | No estan disenados; basta con bordes de contraste en el mapeo de tokens.                                                                                                                                                                                       |
 
 ### 1.5 Ramal Web
 
@@ -280,23 +287,23 @@ Comportamiento propuesto para estas pantallas, para que el disenador no tenga qu
 
 #### Facturacion
 
-| Id   | Vista o estado                                                                                       | Prioridad | Por que                                                                                        |
-| ---- | ---------------------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------- |
-| W-17 | Precios en la landing y comparativa de planes                                                        | P1        | Desktop muestra "Ramal Pro" y la landing no tiene seccion de precios.                          |
-| W-18 | Gestion de la suscripcion: plan, renovacion, metodo de pago, facturas, cancelar, asientos con precio | P1        | "Gestionar suscripcion" (Desktop) y "Anadir asientos" (web) no llevan a nada; depende de Q-02. |
+| Id   | Vista o estado                                                                                       | Prioridad | Por que                                                                                                                                                                                                                    |
+| ---- | ---------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W-17 | Precios en la landing y comparativa de planes                                                        | P1        | Desktop muestra "Ramal Pro" y la landing no tiene seccion de precios. Planes y precios en [ADR 0026](../adr/0026-planes-y-precios.md); mensaje principal: "Gratis para siempre: todo Git local, repos privados incluidos". |
+| W-18 | Gestion de la suscripcion: plan, renovacion, metodo de pago, facturas, cancelar, asientos con precio | P1        | "Gestionar suscripcion" (Desktop) y "Anadir asientos" (web) no llevan a nada. Se cobra con Paddle ([ADR 0022](../adr/0022-proveedor-de-pagos.md)): checkout en una pagina de la web y portal del proveedor.                |
 
 #### Contenido del panel
 
-| Id   | Vista o estado                                                                                                                                                            | Prioridad | Por que                                                                                                                                                     |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| W-19 | Estados vacios: sin workspaces, sin repos, busqueda sin resultados, sin dispositivos (llamada a descargar la app o instalar la extension), equipo solo con el propietario | P0        | Un usuario recien registrado ve todo el panel vacio.                                                                                                        |
-| W-20 | Esqueletos y errores de la API por seccion                                                                                                                                | P0        | Cada seccion carga por separado y puede fallar por separado.                                                                                                |
-| W-21 | Perfil completo (avatar, usuario, zona horaria) y un unico concepto de sesiones y dispositivos                                                                            | P1        | Desktop tiene "Sesiones activas" con ciudad y la web "Dispositivos"; es la misma cosa con dos nombres.                                                      |
-| W-22 | Detalle de dispositivo: marca de "este navegador", version desactualizada, renombrar, cerrar sesion con confirmacion                                                      | P1        | Hoy no se distingue el dispositivo actual y cerrar sesion en otro no confirma.                                                                              |
-| W-23 | Detalle de repositorio: "Abrir en Ramal Desktop" (y la descarga si no esta instalado)                                                                                     | P1        | La web lista repos pero no deja hacer nada con ellos. En que dispositivos esta clonado no se sabe: la API no guarda presencia por dispositivo, a proposito. |
-| W-24 | Eliminar cuenta: volver a autenticarse, bloqueo si es propietario de una organizacion con miembros, pagina final                                                          | P1        | Hoy basta un clic y una confirmacion.                                                                                                                       |
-| W-25 | Indicador de sincronizacion (ultima vez, errores)                                                                                                                         | P1        | Los toggles de sincronizacion no dicen si algo se ha sincronizado nunca.                                                                                    |
-| W-26 | Exportacion asincrona (en curso, lista para descargar)                                                                                                                    | P2        | Solo si la exportacion deja de ser instantanea.                                                                                                             |
+| Id   | Vista o estado                                                                                                                                                            | Prioridad | Por que                                                                                                                                                                                |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| W-19 | Estados vacios: sin workspaces, sin repos, busqueda sin resultados, sin dispositivos (llamada a descargar la app o instalar la extension), equipo solo con el propietario | P0        | Un usuario recien registrado ve todo el panel vacio.                                                                                                                                   |
+| W-20 | Esqueletos y errores de la API por seccion                                                                                                                                | P0        | Cada seccion carga por separado y puede fallar por separado.                                                                                                                           |
+| W-21 | Perfil completo (avatar, usuario, zona horaria) y un unico concepto de sesiones y dispositivos                                                                            | P1        | Desktop tiene "Sesiones activas" con ciudad y la web "Dispositivos"; es la misma cosa con dos nombres. Sin ubicacion (Q-05): dispositivo, sistema, app o navegador y ultima actividad. |
+| W-22 | Detalle de dispositivo: marca de "este navegador", version desactualizada, renombrar, cerrar sesion con confirmacion                                                      | P1        | Hoy no se distingue el dispositivo actual y cerrar sesion en otro no confirma.                                                                                                         |
+| W-23 | Detalle de repositorio: "Abrir en Ramal Desktop" (y la descarga si no esta instalado)                                                                                     | P1        | La web lista repos pero no deja hacer nada con ellos. En que dispositivos esta clonado no se sabe: la API no guarda presencia por dispositivo, a proposito.                            |
+| W-24 | Eliminar cuenta: volver a autenticarse, bloqueo si es propietario de una organizacion con miembros, pagina final                                                          | P1        | Hoy basta un clic y una confirmacion.                                                                                                                                                  |
+| W-25 | Indicador de sincronizacion (ultima vez, errores)                                                                                                                         | P1        | Los toggles de sincronizacion no dicen si algo se ha sincronizado nunca.                                                                                                               |
+| W-26 | Exportacion asincrona (en curso, lista para descargar)                                                                                                                    | P2        | Solo si la exportacion deja de ser instantanea.                                                                                                                                        |
 
 #### Sitio publico
 
@@ -386,6 +393,8 @@ personales sincronizadas. El resto de textos tiene que acompanarlo:
   - Desktop y VS Code las listan de solo lectura con la etiqueta "De la organizacion", y se pueden elegir
     por funcion (mensajes de commit, PRs, resumenes). "Probar conexion" pasa por la API y solo lo ven los
     admins.
+  - El modelo de cada funcion con una llave de la organizacion lo fija el admin, y el miembro lo ve de
+    solo lectura ([ADR 0025](../adr/0025-recomendacion-de-modelos-de-ia.md)).
   - El selector de alcance desaparece del formulario de llaves de Desktop: lo que se anade ahi es
     siempre personal.
   - Ollama y los endpoints compatibles con OpenAI en redes privadas no pueden ser llave de organizacion:
@@ -400,7 +409,7 @@ personales sincronizadas. El resto de textos tiene que acompanarlo:
   desaparecer. Los workspaces de Desktop funcionan sin sesion como workspaces locales, y se suben al
   iniciar sesion si la nube no tiene ninguno (ADR 0014); lo que pide sesion es que se sincronicen. Las cuentas de plataforma y las llaves personales se pueden anadir sin cuenta de Ramal
   y quedan "Solo en este equipo". En la landing, la funcion 06 ("Tu configuracion en la nube") dice que
-  requiere cuenta, y el resto no.
+  requiere cuenta (no pago: la sincronizacion personal es gratis, ADR 0026), y el resto no.
 - **Por que:** decision 4.
 
 ### X-07 Alta de cuentas de plataforma: OAuth publico primero, usuario detectado
@@ -443,14 +452,19 @@ personales sincronizadas. El resto de textos tiene que acompanarlo:
   **Estado (2026-10-01):** hecho. La landing dice "Ubuntu 22.04+, Debian 12+" y no nombra Fedora
   hasta que CI pruebe una version con soporte vigente.
 - **Windows Portable (.zip), hoy:** tarjeta con 121 MB.
-  **Cambio:** se quita (ADR 0016). **Por que:** el empaquetador de Tauri no lo produce y nunca se
-  actualizaria solo.
-- **Windows MSI:** se mantiene para despliegues gestionados, con la etiqueta "sin actualizaciones
-  automaticas". El instalador que se actualiza solo es el NSIS: el manifiesto solo puede dar un paquete de
-  actualizacion por sistema y arquitectura.
+  **Cambio:** se quita (ADR 0016). **Por que:** el empaquetador de Tauri no lo produce, no es portable de
+  verdad y nunca se actualizaria solo.
+- **Windows MSI:** se mantiene para despliegues gestionados, solo x64, con la etiqueta "sin
+  actualizaciones automáticas", y sale en el lanzamiento. El instalador que se actualiza solo es el NSIS.
+  No es un limite de Tauri (desde `tauri-plugin-updater` 2.10 sabe instalar MSI): es una decision, porque
+  el MSI lo gestiona IT y actualizarlo pide administrador.
+- **Windows arm64 y Linux arm64:** salen con la etiqueta beta hasta que su E2E pase en runners arm.
+  Windows arm64 solo tiene NSIS: el MSI de Tauri no se compila para arm64.
 - **macOS Universal (.zip), hoy:** alternativa en la tarjeta de macOS.
   **Cambio:** "Universal (.dmg)", que Tauri si produce y que ADR 0016 anade a la matriz.
-- **`.deb`, `.rpm` y Flathub:** no se actualizan con el actualizador de Tauri. La tarjeta lo indica y
+- **`.deb`, `.rpm` y Flathub:** no se actualizan con el actualizador de Tauri (en `.deb` y `.rpm` porque
+  pediria la contrasena de root; Flathub, que llega despues del lanzamiento, lo actualiza Flatpak). La
+  tarjeta lo indica y
   Desktop, en esos formatos, muestra "Hay una version nueva" con enlace de descarga (o nada en Flatpak,
   que se actualiza por su cuenta) en vez de "Actualizar y reiniciar" (D-45).
 - **VS Code:** la extension lleva el binario del motor, asi que el `.vsix` es uno por plataforma
@@ -460,6 +474,8 @@ personales sincronizadas. El resto de textos tiene que acompanarlo:
 - **Version, tamanos y sha256** salen del endpoint de releases de la API, no del HTML (hoy "v2.4.0, 30
   sep 2026" esta escrito a mano).
 - **Por que:** decision 1 (VSIX por plataforma) y los hechos de Tauri 2.
+- **Estado (2026-10-01):** resuelta y ratificada con Q-04 y Q-07; el detalle esta en
+  [ADR 0016](../adr/0016-actualizaciones-y-descargas.md).
 
 ### X-10 Modelos de IA: de la lista del proveedor, nunca constantes
 
@@ -471,7 +487,13 @@ personales sincronizadas. El resto de textos tiene que acompanarlo:
   campo URL base (OpenRouter, Ollama, personalizado) se guarda de verdad (hoy se recoge y se descarta) y
   aparece tambien en VS Code, que no lo tiene.
 - **Por que:** los modelos cambian cada pocos meses; una constante en una app instalada se queda vieja
-  sin poder corregirla. Que modelo se recomienda por defecto es Q-06.
+  sin poder corregirla.
+- **Estado (2026-10-01):** resuelta con Q-06 por
+  [ADR 0025](../adr/0025-recomendacion-de-modelos-de-ia.md). La insignia "Recomendado" sale de un
+  fichero remoto que sirve la API, cruzado con la lista viva del proveedor, con dos niveles ("Rápido"
+  para commits, "Equilibrado" para PRs y resumenes). Cada funcion puede tener su modelo; con una llave de
+  la organizacion lo fija el admin. Sin red ni copia en cache, no hay recomendacion. Los modelos por
+  defecto de `ramal-data.js` no se copian.
 
 ### X-11 VS Code: lo nativo se hace nativo
 
@@ -489,11 +511,12 @@ personales sincronizadas. El resto de textos tiene que acompanarlo:
   | Barra de estado                                                                  | Elementos nativos                                                        |
   | Ramas, remotos, PRs, stashes, tags                                               | TreeViews con Codicons; no hay doble clic, se usa clic o accion en linea |
   | Menus contextuales                                                               | Contribuciones de menus, tambien dentro de los webviews                  |
-  | Ajustes simples                                                                  | Editor de ajustes de VS Code (`contributes.configuration`)               |
+  | Ajustes de esta maquina (ruta y log del motor, usar la nube)                     | Editor de ajustes de VS Code, con `scope: "machine"` (V-22)              |
   | Iniciar sesion                                                                   | Menu de cuentas mediante un proveedor de autenticacion                   |
 
   Quedan como webview: el grafo con su panel de detalle, el editor de merge, el formulario de crear PR y
-  las listas de entidades de ajustes (cuentas y llaves). El atajo `Mayus+Cmd+G` choca con el de la vista
+  la pagina de ajustes de Ramal, con las cuentas, las llaves y las preferencias de Git e IA que comparte
+  con Desktop (V-22). El atajo `Mayus+Cmd+G` choca con el de la vista
   de control de codigo de VS Code y hay que elegir otro.
 
 - **Por que:** coherencia con el editor, teclado y accesibilidad gratis, y menos codigo que mantener.
@@ -633,15 +656,52 @@ Son atajos del prototipo o errores de logica. Al implementar se hace lo de la ul
 
 ## 4. Decisiones abiertas para Ezequiel
 
-Solo lo que bloquea diseno o backlog y no se puede decidir desde el codigo.
+Solo lo que bloquea diseno o backlog y no se puede decidir desde el codigo. Ezequiel resolvio las
+ocho el 2026-10-01; quedan aqui con su resumen y el ADR que las desarrolla.
 
-| Id   | Decision                                                                                                               | Que bloquea                                                                | Propuesta                                                                                                                                                                           |
-| ---- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Q-01 | Equipos y facturacion en la primera version publica, o despues                                                         | Prioridad de W-11 a W-18 y de las llaves de organizacion                   | Dentro, porque las llaves de organizacion (decision 3) no tienen sentido sin equipos.                                                                                               |
-| Q-02 | Proveedor de pagos                                                                                                     | W-17, W-18 y la API de facturacion                                         | Uno que actue como comerciante registrado (Paddle o Lemon Squeezy) si no se quiere gestionar el IVA de cada pais; Stripe si se prefiere flexibilidad y se asume esa gestion.        |
-| Q-03 | Que es gratis y que es Ramal Pro, y precio por asiento                                                                 | Pagina de precios, limites dentro de las apps                              | Todo Git local gratis (decision 4); nube, equipos e IA de organizacion en el plan de pago.                                                                                          |
-| Q-04 | Windows ARM64 y Linux ARM64 en el lanzamiento                                                                          | Matriz de CI, tarjetas de descarga, VSIX por plataforma                    | **Resuelta por ADR 0016 (matriz de escritorio con Windows y Linux arm64) y ADR 0010 (ocho destinos de VSIX).** Queda ratificarla.                                                   |
-| Q-05 | Ciudad en la lista de sesiones (GeoIP) o solo dispositivo y ultima actividad                                           | W-21 y el modelo de sesiones                                               | Sin GeoIP en la primera version: menos datos personales y sin licencia de base de datos.                                                                                            |
-| Q-06 | Modelos de IA recomendados por defecto y nivel de coste para mensajes de commit                                        | X-10 y los textos de ajustes de IA                                         | Recomendar el nivel barato de cada proveedor para commits y dejar elegir; nada fijo en el binario.                                                                                  |
-| Q-07 | Windows Portable: quitarlo o mantenerlo sin actualizaciones automaticas                                                | X-09 y el pipeline de release                                              | **Resuelta por ADR 0016: se quita.** Queda ratificarla.                                                                                                                             |
-| Q-08 | Repositorio de releases publico (`ramal-releases`) o almacenamiento de objetos, y si el repo del producto sera publico | URL del actualizador, que no se puede cambiar tras el primer build publico | **Resuelta por ADR 0016 en lo que bloquea: repo de releases publico aparte y manifiesto servido por la API.** La visibilidad del repo del producto no bloquea nada y queda abierta. |
+| Id   | Decision                                                                                                               | Resuelta                                                                                                                          | Resumen                                                                                                                                                                                                                                                 |
+| ---- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q-01 | Equipos y facturacion en la primera version publica, o despues                                                         | 2026-10-01, [ADR 0026](../adr/0026-planes-y-precios.md)                                                                           | Todo dentro: organizaciones, equipo, invitaciones, asientos, facturacion y llaves de IA de organizacion con el proxy. E27 a E30 pasan al MVP, y W-11 a W-18 y D-47 son del MVP.                                                                         |
+| Q-02 | Proveedor de pagos                                                                                                     | 2026-10-01, [ADR 0022](../adr/0022-proveedor-de-pagos.md)                                                                         | Paddle como comerciante registrado (plan B: Polar), detras de un puerto `BillingProvider`. Checkout en una pagina de la web con Paddle.js y webhook en `/v1/billing/webhooks/paddle`.                                                                   |
+| Q-03 | Que es gratis y que es Ramal Pro, y precio por asiento                                                                 | 2026-10-01, [ADR 0026](../adr/0026-planes-y-precios.md)                                                                           | Pagan los equipos. Gratis para siempre: todo Git local, PRs, IA con llave propia y la sincronizacion personal. Ramal Pro es el plan de una organizacion: 8 USD por asiento al mes en anual o 10 en mensual, 14 dias de prueba sin tarjeta.              |
+| Q-04 | Windows ARM64 y Linux ARM64 en el lanzamiento                                                                          | 2026-10-01, [ADR 0016](../adr/0016-actualizaciones-y-descargas.md) y [ADR 0010](../adr/0010-un-motor-para-escritorio-y-vscode.md) | Ratificada la matriz entera y los ocho VSIX. Windows arm64 y Linux arm64 salen como beta hasta que su E2E pase en runners arm; Windows arm64 solo lleva NSIS.                                                                                           |
+| Q-05 | Ciudad en la lista de sesiones (GeoIP) o solo dispositivo y ultima actividad                                           | 2026-10-01, [api-surface.md](../api-surface.md#sesiones-activas) y [ADR 0008](../adr/0008-autenticacion-con-tokens.md)            | Sin ubicacion: dispositivo, sistema, app o navegador y ultima actividad. Sin GeoIP, y la pagina del device flow pierde el aviso de pais en la v1.                                                                                                       |
+| Q-06 | Modelos de IA recomendados por defecto y nivel de coste para mensajes de commit                                        | 2026-10-01, [ADR 0025](../adr/0025-recomendacion-de-modelos-de-ia.md)                                                             | Fichero remoto publico servido por la API, cruzado con la lista viva del proveedor. Rapido para commits, equilibrado para PRs y resumenes, razonamiento al minimo. Modelo por funcion; con llaves de organizacion lo fija el admin. Sin coste en la v1. |
+| Q-07 | Windows Portable: quitarlo o mantenerlo sin actualizaciones automaticas                                                | 2026-10-01, [ADR 0016](../adr/0016-actualizaciones-y-descargas.md)                                                                | Ratificada: sin Portable. NSIS se actualiza solo; el MSI x64 para IT sale en el lanzamiento con "sin actualizaciones automáticas", por decision y no por un limite de Tauri.                                                                            |
+| Q-08 | Repositorio de releases publico (`ramal-releases`) o almacenamiento de objetos, y si el repo del producto sera publico | 2026-10-01, [ADR 0016](../adr/0016-actualizaciones-y-descargas.md)                                                                | Sin repositorio aparte ni organizacion: se publica en `eabl0306/ramal`, privado hasta la beta y publico desde entonces. El manifiesto lo sirve la API, con `{{bundle_type}}` en la URL.                                                                 |
+
+El mismo dia se decidieron dos cosas que tocan a este documento sin ser filas suyas: el despliegue y
+el dominio (`ramal.bahoque.com` y `api.ramal.bahoque.com`,
+[ADR 0023](../adr/0023-despliegue-en-apps-01-y-dominio.md)) y el correo
+([ADR 0024](../adr/0024-correo-transaccional-con-resend.md)).
+
+### Lo que sigue abierto
+
+- **Descuento de lanzamiento, Ramal Pro gratis para codigo abierto y educacion, y precios
+  regionales.** No bloquean el MVP.
+- **Que pasa al acabar la prueba sin pagar, o cuando falla un pago.** La propuesta es que la
+  organizacion quede en solo lectura y sus datos se conserven 30 dias. Lo fija E30-01 antes de
+  construir los limites del plan.
+- **Pais y forma (persona fisica o empresa) desde la que factura Ezequiel.** Se confirma al abrir la
+  cuenta de Paddle. De ahi dependen tambien la via de firma de Windows y el nombre que ensena el
+  certificado de macOS.
+- **Que buzon real recibe las respuestas al correo y los informes de DMARC.** Sin el, `Reply-To` no
+  se fija y DMARC no pasa de `p=none`.
+- **Otra cuenta de Ramal en el mismo equipo**: si se le pregunta antes de subir lo creado alli o no
+  se le ofrece nunca. Lo seguro (no subirlo solo) ya esta decidido.
+- **Como llegan las builds a la beta privada** mientras el repositorio sea privado: las descargas de
+  GitHub Releases de un repositorio privado no son publicas, y el actualizador no puede leerlas.
+- **El diseno de lo que falta** (issues #62 a #71). Ezequiel lo disena en Claude Design, en el mismo
+  proyecto del handoff original, y trae un handoff nuevo.
+
+### Issues de seguimiento que salen de estas decisiones
+
+- Hecho el 2026-10-01: el codigo ya no usa `ramal.dev`. El prefijo de los `type` de los errores
+  (`apps/api/crates/http/src/problem.rs`), `apps/api/openapi.json`, sus tests y
+  `@ramal/api-client` usan `https://ramal.bahoque.com/problems/`.
+- Aceptar en el arranque de la API una base por delante del binario (`set_ignore_missing`), para que
+  una vuelta atras que cruce una migracion no deje la API reintentando en bucle
+  ([ADR 0023](../adr/0023-despliegue-en-apps-01-y-dominio.md)). Issue #517 (E26-16).
+- Pasar `ramal.engine.path` y `ramal.engine.logLevel` a `scope: "machine"` en
+  `apps/vscode/package.json` ([ADR 0010](../adr/0010-un-motor-para-escritorio-y-vscode.md)). Va en
+  el issue #301.

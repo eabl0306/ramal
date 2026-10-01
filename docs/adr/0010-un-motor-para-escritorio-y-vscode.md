@@ -3,6 +3,8 @@
 - Estado: aceptado
 - Fecha: 2026-09-30
 - Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
+- Ratificado: 2026-10-01, los ocho destinos de VSIX; y se decide quien sincroniza cada ajuste de
+  la extension (ver [Ajustes y sincronizacion](#ajustes-y-sincronizacion))
 
 ## Contexto
 
@@ -130,7 +132,11 @@ sistema. El caso de uso no sabe cual de los dos tiene delante.
   `win32-arm64`, `darwin-x64`, `darwin-arm64`, `linux-x64`, `linux-arm64`, `alpine-x64` y
   `alpine-arm64`. Cada uno lleva solo su binario en `dist/bin/ramal-vscode-engine` (con `.exe` en
   Windows). Los de Alpine se compilan para musl, que es lo que usan muchos contenedores de
-  desarrollo.
+  desarrollo. Ratificado el 2026-10-01: los ocho salen en el lanzamiento, porque `linux-arm64` y
+  `alpine-*` son justo los contenedores de desarrollo (un Mac con Apple Silicon, Graviton), y
+  compilarlos cuesta poco. Los cuatro destinos de Linux y Alpine salen de un solo job con
+  compilacion cruzada, y los binarios de macOS y Windows se firman con las mismas identidades que
+  escritorio ([ADR 0016](0016-actualizaciones-y-descargas.md)).
 - Se publica en el Marketplace de Visual Studio y en Open VSX, que es de donde instalan VSCodium,
   Cursor y otros derivados.
 - `extensionKind: ["workspace"]`: en Remote SSH, WSL y contenedores, la extension y el motor
@@ -139,9 +145,36 @@ sistema. El caso de uso no sabe cual de los dos tiene delante.
   `capabilities.untrustedWorkspaces.supported: false`, porque ejecutar git en una carpeta no
   confiable puede ejecutar sus hooks y su configuracion.
 - **La ruta del binario no la elige un ajuste en produccion.** Siempre es la del VSIX. Solo en modo
-  desarrollo (`ExtensionMode.Development`) se acepta el ajuste `ramal.engine.path`, de ambito
-  aplicacion, para apuntar a `target/debug`. Un ajuste de workspace que eligiera el binario seria
-  ejecucion de codigo con solo abrir una carpeta.
+  desarrollo (`ExtensionMode.Development`) se acepta el ajuste `ramal.engine.path` para apuntar a
+  `target/debug`. Un ajuste de workspace que eligiera el binario seria ejecucion de codigo con solo
+  abrir una carpeta.
+
+### Ajustes y sincronizacion
+
+Decidido el 2026-10-01 (gaps V-22). VS Code sincroniza sus ajustes entre equipos con Settings Sync,
+y Ramal sincroniza los suyos con su nube. Si los dos sincronizaran la misma clave, se pisarian. La
+regla es que **cada ajuste tiene un solo dueno**:
+
+| Ajuste                                                                                    | Donde vive                              | Quien lo sincroniza                                                 |
+| ----------------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------- |
+| Preferencias de Git (fetch automatico, modo de pull, firmar, podar)                       | Motor, documento `git`, como en Desktop | La nube de Ramal                                                    |
+| Configuracion de IA (funciones, llave y modelo por funcion, idioma, Conventional Commits) | Motor, documento `ai`, como en Desktop  | La nube de Ramal                                                    |
+| Cuentas de plataforma y llaves de IA                                                      | `SecretStorage` y la boveda             | La nube de Ramal (boveda). VS Code nunca sincroniza `SecretStorage` |
+| `ramal.engine.path`, `ramal.engine.logLevel` y "usar la nube" en esta instalacion         | `settings.json`, con `scope: "machine"` | Nadie: Settings Sync no sincroniza los ajustes `machine`            |
+| Tema e idioma                                                                             | VS Code                                 | VS Code                                                             |
+| Confianza de repositorios                                                                 | Motor, por equipo                       | Nadie                                                               |
+
+- Lo compartido con Desktop (Git e IA) se edita en el webview de ajustes de Ramal, el mismo que ya
+  tiene las cuentas y las llaves. No sale en el buscador de ajustes de VS Code, a cambio de que no
+  haya dos sincronizaciones sobre la misma clave ni que la extension escriba en el `settings.json`
+  del usuario.
+- En `settings.json` solo quedan los ajustes de esta maquina, todos con `scope: "machine"`, que
+  tampoco se pueden fijar por workspace, asi que la regla del binario se mantiene.
+- Sin cuenta, o con la nube apagada en esta instalacion, Git e IA son locales a ese VS Code.
+- La extension no registra estado propio con `globalState.setKeysForSync`.
+- **Hoy `package.json` declara `ramal.engine.path` y `ramal.engine.logLevel` con
+  `scope: "application"`**, y Settings Sync si sincroniza ese ambito: un `trace` puesto en un
+  equipo viajaria a todos. Pasarlos a `machine` es una issue de seguimiento (#301).
 
 ## Consecuencias
 

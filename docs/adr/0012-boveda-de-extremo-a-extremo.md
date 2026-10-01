@@ -2,6 +2,8 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Ratificado: 2026-10-01, el cierre de sesion, con una casilla para borrar tambien lo creado en el
+  equipo y reglas que faltaban (ver [Cambios del 2026-10-01](#cambios-del-2026-10-01))
 
 ## Contexto
 
@@ -165,12 +167,34 @@ contrasena.
   y todos los blobs, deja los metadatos y manda un correo de aviso. Es de la web porque es el
   camino de quien ya no tiene la VK y no puede presentar su comprobante; la reautenticacion es lo
   que impide que una sesion robada lo use para destruir.
-- **Cerrar sesion** borra del dispositivo la VK en cache y las copias sincronizadas de los tokens
-  que no se crearon en ese equipo. Lo que el usuario creo alli se queda en su llavero: sin cuenta,
-  Ramal sigue siendo un cliente Git que necesita esas credenciales
-  ([ADR 0014](0014-usar-ramal-sin-cuenta.md)). El motor hace la misma limpieza cuando un refresco
-  recibe un 401 definitivo (sesion revocada o caducada), sin esperar a que el usuario pulse nada:
-  un dispositivo honesto revocado desde otro equipo no debe conservar las copias sincronizadas.
+- **Cerrar sesion** borra del dispositivo la VK en cache y las copias de los secretos (tokens de
+  plataforma y llaves de IA personales) que llegaron sincronizados de otros equipos. Lo que el
+  usuario creo alli se queda en su llavero: sin cuenta, Ramal sigue siendo un cliente Git que
+  necesita esas credenciales ([ADR 0014](0014-usar-ramal-sin-cuenta.md)). Para un ordenador
+  compartido, el dialogo ofrece una casilla **apagada por defecto**, "Borrar también las añadidas
+  en este equipo", que borra tambien lo creado alli. El texto propuesto del dialogo es: "Al cerrar
+  sesión se borran de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de
+  otros equipos. Las que añadiste aquí se quedan para que Git siga funcionando." Lo sostienen
+  estas reglas:
+  - **Marca local de origen por secreto.** Para saber que se creo en este equipo, el motor guarda
+    junto a cada secreto local si se creo aqui o llego sincronizado, y para que usuario de Ramal.
+    La marca es del equipo y no viaja a la nube.
+  - **Solo un codigo concreto borra sin preguntar.** El motor hace la misma limpieza cuando un
+    refresco recibe un 401 con el `code` `session_ended` de la API (sesion revocada, caducada o
+    reutilizacion detectada), sin esperar a que el usuario pulse nada: un dispositivo honesto
+    revocado desde otro equipo no debe conservar las copias sincronizadas. Un 401 sin ese `code`
+    (un proxy, un fallo de configuracion del servidor, un token que la API no reconoce) no borra
+    nada: la app pide volver a iniciar sesion y conserva las copias. Si cualquier 401 borrara, un
+    fallo del servidor dejaria sin copias a todos los equipos a la vez.
+  - **Las demas ventanas de VS Code sueltan la llave.** Cada ventana tiene su motor y todas
+    comparten `SecretStorage`. Al cerrar sesion en una, las demas se enteran por
+    `SecretStorage.onDidChange` y sueltan la VK de memoria.
+  - **Un secreto local queda ligado a quien lo creo** (un usuario de Ramal o "sin cuenta"). Si
+    despues entra otra cuenta de Ramal en el mismo equipo, el motor no lo sube solo a la nube de
+    esa otra cuenta. Si se le pregunta o no se le ofrece nunca esta sin decidir.
+  - **Un token que se queda puede haber caducado.** Si una cuenta creada aqui refresco su token en
+    otro equipo (GitLab y Bitbucket rotan el refresh token), la copia local puede no valer. La
+    interfaz pide "Reconectar"; no falla en silencio.
 
 ### Los tokens no pasan por el servidor al crearse
 
@@ -255,3 +279,14 @@ llave.
 
 **Compartir cuentas con el equipo envolviendo la VK por miembro.** Descartado por la decision del
 usuario, no pendiente.
+
+## Cambios del 2026-10-01
+
+Se ratifica el cierre de sesion de la seccion Operaciones, con estos cambios:
+
+- El texto decia "las copias sincronizadas de los tokens"; son los tokens **y las llaves de IA
+  personales**, como ya decian api-surface.md y gaps.md.
+- Se anade la casilla "Borrar también las añadidas en este equipo", apagada por defecto.
+- Se escriben las reglas que faltaban: la marca local de origen por secreto, el `code`
+  `session_ended` como unica senal para borrar al refrescar, las demas ventanas de VS Code que
+  sueltan la llave, el secreto ligado a quien lo creo y "Reconectar" para un token que ya no vale.

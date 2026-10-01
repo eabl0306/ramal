@@ -30,15 +30,16 @@ esta en la [seccion 10](#10-primer-corte-y-lo-planificado).
 No se reabren aqui: cada una tiene o tendra su ADR. Se listan porque condicionan la forma
 de todo lo demas.
 
-| Decision                                                        | Lo que implica para la arquitectura                                                                                                                                                                                                                                                                                                                                      |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Un solo motor Git en Rust                                       | Desktop lo usa en proceso desde el host de Tauri. VS Code lo lleva como binario sidecar `ramal-vscode-engine` (JSON-RPC por stdio) dentro de VSIX por plataforma, el modelo de rust-analyzer. El extension host se queda fino.                                                                                                                                           |
-| Motor hibrido, primero el git CLI                               | Todo va por el git CLI: escrituras, red, hooks, firma, LFS y credenciales. `gix` entra mas tarde y solo en lecturas calientes, detras del mismo puerto y cuando un benchmark lo justifique. Nada de libgit2 ni `git2`. Git minimo 2.34 con deteccion de capacidades.                                                                                                     |
-| Secretos de cuentas de plataforma cifrados de extremo a extremo | El servidor nunca puede descifrarlos. No existen cuentas de plataforma compartidas con el equipo. La web no puede "probar conexion": solo ve metadatos y puede quitar una cuenta. Anadir o editar un token se hace en Desktop o en VS Code. Las llaves de IA personales, si el usuario activa su sincronizacion (apagada por defecto), usan la misma boveda.             |
-| Llaves de IA de organizacion en el servidor                     | Cifradas en reposo con cifrado de sobre (AES-256-GCM, KEK con identificador para rotar). Nunca salen del servidor: la API hace de proxy de la generacion. Las llaves personales se llaman desde el motor del dispositivo, que es la unica forma de que funcione Ollama.                                                                                                  |
-| Funciona sin cuenta de Ramal                                    | Todo lo que es Git local funciona sin iniciar sesion. Sincronizacion, equipos, llaves de IA de organizacion, dispositivos y el panel web piden sesion.                                                                                                                                                                                                                   |
-| Monorepo pnpm + un workspace de Cargo + just                    | pnpm 11.18.0 por corepack con versiones exactas, un unico `Cargo.toml` raiz (resolver 3, edicion 2024, Rust 1.98.1 fijado en `rust-toolchain.toml`), `just` como punto de entrada unico, lefthook y commitlint. Sin Turborepo ni Nx. El crate de Tauri es miembro del workspace pero no esta en `default-members`, para que `cargo` funcione en maquinas sin webkit2gtk. |
-| Web y API en el mismo origen                                    | Un gateway sirve la web estatica y enruta los prefijos de la API. La API no envia CORS. Desktop y VS Code nunca llaman a la API desde el webview: lo hace el motor en Rust.                                                                                                                                                                                              |
+| Decision                                                        | Lo que implica para la arquitectura                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Un solo motor Git en Rust                                       | Desktop lo usa en proceso desde el host de Tauri. VS Code lo lleva como binario sidecar `ramal-vscode-engine` (JSON-RPC por stdio) dentro de VSIX por plataforma, el modelo de rust-analyzer. El extension host se queda fino.                                                                                                                                                |
+| Motor hibrido, primero el git CLI                               | Todo va por el git CLI: escrituras, red, hooks, firma, LFS y credenciales. `gix` entra mas tarde y solo en lecturas calientes, detras del mismo puerto y cuando un benchmark lo justifique. Nada de libgit2 ni `git2`. Git minimo 2.34 con deteccion de capacidades.                                                                                                          |
+| Secretos de cuentas de plataforma cifrados de extremo a extremo | El servidor nunca puede descifrarlos. No existen cuentas de plataforma compartidas con el equipo. La web no puede "probar conexion": solo ve metadatos y puede quitar una cuenta. Anadir o editar un token se hace en Desktop o en VS Code. Las llaves de IA personales, si el usuario activa su sincronizacion (apagada por defecto), usan la misma boveda.                  |
+| Llaves de IA de organizacion en el servidor                     | Cifradas en reposo con cifrado de sobre (AES-256-GCM, KEK con identificador para rotar). Nunca salen del servidor: la API hace de proxy de la generacion. Las llaves personales se llaman desde el motor del dispositivo, que es la unica forma de que funcione Ollama.                                                                                                       |
+| Funciona sin cuenta de Ramal                                    | Todo lo que es Git local funciona sin iniciar sesion. Sincronizacion, equipos, llaves de IA de organizacion, dispositivos y el panel web piden sesion.                                                                                                                                                                                                                        |
+| Gratis para cada persona, de pago para los equipos              | Todo lo personal es gratis, sincronizacion incluida. Ramal Pro es el plan de una organizacion por asiento, cobrado con Paddle detras del puerto `BillingProvider`. Equipos, IA de organizacion y facturacion salen en la primera version publica ([ADR 0026](adr/0026-planes-y-precios.md), [ADR 0022](adr/0022-proveedor-de-pagos.md)).                                      |
+| Monorepo pnpm + un workspace de Cargo + just                    | pnpm 11.18.0 por corepack con versiones exactas, un unico `Cargo.toml` raiz (resolver 3, edicion 2024, Rust 1.98.1 fijado en `rust-toolchain.toml`), `just` como punto de entrada unico, lefthook y commitlint. Sin Turborepo ni Nx. El crate de Tauri es miembro del workspace pero no esta en `default-members`, para que `cargo` funcione en maquinas sin webkit2gtk.      |
+| Web y API en el mismo origen                                    | Un gateway sirve la web estatica y enruta los prefijos de la API. La API no envia CORS. Desktop y VS Code nunca llaman a la API desde el webview: lo hace el motor en Rust. En produccion la web esta en `ramal.bahoque.com` (con la API bajo su mismo origen) y los clientes nativos usan `api.ramal.bahoque.com` ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)). |
 
 ## 1. La idea en un parrafo
 
@@ -116,14 +117,22 @@ flowchart LR
     api -.->|"solo llaves de organizacion"| llm
 ```
 
-| Proceso                   | Que corre dentro                                                                                               | Con quien habla                                                                                                                                 |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ramal Desktop             | Un proceso de Tauri: el webview (React) y el host Rust `ramal-desktop`, que contiene `ramal-engine` en proceso | git CLI (procesos hijos), llavero del SO, APIs de plataformas, proveedores de IA, Ramal API                                                     |
-| Extension host de VS Code | Node, el bundle `apps/vscode/dist/extension.cjs`                                                               | API de VS Code, sus webviews (postMessage), el sidecar (stdio)                                                                                  |
-| Webviews de VS Code       | React, un webview por superficie (grafo, cambios, merge, ajustes)                                              | Solo el extension host: su CSP lleva `connect-src 'none'`                                                                                       |
-| Sidecar de VS Code        | `ramal-vscode-engine`, que contiene `ramal-engine`                                                             | git CLI, APIs de plataformas, proveedores de IA, Ramal API; SecretStorage a traves del extension host                                           |
-| Navegador                 | Ramal Web: landing prerenderizada mas SPA                                                                      | Gateway del mismo origen                                                                                                                        |
-| Servidor                  | Gateway (nginx), `ramal-api`, PostgreSQL                                                                       | Proveedores OAuth de inicio de sesion, correo, proveedores de IA (solo llaves de organizacion), Bitbucket (solo el intercambio de codigo OAuth) |
+| Proceso                   | Que corre dentro                                                                                               | Con quien habla                                                                                                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ramal Desktop             | Un proceso de Tauri: el webview (React) y el host Rust `ramal-desktop`, que contiene `ramal-engine` en proceso | git CLI (procesos hijos), llavero del SO, APIs de plataformas, proveedores de IA, Ramal API                                                                                             |
+| Extension host de VS Code | Node, el bundle `apps/vscode/dist/extension.cjs`                                                               | API de VS Code, sus webviews (postMessage), el sidecar (stdio)                                                                                                                          |
+| Webviews de VS Code       | React, un webview por superficie (grafo, cambios, merge, ajustes)                                              | Solo el extension host: su CSP lleva `connect-src 'none'`                                                                                                                               |
+| Sidecar de VS Code        | `ramal-vscode-engine`, que contiene `ramal-engine`                                                             | git CLI, APIs de plataformas, proveedores de IA, Ramal API; SecretStorage a traves del extension host                                                                                   |
+| Navegador                 | Ramal Web: landing prerenderizada mas SPA                                                                      | Gateway del mismo origen                                                                                                                                                                |
+| Servidor                  | Gateway (nginx), `ramal-api`, PostgreSQL, en la instancia compartida `apps-01` detras de su Caddy              | Proveedores OAuth de inicio de sesion, correo (Resend por SMTP), Paddle (facturacion), proveedores de IA (solo llaves de organizacion), Bitbucket (solo el intercambio de codigo OAuth) |
+
+**Donde corre la nube** ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)). En `apps-01`, la
+instancia de Lightsail que ya sirve Gastonomo y Grimdex, con su propio proyecto de compose, su
+PostgreSQL y su `.env`. Caddy termina TLS para `ramal.bahoque.com` (la web, con la API bajo su
+mismo origen) y `api.ramal.bahoque.com` (la API para los motores, el actualizador, la CI y los
+webhooks), y manda los dos al gateway de Ramal. Las imagenes se construyen en la CI, se despliegan
+por el SHA del commit y vuelven solas a la anterior si la comprobacion desde fuera falla. El correo
+sale por Resend ([ADR 0024](adr/0024-correo-transaccional-con-resend.md)).
 
 ## 3. El arbol del monorepo
 
@@ -459,7 +468,8 @@ para lo que llega despues de las lecturas del primer corte:
   pone la fecha cero, como hace git.
 - Binario: el ajuste explicito si existe (en VS Code llega el `git.path` que expone la API
   `vscode.git`), si no el del `PATH`, y solo en Desktop para Windows un MinGit empaquetado como
-  respaldo ([ADR 0009](adr/0009-motor-git-hibrido.md)).
+  respaldo en los instaladores NSIS y MSI, x64 y arm64, con version y sha256 fijados
+  ([ADR 0009](adr/0009-motor-git-hibrido.md)).
 - Ningun valor externo llega a argv como opcion: `--end-of-options` antes de refs, revisiones y
   URL, `--` antes de rutas, y nombres de rama validados con `git check-ref-format --branch` y sin
   `-` inicial. Clonar y hacer fetch llevan `-c protocol.allow=never -c protocol.https.allow=always
@@ -644,7 +654,11 @@ app/composition-root.ts     Construye adaptadores y casos de uso
 arrancar VS Code; solo `infrastructure` y `app` tocan la API real, y eso lo cubren los tests
 de integracion (bajo xvfb en Linux sin pantalla). No hay puerto de configuracion: los dos
 ajustes del motor (`ramal.engine.path` y `ramal.engine.logLevel`) los lee la infraestructura al
-lanzar el sidecar.
+lanzar el sidecar. Son ajustes de esta maquina y pasan a `scope: "machine"` para que Settings Sync
+no los lleve a otros equipos (issue de seguimiento #301; hoy son `application`). Lo que comparte con
+Desktop (preferencias de Git e IA) vive en la nube de Ramal y se edita en la pagina de ajustes de
+Ramal, no en `settings.json`
+([ADR 0010](adr/0010-un-motor-para-escritorio-y-vscode.md#ajustes-y-sincronizacion)).
 
 **Webviews, `apps/vscode/src/webview`.** Mismo papel que el frontend de escritorio:
 adaptadores driving que montan `@ramal/repo-view` con otra densidad, otro tema y otro
@@ -714,8 +728,8 @@ src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en s
 - Ruta del binario: en produccion siempre `dist/bin/ramal-vscode-engine` (con `.exe` en
   Windows) dentro de la VSIX de su plataforma; `just vscode-package` lo copia ahi. Solo fuera de
   produccion (desarrollo y tests de integracion) se acepta, por este orden, el ajuste de usuario
-  `ramal.engine.path` (ambito aplicacion), la variable `RAMAL_ENGINE_PATH` o lo que haya
-  compilado cargo en `target/` del monorepo. Un ajuste de workspace nunca puede elegir que
+  `ramal.engine.path` (hoy de ambito aplicacion, pasara a `machine`), la variable
+  `RAMAL_ENGINE_PATH` o lo que haya compilado cargo en `target/` del monorepo. Un ajuste de workspace nunca puede elegir que
   binario se ejecuta: seria ejecucion de codigo con abrir una carpeta.
 - El binario de git llega del `git.path` de la extension `vscode.git` (`--git-path`), que se
   lee al activar la extension.
@@ -1128,9 +1142,10 @@ sequenceDiagram
     UC-->>R: union de resultados, nunca lanza
 ```
 
-El gateway (`docker/gateway.dev.conf`; el de produccion todavia no existe) tiene un `location`
-por prefijo de la API (`/v1/`, `/health/`, `= /openapi.json` y `/swagger-ui`, que la API solo
-sirve con la bandera) antes del `location /` de la web. Las rutas son las mismas dentro y fuera
+El gateway (`docker/gateway.dev.conf`; el de produccion todavia no existe, y atendera los dos
+nombres de [ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md) con `real_ip` detras de Caddy)
+tiene un `location` por prefijo de la API (`/v1/`, `/health/`, `= /openapi.json` y `/swagger-ui`,
+que la API solo sirve con la bandera) antes del `location /` de la web. Las rutas son las mismas dentro y fuera
 del gateway: no hay prefijo `/api` que se quite por el camino
 ([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). Cada prefijo nuevo necesita su
 `location` en el gateway (en los dos ficheros cuando exista el de produccion) y una sonda en
@@ -1141,9 +1156,12 @@ todos los tests en verde.
 
 El motor es el unico que habla con el exterior en Desktop y en VS Code:
 
-- Ramal API: `ramal-cloud-client` implementa `CloudClient` con `reqwest`. El token de acceso
-  vive en memoria del motor y el refresh token en el `SecretStore`. La API no necesita CORS
-  porque ningun navegador hace estas peticiones.
+- Ramal API: `ramal-cloud-client` implementa `CloudClient` con `reqwest` contra
+  `https://api.ramal.bahoque.com`. El token de acceso vive en memoria del motor y el refresh token
+  en el `SecretStore`. La API no necesita CORS porque ningun navegador hace estas peticiones.
+- Modelos de IA recomendados: el motor pide `GET /v1/ai/model-recommendations` (publico, tambien sin
+  cuenta), lo guarda con su `ETag` y lo cruza con la lista viva de cada proveedor
+  ([ADR 0025](adr/0025-recomendacion-de-modelos-de-ia.md)).
 - Plataformas Git: `ramal-platforms` implementa `PlatformClient` y llama directamente a
   GitHub, GitLab, Bitbucket, Gitea y Azure DevOps con el token de la cuenta ligada al repo.
 - IA personal: el adaptador de `ramal-ai` en `ramal-engine` llama al proveedor con la llave
@@ -1390,7 +1408,10 @@ es `'unsafe-inline'` en `script-src`. Ademas:
   boveda y eliminar la cuenta no se pueden cargar dentro de un marco ajeno.
 - `require-trusted-types-for 'script'` con una politica que no crea HTML a partir de texto. Si
   una dependencia lo impide, la excepcion se documenta en el despliegue.
-- Un XSS en `ramal.dev` es la puerta para aprobar sesiones nativas, asi que en las tres
+- **La pagina de pago es la unica excepcion.** Carga Paddle.js para el checkout de Ramal Pro, asi
+  que su CSP abre los dominios de Paddle en `script-src` y `frame-src`, y solo esa ruta
+  ([ADR 0022](adr/0022-proveedor-de-pagos.md)). El resto de la web no carga codigo de terceros.
+- Un XSS en `ramal.bahoque.com` es la puerta para aprobar sesiones nativas, asi que en las tres
   interfaces React esta prohibido `dangerouslySetInnerHTML` (regla `react/no-danger` de ESLint) y
   el Markdown (notas de version, descripciones de PR) se pinta sin HTML crudo.
 
@@ -1552,6 +1573,7 @@ los casos de uso que necesitan la nube preguntan por ella.
 | PRs, checks y reviews desde la API de la plataforma                                                | Si                                           | Nadie                                                                                                                               |
 | IA con llave personal, incluido Ollama                                                             | Si                                           | Nadie                                                                                                                               |
 | Manifiesto del updater y datos de descarga                                                         | Si                                           | Nadie (endpoint publico)                                                                                                            |
+| Modelos de IA recomendados                                                                         | Si                                           | Nadie (endpoint publico)                                                                                                            |
 | Sincronizar ajustes, workspaces y metadatos de repos                                               | No                                           | Motor (`CloudClient` sin sesion devuelve `not_signed_in`) y API (401)                                                               |
 | Sincronizar tokens y llaves personales (boveda)                                                    | No, y ademas pide la frase de sincronizacion | Motor y API                                                                                                                         |
 | Equipos, miembros, invitaciones                                                                    | No                                           | API                                                                                                                                 |
@@ -1631,7 +1653,7 @@ los mismos nombres. Este resumen no lo sustituye:
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ramal-vault`                    | Implementa el puerto `VaultCipher`: derivar KEK y subllaves, envolver y desenvolver la VK, sellar y abrir secretos, calcular el comprobante. Limpia de memoria las claves (`zeroize`). No conoce la red ni el llavero.                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `ramal-core-application`         | Casos de uso: `SetupVault` (genera VK y codigo de recuperacion, ensena el codigo y exige confirmarlo antes de subir), `UnlockVault` (baja la cabecera, deriva, desenvuelve y guarda la VK en el `SecretStore`), `UnlockWithRecoveryCode`, `ChangeSyncPassphrase` (solo reenvuelve), `RegenerateRecoveryCode`, `RotateVaultKey` (pide la frase, genera VK y codigo nuevos, ensena el codigo, vuelve a sellar todos los secretos y lo sube en una peticion), `PushSecret`, `PullSecrets`, `LockVault`. No hay reinicio en el dispositivo: reiniciar es `DELETE /v1/vault`, solo desde la web, porque es el camino de quien ya no tiene la VK. |
-| `ramal-keychain` y SecretStorage | Guardan en el dispositivo la VK desenvuelta (entrada `ramal/vault-key/<user_id>`), el refresh token de Ramal, el secreto del dispositivo y la copia local de cada token y llave. Cerrar sesion, o recibir un 401 definitivo al refrescar, borra la VK y las copias de secretos creados en otros equipos. En VS Code, el sidecar pide los secretos al extension host por peticion inversa y este usa `context.secrets`.                                                                                                                                                                                                                      |
+| `ramal-keychain` y SecretStorage | Guardan en el dispositivo la VK desenvuelta (entrada `ramal/vault-key/<user_id>`), el refresh token de Ramal, el secreto del dispositivo y la copia local de cada token y llave. Cerrar sesion, o recibir al refrescar un 401 con `session_ended`, borra la VK y las copias de secretos que llegaron de otros equipos (lo sabe por una marca local de origen por secreto); la casilla "Borrar también las añadidas en este equipo", apagada por defecto, borra tambien las locales. En VS Code, el sidecar pide los secretos al extension host por peticion inversa y este usa `context.secrets`.                                           |
 | `ramal-cloud-client`             | Sube y baja envolturas y secretos sellados. Nunca ve una clave en claro.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | API, contexto `vault`            | Guarda y sirve bytes que no entiende, con concurrencia optimista por `version` en la cabecera y `FOR SHARE`/`FOR UPDATE` sobre la fila de la boveda para que una escritura de secreto no se cruce con una rotacion. Borra el secreto al borrar su cuenta o su llave, y no deja reutilizar su id.                                                                                                                                                                                                                                                                                                                                            |
 | Web                              | Lista metadatos de cuentas ligadas y puede quitarlas (borra metadatos y secreto). Ve la mascara de las llaves personales, que esta en claro porque la calcula el dispositivo antes de subirla. No puede anadir, editar ni probar un token. Es el unico sitio con el reinicio de la boveda.                                                                                                                                                                                                                                                                                                                                                  |
@@ -1677,11 +1699,14 @@ nunca salen de el.
   datos asociados `ramal:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`: el `kekId` va en la envoltura y
   no en el secreto, para que rotar la KEK no deje los secretos sin poder descifrarse. Se guardan
   `ciphertext`, `nonce`, `wrapped_dek`, `dek_nonce`, `kek_id` y `alg`, ademas de los metadatos
-  (proveedor, etiqueta, modelo, URL base, enmascarado). Las KEK llegan por configuracion
+  (proveedor, etiqueta, modelo por defecto y modelo por funcion, que fija el admin, URL base,
+  enmascarado). Las KEK llegan por configuracion
   (`RAMAL__SECRETS__KEKS`, mapa de id a clave en base64, y `RAMAL__SECRETS__ACTIVE_KEK`), nunca
   desde la base de datos. Rotar es cambiar la KEK activa; un trabajo periodico reenvuelve las DEK
   de la anterior y esa KEK se retira cuando ninguna fila la usa. Un test rota y vuelve a
-  descifrar.
+  descifrar. En produccion la KEK va en el `.env` de Ramal en `apps-01`, compartida con otras dos
+  aplicaciones: 0600, solo el contenedor de la API la recibe, y KMS mas adelante por el mismo
+  puerto ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)).
 - **Salida a los proveedores:** los proveedores conocidos tienen el host fijo y solo `custom` (si
   el despliegue lo permite) elige URL base. El cliente HTTP comprueba en cada conexion, con un
   resolvedor propio, que la direccion no es privada, de loopback ni de enlace local, sin seguir
@@ -1717,8 +1742,9 @@ navegador; en VS Code, la vuelta llega al `UriHandler` del extension host (con l
 por `env.asExternalUri`) y este se la pasa al motor. Device flow queda como alternativa en los
 dos. La sesion nativa nunca cuenta como reautenticacion reciente: para cambiar el correo o la
 contrasena, eliminar la cuenta o transferir una organizacion, el cliente abre la pagina de la
-web. Si un refresco recibe un 401 definitivo, el motor hace la misma limpieza que al cerrar
-sesion. El detalle esta en [ADR 0008](adr/0008-autenticacion-con-tokens.md).
+web. Si un refresco recibe un 401 con el `code` `session_ended`, el motor hace la misma limpieza
+que al cerrar sesion; cualquier otro 401 pide volver a entrar sin borrar nada. El detalle esta en
+[ADR 0008](adr/0008-autenticacion-con-tokens.md) y [ADR 0012](adr/0012-boveda-de-extremo-a-extremo.md).
 
 ## 9. Para anadir algo nuevo
 
@@ -1872,7 +1898,8 @@ tabla dice lo que hay en `main`, no lo que se pidio.
   VSIX de otras plataformas que `linux-x64`.
 
 **Abierto:** el gateway de produccion (`docker/gateway.prod.conf`, que tiene que dejar fuera
-`/swagger-ui`), construir la imagen de Tauri en la CI y la decision de la licencia.
+`/swagger-ui` y atender los dos nombres de ADR 0023) y construir la imagen de Tauri en la CI. La
+licencia ya esta decidida ([ADR 0021](adr/0021-licencia-fsl.md)).
 
 **Hecho significa:**
 
@@ -1891,27 +1918,32 @@ El porque de cada decision de partida y de cada eleccion tecnica de este documen
 de [adr/](adr/). Un ADR aceptado no se edita para cambiar de opinion: se escribe otro que lo
 sustituye y se enlaza desde el viejo.
 
-| ADR                                                   | Decision                                                                                                                                     |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| [0001](adr/0001-monorepo-poliglota.md)                | Monorepo con pnpm, un solo workspace de Cargo y just, sin orquestador; el crate de Tauri fuera de `default-members`                          |
-| [0002](adr/0002-arquitectura-hexagonal.md)            | Arquitectura hexagonal en la API, el motor, los hosts, la web y los paquetes TS, forzada con tests de arquitectura y boundaries              |
-| [0003](adr/0003-rust-con-salvo.md)                    | API en Rust con Salvo 1.0 y el documento OpenAPI generado con salvo-oapi desde el router                                                     |
-| [0004](adr/0004-postgresql-con-sqlx.md)               | PostgreSQL 18 con SQLx sin macros de consulta, migraciones solo hacia delante y tests contra una base real                                   |
-| [0005](adr/0005-enforcement-automatizado.md)          | Limites de calidad bloqueantes en local, en cada commit y en la CI; avisos como errores y toolchain de Rust fijado                           |
-| [0006](adr/0006-estrategia-de-testing.md)             | Piramide de tests por app, repositorios de prueba dorados, Playwright con hosts simulados y una capa fina de E2E reales                      |
-| [0007](adr/0007-docker-desarrollo-y-produccion.md)    | Docker para desarrollo y produccion, gateway del mismo origen por prefijos y la pila probada entrando por la puerta                          |
-| [0008](adr/0008-autenticacion-con-tokens.md)          | JWT Ed25519 de 15 minutos, refresh opaco rotatorio, cookies con CSRF en la web y PKCE o device flow en las apps nativas                      |
-| [0009](adr/0009-motor-git-hibrido.md)                 | Motor Git hibrido: la CLI de git para todo, gix mas tarde solo en lecturas, sin libgit2, git 2.34 como minimo y credenciales por repositorio |
-| [0010](adr/0010-un-motor-para-escritorio-y-vscode.md) | Un solo motor en Rust: en proceso en escritorio y como sidecar JSON-RPC en VSIX por plataforma en VS Code                                    |
-| [0011](adr/0011-ui-compartida-y-puente-tipado.md)     | Interfaz compartida por tokens semanticos, dos temas y dos densidades, React Aria, puente tipado con transportes y tipos de ts-rs            |
-| [0012](adr/0012-boveda-de-extremo-a-extremo.md)       | Boveda de secretos de extremo a extremo: frase de sincronizacion, codigo de recuperacion y nada que el servidor pueda abrir                  |
-| [0013](adr/0013-proxy-de-ia-de-organizacion.md)       | Llaves de IA de organizacion con cifrado de sobre y proxy en la API; llaves personales usadas desde el dispositivo                           |
-| [0014](adr/0014-usar-ramal-sin-cuenta.md)             | Todo lo que es Git local funciona sin cuenta de Ramal; la nube pide sesion en el punto concreto                                              |
-| [0015](adr/0015-framework-web-con-prerender.md)       | React Router 8 en modo framework sin SSR, con la landing prerenderizada en dos idiomas y el panel como SPA                                   |
-| [0016](adr/0016-actualizaciones-y-descargas.md)       | Actualizador de Tauri con artefactos en GitHub Releases y manifiesto servido por la API, con canales, despliegue gradual y retirada          |
-| [0017](adr/0017-internacionalizacion-compartida.md)   | Un solo paquete de textos con claves tipadas y plurales; regla de idioma comun y manifiesto de VS Code con `package.nls`                     |
-| [0018](adr/0018-cuentas-de-plataformas-git.md)        | Cuentas de plataformas con clientes OAuth publicos primero, broker solo para Bitbucket, PAT donde no hay OAuth y PRs pedidos desde el motor  |
-| [0021](adr/0021-licencia-fsl.md)                      | Todo el repositorio con la FSL 1.1 y Apache 2.0 como licencia futura (`FSL-1.1-ALv2`)                                                        |
+| ADR                                                   | Decision                                                                                                                                                                      |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [0001](adr/0001-monorepo-poliglota.md)                | Monorepo con pnpm, un solo workspace de Cargo y just, sin orquestador; el crate de Tauri fuera de `default-members`                                                           |
+| [0002](adr/0002-arquitectura-hexagonal.md)            | Arquitectura hexagonal en la API, el motor, los hosts, la web y los paquetes TS, forzada con tests de arquitectura y boundaries                                               |
+| [0003](adr/0003-rust-con-salvo.md)                    | API en Rust con Salvo 1.0 y el documento OpenAPI generado con salvo-oapi desde el router                                                                                      |
+| [0004](adr/0004-postgresql-con-sqlx.md)               | PostgreSQL 18 con SQLx sin macros de consulta, migraciones solo hacia delante y tests contra una base real                                                                    |
+| [0005](adr/0005-enforcement-automatizado.md)          | Limites de calidad bloqueantes en local, en cada commit y en la CI; avisos como errores y toolchain de Rust fijado                                                            |
+| [0006](adr/0006-estrategia-de-testing.md)             | Piramide de tests por app, repositorios de prueba dorados, Playwright con hosts simulados y una capa fina de E2E reales                                                       |
+| [0007](adr/0007-docker-desarrollo-y-produccion.md)    | Docker para desarrollo y produccion, gateway del mismo origen por prefijos y la pila probada entrando por la puerta                                                           |
+| [0008](adr/0008-autenticacion-con-tokens.md)          | JWT Ed25519 de 15 minutos, refresh opaco rotatorio, cookies con CSRF en la web y PKCE o device flow en las apps nativas                                                       |
+| [0009](adr/0009-motor-git-hibrido.md)                 | Motor Git hibrido: la CLI de git para todo, gix mas tarde solo en lecturas, sin libgit2, git 2.34 como minimo y credenciales por repositorio                                  |
+| [0010](adr/0010-un-motor-para-escritorio-y-vscode.md) | Un solo motor en Rust: en proceso en escritorio y como sidecar JSON-RPC en VSIX por plataforma en VS Code                                                                     |
+| [0011](adr/0011-ui-compartida-y-puente-tipado.md)     | Interfaz compartida por tokens semanticos, dos temas y dos densidades, React Aria, puente tipado con transportes y tipos de ts-rs                                             |
+| [0012](adr/0012-boveda-de-extremo-a-extremo.md)       | Boveda de secretos de extremo a extremo: frase de sincronizacion, codigo de recuperacion y nada que el servidor pueda abrir                                                   |
+| [0013](adr/0013-proxy-de-ia-de-organizacion.md)       | Llaves de IA de organizacion con cifrado de sobre y proxy en la API; llaves personales usadas desde el dispositivo                                                            |
+| [0014](adr/0014-usar-ramal-sin-cuenta.md)             | Todo lo que es Git local funciona sin cuenta de Ramal; la nube pide sesion en el punto concreto                                                                               |
+| [0015](adr/0015-framework-web-con-prerender.md)       | React Router 8 en modo framework sin SSR, con la landing prerenderizada en dos idiomas y el panel como SPA                                                                    |
+| [0016](adr/0016-actualizaciones-y-descargas.md)       | Actualizador de Tauri con artefactos en GitHub Releases de `eabl0306/ramal` y manifiesto servido por la API con `{{bundle_type}}`, con canales, despliegue gradual y retirada |
+| [0017](adr/0017-internacionalizacion-compartida.md)   | Un solo paquete de textos con claves tipadas y plurales; regla de idioma comun y manifiesto de VS Code con `package.nls`                                                      |
+| [0018](adr/0018-cuentas-de-plataformas-git.md)        | Cuentas de plataformas con clientes OAuth publicos primero, broker solo para Bitbucket, PAT donde no hay OAuth y PRs pedidos desde el motor                                   |
+| [0021](adr/0021-licencia-fsl.md)                      | Todo el repositorio con la FSL 1.1 y Apache 2.0 como licencia futura (`FSL-1.1-ALv2`)                                                                                         |
+| [0022](adr/0022-proveedor-de-pagos.md)                | Paddle como comerciante registrado (plan B Polar), detras de un puerto `BillingProvider`; checkout en una pagina de la web y prueba llevada por Ramal                         |
+| [0023](adr/0023-despliegue-en-apps-01-y-dominio.md)   | Despliegue en la instancia compartida `apps-01` con el patron de Gastonomo; web en `ramal.bahoque.com` y API en `api.ramal.bahoque.com`                                       |
+| [0024](adr/0024-correo-transaccional-con-resend.md)   | Correo transaccional por SMTP con Resend, en un equipo propio, remitente verificado en un subdominio y DMARC por etapas                                                       |
+| [0025](adr/0025-recomendacion-de-modelos-de-ia.md)    | Modelos de IA recomendados desde un fichero publico de la API, por nivel y por funcion, con el modelo de las llaves de organizacion fijado por el admin                       |
+| [0026](adr/0026-planes-y-precios.md)                  | Gratis para cada persona; Ramal Pro por asiento para organizaciones (8 USD en anual, 10 en mensual, 14 dias de prueba); todo en la primera version                            |
 
 Pendientes de escribir, con su issue en el backlog (epica E02):
 

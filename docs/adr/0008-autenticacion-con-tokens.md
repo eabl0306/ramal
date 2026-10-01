@@ -2,6 +2,11 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01. El `iss` usa el dominio real
+  ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)); la pagina del device flow no ensena
+  ubicacion en la primera version; y un refresco fallido lleva un `code` concreto cuando la sesion
+  termino, que es lo unico que hace borrar las copias sincronizadas
+  ([ADR 0012](0012-boveda-de-extremo-a-extremo.md))
 
 ## Contexto
 
@@ -41,11 +46,11 @@ los endpoints estan en [api-surface.md](../api-surface.md); aqui va el porque.
 
 ### El access token es un JWT Ed25519 de 15 minutos
 
-- Lleva `iss` (`https://ramal.dev`), `aud` (`ramal-api`), `sub` (usuario), `sid` (sesion), `cli`
-  (`web`, `desktop` o `vscode`), `auth_time` (ultimo inicio de sesion real), `iat` y `exp`. No lleva
-  roles: los roles son por organizacion, cambian, y se leen de la base en cada peticion que los
-  necesita. `iss` y `aud` se comprueban desde el primer dia: cuando haya un segundo servicio que
-  valide tokens, un token emitido para otro destino no le servira.
+- Lleva `iss` (`https://api.ramal.bahoque.com`), `aud` (`ramal-api`), `sub` (usuario), `sid`
+  (sesion), `cli` (`web`, `desktop` o `vscode`), `auth_time` (ultimo inicio de sesion real), `iat`
+  y `exp`. No lleva roles: los roles son por organizacion, cambian, y se leen de la base en cada
+  peticion que los necesita. `iss` y `aud` se comprueban desde el primer dia: cuando haya un
+  segundo servicio que valide tokens, un token emitido para otro destino no le servira.
 - Se firma con Ed25519 y lleva `kid` y `typ: at+jwt` en la cabecera. El verificador solo acepta
   `alg: EdDSA` con un `kid` que conozca y `typ: at+jwt`; cualquier otra combinacion es 401, sin
   intentar otro algoritmo. Las llaves llegan por configuracion
@@ -90,6 +95,13 @@ los endpoints estan en [api-surface.md](../api-surface.md); aqui va el porque.
   lleva nada: el 409 no trae tokens.
 - La caducidad es de la sesion: 14 dias de inactividad en la web y 90 en las apps nativas (cada
   refresco la alarga), y un maximo absoluto de 365 dias.
+- **Cuando la sesion termino, el 401 lo dice con un `code`.** Si el refresco encuentra la sesion
+  revocada, caducada o detecta la reutilizacion, responde 401 con `code` `session_ended`; un token
+  que no reconoce recibe el `unauthorized` de siempre. El `detail` es el mismo texto fijo en los
+  dos. El motor solo borra las copias sincronizadas con `session_ended`: un 401 que venga de un
+  proxy o de un fallo de configuracion no debe vaciar los equipos de nadie. Distinguir los dos casos
+  dice si un refresh token existio, y se acepta: son 256 bits aleatorios que nadie puede adivinar, y
+  quien presenta uno revocado ya lo tenia.
 - **Un dispositivo tiene como mucho una sesion.** Volver a iniciar sesion desde la misma
   instalacion reutiliza la fila del dispositivo y revoca la sesion anterior. La instalacion se
   identifica por un `installationId` y se prueba con un **secreto de dispositivo**: 256 bits
@@ -202,8 +214,9 @@ codigo pendiente ajeno y lo apruebe mete el equipo de otro en su propia cuenta, 
 subir alli sus metadatos. Por eso:
 
 - No hay `verificationUriComplete`: el usuario escribe en la pagina el codigo que ve en su equipo.
-- La pagina dice "Pedido hace N segundos" y, si GeoIP esta activo, desde que ciudad y pais, con un
-  aviso cuando no coinciden con los del navegador que aprueba.
+- La pagina dice "Pedido hace N segundos". No dice desde donde: la primera version no geolocaliza
+  IPs (gaps Q-05), asi que no hay aviso de pais. Si el phishing por device flow preocupa, el
+  siguiente paso seria el pais (no la ciudad) con una base de licencia clara.
 - El nombre se ensena como "nombre que declara el equipo", sin caracteres de control ni de
   direccion de texto.
 - `device/code` admite 10 peticiones por minuto e IP y hay un tope global de flujos pendientes;

@@ -2,6 +2,10 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
+- Revisado: 2026-10-01. Las llaves de organizacion y el proxy entran en la primera version publica
+  ([ADR 0026](0026-planes-y-precios.md)); el admin fija el modelo por funcion
+  ([ADR 0025](0025-recomendacion-de-modelos-de-ia.md)); y se anota donde vive la KEK en produccion
+  ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md))
 
 ## Contexto
 
@@ -44,8 +48,8 @@ La IA corre donde vive la llave.
   hay que contar cuantos mensajes cifra una llave para no repetir nonce.
 - **La DEK se envuelve con la llave maestra activa (KEK)**, tambien con AES-256-GCM y con datos
   asociados `ramal:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`. Se guardan `ciphertext`, `nonce`,
-  `wrapped_dek`, `dek_nonce`, `kek_id` y `alg`, mas los metadatos (proveedor, etiqueta, modelo, URL
-  base y la mascara).
+  `wrapped_dek`, `dek_nonce`, `kek_id` y `alg`, mas los metadatos (proveedor, etiqueta, modelo por
+  defecto y, si el admin los fija, un modelo por funcion, URL base y la mascara).
 - **El `kekId` va en los datos asociados de la envoltura, no en los del secreto.** Si fuera en los
   del secreto, rotar la KEK (que solo reenvuelve la DEK) dejaria todos los secretos sin poder
   descifrarse, porque sus datos asociados ya no coincidirian. Un test rota la KEK y vuelve a
@@ -55,6 +59,12 @@ La IA corre donde vive la llave.
   limpian de memoria y nunca se registran. Un volcado de la base solo trae ciphertext y DEK
   envueltas. Mas adelante, el mismo puerto `KeyEnvelope` puede tener un adaptador sobre un KMS para
   que la KEK no entre nunca en el proceso.
+- **En produccion la KEK vive en una maquina compartida.** Va en el `.env` de Ramal en `apps-01`,
+  que tambien sirve otras dos aplicaciones
+  ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)). La protegen los permisos 0600 del fichero,
+  que solo el contenedor de la API la recibe y que cada aplicacion tiene su proyecto de compose, su
+  red y sus volumenes. Quien tenga root en la maquina puede leerla, como en cualquier servidor sin
+  KMS.
 - **Rotar la KEK** es cambiar la activa para las escrituras nuevas. Un trabajo periodico reenvuelve
   las DEK de las filas con la KEK vieja (48 bytes por fila, sin tocar el ciphertext) y la vieja se
   retira cuando ninguna fila la usa. Rotar la llave del proveedor genera una DEK nueva.
@@ -86,6 +96,10 @@ revocada. La web no tiene interfaz de IA y no tiene por que poder gastar llaves.
   un mensaje de commit, 1500 para un PR y 600 para un resumen), 500 caracteres de instrucciones
   extra, la cuota reservada antes de llamar y como mucho dos generaciones a la vez por usuario y
   organizacion.
+- **El modelo lo fija el admin.** Cada llave de organizacion tiene un modelo por defecto y, si el
+  admin quiere, uno por funcion. La peticion no lleva modelo: el proxy usa el de la funcion o, si no
+  hay, el de la llave. Un miembro no puede gastar la llave de la organizacion en un modelo mas caro
+  que el que eligio el admin ([ADR 0025](0025-recomendacion-de-modelos-de-ia.md)).
 - **Respuesta en JSON o en SSE.** Con `Accept: text/event-stream` el texto llega a medida que se
   genera, que es lo que pinta el "Generando..." del diseno. Si el cliente cierra la conexion, la
   API corta la llamada al proveedor.
@@ -158,7 +172,8 @@ y contiene:
   OpenAI, Groq, Mistral, OpenRouter, Ollama y `custom`), Messages de Anthropic y Gemini.
 - La lista de modelos se pide al endpoint de modelos de cada proveedor y se cachea, con un campo
   manual de respaldo. Nunca va escrita en la app: los modelos del prototipo ya estaban caducados el
-  dia del analisis.
+  dia del analisis. Que modelo se recomienda sale de un fichero remoto que sirve la API
+  ([ADR 0025](0025-recomendacion-de-modelos-de-ia.md)).
 
 ## Consecuencias
 

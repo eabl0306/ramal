@@ -3,6 +3,8 @@
 - Estado: aceptado
 - Fecha: 2026-09-30
 - Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
+- Ratificado: 2026-10-01, el MinGit de respaldo en Windows, con sus reglas de empaquetado y de
+  actualizacion (ver [MinGit en el instalador de Windows](#mingit-en-el-instalador-de-windows))
 
 ## Contexto
 
@@ -129,7 +131,7 @@ En este orden:
    arrancarlo: el usuario ya le dijo a su editor que git usar.
 2. El git del `PATH`, si cumple la version minima.
 3. Solo en Ramal Desktop para Windows, un MinGit empaquetado en el instalador, con la version
-   fijada y actualizada con cada publicacion.
+   fijada y actualizada con cada publicacion (reglas abajo).
 
 En macOS se usa el git del sistema, y si no existe se propone `xcode-select --install`. En Linux,
 el del gestor de paquetes: los paquetes `.deb` y `.rpm` lo declaran como dependencia y la
@@ -141,6 +143,30 @@ configuracion del usuario, su Git Credential Manager y sus hooks funcionando. Fo
 empaquetado siempre, como hace GitHub Desktop, garantiza la version a cambio de desentenderse de
 esa configuracion. Ramal prefiere respetar lo que el usuario tiene y solo trae git cuando no hay
 ninguno que valga, que es el caso normal en un Windows recien instalado.
+
+### MinGit en el instalador de Windows
+
+Ratificado el 2026-10-01, con estas reglas:
+
+- **Va en los dos instaladores de Windows y en las dos arquitecturas**: NSIS y MSI, x64 y arm64
+  (Git for Windows publica MinGit para arm64). Es el MinGit normal, no la variante busybox.
+- **Version y sha256 fijados en el repositorio.** El empaquetado comprueba el sha256 antes de
+  meterlo en el instalador, y un job de la CI avisa cuando sale una version nueva.
+- **Ante una correccion de seguridad de Git for Windows, Ramal publica en pocos dias.** Es el precio
+  de empaquetar git.
+- **Pesa unos 30 MB mas en cada descarga y en cada actualizacion completa** (el zip de MinGit 2.56
+  ronda los 37 MiB en x64 y 36 en arm64). El actualizador de Tauri baja el instalador NSIS entero,
+  asi que tambien quien tiene git instalado recibe MinGit en cada actualizacion. El tamano real de
+  cada instalador sale del pipeline.
+- **Obligaciones de la GPL** ([ADR 0021](0021-licencia-fsl.md)): git es GPLv2, asi que el
+  instalador lleva su licencia y la oferta de su codigo fuente.
+- **El MSI no se actualiza solo** ([ADR 0016](0016-actualizaciones-y-descargas.md)), asi que su
+  MinGit envejece hasta que IT actualiza Ramal. La tarjeta y la documentacion del MSI lo dicen.
+- Hay que comprobar si MinGit trae Git Credential Manager: los repositorios que no estan ligados a
+  una cuenta de Ramal dependen de el para HTTPS. Si no lo trae, el respaldo funciona para lo que
+  usa las cuentas de Ramal y la pantalla de git ausente explica como instalar Git for Windows
+  completo.
+- La pantalla de git ausente o antiguo (gaps D-02) solo sale en Windows si MinGit falta o esta roto.
 
 ### Credenciales por cuenta y por repositorio
 
@@ -221,8 +247,9 @@ En contra:
   repositorios de prueba dorados con snapshots.
 - Depende de un git instalado de una version conocida. Un usuario con git 2.30 ve un error claro
   y tiene que actualizar; en Windows con MinGit no le pasa.
-- MinGit en el instalador de Windows suma decenas de MB y obliga a vigilar sus avisos de
-  seguridad y a subirlo con cada publicacion.
+- MinGit en el instalador de Windows suma unos 30 MB a cada descarga y a cada actualizacion
+  completa, obliga a vigilar sus avisos de seguridad, a publicar Ramal en pocos dias cuando Git for
+  Windows corrige uno y a cumplir la GPL. En el MSI, que no se actualiza solo, envejece.
 - El helper de credenciales es una pieza mas con su canal local. Cualquier proceso del mismo
   usuario que lea el entorno de un git en marcha podria ver el token del canal mientras dura la
   operacion; el motor solo responde dentro de esa operacion, y el mismo usuario ya puede leer su
@@ -242,6 +269,14 @@ con el riesgo de que gix y git no coincidan en el estado del indice o de la conf
 
 **Empaquetar git siempre, en todos los sistemas.** Garantiza la version, pero ignora la
 instalacion y la configuracion del usuario y multiplica lo que hay que actualizar por seguridad.
+
+**No empaquetar git en Windows** y guiar a instalar Git for Windows (enlace y
+`winget install Git.Git`), como en macOS y Linux. Cero deuda de seguridad y de GPL, pero friccion
+en el primer arranque de quien no tiene git, que en Windows es lo normal.
+
+**Descargar MinGit bajo demanda** si no hay git, verificado con un sha256 del manifiesto. Instalador
+mas pequeno y MinGit al dia sin publicar Ramal, a cambio de necesitar red en el primer arranque y
+de mas codigo y mas superficie de cadena de suministro.
 
 **Un unico helper de credenciales global.** No puede elegir la cuenta segun el repositorio, que
 es lo que pide el diseno.

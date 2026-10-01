@@ -40,7 +40,8 @@ entra de fuera, y los crates propios quedan fuera por `[licenses.private]` porqu
 ## Consecuencias
 
 - El codigo se puede publicar cuando se quiera sin cambiar de licencia, y el cifrado de extremo a
-  extremo se puede auditar.
+  extremo se puede auditar. Desde el 2026-10-01 esta decidido cuando: el repositorio
+  `eabl0306/ramal` se hace publico al abrir la beta ([ADR 0016](0016-actualizaciones-y-descargas.md)).
 - Nadie puede montar un clon comercial durante los dos primeros anos de cada version.
 - La FSL no es una licencia de codigo abierto segun la OSI. Algun canal o comunidad puede
   tratarla como propietaria; Marketplace, Open VSX y Flathub la aceptan.

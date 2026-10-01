@@ -23,6 +23,10 @@ mismas del contrato:
 | F4   | `organization_ai_keys`, `organization_ai_settings`, `organization_ai_quota`, `ai_usage_events`                                                                                                                                                                                                                                                                                               |
 | F5   | `subscriptions`, `billing_webhook_events`                                                                                                                                                                                                                                                                                                                                                    |
 
+Las seis fases entran en la primera version publica: equipos, IA de organizacion y facturacion
+estan en el MVP desde el 2026-10-01 ([ADR 0026](adr/0026-planes-y-precios.md)). Las fases son el
+orden de las migraciones, no una frontera de producto.
+
 ## Convenciones del esquema
 
 Son las de Gastonomo mas lo que PostgreSQL 18 permite hacer mejor, y cada una tiene un motivo.
@@ -348,8 +352,6 @@ CREATE TABLE IF NOT EXISTS auth_sessions (
     authenticated_at    timestamptz NOT NULL,
     authenticated_with  text        NOT NULL,
     user_agent          text,
-    location_city       text,
-    location_country    char(2),
     created_at          timestamptz NOT NULL DEFAULT now(),
     last_used_at        timestamptz NOT NULL DEFAULT now(),
     idle_expires_at     timestamptz NOT NULL,
@@ -400,7 +402,8 @@ COMMENT ON TABLE auth_sessions IS
 - **Un dispositivo, una sesion viva**, forzado por el indice unico parcial. Al iniciar sesion
   otra vez en el mismo equipo, la anterior se revoca con motivo `replaced` en la misma
   transaccion.
-- **`location_city` y `location_country` solo si se activa GeoIP**, y nunca la IP. La IP se usa
+- **Sin ubicacion.** Ni la IP ni la ciudad ni el pais: la lista de sesiones ensena dispositivo,
+  sistema, app o navegador y ultima actividad (gaps Q-05, decidido el 2026-10-01). La IP se usa
   para el limite de peticiones y no se guarda.
 - **`user_agent` recortado a 200 caracteres** y solo en sesiones web: basta para "Firefox en
   Linux".
@@ -614,7 +617,7 @@ COMMENT ON TABLE oauth_flows IS
   solo en el handler. El patron exige una barra al principio y prohibe una segunda barra, una
   barra invertida, espacios y caracteres de control en el primer segmento: `/\evil.example` y
   `/%09/...` (ya decodificado) no pasan. El handler resuelve antes la ruta contra
-  `https://ramal.dev` con un analizador WHATWG y exige el mismo origen.
+  `https://ramal.bahoque.com` con un analizador WHATWG y exige el mismo origen.
 - **`user_id` en `link_identity` y `reauthenticate`** es el usuario de la sesion que empezo el
   flujo. En la vuelta se exige que la sesion actual sea de ese usuario y, en `reauthenticate`, que
   la identidad devuelta ya este vinculada a el.
@@ -689,8 +692,6 @@ CREATE TABLE IF NOT EXISTS device_authorizations (
     status           text        NOT NULL DEFAULT 'pending',
     user_id          uuid        REFERENCES users (id) ON DELETE CASCADE,
     approved_auth_time timestamptz,
-    request_city     text,
-    request_country  char(2),
     interval_seconds smallint    NOT NULL DEFAULT 5,
     last_polled_at   timestamptz,
     decided_at       timestamptz,
@@ -725,8 +726,8 @@ COMMENT ON TABLE device_authorizations IS
 AND status = 'approved' RETURNING ...`. Dos sondeos a la vez no crean dos sesiones; el segundo
   no encuentra fila y recibe `invalid_grant`.
 - **`approved_auth_time`** es el `auth_time` de la sesion web que aprobo (menos de 5 minutos), y
-  lo hereda la sesion nativa. **`request_city` y `request_country`** solo con GeoIP activo, para
-  que la pagina diga desde donde se pidio; nunca la IP.
+  lo hereda la sesion nativa. No se guarda desde donde se pidio: sin GeoIP, la pagina de activacion
+  no ensena ubicacion, y la IP nunca se guarda.
 - **`device_info` lo declara el equipo**: la pagina lo ensena como "nombre que declara el equipo"
   y la API quita los caracteres de control y de direccion de texto antes de guardarlo.
 - **`interval_seconds` sube con cada `slow_down`** y `last_polled_at` es lo que lo detecta.
@@ -1035,7 +1036,9 @@ COMMENT ON TABLE preference_documents IS
 - **`jsonb` porque la forma la fija el cliente y crece por version**: un campo nuevo en las
   preferencias de IA no deberia ser una migracion. La forma la valida la aplicacion contra un
   esquema estricto por espacio antes de escribir; la base solo exige un objeto de menos de 16
-  KiB.
+  KiB. El modelo opcional por funcion del documento `ai`
+  ([ADR 0025](adr/0025-recomendacion-de-modelos-de-ia.md)) es justo ese caso: cambia el esquema de
+  la aplicacion, no la tabla.
 - **Sin fila hasta la primera escritura.** La API responde el documento por defecto con
   `version: 0` y el primer `If-Match: "0"` inserta. Asi no hay que sembrar tres filas por cuenta
   ni migrar esas filas cuando cambie un valor por defecto.
@@ -1432,6 +1435,8 @@ COMMENT ON TABLE ai_keys IS
   pintar la lista antes de desbloquear la boveda.
 - **Una predeterminada entre todas**, no una por proveedor: es la regla del prototipo, y la de
   resolucion de llaves la necesita.
+- **`model` es el modelo por defecto de la llave.** Cada funcion puede usar otro con la misma llave;
+  ese modelo vive en las preferencias de IA (`preference_documents`, espacio `ai`), no aqui.
 
 ### retired_secret_records
 
@@ -1491,26 +1496,32 @@ COMMENT ON TABLE user_avatars IS
 
 ```sql
 CREATE TABLE IF NOT EXISTS organizations (
-    id          uuid        PRIMARY KEY DEFAULT uuidv7(),
-    name        text        NOT NULL,
-    seats_total integer     NOT NULL,
-    created_by  uuid        REFERENCES users (id) ON DELETE SET NULL,
-    created_at  timestamptz NOT NULL DEFAULT now(),
-    updated_at  timestamptz NOT NULL DEFAULT now(),
+    id            uuid        PRIMARY KEY DEFAULT uuidv7(),
+    name          text        NOT NULL,
+    seats_total   integer     NOT NULL,
+    trial_ends_at timestamptz NOT NULL,
+    created_by    uuid        REFERENCES users (id) ON DELETE SET NULL,
+    created_at    timestamptz NOT NULL DEFAULT now(),
+    updated_at    timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT organizations_name_not_blank CHECK (length(btrim(name)) BETWEEN 1 AND 60),
-    CONSTRAINT organizations_seats_range CHECK (seats_total BETWEEN 1 AND 10000)
+    CONSTRAINT organizations_seats_range CHECK (seats_total BETWEEN 1 AND 10000),
+    CONSTRAINT organizations_trial_after_creation CHECK (trial_ends_at > created_at)
 );
 
 COMMENT ON TABLE organizations IS
-    'Organizaciones. La owner sale de organization_memberships; seats_total es el limite vigente (configuracion hasta F5, el proveedor de pago despues).';
+    'Organizaciones. La owner sale de organization_memberships; seats_total es el limite vigente (configuracion durante la prueba, Paddle con suscripcion).';
 ```
 
 - **Sin columna de owner.** La owner es una membresia con rol `owner`; guardarla tambien aqui
   seria tener dos fuentes de la misma verdad que se pueden separar.
 - **`seats_total` sin `DEFAULT`**: el valor inicial sale de configuracion
-  (`RAMAL__ORGANIZATIONS__DEFAULT_SEATS`) y lo escribe el caso de uso. Con F5 lo actualizan los
-  webhooks del proveedor de pago. Es el unico sitio donde se lee el limite, este donde este su
+  (`RAMAL__ORGANIZATIONS__DEFAULT_SEATS`) y lo escribe el caso de uso. Con una suscripcion lo
+  actualizan los webhooks de Paddle. Es el unico sitio donde se lee el limite, este donde este su
   origen.
+- **`trial_ends_at`** es el final de la prueba de 14 dias sin tarjeta, que lleva Ramal y no Paddle
+  ([ADR 0022](adr/0022-proveedor-de-pagos.md)). Lo escribe el caso de uso al crear la organizacion
+  (la hora sale del puerto `Clock`). Mientras no haya pasado, la organizacion esta en prueba aunque
+  no tenga fila en `subscriptions`.
 - **Sin slug ni foto**: ninguna pantalla los pide. Las iniciales las calcula el cliente.
 
 ### organization_memberships
@@ -1622,29 +1633,36 @@ filas que ya existen no cambian: todas son personales y privadas.
 
 ```sql
 CREATE TABLE IF NOT EXISTS organization_ai_keys (
-    id              uuid        PRIMARY KEY DEFAULT uuidv7(),
-    organization_id uuid        NOT NULL REFERENCES organizations (id) ON DELETE CASCADE,
-    provider        text        NOT NULL,
-    label           text        NOT NULL,
-    model           text        NOT NULL,
-    base_url        text,
-    masked          text        NOT NULL,
-    is_default      boolean     NOT NULL DEFAULT FALSE,
-    alg             text        NOT NULL DEFAULT 'A256GCM',
-    kek_id          text        NOT NULL,
-    wrapped_dek     bytea       NOT NULL,
-    dek_nonce       bytea       NOT NULL,
-    nonce           bytea       NOT NULL,
-    ciphertext      bytea       NOT NULL,
-    created_by      uuid        REFERENCES users (id) ON DELETE SET NULL,
-    created_at      timestamptz NOT NULL DEFAULT now(),
-    updated_at      timestamptz NOT NULL DEFAULT now(),
-    rotated_at      timestamptz,
-    last_used_at    timestamptz,
+    id                   uuid        PRIMARY KEY DEFAULT uuidv7(),
+    organization_id      uuid        NOT NULL REFERENCES organizations (id) ON DELETE CASCADE,
+    provider             text        NOT NULL,
+    label                text        NOT NULL,
+    model                text        NOT NULL,
+    model_commit_message text,
+    model_pull_request   text,
+    model_commit_summary text,
+    base_url             text,
+    masked               text        NOT NULL,
+    is_default           boolean     NOT NULL DEFAULT FALSE,
+    alg                  text        NOT NULL DEFAULT 'A256GCM',
+    kek_id               text        NOT NULL,
+    wrapped_dek          bytea       NOT NULL,
+    dek_nonce            bytea       NOT NULL,
+    nonce                bytea       NOT NULL,
+    ciphertext           bytea       NOT NULL,
+    created_by           uuid        REFERENCES users (id) ON DELETE SET NULL,
+    created_at           timestamptz NOT NULL DEFAULT now(),
+    updated_at           timestamptz NOT NULL DEFAULT now(),
+    rotated_at           timestamptz,
+    last_used_at         timestamptz,
     CONSTRAINT organization_ai_keys_provider_known CHECK (provider IN (
         'anthropic', 'openai', 'groq', 'google', 'mistral', 'openrouter', 'custom')),
     CONSTRAINT organization_ai_keys_label_not_blank CHECK (length(btrim(label)) BETWEEN 1 AND 40),
     CONSTRAINT organization_ai_keys_model_not_blank CHECK (length(btrim(model)) BETWEEN 1 AND 120),
+    CONSTRAINT organization_ai_keys_feature_models_not_blank CHECK (
+        (model_commit_message IS NULL OR length(btrim(model_commit_message)) BETWEEN 1 AND 120)
+        AND (model_pull_request IS NULL OR length(btrim(model_pull_request)) BETWEEN 1 AND 120)
+        AND (model_commit_summary IS NULL OR length(btrim(model_commit_summary)) BETWEEN 1 AND 120)),
     CONSTRAINT organization_ai_keys_base_url_https CHECK (base_url IS NULL OR (base_url LIKE 'https://%' AND length(base_url) <= 2048)),
     CONSTRAINT organization_ai_keys_base_url_only_custom CHECK ((provider = 'custom') = (base_url IS NOT NULL)),
     CONSTRAINT organization_ai_keys_alg_known CHECK (alg = 'A256GCM'),
@@ -1682,6 +1700,10 @@ COMMENT ON TABLE organization_ai_keys IS
   host al conectar, en cada llamada, y rechazar redes privadas) es de la aplicacion; el `CHECK`
   solo cierra lo evidente.
 - **Cambiar `base_url` exige reenviar la llave**, y deja un evento en `audit_events`.
+- **El modelo lo fija el admin**: `model` es el de la llave y `model_*` el de cada funcion, nulo
+  para usar el de la llave ([ADR 0025](adr/0025-recomendacion-de-modelos-de-ia.md)). Tres columnas
+  y no un `jsonb` porque las funciones son tres y fijas, y asi el `CHECK` las cubre. El proxy no
+  acepta un modelo del miembro.
 - **`last_used_at` no dispara el feed**: se escribe en cada uso del proxy y ningun dispositivo lo
   necesita al momento.
 
@@ -1708,7 +1730,8 @@ COMMENT ON TABLE organization_ai_settings IS
 
 Sin fila, valen los valores por defecto; la primera escritura la crea. `monthly_token_budget`
 `NULL` es sin tope. No hay columna de llave por funcion: la llave de cada funcion la elige cada
-miembro en sus preferencias de IA. La politica no viaja en el feed.
+miembro en sus preferencias de IA, y el modelo de cada funcion va en la propia llave
+(`organization_ai_keys`). La politica no viaja en el feed.
 
 ### organization_ai_quota
 
@@ -1792,10 +1815,12 @@ COMMENT ON TABLE ai_usage_events IS
 
 ## F5: facturacion
 
-**Fase posterior y con el proveedor de pago sin decidir.** Las dos tablas son lo minimo que
-necesita cualquier proveedor (Stripe, Paddle, Lemon Squeezy): una copia del estado de la
-suscripcion y la deduplicacion de webhooks. Las facturas, los metodos de pago y los datos
-fiscales viven en el proveedor, no aqui.
+**En el MVP, con Paddle** ([ADR 0022](adr/0022-proveedor-de-pagos.md)). Ramal Pro es el plan de una
+organizacion por asiento y no hay plan personal de pago
+([ADR 0026](adr/0026-planes-y-precios.md)). Las dos tablas son lo minimo: una copia del estado de
+la suscripcion y la deduplicacion de webhooks. Las facturas, los metodos de pago y los datos
+fiscales viven en Paddle, no aqui. La prueba de 14 dias no esta en estas tablas: es
+`organizations.trial_ends_at`.
 
 ```sql
 CREATE TABLE IF NOT EXISTS subscriptions (
@@ -1804,13 +1829,18 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     provider_customer_id     text        NOT NULL,
     provider_subscription_id text        NOT NULL,
     plan                     text        NOT NULL,
+    billing_interval         text        NOT NULL,
     status                   text        NOT NULL,
     seats_total              integer     NOT NULL,
     current_period_end       timestamptz NOT NULL,
     cancel_at_period_end     boolean     NOT NULL DEFAULT FALSE,
+    last_event_at            timestamptz NOT NULL,
     updated_at               timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT subscriptions_provider_subscription_key UNIQUE (provider, provider_subscription_id),
-    CONSTRAINT subscriptions_status_known CHECK (status IN ('trialing', 'active', 'past_due', 'canceled')),
+    CONSTRAINT subscriptions_provider_known CHECK (provider IN ('paddle', 'polar')),
+    CONSTRAINT subscriptions_plan_known CHECK (plan IN ('pro')),
+    CONSTRAINT subscriptions_interval_known CHECK (billing_interval IN ('month', 'year')),
+    CONSTRAINT subscriptions_status_known CHECK (status IN ('active', 'past_due', 'canceled')),
     CONSTRAINT subscriptions_seats_range CHECK (seats_total BETWEEN 1 AND 10000)
 );
 
@@ -1824,15 +1854,26 @@ CREATE TABLE IF NOT EXISTS billing_webhook_events (
 );
 
 COMMENT ON TABLE subscriptions IS
-    'Copia del estado de la suscripcion que manda el proveedor de pago. La fuente de verdad es el proveedor.';
+    'Copia del estado de la suscripcion de una organizacion que manda Paddle. Los ids de Paddle de la organizacion viven aqui. La fuente de verdad es Paddle.';
 COMMENT ON TABLE billing_webhook_events IS
     'Deduplicacion de webhooks por identificador de evento. No guarda el cuerpo: puede traer datos personales.';
 ```
 
-- **Una suscripcion por organizacion.** Si se decide un plan personal de pago, hara falta una
-  columna `user_id` alternativa o una tabla hermana; es parte de la decision abierta.
-- **Procesar un webhook** es insertar su evento (si ya estaba, se ignora), actualizar
-  `subscriptions` y copiar `seats_total` a `organizations`, todo en una transaccion.
+- **Los ids de Paddle se guardan en la organizacion**: la fila de `subscriptions` es una por
+  organizacion (su clave primaria es `organization_id`) y lleva el id del cliente
+  (`provider_customer_id`) y el de la suscripcion (`provider_subscription_id`). Si una
+  organizacion cancela y vuelve a suscribirse, la fila se actualiza con la suscripcion nueva.
+- **`provider` admite `polar`** porque es el plan B y va detras del mismo puerto. Cambiar de
+  proveedor no cambia la forma de la tabla.
+- **Sin estado `trialing`**: la prueba la lleva Ramal y no existe en Paddle. El contrato deriva
+  `trialing` de `organizations.trial_ends_at` cuando no hay fila aqui. Ramal no ofrece pausar una
+  suscripcion; si Paddle mandara una pausa, cuenta como `canceled`.
+- **`last_event_at`** es la fecha del ultimo evento aplicado. Los webhooks pueden llegar
+  desordenados: un evento con fecha anterior se registra en `billing_webhook_events` y no toca la
+  suscripcion.
+- **Procesar un webhook** es insertar su evento (si ya estaba, se ignora), comparar con
+  `last_event_at`, actualizar `subscriptions` y copiar `seats_total` a `organizations`, todo en una
+  transaccion.
 - **`ON DELETE CASCADE`**: la organizacion no se puede eliminar con una suscripcion activa (lo
   impide el caso de uso con 409), y una cancelada no tiene nada que conservar aqui.
 
@@ -2093,7 +2134,7 @@ un error de diseno, no una mejora.
 - **Diffs, mensajes generados o cualquier entrada o salida del proxy de IA.**
 - **Tokens de los proveedores de identidad** (GitHub, GitLab, Google al iniciar sesion).
 - **Tokens del broker de Bitbucket.**
-- **La IP de las sesiones.** Como mucho ciudad y pais, y solo con GeoIP activado.
+- **La IP de las sesiones, ni la ciudad ni el pais.** La lista de sesiones no ensena ubicacion.
 - **Las imagenes tal como se subieron.** Solo la version recodificada sin metadatos.
 - **Cuerpos de webhooks de facturacion y datos de pago.**
 - **Cualquier token de un solo uso en claro**: todos van como SHA-256.

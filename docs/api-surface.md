@@ -32,8 +32,12 @@ Cada grupo de endpoints lleva la fase del backlog en la que entra:
 | F1   | Identidad: cuentas, sesiones, inicio de sesion nativo, dispositivos, publicaciones.                                                                           |
 | F2   | Sincronizacion personal: preferencias, workspaces, repositorios, cuentas de plataforma, boveda, llaves de IA personales, cambios incrementales, broker OAuth. |
 | F3   | Equipos: organizaciones, miembros, invitaciones, asientos, workspaces compartidos.                                                                            |
-| F4   | IA de organizacion: llaves del servidor, politica, proxy y consumo.                                                                                           |
-| F5   | Facturacion. Fase posterior, con el proveedor de pago sin decidir.                                                                                            |
+| F4   | IA de organizacion: llaves del servidor con el modelo por funcion que fija el admin, politica, proxy y consumo.                                               |
+| F5   | Facturacion: Ramal Pro por asiento para organizaciones, cobrado con Paddle.                                                                                   |
+
+**Las seis fases entran en la primera version publica.** El 2026-10-01 se decidio que equipos, IA
+de organizacion y facturacion salen en el MVP ([ADR 0026](adr/0026-planes-y-precios.md)); las
+fases siguen siendo el orden en que se construye, no una frontera de producto.
 
 Las publicaciones (releases y manifiesto del actualizador) estan en F1 aunque no sean
 identidad: la URL del actualizador queda grabada en cada instalacion y **no se puede
@@ -49,11 +53,13 @@ juego para lo que es de la nube: sincronizar, equipos, llaves de IA de organizac
 dispositivos y el panel web.
 
 Consecuencia directa en el contrato: los unicos endpoints que un cliente sin cuenta puede
-necesitar son publicos y no piden identidad. Son dos grupos:
+necesitar son publicos y no piden identidad. Son tres grupos:
 
 - Publicaciones y actualizador (`/v1/releases`, `/v1/desktop/updates`).
 - El broker OAuth de plataformas que exigen secreto de cliente (`/v1/platform-oauth`),
   para que conectar Bitbucket no obligue a tener cuenta.
+- Los modelos de IA recomendados (`/v1/ai/model-recommendations`), porque la IA con llave propia
+  funciona sin cuenta.
 
 ### 2. Los secretos de las plataformas Git son de extremo a extremo de verdad
 
@@ -99,8 +105,13 @@ Consecuencia: **la API no tiene CORS**. No hay ningun origen de navegador distin
 propio que tenga que hablarle. Que no exista la cabecera es una defensa, no un olvido.
 
 Las rutas son las mismas dentro y fuera del gateway
-([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)): `/v1/...` en este documento es
-`https://ramal.dev/v1/...` en produccion. No hay un prefijo `/api` que se quite por el camino.
+([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). En produccion la API responde en dos
+nombres ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)): `/v1/...` en este documento es
+`https://api.ramal.bahoque.com/v1/...` para los motores de Desktop y VS Code, el actualizador, la CI
+y los webhooks, y `https://ramal.bahoque.com/v1/...` para la web, que llega por su mismo origen. No
+hay un prefijo `/api` que se quite por el camino. La vuelta del OAuth de identidad se registra en
+cada proveedor con el dominio de la web, porque pone cookies; la del broker de Bitbucket, con el de
+la API.
 
 ### 5. Tres ambitos: personal, organizacion y dispositivo
 
@@ -127,7 +138,8 @@ miembros y roles; nombres y colores de workspaces; las URL remotas de los reposi
 cuentas de plataforma (usuario, host, etiqueta, scopes, caducidad declarada); proveedor,
 etiqueta, modelo y mascara de las llaves de IA; las preferencias de Git (incluidos
 `user.name` y `user.email`), de apariencia y de IA; nombre, sistema y version de cada
-dispositivo.
+dispositivo; el plan, los asientos y los ids de Paddle de cada organizacion (nunca una tarjeta ni un
+dato fiscal, que viven en Paddle).
 
 **Lo que la API no ve nunca:** tokens de plataforma, llaves de IA personales, la frase de
 sincronizacion, el codigo de recuperacion, la llave de la boveda, rutas locales, contenido
@@ -160,7 +172,7 @@ cliente, `code` en los errores de campo, concurrencia optimista y streaming en e
 
 ```json
 {
-  "type": "https://ramal.dev/problems/validation",
+  "type": "https://ramal.bahoque.com/problems/validation",
   "title": "Datos invalidos",
   "status": 422,
   "detail": "Revisa los campos marcados.",
@@ -213,8 +225,10 @@ Los `type` del contrato completo (los del primer corte estan en la tabla de arri
 `too-many-requests`, `internal-error`, `bad-gateway`, `gateway-timeout` y
 `service-unavailable`.
 
-El dominio `ramal.dev` es el que usa el diseno; si el producto acaba en otro, cambia el
-prefijo de `type` y nada mas.
+El prefijo de `type` es `https://ramal.bahoque.com/problems/`
+([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)), tambien en el codigo del primer corte
+(`TYPE_PREFIX` en `apps/api/crates/http/src/problem.rs`). Antes era `https://ramal.dev/problems/`,
+el dominio del diseno, que es de un tercero. Cambiar el dominio cambia el prefijo y nada mas.
 
 ### 404 y no 403, y cuando si hay 403
 
@@ -236,6 +250,7 @@ las comprobaciones tambien dice si algo existe. Los `code` de 403 son:
 | `web_session_required`      | La accion solo se acepta desde la web (las que piden reautenticacion). Desktop y VS Code abren la pagina de la web.                                                                |
 | `native_client_required`    | La accion solo se acepta desde Desktop o VS Code (escribir secretos cifrados o metadatos que informa el dispositivo).                                                              |
 | `email_not_verified`        | La accion manda correo a terceros, crea una organizacion, vincula una identidad o cambia el correo, y tu correo no esta verificado.                                                |
+| `subscription_required`     | La accion es de una organizacion sin suscripcion activa ni prueba en curso (ver [Suscripcion y facturacion](#suscripcion-y-facturacion)).                                          |
 
 ### Como se autentica cada peticion
 
@@ -267,7 +282,7 @@ peticion: solo viaja a los endpoints que lo usan.
 
 **El access token es un JWT de 15 minutos firmado con Ed25519** (`kid` y `typ: at+jwt` en la
 cabecera; solo se acepta `alg: EdDSA` con un `kid` conocido). Lleva `iss`
-(`https://ramal.dev`), `aud` (`ramal-api`), `sub` (usuario), `sid` (sesion), `cli` (`web`,
+(`https://api.ramal.bahoque.com`), `aud` (`ramal-api`), `sub` (usuario), `sid` (sesion), `cli` (`web`,
 `desktop` o `vscode`), `auth_time` (ultimo inicio de sesion real), `iat` y `exp`. No lleva
 roles: los roles son por organizacion y cambian, y se leen de la base en cada peticion que
 los necesita.
@@ -403,7 +418,7 @@ par, y 429 con `Retry-After`. Las cifras son configurables con `RAMAL__RATE_LIMI
 | Escrituras de la boveda (crear, cambiar frase, recuperacion, rotar, reiniciar)                       | 10 por hora                                                                                                        | usuario               |
 | `POST /v1/ai/generate`                                                                               | 20 por minuto, 2 a la vez por usuario y organizacion, mas la cuota reservada de la organizacion                    | usuario               |
 | Broker OAuth de plataformas                                                                          | 10 por minuto al iniciar; 120 por hora al canjear o refrescar                                                      | IP                    |
-| Publicaciones y actualizador                                                                         | 120 por minuto                                                                                                     | IP                    |
+| Publicaciones, actualizador y modelos de IA recomendados                                             | 120 por minuto                                                                                                     | IP                    |
 | Resto de endpoints autenticados                                                                      | 600 por minuto                                                                                                     | usuario               |
 
 El limite por correo en `login` existe para frenar a quien prueba contrasenas contra una
@@ -509,9 +524,9 @@ DELETE /v1/me/invitations/{id}                   204  sesion
 Facturacion                                                             F5
 GET    /v1/organizations/{orgId}/subscription    200  miembro
 POST   /v1/organizations/{orgId}/subscription/checkout   200  owner, Idempotency-Key
-POST   /v1/organizations/{orgId}/subscription/seats      200  owner, Idempotency-Key
+POST   /v1/organizations/{orgId}/subscription/seats      200 | 202  owner, Idempotency-Key
 POST   /v1/organizations/{orgId}/subscription/portal     200  owner
-POST   /v1/billing/webhooks/{provider}           204  publico (firma del proveedor)
+POST   /v1/billing/webhooks/paddle               204  publico (firma de Paddle)
 
 Workspaces                                                              F2 (compartidos en F3)
 GET    /v1/workspaces                            200  sesion  ?organizationId=
@@ -549,6 +564,9 @@ POST   /v1/vault/rotate                          200  nativa, viva, If-Match
 GET    /v1/vault/secrets                         200  nativa, viva
 DELETE /v1/vault                                 204  web, reauth fuerte
 
+Modelos de IA recomendados                                              F2
+GET    /v1/ai/model-recommendations              200 | 304  publico, cacheable
+
 Llaves de IA personales                                                 F2
 GET    /v1/ai/keys                               200  sesion
 POST   /v1/ai/keys                               201 | 200  nativa, viva, id del cliente
@@ -581,7 +599,7 @@ GET    /v1/sync/changes                          200 | 410  nativa, viva  ?since
 Publicaciones y actualizador                                            F1
 GET    /v1/releases/latest                       200  publico  ?product=&channel=
 GET    /v1/releases                              200  publico  ?product=&channel=&cursor=&limit=
-GET    /v1/desktop/updates/{target}/{arch}/{currentVersion}  200 | 204  publico  ?channel=
+GET    /v1/desktop/updates/{target}/{arch}/{currentVersion}  200 | 204  publico  ?channel=&bundle=
 POST   /v1/admin/releases                        201  publicacion
 PATCH  /v1/admin/releases/{id}                   200  publicacion
 
@@ -631,7 +649,7 @@ lo declare todavia, porque cualquier ruta puede responderlo.
 apagado y la ruta responde 404 como cualquier otra, asi que una imagen de produccion no lo sirve
 aunque el gateway reenviara la ruta (el de produccion tampoco la enrutara;
 [ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). Swagger UI ha tenido fallos de XSS, y
-servido en `ramal.dev` correria con las cookies de sesion y la cookie CSRF a su alcance. Sus
+servido en `ramal.bahoque.com` correria con las cookies de sesion y la cookie CSRF a su alcance. Sus
 assets van embebidos en el binario: funciona sin salida a internet.
 Los tipos del protocolo del motor (Desktop y VS Code) no salen de aqui: salen de
 `ramal-protocol` con `ts-rs`, porque el motor no es un cliente HTTP de la web.
@@ -650,7 +668,7 @@ facil de que un proceso local malicioso o una extension ajena la capturara.
 POST /v1/auth/register
 {
   "name": "Marta Ruiz",
-  "email": "marta@ramal.dev",
+  "email": "marta@example.com",
   "password": "********",
   "organizationName": "ACME Studio",
   "acceptedTerms": true,
@@ -695,7 +713,7 @@ responden siempre lo mismo, porque ahi no hay ninguna pantalla que necesite la d
 
 ```
 POST /v1/auth/login
-{ "email": "marta@ramal.dev", "password": "********" }
+{ "email": "marta@example.com", "password": "********" }
 ```
 
 **200** con `{ "user": Me, "csrfToken": "..." }` y las cookies. **401**
@@ -747,14 +765,22 @@ Web: **200** con `{ "csrfToken": "..." }` y las cookies renovadas.
   cualquiera de los dos, 401 y a iniciar sesion.
 - **El refresco con el token en el cuerpo es solo para los motores**: rechaza cualquier peticion
   que traiga cabecera `Origin` o cookies de Ramal. Un script en una pagina no puede usarlo.
-- **Un 401 al refrescar es definitivo para el motor**: hace la misma limpieza que al cerrar
-  sesion (ver [Logout](#logout)), aunque nadie pulse nada.
+- **Cuando la sesion termino, el 401 lo dice con un `code`**: `session_ended` si la sesion esta
+  revocada o caducada, o si se detecto la reutilizacion (que ademas la revoca). Un token que la API
+  no reconoce recibe `unauthorized`. El `detail` es el mismo texto fijo en los dos.
+- **Solo `session_ended` hace que el motor borre**: con el, hace la misma limpieza que al cerrar
+  sesion (ver [Logout](#logout)), aunque nadie pulse nada. Con cualquier otro 401 (sin ese `code`,
+  o sin problem+json de la API, como el de un proxy) pide volver a iniciar sesion y conserva las
+  copias. Si cualquier 401 borrara, un fallo de configuracion del servidor dejaria sin copias a
+  todos los equipos a la vez ([ADR 0012](adr/0012-boveda-de-extremo-a-extremo.md)). Es la unica
+  excepcion a "los 401 no distinguen motivos", y se acepta: un refresh token son 256 bits que nadie
+  adivina, y quien presenta uno revocado ya lo tenia.
 
-| Codigo | Cuando                                                                                        |
-| ------ | --------------------------------------------------------------------------------------------- |
-| 200    | Par nuevo.                                                                                    |
-| 401    | Token desconocido, sesion revocada o caducada, o reutilizacion detectada (que ademas revoca). |
-| 409    | `refresh_superseded`: otra ventana acaba de rotarlo.                                          |
+| Codigo | Cuando                                                                                                                         |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| 200    | Par nuevo.                                                                                                                     |
+| 401    | `session_ended`: sesion revocada o caducada, o reutilizacion detectada (que ademas revoca). `unauthorized`: token desconocido. |
+| 409    | `refresh_superseded`: otra ventana acaba de rotarlo.                                                                           |
 
 ### Logout
 
@@ -764,11 +790,15 @@ por el refresh token del cuerpo o de la cookie. En la web borra las cookies. Si 
 de un dispositivo, el dispositivo sale de la lista de sincronizados.
 
 Lo que pasa con los secretos del dispositivo al cerrar sesion lo decide el cliente, y el
-contrato lo fija asi: el motor borra la llave de la boveda cacheada y las copias
-sincronizadas de tokens y llaves que no se crearon en ese equipo. Lo que el usuario creo en
-ese equipo se queda en su llavero: sin cuenta, Ramal sigue siendo un cliente Git que necesita
-esas credenciales para hacer push. La misma limpieza corre cuando un refresco recibe un 401
-definitivo: un dispositivo revocado desde otro equipo no conserva las copias sincronizadas.
+contrato lo fija asi ([ADR 0012](adr/0012-boveda-de-extremo-a-extremo.md)): el motor borra la
+llave de la boveda cacheada y las copias de los tokens y las llaves que llegaron sincronizados de
+otros equipos; lo sabe por una marca local de origen que guarda junto a cada secreto. Lo que el
+usuario creo en ese equipo se queda en su llavero: sin cuenta, Ramal sigue siendo un cliente Git
+que necesita esas credenciales para hacer push. El dialogo ofrece la casilla "Borrar también las
+añadidas en este equipo", apagada por defecto, para un ordenador compartido. La misma limpieza
+corre cuando un refresco recibe un 401 con `session_ended`: un dispositivo revocado desde otro
+equipo no conserva las copias sincronizadas. En VS Code, las demas ventanas se enteran por
+`SecretStorage.onDidChange` y sueltan la llave de la boveda.
 
 ### Reautenticacion
 
@@ -786,7 +816,7 @@ POST /v1/auth/reauthenticate
   obligar a volver a entrar, asi que su reautenticacion vale para **reauth** pero no para
   **reauth fuerte**.
 - **Enlace al correo**: `POST /v1/auth/reauthenticate/email-link` (sin cuerpo) manda al correo
-  verificado un enlace de 15 minutos y un solo uso, `https://ramal.dev/reauthenticate#token=...`.
+  verificado un enlace de 15 minutos y un solo uso, `https://ramal.bahoque.com/reauthenticate#token=...`.
   `POST /v1/auth/reauthenticate/email-link/confirm { "token": "..." }` responde **204** y marca
   como reautenticada la sesion que lo pidio, aunque el enlace se abra en otro dispositivo: el
   token prueba el buzon y queda atado a esa sesion. El siguiente refresco de la pagina trae el
@@ -808,7 +838,7 @@ aprenderlo:
 - El correo sale de la peticion a una tarea de fondo, para que el tiempo de respuesta no
   delate la cuenta.
 
-El enlace es `https://ramal.dev/reset-password#token=...`. **El token va en el fragmento**,
+El enlace es `https://ramal.bahoque.com/reset-password#token=...`. **El token va en el fragmento**,
 que el navegador no envia al servidor ni queda en los logs del gateway; la pagina lo lee y lo
 manda en el cuerpo de:
 
@@ -852,7 +882,7 @@ nueva no cumple.
 ### Verificar el correo
 
 - Al registrarse, y al pedir reenvio, se manda un enlace de 48 horas:
-  `https://ramal.dev/verify-email#token=...`.
+  `https://ramal.bahoque.com/verify-email#token=...`.
 - `POST /v1/auth/email/verify { "token": "..." }` responde **204** y marca el correo. Es
   publico: el token es la prueba, y verificar desde el movil sin haber iniciado sesion ahi es
   el caso normal. **400** `invalid_token` si no vale.
@@ -908,7 +938,7 @@ OAuth registrada, y la identidad de Ramal no puede depender de un servidor de te
   `reauth` exigen sesion web y la cabecera CSRF; `link` exige ademas **reauth** y el correo de la
   cuenta verificado (**403** `email_not_verified`), porque vincular otro metodo de entrada es dar
   una puerta nueva.
-- `returnTo` se resuelve contra `https://ramal.dev` con un analizador WHATWG (el crate `url`) y
+- `returnTo` se resuelve contra `https://ramal.bahoque.com` con un analizador WHATWG (el crate `url`) y
   tiene que dar el mismo origen; se guarda solo la ruta y la query. Comprobar "empieza por `/` y no
   por `//`" no basta: `/\evil.example` o `/%09/evil.example` pasan esa regla y el navegador los
   convierte en `//evil.example`. Cualquier otra cosa se sustituye por `/dashboard`.
@@ -1024,7 +1054,7 @@ funciona y el editor lo reenvia a la extension remota.
 ### Authorization Code + PKCE
 
 1. El motor genera `code_verifier`, `code_challenge` (S256) y `state`, abre el navegador del
-   sistema en la pagina web `https://ramal.dev/authorize/app` con los parametros estandar de
+   sistema en la pagina web `https://ramal.bahoque.com/authorize/app` con los parametros estandar de
    OAuth (`client_id`, `redirect_uri`, `code_challenge`, `code_challenge_method=S256`,
    `state`) mas `device_name` para ensenarlo. Estos parametros van en snake_case porque los
    produce cualquier libreria OAuth (el crate `oauth2` en el motor).
@@ -1044,7 +1074,7 @@ funciona y el editor lo reenvia a la extension remota.
    {
      "client": { "id": "ramal-desktop", "name": "Ramal Desktop" },
      "deviceName": "MacBook Pro de Marta",
-     "user": { "name": "Marta Ruiz", "email": "marta@ramal.dev" }
+     "user": { "name": "Marta Ruiz", "email": "marta@example.com" }
    }
    ```
 
@@ -1143,7 +1173,7 @@ de loopback.
    {
      "deviceCode": "dc_7e21...",
      "userCode": "WDJB-MJHT",
-     "verificationUri": "https://ramal.dev/activate",
+     "verificationUri": "https://ramal.bahoque.com/activate",
      "expiresIn": 600,
      "interval": 5
    }
@@ -1158,15 +1188,15 @@ de loopback.
    confundan (`BCDFGHJKLMNPQRSTVWXZ`), como recomienda RFC 8628. Sin vocales no se forman
    palabras, y sin `0/O` ni `1/I` no hay erratas al teclearlo.
 
-2. En `https://ramal.dev/activate` el usuario inicia sesion y escribe el codigo. La pagina
+2. En `https://ramal.bahoque.com/activate` el usuario inicia sesion y escribe el codigo. La pagina
    pregunta que es:
 
    `POST /v1/auth/device/lookup { "userCode": "WDJB-MJHT" }` responde **200** con
-   `{ "client": {...}, "device": { "declaredName": "VS Code en ubuntu-dev", "os": "linux" }, "requestedAgoSeconds": 42, "requestedFrom": { "city": "Madrid", "country": "ES" }, "expiresAt": "..." }`
-   o **404** si no existe o caduco. La pagina ensena "Pedido hace 42 segundos", el nombre como
-   "nombre que declara el equipo" (sin caracteres de control ni de direccion de texto) y, si
-   GeoIP esta activo, la ciudad y el pais, con un aviso si no coinciden con los del navegador que
-   aprueba; sin GeoIP, `requestedFrom` es `null`. Limites: 10 por minuto por usuario y, aparte,
+   `{ "client": {...}, "device": { "declaredName": "VS Code en ubuntu-dev", "os": "linux" }, "requestedAgoSeconds": 42, "expiresAt": "..." }`
+   o **404** si no existe o caduco. La pagina ensena "Pedido hace 42 segundos" y el nombre como
+   "nombre que declara el equipo" (sin caracteres de control ni de direccion de texto). No ensena
+   desde donde se pidio: la API no geolocaliza IPs (ver [Sesiones activas](#sesiones-activas)).
+   Limites: 10 por minuto por usuario y, aparte,
    por IP, y 50 codigos fallidos por hora y usuario. Un limite por sesion no bastaria: una sesion
    nueva lo esquiva.
 
@@ -1206,7 +1236,6 @@ GET /v1/auth/sessions
       "current": true,
       "device": { "id": "...", "name": "MacBook Pro de Marta", "kind": "desktop", "os": "macos", "osVersion": "15.1", "appVersion": "2.4.0" },
       "browser": null,
-      "location": { "city": "Madrid", "country": "ES" },
       "createdAt": "2026-09-30T08:12:00Z",
       "lastUsedAt": "2026-09-30T10:02:00Z"
     },
@@ -1216,7 +1245,6 @@ GET /v1/auth/sessions
       "current": false,
       "device": null,
       "browser": "Firefox en Linux",
-      "location": null,
       "createdAt": "...",
       "lastUsedAt": "..."
     }
@@ -1228,10 +1256,11 @@ GET /v1/auth/sessions
 - `current` marca la de quien pregunta, por el `sid` del token. Es la pastilla "Este
   dispositivo" del diseno.
 - `browser` es un resumen del `User-Agent` (familia y sistema), no la cadena entera.
-- **`location` es opcional y viene apagado por defecto.** El diseno ensena una ciudad; eso
-  exige geolocalizar la IP con una base GeoIP, y es un dato personal que hay que justificar.
-  Si se activa (`RAMAL__SESSIONS__GEOIP_DATABASE`), se guarda solo ciudad y pais al crear la
-  sesion, nunca la IP. Si no, `null` y la interfaz ensena solo el dispositivo y la hora.
+- **No hay ubicacion.** El diseno ensena una ciudad; eso exige geolocalizar la IP con una base
+  GeoIP, que es un dato personal mas que justificar y una licencia mas que cumplir. Decidido el
+  2026-10-01 (gaps Q-05): la lista ensena el dispositivo, el sistema, la app o el navegador y la
+  ultima actividad, y nada mas. La API no geolocaliza ni guarda la IP: la usa para el limite de
+  peticiones y la olvida. Si algun dia hace falta, el siguiente paso seria el pais, no la ciudad.
 
 `DELETE /v1/auth/sessions/{id}` revoca una sesion (el boton "Cerrar"). **204**; **404** si no
 es tuya. Revocar la propia equivale a cerrar sesion. Si la sesion era de un dispositivo, el
@@ -1283,16 +1312,16 @@ GET /v1/me
   "id": "0192f3c0-...",
   "name": "Marta Ruiz",
   "username": "marta",
-  "email": "marta@ramal.dev",
+  "email": "marta@example.com",
   "emailVerified": true,
   "pendingEmail": null,
   "timezone": "Europe/Madrid",
   "locale": "es",
-  "avatarUrl": "https://ramal.dev/v1/avatars/5b0c2e8a-...",
+  "avatarUrl": "https://ramal.bahoque.com/v1/avatars/5b0c2e8a-...",
   "hasPassword": true,
   "vaultEnabled": true,
   "vaultCreatedAt": "2026-09-05T10:00:00Z",
-  "identities": [{ "provider": "github", "email": "marta@ramal.dev" }],
+  "identities": [{ "provider": "github", "email": "marta@example.com" }],
   "organizations": [{ "id": "0192f3d0-...", "name": "ACME Studio", "role": "owner" }],
   "createdAt": "2026-09-01T09:00:00Z"
 }
@@ -1392,7 +1421,7 @@ Cubre el derecho de portabilidad y el boton "Exportar configuracion" del panel.
 
 ```
 DELETE /v1/me
-{ "confirmation": "marta@ramal.dev" }
+{ "confirmation": "marta@example.com" }
 ```
 
 **204** y cookies borradas. Exige **reauth fuerte** (contrasena, Google o enlace al correo) y
@@ -1504,7 +1533,13 @@ GET /v1/organizations
       "name": "ACME Studio",
       "role": "owner",
       "seats": { "total": 5, "used": 5, "activeMembers": 4, "pendingInvitations": 1 },
-      "plan": null,
+      "plan": {
+        "id": "pro",
+        "name": "Ramal Pro",
+        "status": "trialing",
+        "trialEndsAt": "2026-09-16T10:00:00Z",
+        "renewsAt": null
+      },
       "createdAt": "2026-09-02T10:00:00Z"
     }
   ]
@@ -1513,14 +1548,16 @@ GET /v1/organizations
 
 - `role` es el de quien pregunta. Las iniciales del cuadrado del selector (`AS`) las deriva
   el cliente del nombre.
-- `plan` es `null` hasta F5. Con facturacion sera
-  `{ "id": "pro", "name": "Ramal Pro", "status": "active", "renewsAt": "2026-10-12T00:00:00Z" }`,
-  que es la tarjeta de plan de Desktop.
+- `plan` es la tarjeta de plan de Desktop. Una organizacion nueva nace en prueba (`trialing`, con
+  `trialEndsAt`); con una suscripcion pagada, `status` pasa a `active` y `renewsAt` dice cuando
+  renueva. `status` es el de [Suscripcion y facturacion](#suscripcion-y-facturacion). `plan` es
+  `null` si la prueba acabo sin suscripcion.
 - El contexto personal no aparece: el cliente anade la entrada "Personal" siempre.
 
 `POST /v1/organizations { "name": "ACME Studio" }` (acepta `Idempotency-Key`) crea la
-organizacion con quien llama como owner. **201** con la organizacion. **403**
-`email_not_verified` si el correo no esta verificado. **409** `limit_reached` si ya creo 5.
+organizacion con quien llama como owner. **201** con la organizacion, que empieza
+una prueba de Ramal Pro de 14 dias sin tarjeta. **403** `email_not_verified` si el correo no esta
+verificado. **409** `limit_reached` si ya creo 5.
 Nombre de 1 a 60 caracteres, sin caracteres de control ni de direccion de texto: el nombre
 aparece en los correos de invitacion, que van como texto plano y nunca convierten el nombre en
 un enlace, para que una organizacion no sirva para mandar spam con la firma de Ramal.
@@ -1531,7 +1568,7 @@ un enlace, para que una organizacion no sirva para mandar spam con la firma de R
 
 `DELETE /v1/organizations/{orgId}` (owner, **reauth**, solo web, cuerpo `{ "confirmation": "ACME Studio" }`)
 la elimina con todo lo suyo: miembros, invitaciones, workspaces de la organizacion, llaves de
-IA de organizacion y su consumo. En F5 exige ademas que no haya una suscripcion activa
+IA de organizacion y su consumo. Exige ademas que no haya una suscripcion activa
 (**409** `active_subscription`).
 
 `POST /v1/organizations/{orgId}/leave` sale de la organizacion. **204**. **409**
@@ -1573,7 +1610,7 @@ GET /v1/organizations/{orgId}/members?cursor=&limit=
       "userId": "0192f3c0-...",
       "name": "Marta Ruiz",
       "username": "marta",
-      "email": "marta@ramal.dev",
+      "email": "marta@example.com",
       "avatarUrl": null,
       "role": "owner",
       "joinedAt": "2026-09-02T10:00:00Z",
@@ -1647,7 +1684,7 @@ POST /v1/organizations/{orgId}/invitations
 }
 ```
 
-Manda un correo con `https://ramal.dev/invitations#token=...`. El token son 256 bits
+Manda un correo con `https://ramal.bahoque.com/invitations#token=...`. El token son 256 bits
 aleatorios y en la base solo esta su hash. Caduca a los 7 dias. El correo lleva el nombre de la
 organizacion y el de quien invita como texto plano, sin enlaces ni caracteres de control o de
 direccion de texto. Ademas del limite por organizacion, quien invita puede mandar como mucho 20
@@ -1667,8 +1704,8 @@ invitaciones a la vez veran el mismo asiento libre y la organizacion acabaria co
 
 **`no_seats_available` y no una compra silenciosa.** El prototipo subia el numero de asientos
 al invitar por encima del limite. En produccion eso es cobrar sin confirmacion. La API
-rechaza y la interfaz ofrece "Anadir asientos", que en F5 es una compra con precio a la
-vista.
+rechaza y la interfaz ofrece "Anadir asientos", que es una compra con precio a la vista (el
+checkout de Paddle, o el cambio de asientos con prorrateo si ya hay suscripcion).
 
 **Las invitaciones pendientes ocupan asiento**, como en el diseno. Si no lo ocuparan,
 aceptar una invitacion podria fallar por falta de sitio despues de que la persona se hubiera
@@ -1743,23 +1780,32 @@ Es la tarjeta "5 de 5 asientos usados" con su barra. `used = activeMembers + pen
 El porcentaje de la barra lo calcula el cliente. Todo lo que ocupa o libera un asiento toma antes
 la fila de la organizacion con `FOR UPDATE` (ver [Invitaciones](#invitaciones)).
 
-Hasta que exista facturacion (F5), el total de una organizacion nueva sale de configuracion
-(`RAMAL__ORGANIZATIONS__DEFAULT_SEATS`, por defecto 5, que es lo que ensena el diseno) y
-`purchasable` es `false`: la interfaz esconde "Anadir asientos". Con F5, `purchasable` pasa a
-`true` para owners y el boton lleva a la compra.
+Durante la prueba, el total sale de configuracion (`RAMAL__ORGANIZATIONS__DEFAULT_SEATS`, por
+defecto 5, que es lo que ensena el diseno; cuantos asientos trae la prueba es una propuesta). Con
+una suscripcion, el total es el que manda Paddle por el webhook. `purchasable` es `true` para la
+owner, y "Anadir asientos" lleva al checkout (en prueba) o al cambio de asientos (con
+suscripcion); para el resto es `false` y la interfaz esconde el boton.
 
 ## Suscripcion y facturacion
 
-**F5, fase posterior.** Esta seccion fija la forma para que el resto del contrato no tenga
-que cambiar cuando llegue, pero **hay una decision abierta que la bloquea: el proveedor de
-pago**. Las opciones que hay que comparar son un procesador (Stripe Billing) o un comerciante
-de registro que se encarga del IVA y los impuestos de cada pais (Paddle, Lemon Squeezy). Con
-clientes en Europa y America, el IVA por pais pesa mas que la comision. Tampoco estan
-decididos: si hay plan personal de pago o solo de organizacion, el precio por asiento, y que
-funciones dependen del plan. La tarjeta "Ramal Pro" de Desktop es lo unico que el diseno
-ensena.
+**F5, en el MVP.** Ramal Pro es **el plan de una organizacion, por asiento**
+([ADR 0026](adr/0026-planes-y-precios.md)): 8 USD por asiento al mes en pago anual (96 USD al ano) o
+10 USD en pago mensual, con un minimo de un asiento y 14 dias de prueba sin tarjeta al crear la
+organizacion. **No hay plan personal de pago**: todo lo de una persona (Git local, pull requests,
+IA con llave propia y la sincronizacion personal) es gratis, asi que ningun endpoint personal mira
+el plan. No hay plan gratuito para organizaciones pequenas: solo la prueba.
 
-Lo que se propone, sea cual sea el proveedor:
+Se cobra con **Paddle** como comerciante registrado, detras del puerto `BillingProvider`
+([ADR 0022](adr/0022-proveedor-de-pagos.md)). Paddle es el vendedor ante el cliente: cobra, emite
+las facturas y se ocupa del IVA y de los impuestos de ventas de cada pais. La API nunca ve una
+tarjeta ni un dato fiscal. Las llaves de Paddle, el secreto del webhook y los ids de los dos precios
+llegan por configuracion.
+
+**Las funciones de organizacion necesitan la suscripcion activa o la prueba en curso**: miembros,
+invitaciones, workspaces compartidos, llaves de IA de organizacion y el proxy. Sin ninguna de las
+dos, una escritura de organizacion responde **403** `subscription_required`. Que se puede seguir
+leyendo cuando acaba la prueba sin pagar, o cuando falla un pago, lo fija la issue de reglas de
+facturacion (E30-01); la propuesta es solo lectura y los datos conservados 30 dias.
 
 - `GET /v1/organizations/{orgId}/subscription` (miembro):
 
@@ -1767,29 +1813,44 @@ Lo que se propone, sea cual sea el proveedor:
   {
     "plan": { "id": "pro", "name": "Ramal Pro" },
     "status": "active",
+    "interval": "year",
     "seatsTotal": 5,
+    "trialEndsAt": null,
     "renewsAt": "2026-10-12T00:00:00Z",
     "cancelAtPeriodEnd": false
   }
   ```
 
-  `status`: `trialing`, `active`, `past_due`, `canceled`. **404** si la organizacion no tiene
-  suscripcion (plan gratuito).
+  `status`: `trialing` (la prueba de Ramal, que no existe en Paddle; `interval` y `renewsAt` son
+  `null`), `active`, `past_due` o `canceled`. `interval`: `month` o `year`. **404** si la prueba
+  acabo y no hay suscripcion.
 
-- `POST /v1/organizations/{orgId}/subscription/checkout { "planId": "pro", "seats": 5 }`
-  (owner, `Idempotency-Key`) devuelve `{ "url": "..." }`: la pagina de pago del proveedor. La
-  API nunca ve una tarjeta.
+- `POST /v1/organizations/{orgId}/subscription/checkout { "planId": "pro", "interval": "year", "seats": 5 }`
+  (owner, `Idempotency-Key`). La API crea en Paddle una transaccion con el precio del intervalo, la
+  cantidad de asientos y el id de la organizacion en sus datos propios, y devuelve
+  `{ "url": "https://ramal.bahoque.com/billing/checkout?..." }`: la pagina de pago de la web con el
+  identificador de esa transaccion. **La pagina carga Paddle.js y abre el checkout de Paddle; la CSP
+  de la web se abre a los dominios de Paddle solo en esa pagina.** Desktop y VS Code abren la URL en
+  el navegador del sistema. **409** `subscription_exists` si ya hay una activa. `seats` no puede
+  ser menor que los asientos que ya se usan (**409** `seats_below_usage`).
 - `POST /v1/organizations/{orgId}/subscription/seats { "quantity": 7 }` (owner,
-  `Idempotency-Key` obligatoria) cambia el numero de asientos con prorrateo. **200** con la
-  suscripcion, o **202** con `{ "url": "..." }` si el proveedor exige confirmar el pago. **409**
-  `seats_below_usage` si se piden menos asientos de los que se usan.
+  `Idempotency-Key` obligatoria) cambia el numero de asientos en Paddle, con prorrateo. **200** con
+  la suscripcion, o **202** con `{ "url": "..." }` si Paddle exige confirmar el pago. **409**
+  `seats_below_usage` si se piden menos asientos de los que se usan, y `no_subscription` durante la
+  prueba (ahi "Anadir asientos" lleva al checkout).
 - `POST /v1/organizations/{orgId}/subscription/portal` (owner) devuelve `{ "url": "..." }`: el
-  portal del proveedor para metodo de pago, facturas y cancelacion. Es el boton "Gestionar
-  suscripcion".
-- `POST /v1/billing/webhooks/{provider}`: publico, verifica la firma del proveedor, deduplica
-  por identificador de evento y actualiza el total de asientos de la organizacion. La fuente
-  de verdad del numero de asientos es el proveedor; la API guarda la copia que le llega por
-  aqui.
+  portal de cliente de Paddle para metodo de pago, facturas y cancelacion. Es el boton "Gestionar
+  suscripcion". **409** `no_subscription` si nunca hubo suscripcion.
+- `POST /v1/billing/webhooks/paddle`: publico. Verifica la firma de la cabecera
+  `Paddle-Signature` con el secreto del webhook y rechaza una marca de tiempo de mas de 5 minutos
+  (**400** `invalid_signature`). Deduplica por el identificador del evento, descarta un evento mas
+  antiguo que el ultimo aplicado a esa suscripcion (los webhooks pueden llegar desordenados), saca
+  la organizacion de los datos propios de la transaccion y actualiza la suscripcion y el total de
+  asientos en una transaccion. **204**. La fuente de verdad del estado y de los asientos es Paddle;
+  la API guarda la copia que le llega por aqui.
+
+Los E2E de facturacion corren contra el **sandbox de Paddle**, con sus tarjetas de prueba y un
+webhook de sandbox; nunca contra la cuenta de produccion.
 
 ## Workspaces
 
@@ -2441,9 +2502,11 @@ GET /v1/ai/keys
   claro deja ver como mucho el prefijo y cuatro caracteres, que es lo que ensena cualquier
   panel de proveedor, y permite pintar la lista en un dispositivo nuevo antes de desbloquear
   la boveda.
-- `model` es texto libre. **La lista de modelos no la da la API** ni va escrita en la app:
-  la pide el motor al endpoint de modelos de cada proveedor. Los modelos del prototipo ya
-  estaban caducados el dia del analisis.
+- `model` es el modelo por defecto de la llave, en texto libre. Cada funcion puede usar otro con
+  la misma llave (`model` por funcion en las [preferencias de IA](#ai)). **La lista de modelos no
+  la da la API** ni va escrita en la app: la pide el motor al endpoint de modelos de cada
+  proveedor. Lo que si da la API es que modelo se recomienda (ver
+  [Modelos de IA recomendados](#recomendaciones-de-modelos-de-ia)).
 - Una llave de Ollama no tiene secreto.
 
 `POST /v1/ai/keys` (nativa, **viva**) con `id` del cliente, `provider`, `label`, `model`,
@@ -2472,6 +2535,47 @@ tiene que confirmar el usuario en ese equipo antes de mandarle codigo.
 
 **Las llaves personales no se usan nunca en el servidor.** No hay ningun endpoint que genere
 texto con una llave personal: eso lo hace el motor llamando al proveedor.
+
+## Recomendaciones de modelos de IA
+
+**F2**, publico. Dice que modelo marcar como "Recomendado" para cada proveedor y cada funcion, sin
+escribir nombres de modelos en el binario ([ADR 0025](adr/0025-recomendacion-de-modelos-de-ia.md)).
+No pide sesion porque la IA con llave propia funciona sin cuenta, como el actualizador.
+
+```
+GET /v1/ai/model-recommendations
+{
+  "schemaVersion": 1,
+  "revision": "2026-10-01",
+  "nextReviewBy": "2027-01-01",
+  "features": { "commitMessage": "fast", "pullRequest": "balanced", "commitSummary": "balanced" },
+  "providers": {
+    "anthropic": { "fast": ["claude-haiku-4-5"], "balanced": ["claude-sonnet-5-5"] },
+    "openai": { "fast": ["gpt-6-luna"], "balanced": ["gpt-6.1-sol"] },
+    "mistral": { "fast": ["mistral-small-latest"], "balanced": ["mistral-medium-latest"] }
+  }
+}
+```
+
+- `features` dice el nivel de cada funcion: `fast` (rapido y barato) para los mensajes de commit,
+  `balanced` (equilibrado) para los PRs y los resumenes de commit.
+- `providers` trae, por proveedor y nivel, **una lista ordenada de ids**. El motor la cruza con la
+  lista viva de modelos del proveedor y marca el primer id que exista en ella. Un proveedor que no
+  aparece (Ollama, `custom`) no tiene recomendacion.
+- Los ids del ejemplo son los de la primera revision; los que valen son los del fichero, que vive
+  en el repositorio dentro de `apps/api`, la API incrusta al compilar y se revisa cada trimestre.
+  `nextReviewBy` lo deja escrito. Cambiarlo es un despliegue de la API, nunca una version de las
+  apps.
+- `schemaVersion` cambia solo si cambia la forma. Un cliente que no conoce la version, o un nivel o
+  una funcion, los ignora y se queda sin recomendacion.
+- Respuesta con `Cache-Control: public, max-age=86400, stale-while-revalidate=604800` y `ETag`; con
+  `If-None-Match` que coincide, **304**. El motor guarda la ultima copia en disco y la revalida como
+  mucho una vez al dia. **Sin red y sin copia no hay recomendacion**: la interfaz ensena la lista
+  del proveedor tal cual.
+- La recomendacion **solo preselecciona** al crear una llave o al elegir el modelo de una funcion
+  que no tiene ninguno. Nunca cambia un modelo que el usuario ya eligio.
+- La peticion no lleva ningun identificador del cliente. Comparte el limite por IP de las
+  publicaciones.
 
 ## Preferencias sincronizadas
 
@@ -2512,7 +2616,7 @@ se anade al esquema del servidor, que siempre va por delante.
 ```json
 {
   "userName": "Marta Ruiz",
-  "userEmail": "marta@ramal.dev",
+  "userEmail": "marta@example.com",
   "defaultBranch": "main",
   "signCommits": false,
   "autoFetchMinutes": 15,
@@ -2546,11 +2650,16 @@ se anade al esquema del servidor, que siempre va por delante.
 ```json
 {
   "features": {
-    "commitMessage": { "enabled": true, "key": null },
-    "pullRequest": { "enabled": true, "key": { "scope": "personal", "keyId": "0192f430-..." } },
+    "commitMessage": { "enabled": true, "key": null, "model": "claude-haiku-4-5" },
+    "pullRequest": {
+      "enabled": true,
+      "key": { "scope": "personal", "keyId": "0192f430-..." },
+      "model": null
+    },
     "commitSummary": {
       "enabled": false,
-      "key": { "scope": "organization", "organizationId": "0192f3d0-...", "keyId": "0192f440-..." }
+      "key": { "scope": "organization", "organizationId": "0192f3d0-...", "keyId": "0192f440-..." },
+      "model": null
     }
   },
   "language": "app",
@@ -2564,6 +2673,12 @@ se anade al esquema del servidor, que siempre va por delante.
   contiene al otro, y el ajuste unico de VS Code se traduce a las tres funciones con la misma
   llave.
 - `key: null` es "Llave predeterminada".
+- **`model` por funcion**, opcional: `null` es "el de la llave". Permite usar la misma llave con un
+  modelo rapido para los commits y uno equilibrado para los PRs. Solo se aplica a las llaves
+  personales: con una llave de organizacion manda el modelo que fijo el admin
+  ([Llaves de IA de organizacion](#llaves-de-ia-de-organizacion)) y la interfaz lo ensena de solo
+  lectura. Si el modelo elegido ya no esta en la lista del proveedor, la funcion avisa ("este modelo
+  ya no esta disponible") y no cae en otro sin decirlo.
 - **Resolucion**, en el motor: la llave referenciada si existe en este dispositivo; si no, la
   predeterminada; si no, la primera; si no, ninguna y la funcion avisa. Una referencia a una
   llave personal que solo existe en otro equipo (con la sincronizacion de llaves apagada, cada
@@ -2626,8 +2741,12 @@ Apagar una categoria no significa lo mismo en todas, y es a proposito:
 
 **Estos ajustes son de la cuenta, no del dispositivo.** El interruptor "Sync settings from the
 cloud" de VS Code es otra cosa: decide si **esa instalacion** aplica lo que viene de la nube,
-se guarda en la configuracion local de VS Code y no llama a la API. El texto del prototipo
-decia que tambien sincronizaba las llaves de IA; manda lo que diga la cuenta.
+se guarda en el `settings.json` de VS Code con `scope: "machine"` (que Settings Sync no
+sincroniza) y no llama a la API. El texto del prototipo decia que tambien sincronizaba las llaves
+de IA; manda lo que diga la cuenta. En VS Code, las preferencias de Git e IA viven en la nube de
+Ramal igual que en Desktop y se editan en la pagina de ajustes de Ramal, no en `settings.json`:
+asi Settings Sync y la nube nunca sincronizan la misma clave
+([ADR 0010](adr/0010-un-motor-para-escritorio-y-vscode.md#ajustes-y-sincronizacion)).
 
 El "Guardar" de la cabecera de la pagina de la web mezclaba cambios instantaneos con un
 guardado global. Con este contrato cada interruptor guarda al cambiar (con su `If-Match`) y
@@ -2637,7 +2756,8 @@ el boton sobra; el perfil, que si es un formulario, guarda con su propio boton.
 
 **F4.** Las da de alta un admin, viven cifradas en el servidor y los miembros las usan a
 traves del proxy sin verlas nunca. Es la llave "ACME (equipo)" con alcance "Organizacion" de
-los ajustes de IA de Desktop.
+los ajustes de IA de Desktop. **El admin fija el modelo**: uno por defecto y, si quiere, uno por
+funcion; el miembro no lo puede cambiar.
 
 ```
 GET /v1/organizations/{orgId}/ai-keys
@@ -2647,7 +2767,8 @@ GET /v1/organizations/{orgId}/ai-keys
       "id": "0192f440-...",
       "provider": "openai",
       "label": "ACME (equipo)",
-      "model": "gpt-5-mini",
+      "model": "gpt-6.1-sol",
+      "models": { "commitMessage": "gpt-6-luna", "pullRequest": null, "commitSummary": null },
       "baseUrl": null,
       "masked": "sk-proj-••••••••9b1c",
       "isDefault": true,
@@ -2661,7 +2782,8 @@ GET /v1/organizations/{orgId}/ai-keys
 ```
 
 Todos los miembros ven la lista enmascarada, porque la necesitan para elegir llave en "Donde
-usar la IA". Nadie ve mas.
+usar la IA" y para ver que modelo usara cada funcion. Nadie ve mas. `model` es el modelo por
+defecto de la llave y `models` el de cada funcion (`null` es el de la llave).
 
 `POST /v1/organizations/{orgId}/ai-keys` (admin, `Idempotency-Key`):
 
@@ -2670,7 +2792,8 @@ usar la IA". Nadie ve mas.
   "provider": "openai",
   "label": "ACME (equipo)",
   "apiKey": "sk-proj-...",
-  "model": "gpt-5-mini",
+  "model": "gpt-6.1-sol",
+  "models": { "commitMessage": "gpt-6-luna", "pullRequest": null, "commitSummary": null },
   "baseUrl": null,
   "isDefault": true
 }
@@ -2704,7 +2827,7 @@ cifra en el acto y el valor en claro no se escribe en ningun log ni traza (tipos
   direccion.
 - La mascara la calcula el servidor con la misma regla que el cliente.
 
-`PATCH /v1/organizations/{orgId}/ai-keys/{id}` (admin) cambia `label`, `model`, `isDefault`,
+`PATCH /v1/organizations/{orgId}/ai-keys/{id}` (admin) cambia `label`, `model`, `models`, `isDefault`,
 `apiKey` (rotar la llave: se cifra con una llave de datos nueva) o `baseUrl` de una llave
 `custom`. **200**. **Cambiar `baseUrl` exige mandar `apiKey` en la misma peticion** (**422**
 `api_key_required` si no), deja un evento de auditoria y avisa a la owner de la organizacion: un
@@ -2715,7 +2838,7 @@ las preferencias de IA de los miembros caen en la predeterminada por la regla de
 
 `POST /v1/organizations/{orgId}/ai-keys/{id}/test` (admin) hace una llamada minima al
 proveedor (la lista de modelos) con la llave. **200** con
-`{ "ok": true, "provider": "openai", "model": "gpt-5-mini", "latencyMs": 412 }` o
+`{ "ok": true, "provider": "openai", "model": "gpt-6.1-sol", "latencyMs": 412 }` o
 `{ "ok": false, "error": "unauthorized" }` (`unauthorized`, `quota`, `network`, `model_not_found`).
 Aqui si hay prueba de conexion, a diferencia de las cuentas de plataforma: el servidor tiene
 la llave.
@@ -2776,6 +2899,8 @@ sesion web no puede gastar llaves.
 ```
 
 - `keyId` `null` es la predeterminada de la organizacion.
+- **La peticion no lleva modelo.** El proxy usa el de la funcion en `models` o, si es `null`, el
+  `model` de la llave: lo decide el admin, no el miembro.
 - `feature` decide la forma de `input`:
   - `commit_message`: `branch` y `files` (el diff preparado, ya filtrado).
   - `pull_request`: `baseBranch`, `headBranch`, `commits` (`sha`, `summary`, `body`) y
@@ -2809,7 +2934,7 @@ Respuesta con `Accept: application/json`: **200** con el resultado entero:
     "description": "- Nuevo modulo de zoom\n- Ajusta el calculo de carriles"
   },
   "excludedPaths": [".env.local"],
-  "usage": { "inputTokens": 1834, "outputTokens": 96, "provider": "openai", "model": "gpt-5-mini" }
+  "usage": { "inputTokens": 1834, "outputTokens": 96, "provider": "openai", "model": "gpt-6-luna" }
 }
 ```
 
@@ -2827,7 +2952,7 @@ event: result
 data: {"summary":"feat(graph): anade zoom al grafo","description":"- ..."}
 
 event: usage
-data: {"inputTokens":1834,"outputTokens":96,"provider":"openai","model":"gpt-5-mini"}
+data: {"inputTokens":1834,"outputTokens":96,"provider":"openai","model":"gpt-6-luna"}
 
 event: done
 data: {}
@@ -2995,7 +3120,7 @@ GET /v1/releases/latest?product=desktop&channel=stable
   "version": "2.4.0",
   "channel": "stable",
   "releasedAt": "2026-09-30T08:00:00Z",
-  "notesUrl": "https://ramal.dev/releases/2.4.0",
+  "notesUrl": "https://ramal.bahoque.com/releases/2.4.0",
   "minimumSupportedVersion": "2.0.0",
   "platforms": [
     {
@@ -3003,7 +3128,7 @@ GET /v1/releases/latest?product=desktop&channel=stable
       "requirements": { "es": "macOS 12 o posterior", "en": "macOS 12 or later" },
       "installMethod": "brew_cask",
       "artifacts": [
-        { "id": "0192f500-...", "kind": "dmg", "arch": "arm64", "primary": true, "url": "https://github.com/<propietario>/ramal-releases/releases/download/v2.4.0/Ramal-2.4.0-arm64.dmg", "fileName": "Ramal-2.4.0-arm64.dmg", "sizeBytes": 112459776, "sha256": "base64url", "external": false },
+        { "id": "0192f500-...", "kind": "dmg", "arch": "arm64", "primary": true, "url": "https://github.com/eabl0306/ramal/releases/download/v2.4.0/Ramal-2.4.0-arm64.dmg", "fileName": "Ramal-2.4.0-arm64.dmg", "sizeBytes": 112459776, "sha256": "base64url", "external": false },
         { "id": "0192f501-...", "kind": "dmg", "arch": "x64", "primary": false, "url": "...", "fileName": "Ramal-2.4.0-x64.dmg", "sizeBytes": 123731968, "sha256": "...", "external": false }
       ]
     }
@@ -3035,8 +3160,11 @@ GET /v1/releases/latest?product=desktop&channel=stable
 - La tarjeta "Windows Portable (.zip)" del diseno se quita
   ([ADR 0016](adr/0016-actualizaciones-y-descargas.md)): el empaquetador de Tauri no la produce y
   no se actualizaria sola.
-- El instalador MSI se ofrece para despliegues gestionados y no se actualiza solo; la tarjeta lo
-  dice. El de actualizacion automatica en Windows es el NSIS.
+- El instalador MSI (solo x64) se ofrece para despliegues gestionados y no se actualiza solo, por
+  decision; la tarjeta lo dice. El de actualizacion automatica en Windows es el NSIS, el unico que
+  hay en arm64.
+- Los artefactos de Windows arm64 y Linux arm64 salen como beta hasta que su E2E pase en runners
+  arm. La etiqueta la pone la web desde `@ramal/i18n`.
 
 La landing se prerenderiza con esta respuesta en tiempo de build y la refresca en el cliente;
 el sistema operativo se detecta en el navegador. Respuesta con
@@ -3048,13 +3176,20 @@ sus notas. Es "Notas de la version" del pie de pagina.
 ### Manifiesto del actualizador de Tauri
 
 ```
-GET /v1/desktop/updates/{target}/{arch}/{currentVersion}?channel=stable
+GET /v1/desktop/updates/{target}/{arch}/{currentVersion}?channel=stable&bundle={bundleType}
 ```
 
 Es la URL que va dentro de `tauri.conf.json` con las variables de Tauri: `{{target}}`
-(`darwin`, `windows`, `linux`), `{{arch}}` (`x86_64`, `aarch64`) y `{{current_version}}`.
+(`darwin`, `windows`, `linux`), `{{arch}}` (`x86_64`, `aarch64`), `{{current_version}}` y
+`{{bundle_type}}` (`app`, `nsis`, `msi`, `appimage`, `deb` o `rpm`), en
+`https://api.ramal.bahoque.com`. **`bundle` va en la URL desde la primera build publica**: la URL
+no se puede cambiar despues, y es lo que deja a la API responder distinto a cada formato sin tocar
+las apps instaladas.
 
-- **204** si no hay nada mas nuevo para ese destino.
+- **204** si no hay nada mas nuevo para ese destino y ese formato, y siempre para `msi`, `deb` y
+  `rpm`, que no se actualizan solos por decision ([ADR 0016](adr/0016-actualizaciones-y-descargas.md)).
+  Un `bundle` que falte o que no se conozca tambien recibe 204: no ofrecer nada es mejor que
+  ofrecer un paquete que no es el suyo.
 - **200** con el formato que dicta Tauri, **en snake_case** porque no es nuestro:
 
 ```json
@@ -3062,15 +3197,15 @@ Es la URL que va dentro de `tauri.conf.json` con las variables de Tauri: `{{targ
   "version": "2.4.1",
   "notes": "Corrige el calculo de carriles con ramas muy largas.",
   "pub_date": "2026-10-05T08:00:00Z",
-  "url": "https://github.com/<propietario>/ramal-releases/releases/download/v2.4.1/Ramal_2.4.1_aarch64.app.tar.gz",
+  "url": "https://github.com/eabl0306/ramal/releases/download/v2.4.1/Ramal_2.4.1_aarch64.app.tar.gz",
   "signature": "dW50cnVzdGVkIGNvbW1lbnQ6..."
 }
 ```
 
-- Solo se ofrecen los paquetes que Tauri sabe actualizar: `.app` en macOS, NSIS en Windows y
-  AppImage en Linux. El manifiesto da un solo paquete por sistema y arquitectura, asi que en
-  Windows el formato de actualizacion es el NSIS; quien instalo el MSI, un `.deb` o un `.rpm` no
-  recibe actualizacion por aqui.
+- Solo se ofrecen `.app` en macOS, NSIS en Windows y AppImage en Linux. Tauri sabria instalar
+  tambien MSI, `.deb` y `.rpm` (desde `tauri-plugin-updater` 2.10), pero pidiendo permisos de
+  administrador; quien los instalo no recibe actualizacion por aqui. Los `.deb` y `.rpm` ensenan
+  "Hay una version nueva" con el enlace, a partir de `GET /v1/releases/latest`.
 - **Despliegue gradual:** cada publicacion tiene un porcentaje. La app manda la cabecera
   `X-Ramal-Rollout-Bucket` con un numero de 0 a 99 que calcula una vez de una semilla aleatoria
   propia, y la API ofrece la version si ese numero cae por debajo del porcentaje. Sin cabecera,
@@ -3084,8 +3219,10 @@ Es la URL que va dentro de `tauri.conf.json` con las variables de Tauri: `{{targ
 - La firma es la del par de llaves del actualizador de Tauri, que es independiente de la
   firma de codigo de macOS y Windows. **Perder la llave privada deja todas las instalaciones
   sin poder actualizarse nunca mas**: copia fuera de linea obligatoria.
-- `tauri.conf.json` lleva como segundo endpoint el `latest.json` estatico del repositorio de
-  publicaciones, por si la API no responde.
+- `tauri.conf.json` lleva como segundo endpoint el `latest.json` estatico de las publicaciones de
+  `eabl0306/ramal`, por si la API no responde. Solo lleva claves por formato
+  (`darwin-aarch64-app`, `windows-x86_64-nsis`, `linux-x86_64-appimage`...) y ninguna generica,
+  para que un MSI o un `.deb` no caigan en una entrada que no es la suya.
 
 ### Registro de publicaciones
 
@@ -3102,7 +3239,7 @@ compara en tiempo constante.
   "version": "2.4.1",
   "channel": "beta",
   "releasedAt": "2026-10-05T08:00:00Z",
-  "notesUrl": "https://ramal.dev/releases/2.4.1",
+  "notesUrl": "https://ramal.bahoque.com/releases/2.4.1",
   "notes": { "es": "...", "en": "..." },
   "rolloutPercentage": 10,
   "minimumSupportedVersion": "2.0.0",
@@ -3144,8 +3281,10 @@ pagina de descargas.
 que los usuarios descargan y ejecutan:
 
 - Cada `url` tiene que empezar por
-  `https://github.com/<propietario>/ramal-releases/releases/download/v{version}/`, con el
-  propietario de la configuracion y la version de la propia publicacion (**422** si no).
+  `https://github.com/<propietario>/<repositorio>/releases/download/v{version}/`, con el
+  propietario y el repositorio de la configuracion (hoy `eabl0306/ramal`) y la version de la propia
+  publicacion (**422** si no). El repositorio es privado hasta la beta y publico desde entonces; la
+  primera build publica sale con el ya publico.
 - `installMethod` es un valor de la lista, nunca un comando.
 - `updaterSignature` se verifica al registrar con la llave publica de minisign del actualizador
   que la API tiene en su configuracion. Una firma que no verifica es **422**.
@@ -3207,7 +3346,7 @@ que poder conectar una cuenta aunque la API no responda.
    `?code=...&flow=<id del flujo>&state=<state del cliente>`, construido con la API de `url`. El
    navegador aterriza en el receptor del motor, que sirve la pagina "Cuenta conectada, vuelve a
    Ramal" (o el error del proveedor). Si el flujo no existe o caduco, la API no tiene a donde
-   redirigir y manda al navegador a `https://ramal.dev/connect/error?reason=expired`, una pagina
+   redirigir y manda al navegador a `https://ramal.bahoque.com/connect/error?reason=expired`, una pagina
    de la web que explica que hay que empezar otra vez desde la app.
 3. El motor canjea:
 
@@ -3335,7 +3474,11 @@ Si un cambio en la API choca con alguna de estas reglas, el cambio esta mal, no 
   interruptores de sincronizacion; los endpoints ya lo permitirian si algun dia se dibuja.
 - **Foto de organizacion, reordenar workspaces, selector de color.** Los datos lo soportan
   (el color ya es un campo); falta el diseno.
-- **Pagina de precios y facturacion.** F5, con el proveedor sin decidir.
+- **Plan personal de pago.** No existe y no esta previsto: Ramal Pro es solo de organizaciones
+  ([ADR 0026](adr/0026-planes-y-precios.md)).
+- **Ubicacion en las sesiones y en el device flow.** Sin GeoIP en la primera version.
+- **Coste aproximado por generacion de IA.** La v1 no lo ensena
+  ([ADR 0025](adr/0025-recomendacion-de-modelos-de-ia.md)).
 - **Recuperar secretos sin frase ni codigo.** No es un hueco: es imposible por diseno.
 
 ## Lo que hay que vigilar
@@ -3359,10 +3502,15 @@ Si un cambio en la API choca con alguna de estas reglas, el cambio esta mal, no 
   antes de dar de alta una llave.
 - **Perder la llave maestra del servidor pierde todas las llaves de IA de organizacion.** Copia
   fuera de linea, igual que la llave del actualizador.
-- **La URL del actualizador es para siempre.** Va dentro de cada instalacion.
+- **La URL del actualizador es para siempre.** Va dentro de cada instalacion, con
+  `api.ramal.bahoque.com`: si el producto cambia algun dia de dominio, ese nombre tiene que seguir
+  respondiendo mientras queden instalaciones que lo tengan.
 - **La normalizacion de remotos es un contrato de datos.** Cambiarla parte repositorios en dos y
   exige migracion.
-- **La ciudad de las sesiones exige GeoIP**, que es un dato personal. Viene apagada.
+- **El fichero de modelos recomendados envejece** si nadie lo revisa. No llega a recomendar un
+  modelo retirado, porque se cruza con la lista viva, pero puede quedarse en uno caro o lento.
+- **Los webhooks de Paddle llegan desordenados y repetidos.** La deduplicacion por evento y el
+  descarte de eventos mas viejos que el ultimo aplicado son los que mantienen bien los asientos.
 - **El refresco con varias ventanas de VS Code** depende de la ventana de 30 segundos. Si
   aparecen cierres de sesion inesperados, es lo primero que hay que mirar.
 - **El limite por correo en `login` deja que un tercero bloquee 15 minutos** el inicio de sesion
@@ -3426,7 +3574,7 @@ significa que la accion desaparece o es local, y dice por que.
 | Cuentas vinculadas                          | "Compartir con el equipo", pastilla Tuya/Equipo                                                     | Sin endpoint: desaparece (decision 2)                                                                                                        | F2   |
 | Cuentas vinculadas                          | "Desconectar"                                                                                       | `DELETE /v1/linked-accounts/{id}`                                                                                                            | F2   |
 | Equipo                                      | "N de M asientos usados" y barra                                                                    | `GET /v1/organizations/{orgId}/seats`                                                                                                        | F3   |
-| Equipo                                      | "Anadir asientos"                                                                                   | `POST /v1/organizations/{orgId}/subscription/seats` (oculto antes de F5)                                                                     | F5   |
+| Equipo                                      | "Anadir asientos"                                                                                   | En prueba, `POST /v1/organizations/{orgId}/subscription/checkout`; con suscripcion, `POST .../subscription/seats`. Solo la owner             | F5   |
 | Equipo                                      | Miembros con rol                                                                                    | `GET /v1/organizations/{orgId}/members`                                                                                                      | F3   |
 | Equipo                                      | Invitaciones pendientes                                                                             | `GET /v1/organizations/{orgId}/invitations`                                                                                                  | F3   |
 | Equipo                                      | Selector de rol                                                                                     | `PATCH /v1/organizations/{orgId}/members/{userId}`                                                                                           | F3   |
@@ -3439,6 +3587,9 @@ significa que la accion desaparece o es local, y dice por que.
 | Ajustes de la organizacion (nuevo)          | Eliminar (reauth, confirmacion escrita)                                                             | `DELETE /v1/organizations/{orgId}`                                                                                                           | F3   |
 | Ajustes de la organizacion (nuevo)          | Salir                                                                                               | `POST /v1/organizations/{orgId}/leave`                                                                                                       | F3   |
 | Ajustes de la organizacion (nuevo)          | Transferir la propiedad (reauth)                                                                    | `POST /v1/organizations/{orgId}/transfer-ownership`                                                                                          | F3   |
+| Ajustes de la organizacion (nuevo)          | Plan, prueba, renovacion y asientos; "Gestionar suscripcion"                                        | `GET /v1/organizations/{orgId}/subscription`, `POST .../subscription/portal`                                                                 | F5   |
+| Nueva: pago                                 | Checkout de Ramal Pro (Paddle.js, con la CSP abierta solo aqui)                                     | La URL de `POST /v1/organizations/{orgId}/subscription/checkout`; el pago es de Paddle                                                       | F5   |
+| Landing (nuevo)                             | Precios: gratis para cada persona, Ramal Pro por asiento                                            | Sin endpoint: precios de ADR 0026 en `@ramal/i18n`                                                                                           | F5   |
 | IA de la organizacion (nuevo, admins)       | Lista, alta, rotar, quitar llaves                                                                   | `GET`, `POST`, `PATCH` y `DELETE /v1/organizations/{orgId}/ai-keys`                                                                          | F4   |
 | IA de la organizacion (nuevo, admins)       | Probar conexion                                                                                     | `POST /v1/organizations/{orgId}/ai-keys/{id}/test`                                                                                           | F4   |
 | IA de la organizacion (nuevo, admins)       | Politica: funciones, cuota diaria, presupuesto                                                      | `GET` y `PATCH /v1/organizations/{orgId}/ai-settings`                                                                                        | F4   |
@@ -3496,6 +3647,7 @@ significa que la accion desaparece o es local, y dice por que.
 | Ajustes > IA                      | Probar conexion                                                                                               | Personal: motor. Organizacion: `POST .../ai-keys/{id}/test`, solo admins                                                                               | F4              |
 | Ajustes > IA                      | Cuota que le queda al miembro                                                                                 | `myUsage` de `GET /v1/organizations/{orgId}/ai-settings`                                                                                               | F4              |
 | Ajustes > IA                      | Donde usar la IA, idioma, Conventional Commits, excluir, instrucciones                                        | `PATCH /v1/me/preferences/ai`                                                                                                                          | F2              |
+| Ajustes > IA                      | Modelo por funcion con la insignia "Recomendado"                                                              | Motor: lista del proveedor cruzada con `GET /v1/ai/model-recommendations`; con llave de organizacion, el modelo del admin de solo lectura              | F2              |
 | Commit, PR, detalle               | Generar con llave personal                                                                                    | Motor contra el proveedor                                                                                                                              | -               |
 | Commit, PR, detalle               | Generar con llave de organizacion                                                                             | `POST /v1/ai/generate`                                                                                                                                 | F4              |
 | Ajustes > Git                     | Identidad y comportamiento                                                                                    | `PATCH /v1/me/preferences/git`                                                                                                                         | F2              |
@@ -3511,21 +3663,21 @@ significa que la accion desaparece o es local, y dice por que.
 
 ### Ramal para VS Code
 
-| Pantalla                  | Accion o dato                                               | Endpoint                                                                                   | Fase |
-| ------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---- |
-| Menu Accounts (nuevo)     | Iniciar sesion en Ramal                                     | Navegador + `UriHandler` + `POST /v1/auth/app/token`; device flow en entornos de navegador | F1   |
-| Ajustes > Cuenta de Ramal | Tarjeta: nombre, correo, organizacion, plan                 | `GET /v1/me`; plan de `GET /v1/organizations`                                              | F1   |
-| Ajustes > Cuenta de Ramal | Abrir panel web                                             | Sin endpoint: `env.openExternal`                                                           | -    |
-| Ajustes > Cuenta de Ramal | Cambiar correo o contrasena, que se sincroniza              | Sin endpoint: abre la pagina de la web                                                     | -    |
-| Ajustes > Cuenta de Ramal | Cerrar sesion                                               | `POST /v1/auth/logout`                                                                     | F1   |
-| Ajustes > Cuenta de Ramal | "Sync settings from the cloud"                              | Sin endpoint: ajuste local de la instalacion                                               | -    |
-| Ajustes > Plataformas Git | Anadir, predeterminada, desconectar                         | Los mismos que Desktop                                                                     | F2   |
-| Ajustes > IA              | Llaves, funciones, llave, idioma, Conventional Commits      | Los mismos que Desktop                                                                     | F2   |
-| Ajustes > Git             | Fetch automatico, pull, firmar, podar                       | `PATCH /v1/me/preferences/git`                                                             | F2   |
-| Cambios, grafo, detalle   | Generar con llave de organizacion                           | `POST /v1/ai/generate`                                                                     | F4   |
-| Barra de estado           | "Ramal: @cuenta" y proveedor de IA                          | `profile` y `preferences` del feed                                                         | F2   |
-| Fondo                     | Registrar la instalacion como dispositivo                   | `POST /v1/auth/app/token` (bloque `device`)                                                | F1   |
-| Fondo                     | Cuenta de plataforma para el remoto del repositorio abierto | Repositorios del feed: `remoteKey` a `linkedAccountId`                                     | F2   |
-| Fondo                     | Ponerse al dia                                              | `GET /v1/sync/changes`                                                                     | F2   |
-| Pull Requests             | Lista y creacion                                            | Motor contra la plataforma                                                                 | -    |
-| Paleta                    | "Open in Ramal Desktop"                                     | Sin endpoint: deep link `ramal://`                                                         | -    |
+| Pantalla                  | Accion o dato                                                   | Endpoint                                                                                   | Fase |
+| ------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---- |
+| Menu Accounts (nuevo)     | Iniciar sesion en Ramal                                         | Navegador + `UriHandler` + `POST /v1/auth/app/token`; device flow en entornos de navegador | F1   |
+| Ajustes > Cuenta de Ramal | Tarjeta: nombre, correo, organizacion, plan                     | `GET /v1/me`; plan de `GET /v1/organizations`                                              | F1   |
+| Ajustes > Cuenta de Ramal | Abrir panel web                                                 | Sin endpoint: `env.openExternal`                                                           | -    |
+| Ajustes > Cuenta de Ramal | Cambiar correo o contrasena, que se sincroniza                  | Sin endpoint: abre la pagina de la web                                                     | -    |
+| Ajustes > Cuenta de Ramal | Cerrar sesion                                                   | `POST /v1/auth/logout`                                                                     | F1   |
+| Ajustes > Cuenta de Ramal | "Sync settings from the cloud"                                  | Sin endpoint: ajuste local de la instalacion                                               | -    |
+| Ajustes > Plataformas Git | Anadir, predeterminada, desconectar                             | Los mismos que Desktop                                                                     | F2   |
+| Ajustes > IA              | Llaves, funciones, llave y modelo, idioma, Conventional Commits | Los mismos que Desktop, en la pagina de ajustes de Ramal (no en `settings.json`)           | F2   |
+| Ajustes > Git             | Fetch automatico, pull, firmar, podar                           | `PATCH /v1/me/preferences/git`, en la pagina de ajustes de Ramal                           | F2   |
+| Cambios, grafo, detalle   | Generar con llave de organizacion                               | `POST /v1/ai/generate`                                                                     | F4   |
+| Barra de estado           | "Ramal: @cuenta" y proveedor de IA                              | `profile` y `preferences` del feed                                                         | F2   |
+| Fondo                     | Registrar la instalacion como dispositivo                       | `POST /v1/auth/app/token` (bloque `device`)                                                | F1   |
+| Fondo                     | Cuenta de plataforma para el remoto del repositorio abierto     | Repositorios del feed: `remoteKey` a `linkedAccountId`                                     | F2   |
+| Fondo                     | Ponerse al dia                                                  | `GET /v1/sync/changes`                                                                     | F2   |
+| Pull Requests             | Lista y creacion                                                | Motor contra la plataforma                                                                 | -    |
+| Paleta                    | "Open in Ramal Desktop"                                         | Sin endpoint: deep link `ramal://`                                                         | -    |
