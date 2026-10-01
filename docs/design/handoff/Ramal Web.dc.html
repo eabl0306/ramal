@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;
+--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);
+--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);
+--shadow:0 24px 70px oklch(0.05 0.01 230 / 0.55),0 2px 8px oklch(0.05 0.01 230 / 0.3);
+background:var(--bg);color:var(--text)}
+body[data-theme="light"]{--bg:oklch(0.975 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.945 0.006 230);--border:oklch(0.9 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);
+--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);
+--shadow:0 24px 70px oklch(0.3 0.02 230 / 0.18),0 2px 8px oklch(0.3 0.02 230 / 0.08)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+a{color:var(--accent);text-decoration:none} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px">
+
+  <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+    <div style="position:sticky;top:0;z-index:20;height:64px;display:flex;align-items:center;gap:20px;padding:0 28px;background:color-mix(in oklch, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)">
+      <div onClick="{{ goLanding }}" style="display:flex;align-items:center;gap:9px;cursor:pointer">
+        <div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div>
+        <span style="font-weight:600;font-size:16px;letter-spacing:-0.01em">Ramal</span>
+      </div>
+      <div style="display:flex;gap:4px;margin-left:12px">
+        <sc-for list="{{ navLinks }}" as="n" hint-placeholder-count="3">
+          <a onClick="{{ n.onClick }}" style="padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="color:var(--text);background:var(--surface2)">{{ n.label }}</a>
+        </sc-for>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+        <sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:26px;padding:0 9px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+      </div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+        <sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="width:30px;height:26px;border:0;border-radius:6px;cursor:pointer;font-size:13px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+      </div>
+      <sc-if value="{{ loggedOut }}">
+        <a onClick="{{ goLogin }}" style="padding:8px 12px;color:var(--text);cursor:pointer;font-weight:500;white-space:nowrap">{{ w.login }}</a>
+        <button onClick="{{ goSignup }}" style="height:38px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap">{{ w.signup }}</button>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}">
+        <button onClick="{{ goDash }}" style="height:38px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap">{{ w.openDash }}</button>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+      <section style="padding:88px 28px 44px;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px">
+        <span style="height:30px;padding:0 14px;border-radius:15px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;background:var(--accent-soft);color:var(--accent)"><span style="font-family:'IBM Plex Mono',monospace">v2.4</span>{{ w.heroTag }}</span>
+        <h1 style="margin:0;font-size:clamp(38px,6vw,66px);line-height:1.04;letter-spacing:-0.035em;font-weight:600;max-width:900px;text-wrap:balance">{{ w.heroTitle }}</h1>
+        <p style="margin:0;font-size:18px;line-height:1.55;color:var(--muted);max-width:660px;text-wrap:pretty">{{ w.heroSub }}</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px">
+          <button onClick="{{ dlPrimary }}" style="height:48px;padding:0 22px;border-radius:12px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:15px;cursor:pointer">↓ {{ w.dlFor }}</button>
+          <button onClick="{{ goDownload }}" style="height:48px;padding:0 22px;border-radius:12px;border:1px solid var(--border);background:var(--surface);font-weight:500;font-size:15px;cursor:pointer" style-hover="background:var(--surface2)">{{ w.allPlatforms }}</button>
+        </div>
+        <a onClick="{{ goVscode }}" style="cursor:pointer;font-weight:500">{{ w.vscodeLink }} →</a>
+      </section>
+      <section style="padding:0 28px 96px;max-width:1180px;margin:0 auto">
+        <div style="border-radius:16px;border:1px solid var(--border);background:var(--panel);box-shadow:var(--shadow);overflow:hidden">
+          <div style="height:34px;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:1px solid var(--border)">
+            <span style="width:11px;height:11px;border-radius:50%;background:#ff5f57"></span><span style="width:11px;height:11px;border-radius:50%;background:#febc2e"></span><span style="width:11px;height:11px;border-radius:50%;background:#28c840"></span>
+          </div>
+          <div style="height:clamp(300px,52vw,640px);overflow:hidden;position:relative">
+            <iframe src="./Ramal.dc.html" title="Ramal" loading="lazy" style="position:absolute;top:0;left:0;width:1560px;height:960px;border:0;transform:scale(0.72);transform-origin:0 0;pointer-events:none"></iframe>
+          </div>
+        </div>
+      </section>
+
+      <section id="features-anchor" style="padding:0 28px 110px;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;gap:36px">
+        <div style="max-width:640px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:10px">{{ w.featKicker }}</div>
+          <h2 style="margin:0;font-size:clamp(28px,4vw,40px);letter-spacing:-0.025em;font-weight:600;line-height:1.12;text-wrap:balance">{{ w.featTitle }}</h2>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+          <sc-for list="{{ features }}" as="f" hint-placeholder-count="6">
+            <div style="padding:28px;background:var(--bg);display:flex;flex-direction:column;gap:10px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ f.n }}</span>
+              <div style="font-size:17px;font-weight:600">{{ f.title }}</div>
+              <div style="color:var(--muted);line-height:1.6;text-wrap:pretty">{{ f.text }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section id="vscode" style="padding:0 28px 110px;max-width:1160px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:40px;align-items:center">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">{{ w.vsKicker }}</div>
+          <h2 style="margin:0;font-size:clamp(28px,4vw,40px);letter-spacing:-0.025em;font-weight:600;line-height:1.12">{{ w.vsTitle }}</h2>
+          <p style="margin:0;color:var(--muted);line-height:1.6;font-size:16px;text-wrap:pretty">{{ w.vsText }}</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button onClick="{{ dlVsMarket }}" style="height:42px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">VS Code Marketplace</button>
+            <button onClick="{{ dlVsOpen }}" style="height:42px;padding:0 18px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-weight:500;cursor:pointer" style-hover="background:var(--surface2)">Open VSX</button>
+          </div>
+          <div onClick="{{ copyVsCmd }}" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:var(--panel);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:13px;cursor:pointer" style-hover="border-color:var(--accent)">
+            <span style="color:var(--faint)">$</span><span style="flex:1">code --install-extension ramal.ramal</span><span style="color:var(--faint);font-family:'IBM Plex Sans',sans-serif;font-size:12px">{{ w.copy }}</span>
+          </div>
+        </div>
+        <div style="border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;height:420px;position:relative;background:#1f1f1f">
+          <iframe src="./Ramal VS Code.dc.html" title="Ramal for VS Code" loading="lazy" style="position:absolute;top:0;left:0;width:1300px;height:840px;border:0;transform:scale(0.5);transform-origin:0 0;pointer-events:none"></iframe>
+        </div>
+      </section>
+
+      <section id="download" style="padding:0 28px 110px;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;gap:28px">
+        <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:10px">{{ w.dlKicker }}</div>
+            <h2 style="margin:0;font-size:clamp(28px,4vw,40px);letter-spacing:-0.025em;font-weight:600">{{ w.dlTitle }}</h2>
+          </div>
+          <span style="color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:13px">{{ w.version }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+          <sc-for list="{{ platforms }}" as="p" hint-placeholder-count="4">
+            <div style="padding:22px;border-radius:14px;background:var(--surface);border:1px solid {{ p.border }};display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:18px;font-weight:600;flex:1">{{ p.name }}</span>
+                <sc-if value="{{ p.isYours }}"><span style="height:22px;padding:0 9px;border-radius:11px;font-size:11px;font-weight:600;display:flex;align-items:center;background:var(--accent-soft);color:var(--accent)">{{ w.yourSystem }}</span></sc-if>
+              </div>
+              <span style="color:var(--muted);font-size:13px">{{ p.req }}</span>
+              <button onClick="{{ p.onMain }}" style="height:42px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">↓ {{ p.main }}</button>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <sc-for list="{{ p.alts }}" as="a"><a onClick="{{ a.onClick }}" style="display:flex;justify-content:space-between;gap:10px;padding:7px 2px;border-bottom:1px solid var(--border);cursor:pointer;color:var(--text);font-size:13px"><span>{{ a.label }}</span><span style="color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:12px">{{ a.size }}</span></a></sc-for>
+              </div>
+              <div onClick="{{ p.onCopy }}" style="padding:9px 11px;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="border-color:var(--accent)">$ {{ p.cmd }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="padding:0 28px 110px;max-width:1160px;margin:0 auto">
+        <div style="padding:44px;border-radius:18px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <h2 style="margin:0 0 8px;font-size:28px;letter-spacing:-0.02em;font-weight:600">{{ w.ctaTitle }}</h2>
+            <p style="margin:0;color:var(--muted);line-height:1.6;max-width:560px;text-wrap:pretty">{{ w.ctaText }}</p>
+          </div>
+          <button onClick="{{ goSignup }}" style="height:48px;padding:0 24px;border-radius:12px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:15px;cursor:pointer">{{ w.signup }}</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isAuth }}" hint-placeholder-val="{{ false }}">
+      <section style="min-height:calc(100vh - 64px);display:grid;place-items:center;padding:40px 20px">
+        <div style="width:100%;max-width:420px;padding:32px;border-radius:18px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px">
+          <div>
+            <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ au.title }}</h1>
+            <p style="margin:6px 0 0;color:var(--muted)">{{ au.sub }}</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ au.oauth }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.onClick }}" style="height:42px;border-radius:10px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="border-color:var(--accent)">
+                <span style="width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:8px;font-weight:700;color:white;background:{{ o.color }}">{{ o.abbr }}</span>{{ o.label }}
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;color:var(--faint);font-size:12px"><span style="flex:1;height:1px;background:var(--border)"></span>{{ w.orEmail }}<span style="flex:1;height:1px;background:var(--border)"></span></div>
+          <sc-for list="{{ au.fields }}" as="f" hint-placeholder-count="2">
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--muted)"><span>{{ f.label }}</span><sc-if value="{{ f.hasLink }}"><a onClick="{{ f.onLink }}" style="cursor:pointer;font-weight:500">{{ f.link }}</a></sc-if></span>
+              <input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" style="height:42px;padding:0 12px;border-radius:10px;border:1px solid {{ f.border }};background:var(--bg);outline:0">
+              <sc-if value="{{ f.hasHint }}"><span style="font-size:12px;color:{{ f.hintColor }}">{{ f.hint }}</span></sc-if>
+            </label>
+          </sc-for>
+          <sc-if value="{{ au.isSignup }}">
+            <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{ au.terms }}" onChange="{{ au.onTerms }}" style="margin-top:3px;accent-color:var(--accent)"><span>{{ w.terms }}</span></label>
+          </sc-if>
+          <sc-if value="{{ au.hasError }}"><div style="padding:10px 12px;border-radius:9px;font-size:13px;color:var(--danger);background:color-mix(in oklch, var(--danger) 10%, transparent)">{{ au.error }}</div></sc-if>
+          <button onClick="{{ au.onSubmit }}" style="height:44px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;font-size:15px">{{ au.submit }}</button>
+          <div style="text-align:center;color:var(--muted);font-size:13px">{{ au.switchText }} <a onClick="{{ au.onSwitch }}" style="cursor:pointer;font-weight:600">{{ au.switchLink }}</a></div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+      <footer style="border-top:1px solid var(--border);padding:28px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;max-width:1216px;margin:0 auto;color:var(--faint);font-size:13px">
+        <span style="font-weight:600;color:var(--text)">Ramal</span>
+        <sc-for list="{{ footLinks }}" as="l"><a onClick="{{ l.onClick }}" style="color:var(--faint);cursor:pointer" style-hover="color:var(--text)">{{ l.label }}</a></sc-for>
+        <span style="flex:1"></span><span>© 2026 Ramal</span>
+      </footer>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{ isDash }}" hint-placeholder-val="{{ false }}">
+    <div style="height:100vh;display:flex;flex-direction:column">
+      <div style="height:56px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--border)">
+        <div onClick="{{ goLanding }}" style="display:flex;align-items:center;gap:9px;cursor:pointer">
+          <div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div>
+          <span style="font-weight:600">Ramal</span>
+        </div>
+        <span style="color:var(--faint)">/</span>
+        <button onClick="{{ onOrg }}" style="height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500"><span style="width:18px;height:18px;border-radius:5px;background:var(--accent);color:var(--accent-ink);font-size:9px;font-weight:700;display:grid;place-items:center">{{ org.ini }}</span>{{ org.name }} <span style="color:var(--faint);font-size:10px">▾</span></button>
+        <div style="flex:1"></div>
+        <a onClick="{{ goDownload }}" style="cursor:pointer;font-weight:500;white-space:nowrap">↓ {{ w.download }}</a>
+        <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+          <sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:24px;padding:0 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+        </div>
+        <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+          <sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="width:28px;height:24px;border:0;border-radius:6px;cursor:pointer;font-size:12px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+        </div>
+        <div onClick="{{ onUserMenu }}" style="width:32px;height:32px;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px;cursor:pointer">{{ me.ini }}</div>
+      </div>
+      <div style="flex:1;min-height:0;display:flex">
+        <div style="width:232px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto">
+          <sc-for list="{{ dNav }}" as="n" hint-placeholder-count="6">
+            <div onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}" style-hover="background:var(--surface2)">
+              <span style="flex:1">{{ n.label }}</span><span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ n.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="flex:1;min-width:0;overflow:auto">
+          <div style="max-width:1060px;margin:0 auto;padding:30px 34px 60px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:4px">
+              <div style="flex:1;min-width:260px">
+                <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ dh.title }}</h1>
+                <p style="margin:6px 0 0;color:var(--muted);max-width:640px;text-wrap:pretty">{{ dh.sub }}</p>
+              </div>
+              <sc-if value="{{ dh.hasAction }}"><button onClick="{{ dh.onAction }}" style="height:38px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ dh.action }}</button></sc-if>
+            </div>
+
+            <sc-if value="{{ isOverview }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+                <sc-for list="{{ ov.tiles }}" as="x" hint-placeholder-count="4">
+                  <div onClick="{{ x.onClick }}" style="padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;gap:6px" style-hover="border-color:var(--accent)">
+                    <span style="font-size:28px;font-weight:600;font-family:'IBM Plex Mono',monospace">{{ x.value }}</span><span style="color:var(--muted)">{{ x.label }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);overflow:hidden">
+                <div style="padding:14px 18px;font-weight:600">{{ w.devices }}</div>
+                <sc-for list="{{ ov.devices }}" as="d" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--border)">
+                    <span style="width:34px;height:34px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;font-size:10px;font-weight:700;background:var(--bg);border:1px solid var(--border);color:var(--muted)">{{ d.abbr }}</span>
+                    <div style="flex:1;min-width:0"><div style="font-weight:500">{{ d.name }}</div><div style="font-size:12px;color:var(--faint)">{{ d.app }}</div></div>
+                    <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:{{ d.dot }}"></span>{{ d.sync }}</span>
+                    <button onClick="{{ d.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isWorkspaces }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
+                <sc-for list="{{ wsCards }}" as="c" hint-placeholder-count="3">
+                  <div onContextMenu="{{ c.onMenu }}" style="padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:14px">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span style="width:12px;height:12px;border-radius:4px;background:{{ c.color }}"></span>
+                      <span style="font-weight:600;font-size:16px;flex:1">{{ c.name }}</span>
+                      <button onClick="{{ c.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                    </div>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                      <sc-for list="{{ c.repos }}" as="r"><span style="height:24px;padding:0 9px;border-radius:7px;display:flex;align-items:center;gap:6px;font-size:12px;background:var(--bg);border:1px solid var(--border)"><span style="width:14px;height:14px;border-radius:4px;display:grid;place-items:center;font-size:6px;font-weight:700;color:white;background:{{ r.color }}">{{ r.abbr }}</span>{{ r.name }}</span></sc-for>
+                      <sc-if value="{{ c.empty }}"><span style="color:var(--faint);font-size:13px">{{ w.noReposWs }}</span></sc-if>
+                    </div>
+                    <div onClick="{{ c.onShare }}" style="display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--border);cursor:pointer;font-size:13px">
+                      <span style="width:32px;height:18px;border-radius:9px;position:relative;background:{{ c.tbg }}"><span style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:white;transform:{{ c.tx }}"></span></span>
+                      <span style="color:var(--muted)">{{ c.shareLabel }}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isRepos }}">
+              <div style="display:flex;align-items:center;gap:10px;padding:0 14px;height:42px;border-radius:10px;background:var(--surface);border:1px solid var(--border)">
+                <span style="color:var(--faint)">⌕</span><input value="{{ rq }}" onChange="{{ onRq }}" placeholder="{{ w.searchRepos }}" style="flex:1;min-width:0;border:0;outline:0;background:transparent;height:100%">
+              </div>
+              <div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);overflow:hidden">
+                <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.3fr) minmax(0,1fr) 96px 40px;gap:14px;padding:10px 18px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border)">
+                  <span>{{ w.colRepo }}</span><span>{{ w.colSource }}</span><span>{{ w.colWs }}</span><span>{{ w.colSync }}</span><span></span>
+                </div>
+                <sc-for list="{{ repoRows }}" as="r" hint-placeholder-count="8">
+                  <div onContextMenu="{{ r.onMenu }}" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.3fr) minmax(0,1fr) 96px 40px;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border)" style-hover="background:var(--surface2)">
+                    <div style="min-width:0"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div><div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.sub }}</div></div>
+                    <div style="display:flex;align-items:center;gap:8px;min-width:0"><span style="width:20px;height:20px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:8px;font-weight:700;color:{{ r.badgeColor }};background:{{ r.badgeBg }}">{{ r.abbr }}</span><div style="min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px">{{ r.source }}</div><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ r.srcUser }}</div></div></div>
+                    <div style="display:flex;gap:4px;flex-wrap:wrap;min-width:0">
+                      <sc-for list="{{ r.wss }}" as="x"><span style="height:22px;padding:0 8px;border-radius:6px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border)"><span style="width:6px;height:6px;border-radius:2px;background:{{ x.color }}"></span>{{ x.name }}</span></sc-for>
+                      <sc-if value="{{ r.noWs }}"><span style="font-size:12px;color:var(--faint)">—</span></sc-if>
+                    </div>
+                    <span style="font-size:12px;color:var(--muted);white-space:nowrap">{{ r.sync }}</span>
+                    <button onClick="{{ r.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isAccounts }}">
+              <sc-for list="{{ accGroups }}" as="g" hint-placeholder-count="3">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ g.color }}">{{ g.abbr }}</span>
+                    <span style="font-weight:600;font-size:15px">{{ g.label }}</span><span style="color:var(--faint);font-size:12px">{{ g.count }}</span>
+                    <div style="flex:1;height:1px;background:var(--border);margin:0 6px"></div>
+                    <button onClick="{{ g.onAdd }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500">+ {{ w.connect }}</button>
+                  </div>
+                  <sc-for list="{{ g.accounts }}" as="a">
+                    <div onContextMenu="{{ a.onMenu }}" style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--border)">
+                      <div style="width:34px;height:34px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:11px;color:oklch(0.2 0.02 230);background:{{ a.avBg }}">{{ a.ini }}</div>
+                      <div style="flex:1;min-width:0"><div style="font-weight:600">@{{ a.user }} <span style="font-weight:400;color:var(--muted)">· {{ a.name }}</span></div><div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ a.host }} · {{ a.method }}</div></div>
+                      <span style="font-size:12px;color:var(--muted);white-space:nowrap">{{ a.usedIn }}</span>
+                      <span style="height:22px;padding:0 9px;border-radius:11px;display:flex;align-items:center;font-size:11px;font-weight:600;white-space:nowrap;color:{{ a.ownerColor }};background:{{ a.ownerBg }}">{{ a.owner }}</span>
+                      <button onClick="{{ a.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </sc-if>
+
+            <sc-if value="{{ isTeam }}">
+              <div style="padding:16px 18px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <div style="flex:1;min-width:220px"><div style="font-weight:600">{{ tm.seats }}</div><div style="height:6px;border-radius:3px;background:var(--bg);margin-top:8px;overflow:hidden"><div style="height:100%;border-radius:3px;background:var(--accent);width:{{ tm.pct }}"></div></div></div>
+                <button onClick="{{ tm.onSeats }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500">{{ w.addSeats }}</button>
+              </div>
+              <div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);overflow:hidden">
+                <sc-for list="{{ tm.members }}" as="m" hint-placeholder-count="5">
+                  <div onContextMenu="{{ m.onMenu }}" style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border)">
+                    <span style="width:34px;height:34px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ m.avBg }};opacity:{{ m.opacity }}">{{ m.ini }}</span>
+                    <div style="flex:1;min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div><div style="font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.sub }}</div></div>
+                    <select value="{{ m.role }}" onChange="{{ m.onRole }}" disabled="{{ m.locked }}" style="height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--border);background:var(--bg)">
+                      <sc-for list="{{ m.roles }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                    </select>
+                    <button onClick="{{ m.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-for list="{{ cards }}" as="cd">
+              <div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);overflow:hidden">
+                <div style="padding:14px 18px"><div style="font-weight:600">{{ cd.title }}</div><sc-if value="{{ cd.hasSub }}"><div style="font-size:12px;color:var(--muted);margin-top:2px">{{ cd.sub }}</div></sc-if></div>
+                <sc-for list="{{ cd.rows }}" as="rw">
+                  <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;padding:12px 18px;border-top:1px solid var(--border)">
+                    <div style="flex:1 1 220px;min-width:0"><div style="font-weight:500">{{ rw.label }}</div><sc-if value="{{ rw.hasDesc }}"><div style="font-size:12px;color:var(--muted);margin-top:2px">{{ rw.desc }}</div></sc-if></div>
+                    <sc-if value="{{ rw.isInput }}"><input value="{{ rw.value }}" onChange="{{ rw.onChange }}" style="flex:0 1 300px;min-width:0;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0"></sc-if>
+                    <sc-if value="{{ rw.isButton }}"><button onClick="{{ rw.onBtn }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid {{ rw.btnBorder }};background:var(--bg);color:{{ rw.btnColor }};cursor:pointer;font-weight:500;white-space:nowrap">{{ rw.btnLabel }}</button></sc-if>
+                    <sc-if value="{{ rw.isToggle }}"><button onClick="{{ rw.onToggle }}" style="width:38px;height:22px;flex-shrink:0;border-radius:11px;border:0;padding:0;cursor:pointer;position:relative;background:{{ rw.tbg }}"><span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transform:{{ rw.tx }};transition:transform .15s"></span></button></sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:40;background:oklch(0.1 0.01 230 / 0.5);display:grid;place-items:center;padding:24px">
+      <div onClick="{{ stop }}" style="width:100%;max-width:460px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column">
+        <div style="padding:20px 22px 4px;font-size:16px;font-weight:600">{{ modal.title }}</div>
+        <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ modal.fields }}" as="f">
+            <sc-if value="{{ f.isInfo }}"><div style="padding:10px 12px;border-radius:9px;background:var(--bg);border:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.5">{{ f.text }}</div></sc-if>
+            <sc-if value="{{ f.isText }}"><label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span><input value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" style="height:38px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0"></label></sc-if>
+            <sc-if value="{{ f.isSelect }}"><label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span><select value="{{ f.value }}" onChange="{{ f.onChange }}" style="height:38px;padding:0 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ f.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label></sc-if>
+            <sc-if value="{{ f.isCheck }}"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onToggle }}" style="accent-color:var(--accent)"><span>{{ f.label }}</span></label></sc-if>
+          </sc-for>
+        </div>
+        <div style="padding:14px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+          <button onClick="{{ closeModal }}" style="height:38px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ w.cancel }}</button>
+          <button onClick="{{ submitModal }}" style="height:38px;padding:0 18px;border-radius:9px;border:0;cursor:pointer;font-weight:600;background:{{ modal.btnBg }};color:{{ modal.btnColor }}">{{ modal.submit }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasMenu }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenu }}" onContextMenu="{{ closeMenu }}" style="position:fixed;inset:0;z-index:50"></div>
+    <div style="position:fixed;left:{{ menu.x }}px;top:{{ menu.y }}px;z-index:51;min-width:220px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)">
+      <sc-for list="{{ menu.items }}" as="it">
+        <sc-if value="{{ it.isSep }}"><div style="height:1px;background:var(--border);margin:4px 6px"></div></sc-if>
+        <sc-if value="{{ it.notSep }}"><div onClick="{{ it.onClick }}" style="display:flex;align-items:center;height:32px;padding:0 10px;border-radius:7px;cursor:pointer;white-space:nowrap;color:{{ it.color }}" style-hover="background:var(--surface2)">{{ it.label }}</div></sc-if>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;right:20px;bottom:20px;z-index:60;display:flex;flex-direction:column;gap:8px;pointer-events:none">
+    <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0">
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:11px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-width:420px;animation:toastIn .2s ease-out"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ to.color }}"></span><span>{{ to.text }}</span></div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;startPage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;login&quot;,&quot;signup&quot;,&quot;dashboard&quot;],&quot;default&quot;:&quot;landing&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const W = {
+  features: ['Funciones', 'Features'], download: ['Descargar', 'Download'], vscode: ['VS Code', 'VS Code'], login: ['Iniciar sesión', 'Log in'], signup: ['Crear cuenta', 'Sign up'], openDash: ['Abrir panel', 'Open dashboard'],
+  heroTag: ['Conflictos resueltos línea a línea', 'Line-by-line conflict resolution'],
+  heroTitle: ['Un cliente de Git para todos tus repositorios y todas tus cuentas', 'A Git client for all your repositories and all your accounts'],
+  heroSub: ['Ramal muestra el historial de todas las ramas, resuelve conflictos línea a línea y trabaja con GitHub, GitLab, Bitbucket, Gitea y Azure DevOps a la vez, con varias cuentas en cada plataforma.', 'Ramal shows the history of every branch, resolves conflicts line by line and works with GitHub, GitLab, Bitbucket, Gitea and Azure DevOps at once, with several accounts on each platform.'],
+  dlFor: ['Descargar para {p}', 'Download for {p}'], allPlatforms: ['Todas las plataformas', 'All platforms'], vscodeLink: ['También como extensión para VS Code', 'Also available as a VS Code extension'],
+  featKicker: ['FUNCIONES', 'FEATURES'], featTitle: ['Todo lo que necesitas para trabajar con Git en equipo', 'Everything you need to work with Git as a team'],
+  f1: ['Grafo de todas las ramas', 'Graph of every branch'], f1t: ['Commits, ramas, tags y stashes en una sola vista. Con clic derecho haces checkout, merge, rebase, cherry-pick o reset.', 'Commits, branches, tags and stashes in one view. Right-click to checkout, merge, rebase, cherry-pick or reset.'],
+  f2: ['Conflictos línea a línea', 'Line-by-line conflicts'], f2t: ['Tu versión y la entrante lado a lado, y debajo el resultado final. Añade o quita cada línea con + y −.', 'Your version and the incoming one side by side, with the final result below. Add or remove each line with + and −.'],
+  f3: ['Varias cuentas por plataforma', 'Several accounts per platform'], f3t: ['Personal, trabajo y clientes en la misma app. Cada repositorio usa la cuenta que le corresponde para fetch, push y PRs.', 'Personal, work and client accounts in one app. Each repository uses its own account for fetch, push and PRs.'],
+  f4: ['Workspaces', 'Workspaces'], f4t: ['Agrupa repos por proyecto o por equipo. Un repo puede estar en varios workspaces y ves los pull requests de todos juntos.', 'Group repos by project or team. A repo can belong to several workspaces, and you see all their pull requests together.'],
+  f5: ['IA con tu propia llave', 'AI with your own key'], f5t: ['Conecta Anthropic, OpenAI, Groq u otro proveedor para redactar mensajes de commit y descripciones de pull requests.', 'Connect Anthropic, OpenAI, Groq or another provider to draft commit messages and pull request descriptions.'],
+  f6: ['Tu configuración en la nube', 'Your settings in the cloud'], f6t: ['Inicia sesión y tus workspaces, cuentas vinculadas y preferencias te siguen a cada equipo y a VS Code.', 'Sign in and your workspaces, linked accounts and preferences follow you to every machine and to VS Code.'],
+  vsKicker: ['EXTENSIÓN', 'EXTENSION'], vsTitle: ['Ramal dentro de VS Code', 'Ramal inside VS Code'],
+  vsText: ['El grafo, los cambios pendientes, el resolutor de conflictos y la IA, en el repositorio que tienes abierto. Usa el tema y el idioma de tu editor y la misma cuenta de Ramal.', 'The graph, pending changes, the conflict resolver and AI, for the repository you have open. It uses your editor theme and language and the same Ramal account.'],
+  copy: ['Copiar', 'Copy'], dlKicker: ['DESCARGA', 'DOWNLOAD'], dlTitle: ['Descargar Ramal', 'Download Ramal'], version: ['v2.4.0 · 30 sep 2026', 'v2.4.0 · Sep 30, 2026'], yourSystem: ['Tu sistema', 'Your system'],
+  reqMac: ['macOS 12 o posterior', 'macOS 12 or later'], reqWin: ['Windows 10 y 11', 'Windows 10 and 11'], reqLin: ['Ubuntu 20.04+, Fedora 38+, Debian 11+', 'Ubuntu 20.04+, Fedora 38+, Debian 11+'], reqVs: ['VS Code 1.90 o posterior', 'VS Code 1.90 or later'],
+  install: ['Instalar extensión', 'Install extension'], dlStarted: ['Descarga iniciada: {f} (simulado)', 'Download started: {f} (simulated)'], copied: ['Copiado: {x}', 'Copied: {x}'],
+  ctaTitle: ['Crea tu cuenta de Ramal', 'Create your Ramal account'], ctaText: ['Con una cuenta tus workspaces, cuentas vinculadas y preferencias se sincronizan entre la app de escritorio y VS Code, y puedes gestionar tu equipo desde la web.', 'With an account your workspaces, linked accounts and preferences sync between the desktop app and VS Code, and you can manage your team from the web.'],
+  docs: ['Documentación', 'Docs'], notes: ['Notas de la versión', 'Release notes'], status: ['Estado', 'Status'], privacy: ['Privacidad', 'Privacy'],
+  loginTitle: ['Iniciar sesión', 'Log in'], loginSub: ['Accede a tu configuración y a tu equipo.', 'Access your settings and your team.'], signupTitle: ['Crear cuenta', 'Create account'], signupSub: ['Sincroniza Ramal entre tus equipos y trabaja en equipo.', 'Sync Ramal across your machines and work as a team.'],
+  withP: ['Continuar con {p}', 'Continue with {p}'], orEmail: ['o con email', 'or with email'], email: ['Email', 'Email'], password: ['Contraseña', 'Password'], forgot: ['¿La olvidaste?', 'Forgot it?'], name: ['Nombre', 'Name'], orgName: ['Organización (opcional)', 'Organization (optional)'],
+  pwHint: ['Mínimo 8 caracteres', 'At least 8 characters'], pwOk: ['Contraseña válida', 'Valid password'], terms: ['Acepto los términos del servicio y la política de privacidad.', 'I accept the terms of service and privacy policy.'],
+  noAccount: ['¿No tienes cuenta?', 'No account yet?'], haveAccount: ['¿Ya tienes cuenta?', 'Already have an account?'],
+  errEmail: ['Escribe un email válido.', 'Enter a valid email.'], errPw: ['La contraseña debe tener al menos 8 caracteres.', 'Password must be at least 8 characters.'], errName: ['Escribe tu nombre.', 'Enter your name.'], errTerms: ['Debes aceptar los términos.', 'You must accept the terms.'],
+  resetSent: ['Te enviamos un enlace para restablecer la contraseña (simulado).', 'We sent you a password reset link (simulated).'], welcome: ['Sesión iniciada como {e}', 'Signed in as {e}'],
+  dOverview: ['Resumen', 'Overview'], dWorkspaces: ['Workspaces', 'Workspaces'], dRepos: ['Repositorios', 'Repositories'], dAccounts: ['Cuentas vinculadas', 'Linked accounts'], dTeam: ['Equipo', 'Team'], dSync: ['Configuración en la nube', 'Cloud settings'],
+  hello: ['Hola, {n}', 'Hi, {n}'], ovSub: ['Esto es lo que se sincroniza con tus dispositivos.', 'This is what syncs to your devices.'], devices: ['Dispositivos sincronizados', 'Synced devices'], syncedAgo: ['Sincronizado {a}', 'Synced {a}'], now: ['ahora', 'just now'],
+  wsSub: ['Los workspaces agrupan repositorios. Los compartidos aparecen para todo el equipo.', 'Workspaces group repositories. Shared ones show up for the whole team.'], newWs: ['Nuevo workspace', 'New workspace'],
+  shared: ['Compartido con {o}', 'Shared with {o}'], onlyYou: ['Solo tú', 'Only you'], noReposWs: ['Sin repositorios', 'No repositories'],
+  reposSub: ['Repositorios vinculados a tu cuenta. Los locales solo existen en el dispositivo donde se añadieron.', 'Repositories linked to your account. Local ones only exist on the device where they were added.'],
+  searchRepos: ['Buscar repositorio, cuenta o workspace…', 'Search repository, account or workspace…'], colRepo: ['Repositorio', 'Repository'], colSource: ['Origen', 'Source'], colWs: ['Workspaces', 'Workspaces'], colSync: ['Actualizado', 'Updated'],
+  localOn: ['Local · {d}', 'Local · {d}'], accSub: ['Cuentas de plataformas Git conectadas a Ramal. Los tokens se guardan cifrados.', 'Git platform accounts connected to Ramal. Tokens are stored encrypted.'], connect: ['Conectar', 'Connect'],
+  usedIn: ['{n} repos', '{n} repos'], ownerYou: ['Tuya', 'Yours'], ownerTeam: ['Equipo', 'Team'],
+  teamSub: ['Miembros de {o}, sus roles e invitaciones.', 'Members of {o}, their roles and invitations.'], invite: ['Invitar miembro', 'Invite member'], seats: ['{n} de {m} asientos usados', '{n} of {m} seats used'], addSeats: ['Añadir asientos', 'Add seats'],
+  pending: ['Invitación pendiente', 'Invitation pending'], owner: ['Propietaria', 'Owner'], admin: ['Admin', 'Admin'], member: ['Miembro', 'Member'], role: ['Rol', 'Role'],
+  syncSub: ['Qué se guarda en tu cuenta y se aplica en cada dispositivo al iniciar sesión.', 'What is stored in your account and applied on each device when you sign in.'],
+  profile: ['Perfil', 'Profile'], syncWhat: ['Qué se sincroniza', 'What syncs'], sWs: ['Workspaces y repositorios', 'Workspaces and repositories'], sAcc: ['Cuentas vinculadas', 'Linked accounts'], sAccD: ['Tokens cifrados de extremo a extremo', 'End-to-end encrypted tokens'],
+  sAiPrefs: ['Preferencias de IA', 'AI preferences'], sAiKeys: ['Llaves de IA', 'AI keys'], sAiKeysD: ['Desactivado: cada dispositivo guarda sus propias llaves', 'Off: each device keeps its own keys'], sGit: ['Preferencias de Git', 'Git preferences'], sLook: ['Apariencia', 'Appearance'], sLookD: ['En VS Code se usa siempre el tema del editor', 'VS Code always uses the editor theme'],
+  data: ['Datos', 'Data'], export: ['Exportar configuración', 'Export settings'], exportD: ['Descarga un JSON con todo lo sincronizado', 'Download a JSON with everything synced'], delete: ['Eliminar cuenta…', 'Delete account…'], deleteD: ['Borra tu cuenta y la configuración en la nube', 'Deletes your account and cloud settings'],
+  save: ['Guardar', 'Save'], cancel: ['Cancelar', 'Cancel'], create: ['Crear', 'Create'], remove: ['Quitar', 'Remove'], rename: ['Renombrar…', 'Rename…'], del: ['Eliminar', 'Delete'], saved: ['Cambios guardados', 'Changes saved'],
+  signOut: ['Cerrar sesión', 'Sign out'], signedOut: ['Sesión cerrada', 'Signed out'], invited: ['Invitación enviada a {e}', 'Invitation sent to {e}'], resend: ['Reenviar invitación', 'Resend invitation'],
+  revoke: ['Desconectar…', 'Disconnect…'], test: ['Probar conexión', 'Test connection'], ok: ['Listo: {x}', 'Done: {x}'], wsLabel: ['Workspaces', 'Workspaces'], unlink: ['Quitar de la cuenta…', 'Unlink from account…'],
+  signOutDevice: ['Cerrar sesión en este dispositivo', 'Sign out on this device'], platform: ['Plataforma', 'Platform'], host: ['Servidor', 'Host'], user: ['Usuario', 'Username'], token: ['Token de acceso', 'Access token'], teamAcc: ['Compartir con el equipo', 'Share with team'],
+  deleteConfirm: ['Esta acción es irreversible. Tus repositorios en disco no se tocan.', 'This cannot be undone. Repositories on disk are not touched.'], newOrg: ['Crear organización…', 'Create organization…'], personal: ['Personal', 'Personal']
+};
+const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
+
+class Component extends DCLogic {
+  state = { ready: false };
+  componentDidMount() { const go = () => window.RAMAL ? this.init() : setTimeout(go, 30); go(); this._k = e => { if (e.key === 'Escape') this.setState({ menu: null, modal: null }); }; window.addEventListener('keydown', this._k); }
+  componentWillUnmount() { window.removeEventListener('keydown', this._k); }
+  componentDidUpdate(pp) {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+    if (pp.theme !== this.props.theme && this.props.theme) this.setState({ theme: this.props.theme });
+    if (pp.lang !== this.props.lang && this.props.lang) this.setState({ lang: this.props.lang });
+    if (pp.startPage !== this.props.startPage && this.props.startPage) this.go(this.props.startPage);
+  }
+  init() {
+    const R = window.RAMAL, sp = this.props.startPage || 'landing';
+    const ua = navigator.userAgent; const os = /Win/.test(ua) ? 'win' : /Linux|X11/.test(ua) && !/Android/.test(ua) ? 'linux' : 'mac';
+    this.setState({ ready: true, theme: this.props.theme || 'dark', lang: this.props.lang || 'es', os,
+      page: sp === 'dashboard' ? 'dash' : sp, user: sp === 'dashboard' ? { name: 'Marta Ruiz', email: 'marta@ramal.dev' } : null, dsec: 'overview',
+      form: { email: '', password: '', name: '', org: '' }, terms: false, err: '',
+      workspaces: R.WS.map((w, i) => ({ ...w, shared: i !== 2 })), repos: R.REPOS.map(r => ({ ...r })), accounts: R.ACCOUNTS.map((a, i) => ({ ...a, team: i === 1 || i === 2 })), members: R.MEMBERS.map(m => ({ ...m })),
+      devices: [{ abbr: 'MAC', name: 'MacBook Pro de Marta', app: 'Ramal Desktop 2.4.0 · macOS 15', mins: 2 }, { abbr: 'VS', name: 'VS Code · ubuntu-dev', app: 'Extensión 1.3.0 · Ubuntu 24.04', mins: 40 }, { abbr: 'WIN', name: 'PC-OFICINA', app: 'Ramal Desktop 2.3.1 · Windows 11', mins: 4320 }],
+      sync: { ws: true, acc: true, aiPrefs: true, aiKeys: false, git: true, look: true }, seats: 5, rq: '', menu: null, modal: null, toasts: [] });
+  }
+  w(k, v) { const e = W[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  ago(m) { const en = this.state.lang === 'en'; if (m < 1) return this.w('now'); if (m < 60) return en ? `${m} min ago` : `hace ${m} min`; if (m < 1440) { const h = Math.round(m / 60); return en ? `${h}h ago` : `hace ${h} h`; } const d = Math.round(m / 1440); return en ? `${d}d ago` : `hace ${d} d`; }
+  toast(text, kind) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
+  copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.toast(this.w('copied', { x })); }
+  dl(file) { this.toast(this.w('dlStarted', { f: file })); }
+  go(page) { this.setState({ page: page === 'dashboard' ? (this.state.user ? 'dash' : 'login') : page, err: '', menu: null }); window.scrollTo(0, 0); }
+  scrollTo(id) { if (this.state.page !== 'landing') { this.setState({ page: 'landing' }); setTimeout(() => this.scrollTo(id), 60); return; } const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: 'smooth' }); }
+  openMenu(e, items) { e.preventDefault(); e.stopPropagation(); const h = items.reduce((a, i) => a + (i.sep ? 9 : 32), 14); this.setState({ menu: { x: Math.max(8, Math.min(e.clientX, window.innerWidth - 240)), y: Math.max(8, Math.min(e.clientY, window.innerHeight - h - 8)), items } }); }
+  openForm(cfg) { const values = {}; cfg.fields.forEach(f => { if (f.key) values[f.key] = f.value !== undefined ? f.value : (f.type === 'check' ? false : ''); }); this.setState({ modal: { ...cfg, values }, menu: null }); }
+  setVal(k, v) { this.setState(s => ({ modal: { ...s.modal, values: { ...s.modal.values, [k]: v } } })); }
+  confirm(title, text, label, fn) { this.openForm({ title, danger: true, submitLabel: label, fields: [{ type: 'info', text }], onSubmit: fn }); }
+  submitAuth = () => {
+    const s = this.state, f = s.form, su = s.page === 'signup';
+    let err = '';
+    if (su && !f.name.trim()) err = this.w('errName'); else if (!/^\S+@\S+\.\S+$/.test(f.email)) err = this.w('errEmail'); else if (f.password.length < 8) err = this.w('errPw'); else if (su && !s.terms) err = this.w('errTerms');
+    if (err) { this.setState({ err }); return; }
+    const user = { name: su ? f.name.trim() : 'Marta Ruiz', email: f.email };
+    this.setState({ user, page: 'dash', dsec: 'overview', err: '' }); window.scrollTo(0, 0); this.toast(this.w('welcome', { e: f.email }));
+  };
+  oauth(p) { this.setState({ user: { name: 'Marta Ruiz', email: 'marta@ramal.dev' }, page: 'dash', dsec: 'overview', err: '' }); this.toast(this.w('welcome', { e: 'marta@ramal.dev · ' + p })); }
+  signOut() { this.setState({ user: null, page: 'landing', menu: null }); this.toast(this.w('signedOut')); }
+  newWs() { this.openForm({ title: this.w('newWs'), submitLabel: this.w('create'), fields: [{ type: 'text', key: 'name', label: this.w('name'), placeholder: 'Frontend' }, { type: 'check', key: 'shared', label: this.w('shared', { o: 'ACME Studio' }), value: true }], onSubmit: v => { const n = (v.name || '').trim(); if (!n) return false; const L = window.RAMAL.LANE; this.setState(s => ({ workspaces: [...s.workspaces, { id: 'w' + Date.now(), name: n, color: L[s.workspaces.length % L.length], shared: v.shared }] })); } }); }
+  addAcc(p) { const P = window.RAMAL.PLAT; this.openForm({ title: this.w('connect') + ' · ' + P[p || 'github'].label, submitLabel: this.w('connect'), fields: [{ type: 'select', key: 'platform', label: this.w('platform'), value: p || 'github', options: Object.keys(P).map(k => ({ value: k, label: P[k].label })) }, { type: 'text', key: 'host', label: this.w('host'), placeholder: 'github.com' }, { type: 'text', key: 'user', label: this.w('user') }, { type: 'text', key: 'token', label: this.w('token'), placeholder: '••••••••' }, { type: 'check', key: 'team', label: this.w('teamAcc') }], onSubmit: v => { const u = (v.user || '').trim(); if (!u) return false; this.setState(s => ({ accounts: [...s.accounts, { id: 'a' + Date.now(), platform: v.platform, user: u, name: '—', host: v.host || { github: 'github.com', gitlab: 'gitlab.com', bitbucket: 'bitbucket.org', gitea: 'gitea.com', azure: 'dev.azure.com' }[v.platform], method: 'Token (PAT)', team: v.team }] })); } }); }
+  invite() { this.openForm({ title: this.w('invite'), submitLabel: this.w('invite'), fields: [{ type: 'text', key: 'email', label: this.w('email'), placeholder: 'nombre@empresa.com' }, { type: 'select', key: 'role', label: this.w('role'), value: 'member', options: [{ value: 'member', label: this.w('member') }, { value: 'admin', label: this.w('admin') }] }], onSubmit: v => { const e = (v.email || '').trim(); if (!e.includes('@')) return false; this.setState(s => ({ members: [...s.members, { name: e, email: e, role: v.role, ini: e[0].toUpperCase(), lane: s.members.length % 5, pending: true }], seats: Math.max(s.seats, s.members.length + 1) })); this.toast(this.w('invited', { e })); } }); }
+
+  renderVals() {
+    const s = this.state;
+    if (!s.ready || !window.RAMAL) return { isPublic: true, isLanding: true, w: {} };
+    const R = window.RAMAL, P = R.PLAT, LANE = R.LANE, wf = this.w.bind(this), L = s.lang === 'en' ? 1 : 0;
+    const w = {}; for (const k in W) w[k] = W[k][L];
+    const osName = { mac: 'macOS', win: 'Windows', linux: 'Linux' }[s.os];
+    w.dlFor = wf('dlFor', { p: osName });
+    const accById = Object.fromEntries(s.accounts.map(a => [a.id, a])), wsById = Object.fromEntries(s.workspaces.map(x => [x.id, x]));
+    const isDash = s.page === 'dash' && !!s.user;
+    const base = { w, isPublic: !isDash, isDash, isLanding: !isDash && s.page === 'landing', isAuth: !isDash && (s.page === 'login' || s.page === 'signup'), loggedIn: !!s.user, loggedOut: !s.user,
+      goLanding: () => this.go('landing'), goLogin: () => this.go('login'), goSignup: () => this.go('signup'), goDash: () => this.go('dashboard'), goDownload: () => this.scrollTo('download'), goVscode: () => this.scrollTo('vscode'),
+      langOpts: [['es', 'ES'], ['en', 'EN']].map(([k, l]) => ({ label: l, bg: s.lang === k ? 'var(--accent)' : 'transparent', color: s.lang === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ lang: k }) })),
+      themeOpts: [['light', '☀︎'], ['dark', '☾']].map(([k, l]) => ({ label: l, title: k, bg: s.theme === k ? 'var(--accent)' : 'transparent', color: s.theme === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ theme: k }) })),
+      closeModal: () => this.setState({ modal: null }), stop: e => e.stopPropagation(), closeMenu: e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ menu: null }); },
+      submitModal: () => { const m = s.modal; if (m && m.onSubmit(m.values) !== false) this.setState({ modal: null }); }, hasModal: !!s.modal, hasMenu: !!s.menu,
+      toasts: s.toasts.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : 'var(--ok)' })) };
+    if (s.menu) base.menu = { x: s.menu.x, y: s.menu.y, items: s.menu.items.map(it => ({ isSep: !!it.sep, notSep: !it.sep, label: it.label, color: it.danger ? 'var(--danger)' : 'var(--text)', onClick: () => { this.setState({ menu: null }); it.action && it.action(); } })) };
+    if (s.modal) { const m = s.modal, mv = m.values; base.modal = { title: m.title, submit: m.submitLabel, btnBg: m.danger ? 'var(--danger)' : 'var(--accent)', btnColor: m.danger ? 'white' : 'var(--accent-ink)', fields: m.fields.map(f => { const v = f.key ? mv[f.key] : undefined; return { isInfo: f.type === 'info', isText: f.type === 'text', isSelect: f.type === 'select', isCheck: f.type === 'check', label: f.label || '', text: f.text || '', value: v == null ? '' : v, placeholder: f.placeholder || '', checked: !!v, options: f.options || [], onChange: e => this.setVal(f.key, e.target.value), onToggle: e => this.setVal(f.key, e.target.checked) }; }) }; }
+
+    if (!isDash) {
+      base.navLinks = [[w.features, () => this.scrollTo('features-anchor')], [w.download, () => this.scrollTo('download')], [w.vscode, () => this.scrollTo('vscode')]].map(([label, onClick]) => ({ label, onClick }));
+      if (base.isLanding) {
+        base.dlPrimary = () => this.dl({ mac: 'Ramal-2.4.0-arm64.dmg', win: 'Ramal-Setup-2.4.0-x64.exe', linux: 'ramal_2.4.0_amd64.deb' }[s.os]);
+        base.features = [1, 2, 3, 4, 5, 6].map(i => ({ n: '0' + i, title: w['f' + i], text: w['f' + i + 't'] }));
+        base.dlVsMarket = () => this.dl('ramal.ramal @ VS Code Marketplace'); base.dlVsOpen = () => this.dl('ramal.ramal @ Open VSX'); base.copyVsCmd = () => this.copy('code --install-extension ramal.ramal');
+        const plat = (id, name, req, main, mainFile, alts, cmd) => ({ name, req, main, isYours: s.os === id, border: s.os === id ? 'var(--accent)' : 'var(--border)', onMain: () => this.dl(mainFile), alts: alts.map(([label, size, file]) => ({ label, size, onClick: () => this.dl(file || label) })), cmd, onCopy: () => this.copy(cmd) });
+        base.platforms = [
+          plat('mac', 'macOS', w.reqMac, 'Apple Silicon (.dmg)', 'Ramal-2.4.0-arm64.dmg', [['Intel (.dmg)', '118 MB', 'Ramal-2.4.0-x64.dmg'], ['Universal (.zip)', '231 MB', 'Ramal-2.4.0-universal.zip']], 'brew install --cask ramal'),
+          plat('win', 'Windows', w.reqWin, 'x64 (.exe)', 'Ramal-Setup-2.4.0-x64.exe', [['ARM64 (.exe)', '104 MB', 'Ramal-Setup-2.4.0-arm64.exe'], ['x64 (.msi)', '109 MB', 'Ramal-2.4.0-x64.msi'], ['Portable (.zip)', '121 MB', 'Ramal-2.4.0-win-portable.zip']], 'winget install Ramal.Ramal'),
+          plat('linux', 'Linux', w.reqLin, 'Debian / Ubuntu (.deb)', 'ramal_2.4.0_amd64.deb', [['Fedora / RHEL (.rpm)', '97 MB', 'ramal-2.4.0.x86_64.rpm'], ['AppImage', '112 MB', 'Ramal-2.4.0.AppImage'], ['Flathub', '—', 'io.ramal.Ramal (Flathub)'], ['ARM64 (.deb)', '94 MB', 'ramal_2.4.0_arm64.deb']], 'flatpak install flathub io.ramal.Ramal'),
+          plat('vscode', 'VS Code', w.reqVs, w.install, 'ramal.ramal @ VS Code Marketplace', [['Open VSX (VSCodium, Cursor)', '6 MB', 'ramal.ramal @ Open VSX'], ['.vsix', '6 MB', 'ramal-1.3.0.vsix']], 'code --install-extension ramal.ramal')
+        ];
+        base.footLinks = [w.docs, w.notes, w.status, w.privacy].map(label => ({ label, onClick: () => this.toast(wf('ok', { x: label })) }));
+      }
+      if (base.isAuth) {
+        const su = s.page === 'signup', f = s.form, setF = k => e => this.setState({ form: { ...s.form, [k]: e.target.value }, err: '' });
+        const fld = (k, label, type, ph, extra) => ({ label, type, value: f[k], placeholder: ph, onChange: setF(k), border: 'var(--border)', hasLink: false, hasHint: false, ...extra });
+        const pwOk = f.password.length >= 8;
+        base.au = { isSignup: su, title: su ? w.signupTitle : w.loginTitle, sub: su ? w.signupSub : w.loginSub, submit: su ? w.signup : w.login,
+          oauth: [['github', 'GitHub'], ['gitlab', 'GitLab'], ['google', 'Google']].map(([k, l]) => ({ label: wf('withP', { p: l }), abbr: k === 'google' ? 'G' : P[k].abbr, color: k === 'google' ? 'oklch(0.6 0.15 255)' : P[k].color, onClick: () => this.oauth(l) })),
+          fields: [...(su ? [fld('name', w.name, 'text', 'Marta Ruiz')] : []), fld('email', w.email, 'email', 'tu@empresa.com'),
+            fld('password', w.password, 'password', '••••••••', su ? { hasHint: true, hint: pwOk ? w.pwOk : w.pwHint, hintColor: pwOk ? 'var(--ok)' : 'var(--faint)' } : { hasLink: true, link: w.forgot, onLink: e => { e.preventDefault(); this.toast(w.resetSent); } }),
+            ...(su ? [fld('org', w.orgName, 'text', 'ACME Studio')] : [])],
+          terms: s.terms, onTerms: e => this.setState({ terms: e.target.checked, err: '' }), hasError: !!s.err, error: s.err, onSubmit: this.submitAuth,
+          switchText: su ? w.haveAccount : w.noAccount, switchLink: su ? w.login : w.signup, onSwitch: () => this.go(su ? 'login' : 'signup') };
+      }
+      return base;
+    }
+
+    // dashboard
+    const u = s.user, sec = s.dsec;
+    base.me = { ini: u.name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase() };
+    base.org = { name: 'ACME Studio', ini: 'AS' };
+    base.onOrg = e => this.openMenu(e, [{ label: '✓  ACME Studio', action: () => {} }, { label: '    ' + w.personal, action: () => {} }, { sep: 1 }, { label: w.newOrg, action: () => this.toast(wf('ok', { x: w.newOrg.replace('…', '') })) }]);
+    base.onUserMenu = e => this.openMenu(e, [{ label: u.email, action: () => {} }, { sep: 1 }, { label: w.dSync, action: () => this.setState({ dsec: 'sync' }) }, { label: w.download, action: () => this.scrollTo('download') }, { sep: 1 }, { label: w.signOut, danger: 1, action: () => this.signOut() }]);
+    base.dNav = [['overview', w.dOverview, ''], ['workspaces', w.dWorkspaces, s.workspaces.length], ['repos', w.dRepos, s.repos.length], ['accounts', w.dAccounts, s.accounts.length], ['team', w.dTeam, s.members.length], ['sync', w.dSync, '']].map(([k, l, c]) => ({ label: l, count: String(c), bg: sec === k ? 'var(--accent-soft)' : 'transparent', color: sec === k ? 'var(--accent)' : 'var(--text)', onClick: () => this.setState({ dsec: k }) }));
+    Object.assign(base, { isOverview: sec === 'overview', isWorkspaces: sec === 'workspaces', isRepos: sec === 'repos', isAccounts: sec === 'accounts', isTeam: sec === 'team', cards: [] });
+    const repoSrc = r => { const a = accById[r.acc], p = a ? P[a.platform] : null; return { abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)', source: p ? p.label : wf('localOn', { d: 'MacBook Pro' }), srcUser: p ? '@' + a.user : '' }; };
+    let dh = { title: '', sub: '', hasAction: false };
+    if (sec === 'overview') {
+      dh = { title: wf('hello', { n: u.name.split(' ')[0] }), sub: w.ovSub, hasAction: false };
+      base.ov = { tiles: [[s.workspaces.length, w.dWorkspaces, 'workspaces'], [s.repos.length, w.dRepos, 'repos'], [s.accounts.length, w.dAccounts, 'accounts'], [s.members.length, w.dTeam, 'team']].map(([value, label, k]) => ({ value: String(value), label, onClick: () => this.setState({ dsec: k }) })),
+        devices: s.devices.map((d, i) => ({ ...d, sync: wf('syncedAgo', { a: this.ago(d.mins) }), dot: d.mins < 60 ? 'var(--ok)' : 'var(--warn)', onMenu: e => this.openMenu(e, [{ label: w.signOutDevice, danger: 1, action: () => this.setState(x => ({ devices: x.devices.filter((_, j) => j !== i) })) }]) })) };
+    }
+    if (sec === 'workspaces') {
+      dh = { title: w.dWorkspaces, sub: w.wsSub, hasAction: true, action: '+ ' + w.newWs, onAction: () => this.newWs() };
+      base.wsCards = s.workspaces.map(x => { const rs = s.repos.filter(r => r.wss.includes(x.id)); return { name: x.name, color: x.color, empty: !rs.length, repos: rs.map(r => { const src = repoSrc(r); return { name: r.alias || r.name, abbr: src.abbr, color: src.badgeBg }; }),
+        tbg: x.shared ? 'var(--accent)' : 'var(--border)', tx: x.shared ? 'translateX(14px)' : 'none', shareLabel: x.shared ? wf('shared', { o: 'ACME Studio' }) : w.onlyYou,
+        onShare: () => this.setState(y => ({ workspaces: y.workspaces.map(z => z.id === x.id ? { ...z, shared: !z.shared } : z) })),
+        onMenu: e => this.openMenu(e, [{ label: w.rename, action: () => this.openForm({ title: w.rename.replace('…', ''), submitLabel: w.save, fields: [{ type: 'text', key: 'name', label: w.name, value: x.name }], onSubmit: v => this.setState(y => ({ workspaces: y.workspaces.map(z => z.id === x.id ? { ...z, name: v.name || z.name } : z) })) }) }, { sep: 1 }, { label: w.del, danger: 1, action: () => this.confirm(w.del + ' · ' + x.name, w.noReposWs, w.del, () => this.setState(y => ({ workspaces: y.workspaces.filter(z => z.id !== x.id), repos: y.repos.map(r => ({ ...r, wss: r.wss.filter(id => id !== x.id) })) }))) }]) }; });
+    }
+    if (sec === 'repos') {
+      dh = { title: w.dRepos, sub: w.reposSub, hasAction: false };
+      const q = s.rq.trim().toLowerCase();
+      base.rq = s.rq; base.onRq = e => this.setState({ rq: e.target.value });
+      base.repoRows = s.repos.filter(r => { if (!q) return true; const src = repoSrc(r).source; const wsn = r.wss.map(id => (wsById[id] || {}).name).join(' '); return (r.name + ' ' + r.alias + ' ' + src + ' ' + wsn).toLowerCase().includes(q); }).map(r => { const wl = r.wss.map(id => wsById[id]).filter(Boolean);
+        return { name: r.alias || r.name, sub: r.alias ? r.name : r.path, ...repoSrc(r), wss: wl.map(x => ({ name: x.name, color: x.color })), noWs: !wl.length, sync: this.ago(r.mins),
+          onMenu: e => this.openMenu(e, [...s.workspaces.map(x => ({ label: (r.wss.includes(x.id) ? '✓  ' : '     ') + x.name, action: () => this.setState(y => ({ repos: y.repos.map(z => z.id !== r.id ? z : { ...z, wss: z.wss.includes(x.id) ? z.wss.filter(i => i !== x.id) : [...z.wss, x.id] }) })) })), { sep: 1 }, { label: w.unlink, danger: 1, action: () => this.confirm(w.unlink.replace('…', ''), r.alias || r.name, w.remove, () => this.setState(y => ({ repos: y.repos.filter(z => z.id !== r.id) }))) }]) }; });
+    }
+    if (sec === 'accounts') {
+      dh = { title: w.dAccounts, sub: w.accSub, hasAction: true, action: '+ ' + w.connect, onAction: () => this.addAcc('github') };
+      base.accGroups = Object.keys(P).map(k => { const list = s.accounts.filter(a => a.platform === k); return { label: P[k].label, abbr: P[k].abbr, color: P[k].color, count: list.length, onAdd: () => this.addAcc(k),
+        accounts: list.map((a, i) => ({ user: a.user, name: a.name, host: a.host, method: a.method, ini: a.user.slice(0, 2).toUpperCase(), avBg: LANE[(i + k.length) % LANE.length], usedIn: wf('usedIn', { n: s.repos.filter(r => r.acc === a.id).length }), owner: a.team ? w.ownerTeam : w.ownerYou, ownerColor: a.team ? 'var(--info)' : 'var(--accent)', ownerBg: tint(a.team ? 'var(--info)' : 'var(--accent)', 14),
+          onMenu: e => this.openMenu(e, [{ label: w.test, action: () => this.toast(wf('ok', { x: w.test + ' @' + a.user })) }, { label: (a.team ? '✓  ' : '     ') + w.teamAcc, action: () => this.setState(y => ({ accounts: y.accounts.map(z => z.id === a.id ? { ...z, team: !z.team } : z) })) }, { sep: 1 }, { label: w.revoke, danger: 1, action: () => this.confirm(w.revoke.replace('…', '') + ' @' + a.user, a.host, w.remove, () => this.setState(y => ({ accounts: y.accounts.filter(z => z.id !== a.id) }))) }]) })) }; });
+    }
+    if (sec === 'team') {
+      dh = { title: w.dTeam, sub: wf('teamSub', { o: 'ACME Studio' }), hasAction: true, action: '+ ' + w.invite, onAction: () => this.invite() };
+      const n = s.members.length;
+      base.tm = { seats: wf('seats', { n, m: s.seats }), pct: Math.min(100, Math.round(n / s.seats * 100)) + '%', onSeats: () => { this.setState(x => ({ seats: x.seats + 1 })); this.toast(wf('ok', { x: w.addSeats })); },
+        members: s.members.map(m => ({ ini: m.ini, name: m.name, sub: m.pending ? w.pending : m.email, avBg: LANE[m.lane], opacity: m.pending ? 0.5 : 1, role: m.role, locked: m.role === 'owner',
+          roles: (m.role === 'owner' ? ['owner'] : ['admin', 'member']).map(r => ({ value: r, label: w[r] })), onRole: e => this.setState(x => ({ members: x.members.map(y => y.email === m.email ? { ...y, role: e.target.value } : y) })),
+          onMenu: e => this.openMenu(e, m.role === 'owner' ? [{ label: m.email, action: () => this.copy(m.email) }] : [...(m.pending ? [{ label: w.resend, action: () => this.toast(wf('invited', { e: m.email })) }] : []), { label: m.email, action: () => this.copy(m.email) }, { sep: 1 }, { label: w.remove, danger: 1, action: () => this.confirm(w.remove + ' · ' + m.name, m.email, w.remove, () => this.setState(x => ({ members: x.members.filter(y => y.email !== m.email) }))) }]) })) };
+    }
+    if (sec === 'sync') {
+      dh = { title: w.dSync, sub: w.syncSub, hasAction: true, action: w.save, onAction: () => this.toast(w.saved) };
+      const R0 = { isInput: false, isButton: false, isToggle: false, hasDesc: false, desc: '' };
+      const tog = (label, desc, k) => ({ ...R0, label, desc: desc || '', hasDesc: !!desc, isToggle: true, tbg: s.sync[k] ? 'var(--accent)' : 'var(--border)', tx: s.sync[k] ? 'translateX(16px)' : 'none', onToggle: () => this.setState(x => ({ sync: { ...x.sync, [k]: !x.sync[k] } })) });
+      const inp = (label, k) => ({ ...R0, label, isInput: true, value: u[k], onChange: e => this.setState({ user: { ...u, [k]: e.target.value } }) });
+      const btn = (label, desc, b, fn, danger) => ({ ...R0, label, desc, hasDesc: true, isButton: true, btnLabel: b, onBtn: fn, btnColor: danger ? 'var(--danger)' : 'var(--text)', btnBorder: danger ? 'var(--danger)' : 'var(--border)' });
+      base.cards = [
+        { title: w.profile, hasSub: false, sub: '', rows: [inp(w.name, 'name'), inp(w.email, 'email')] },
+        { title: w.syncWhat, hasSub: false, sub: '', rows: [tog(w.sWs, '', 'ws'), tog(w.sAcc, w.sAccD, 'acc'), tog(w.sAiPrefs, '', 'aiPrefs'), tog(w.sAiKeys, w.sAiKeysD, 'aiKeys'), tog(w.sGit, '', 'git'), tog(w.sLook, w.sLookD, 'look')] },
+        { title: w.data, hasSub: false, sub: '', rows: [btn(w.export, w.exportD, '↓ JSON', () => this.dl('ramal-settings.json')), btn(w.delete.replace('…', ''), w.deleteD, w.delete, () => this.confirm(w.delete.replace('…', ''), w.deleteConfirm, w.del, () => this.signOut()), true)] }
+      ];
+    }
+    base.dh = dh;
+    return base;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+# ADR 0010: Un solo motor en Rust para escritorio y VS Code, como sidecar JSON-RPC en VS Code
+
+- Estado: aceptado
+- Fecha: 2026-09-30
+
+## Contexto
+
+Ramal for VS Code ensena la misma vista de repositorio que Ramal Desktop, sin lista de
+repositorios ni workspaces: el grafo, los cambios con staging, ramas, remotos, PRs, stashes y
+tags, el resolver de conflictos, el diff, los ajustes, commit y commit con push, mensaje de commit
+con IA, la barra de estado y "Abrir en Ramal Desktop". Por debajo necesita lo mismo que
+escritorio: git con varias cuentas por repositorio, las APIs de las plataformas, los proveedores
+de IA, la sesion de Ramal y la boveda de secretos.
+
+La extension corre en el extension host de VS Code, que es Node. Las opciones para darle un motor
+eran:
+
+- La API `vscode.git` que trae VS Code.
+- Lanzar el git CLI desde TypeScript, que es el modelo de GitLens.
+- El mismo motor de Rust que usa escritorio, como binario sidecar.
+- El mismo motor como addon nativo de Node (napi-rs).
+- Git en WebAssembly (isomorphic-git).
+
+La decision de partida del usuario es la tercera: **un solo motor en Rust**, que escritorio usa
+en proceso desde el host de Tauri y VS Code lleva como sidecar `ramal-vscode-engine` por stdio
+con JSON-RPC, en paquetes VSIX por plataforma (el modelo de rust-analyzer), con el extension host
+fino. Este ADR la desarrolla.
+
+## Decision
+
+### `ramal-engine` es la unica puerta
+
+Los dos hosts llaman a la misma funcion, `Engine::handle(RpcRequest) -> Option<RpcResponse>`, que
+deserializa los parametros, llama al caso de uso y serializa el resultado. Por eso el protocolo es
+identico en los dos productos: los metodos, los DTOs y los errores los define `ramal-protocol` una
+vez ([ADR 0011](0011-ui-compartida-y-puente-tipado.md)), y ningun host tiene una lista propia de
+metodos.
+
+- **Escritorio:** el motor vive en el proceso de Tauri. Un unico comando de negocio, `rpc`, recibe
+  un `RpcRequest` y devuelve la respuesta; las notificaciones (progreso, cambios del repositorio,
+  tokens de IA) salen por un `Channel` de Tauri.
+- **VS Code:** el motor vive en un proceso hijo, `ramal-vscode-engine`, que habla JSON-RPC 2.0 por
+  stdin y stdout.
+
+### El sidecar: JSON-RPC 2.0 con marcos de estilo LSP
+
+- Marcos `Content-Length: <bytes>\r\n\r\n` seguidos de exactamente esos bytes de JSON en UTF-8,
+  como LSP. Otras cabeceras se ignoran. Un marco de mas de 32 MiB se rechaza y se cierra la
+  conexion.
+- Una tarea por peticion y una unica tarea que escribe en stdout, para que dos respuestas nunca se
+  mezclen.
+- **stdout es solo protocolo.** Todo el log va a stderr con `tracing-subscriber`, y el extension
+  host lo vuelca en el canal de salida "Ramal Engine". Un `println!` romperia el protocolo, y por
+  eso `print_stdout` esta denegado en clippy en todo el workspace
+  ([ADR 0005](0005-enforcement-automatizado.md)).
+- El sidecar termina cuando se cierra su stdin: si el extension host muere, el motor no se queda
+  huerfano.
+- Notificaciones de control con prefijo `$/`: `$/cancel` para cancelar una peticion y
+  `$/progress` para las operaciones largas, con los codigos de LSP donde existen (-32800 para una
+  peticion cancelada).
+
+### El extension host se queda fino
+
+Hace lo que solo el puede hacer y nada mas:
+
+- Activacion, comandos, paneles y vistas de VS Code, barra de estado, `AuthenticationProvider` y
+  `UriHandler` para el inicio de sesion ([ADR 0008](0008-autenticacion-con-tokens.md)).
+- Arrancar, vigilar y reiniciar el sidecar.
+- Validar y enrutar los mensajes de los webviews. Un webview pinta contenido no confiable
+  (mensajes de commit, nombres de rama, contenido de ficheros) y se trata como un cliente hostil:
+  el host comprueba origen, tamano (1 MiB), forma (zod), que el metodo este en la lista generada
+  de metodos y en la de su superficie, y reescribe los ids para que un webview no pueda chocar con
+  otro ni cancelar peticiones ajenas. El motor vuelve a validar despues.
+- Resolver las peticiones nativas (dialogos, QuickPick, abrir un fichero, copiar) con la API de VS
+  Code, sin pasar por el sidecar.
+- Guardar secretos en `SecretStorage`.
+- Leer de la API `vscode.git` solo tres cosas: la ruta de git configurada (que pasa al sidecar),
+  el descubrimiento de repositorios en workspaces con varias carpetas y los avisos de "el
+  repositorio cambio" como pista para refrescar.
+
+No lanza git, no parsea salida de git, no llama a ninguna API de plataforma ni de IA y no calcula
+el grafo.
+
+### Secretos por peticion inversa
+
+El motor no guarda secretos en disco. Cuando necesita el refresh token de Ramal, el token de una
+plataforma o la llave de la boveda, manda al extension host una peticion JSON-RPC en sentido
+inverso (del servidor al cliente, como hace LSP), y el extension host responde con
+`context.secrets`. En escritorio el mismo puerto `SecretStore` lo implementa el llavero del
+sistema. El caso de uso no sabe cual de los dos tiene delante.
+
+### Ciclo de vida
+
+- El extension host arranca el sidecar la primera vez que hace falta, no al activarse la
+  extension.
+- Al arrancar, llama a `engine/info` y compara `PROTOCOL_VERSION` con la que trae generada. Como
+  los dos viajan en el mismo VSIX, una diferencia es un fallo de empaquetado y se ensena como tal.
+- Si el sidecar muere, lo reinicia tras 1, 2, 4, 8 y 16 segundos. Con cinco caidas en tres
+  minutos deja de intentarlo y muestra una notificacion con "Reintentar". Las peticiones
+  pendientes fallan con el tipo `engine_unavailable`, que genera el propio host, en vez de
+  quedarse colgadas.
+- Cada ventana de VS Code tiene su extension host y por tanto su sidecar. Todos comparten
+  `SecretStorage`, y de ahi sale la ventana de 30 segundos del refresco de sesion
+  ([ADR 0008](0008-autenticacion-con-tokens.md)).
+
+### VSIX por plataforma
+
+- Un VSIX por destino, con `vsce package --target` y `ovsx publish --target`: `win32-x64`,
+  `win32-arm64`, `darwin-x64`, `darwin-arm64`, `linux-x64`, `linux-arm64`, `alpine-x64` y
+  `alpine-arm64`. Cada uno lleva solo su binario en `dist/bin/ramal-vscode-engine` (con `.exe` en
+  Windows). Los de Alpine se compilan para musl, que es lo que usan muchos contenedores de
+  desarrollo.
+- Se publica en el Marketplace de Visual Studio y en Open VSX, que es de donde instalan VSCodium,
+  Cursor y otros derivados.
+- `extensionKind: ["workspace"]`: en Remote SSH, WSL y contenedores, la extension y el motor
+  corren junto al repositorio, y VS Code instala el VSIX de la plataforma remota.
+- `capabilities.virtualWorkspaces: false` (no hay git local en vscode.dev ni en github.dev) y
+  `capabilities.untrustedWorkspaces.supported: false`, porque ejecutar git en una carpeta no
+  confiable puede ejecutar sus hooks y su configuracion.
+- **La ruta del binario no la elige un ajuste en produccion.** Siempre es la del VSIX. Solo en modo
+  desarrollo (`ExtensionMode.Development`) se acepta el ajuste `ramal.engine.path`, de ambito
+  aplicacion, para apuntar a `target/debug`. Un ajuste de workspace que eligiera el binario seria
+  ejecucion de codigo con solo abrir una carpeta.
+
+## Consecuencias
+
+A favor:
+
+- Una sola implementacion de git, credenciales por cuenta, plataformas, IA, sesion y boveda para
+  los dos productos. Un fallo se arregla una vez.
+- El mismo protocolo en los dos hosts, asi que `@ramal/repo-view` no sabe en cual esta.
+- VS Code recibe el grafo ya calculado en Rust y por ventanas, sin mandar el historial entero a un
+  webview.
+- Funciona en Remote SSH, WSL y contenedores, porque el motor corre donde esta el repositorio.
+- Si el motor falla, cae un proceso hijo, no el extension host ni el editor.
+
+En contra:
+
+- Ocho VSIX que compilar, publicar en dos tiendas y, en macOS y Windows, firmar. La CI de
+  publicacion es mas larga y los destinos de Alpine necesitan compilacion cruzada para musl.
+- Cada VSIX pesa varios MB mas que una extension en TypeScript puro.
+- No hay version para vscode.dev ni github.dev. Con git local es imposible de todos modos.
+- Un proceso mas por ventana de VS Code, con su memoria.
+- Hay que gestionar el ciclo de vida del proceso: arranque, reinicio, cancelacion y versiones.
+- Si una politica corporativa bloquea binarios nativos en extensiones, Ramal for VS Code no
+  funciona ahi. No hay plan B en el primer corte; el precedente de rust-analyzer, Ruff o Biome dice
+  que es un caso raro.
+
+## Alternativas descartadas
+
+**La API `vscode.git`.** No da el grafo con padres, ni rebase interactivo, ni cherry-pick, ni un
+modelo de conflictos, ni credenciales por cuenta, y depende de que la extension de git de VS Code
+este activada. Se usa solo como fuente de pistas.
+
+**Git CLI desde TypeScript, el modelo de GitLens.** Obligaria a escribir por segunda vez, en otro
+lenguaje, todo el adaptador de git (parseo de log, estado, diff y conflictos, el driver de rebase,
+las credenciales por cuenta) y ademas los clientes de plataformas e IA, cada uno con sus propios
+fallos.
+
+**Addon nativo de Node con napi-rs.** En proceso y sin JSON-RPC, a cambio de problemas de ABI con
+el Electron de VS Code y de que un fallo del motor tumbe el extension host. El coste de empaquetar
+por plataforma es el mismo que el del sidecar.
+
+**isomorphic-git en WebAssembly.** Lento, sin hooks, sin firma, sin LFS y sin SSH. No sirve para un
+cliente Git.
+
+**Un VSIX universal con los ocho binarios.** Una sola publicacion, a cambio de que cada usuario se
+descargue ocho veces el motor.
+
+**Una biblioteca de LSP (tower-lsp) para el sidecar.** El framing es el mismo, pero la semantica de
+LSP (documentos, capacidades del lenguaje) no encaja, y el marco propio son unas decenas de lineas
+con sus tests.
+
+**Un comando de Tauri por metodo.** El protocolo de escritorio divergiria del del sidecar, que es
+justo lo que un solo `rpc` impide.

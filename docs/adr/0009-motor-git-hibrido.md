@@ -1,0 +1,237 @@
+# ADR 0009: Motor Git hibrido, primero con la CLI de git y sin libgit2
+
+- Estado: aceptado
+- Fecha: 2026-09-30
+
+## Contexto
+
+Ramal es un cliente Git al estilo de GitKraken. El diseno pide el grafo de todas las ramas,
+estado y staging por fichero, commit con amend y firma (SSH o GPG, activada por defecto en los
+ajustes), fetch y pull con sus modos, push con upstream y `--force-with-lease`, ramas, tags,
+stash, merge en sus tres estrategias, resolucion de conflictos, rebase interactivo, cherry-pick,
+revert, reset en sus tres modos, clonado con submodulos, blame e historial de fichero, deshacer
+y rehacer, y **varias cuentas por plataforma**, donde cada repositorio usa una de ellas para
+fetch, push y pull requests.
+
+Lo que hacen los productos comparables deja la tendencia clara:
+
+| Producto                                          | Motor                                                                                                                                                                                                                                                        |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GitKraken Desktop                                 | Paso de NodeGit y libgit2 al ejecutable de git para commit, fetch, push, pull, rebase, cherry-pick, stash, firma SSH y Git Credential Manager. Motivos publicados: libgit2 va muy por detras de git, rinde mal con LFS y soporta mal la configuracion de SSH |
+| GitHub Desktop                                    | Git empaquetado (dugite); todas las operaciones lanzan git                                                                                                                                                                                                   |
+| Tower                                             | Empaqueta el binario oficial de git, con opcion de elegir otro                                                                                                                                                                                               |
+| GitButler (Tauri y Rust, el mas parecido a Ramal) | Paso de `git2` a `gix` para lecturas y lanza git para fetch y push, para heredar la configuracion de SSH, el agente y los helpers de credenciales                                                                                                            |
+
+Las opciones eran `git2` (libgit2), `gix` (gitoxide) solo, la CLI de git sola, o un hibrido. La
+decision de partida del usuario: **un hibrido que empieza con la CLI para todo**, `gix` mas tarde
+y solo en lecturas calientes si un benchmark lo justifica, nada de libgit2, y git 2.34 como
+minimo con deteccion de capacidades. Este ADR la desarrolla.
+
+## Decision
+
+### Todo por la CLI de git, detras de dos puertos
+
+El motor habla con git a traves de dos puertos de `ramal-core-application`:
+
+- **`GitReader`**: log y ventana del grafo, refs, estado, detalle de commit, diff, blame, etapas
+  de un conflicto.
+- **`GitWriter`**: todo lo que modifica el repositorio o habla con un remoto.
+
+`ramal-git` implementa los dos lanzando el ejecutable de git. Escrituras, red, hooks, firma, LFS y
+credenciales van siempre por la CLI y nunca dejaran de hacerlo: son justo las partes donde la
+semantica exacta de git importa y donde las bibliotecas van por detras.
+
+### Reglas del adaptador
+
+Las que evitan los errores clasicos de envolver una CLI:
+
+- Siempre formatos de maquina: `-z`, `--porcelain=v2`, `--format` explicito con separadores
+  `%x00` y `%x1f`. Siempre `--no-pager`, `--no-color` y `-c core.quotepath=off`.
+- Entorno fijo en cada llamada: `LC_ALL=C` (los mensajes de git no cambian con el idioma del
+  usuario) y `GIT_TERMINAL_PROMPT=0` (git nunca se queda esperando una contrasena por una
+  terminal que no existe).
+- Las lecturas en segundo plano (refresco de estado, fetch automatico) anaden
+  `GIT_OPTIONAL_LOCKS=0`, para no tomar `index.lock` mientras el usuario trabaja en una terminal.
+- Las refs se leen con `git for-each-ref`, nunca con la decoracion `%D` del log: un nombre de ref
+  puede contener comas y `%D` las usa como separador.
+- Rebase interactivo sin editor: el motor escribe el fichero de tareas desde el plan del dominio
+  y lanza git con `GIT_SEQUENCE_EDITOR` apuntando a un helper que lo coloca; `reword` usa
+  `GIT_EDITOR` igual. Los estados detenidos (`rebase-merge`, `MERGE_HEAD`, `CHERRY_PICK_HEAD`)
+  los detecta el lector.
+- Operaciones largas: el progreso se lee de stderr (`--progress`) y sale como notificacion
+  `$/progress`. Cancelar mata el grupo de procesos entero (un Job Object en Windows), no solo el
+  proceso de git, porque git lanza hijos (ssh, helpers, hooks).
+- Deshacer y rehacer se apoyan en un diario de operaciones: las refs y `HEAD` antes de cada
+  escritura, con el reflog como respaldo.
+- Hooks: se ejecutan como los ejecuta git, y su salida se ensena al usuario cuando fallan. Por
+  eso la extension de VS Code no se activa en workspaces no confiables
+  ([ADR 0010](0010-un-motor-para-escritorio-y-vscode.md)): abrir una carpeta ejecutaria sus hooks.
+- **Ningun valor llega a la linea de comandos como opcion.** Refs, revisiones, rutas y URL pueden
+  venir de otros (el nombre de una rama remota, la URL de un workspace compartido), y un valor que
+  empieza por `-` se convertiria en una opcion de git. Por eso va `--end-of-options` antes de refs,
+  revisiones y URL (git lo admite desde 2.24) y `--` antes de las rutas; los nombres de rama se
+  validan con `git check-ref-format --branch` y se rechaza cualquiera que empiece por `-`.
+- **Clonar y hacer fetch solo con protocolos conocidos**: cada llamada lleva
+  `-c protocol.allow=never -c protocol.https.allow=always -c protocol.ssh.allow=always`. `ext::` y
+  `fd::` ejecutan comandos y nunca se permiten; `file` solo para una carpeta que el usuario eligio
+  en el dialogo nativo.
+
+### Confianza en un repositorio
+
+Abrir una carpeta ya ejecuta codigo si su `.git/config` lo pide: `git status` lanza
+`core.fsmonitor` y los filtros de limpieza, y `git diff` y `git log -p` lanzan `diff.external` y
+los `textconv`. Una carpeta extraida de un zip trae su propio `.git/config` y sus hooks. VS Code
+tiene Workspace Trust; escritorio necesita su propio equivalente:
+
+- Antes del primer comando de git en un repositorio que Ramal no clono, el motor lee
+  `git config --local --list --show-origin` (con `--local` no sigue `include`, asi que no ejecuta
+  nada) y mira `.git/hooks`.
+- Si aparece cualquier clave que pueda lanzar un comando (`core.fsmonitor`, `core.hooksPath`,
+  `core.sshCommand`, `core.pager`, `core.editor`, `sequence.editor`, `diff.external`,
+  `diff.*.textconv`, `diff.*.command`, `filter.*`, `merge.*.driver`, `credential.helper`,
+  `gpg*.program`, `uploadpack.*`, `include*`) o un hook que no sea `.sample`, la interfaz pregunta
+  "Confiar en este repositorio" y ensena lo que encontro.
+- Sin confianza, el repositorio se abre solo para leer, y las lecturas anaden
+  `-c core.fsmonitor=false --no-ext-diff --no-textconv`. Las escrituras, que pueden lanzar hooks,
+  piden confiar antes.
+- La confianza se guarda por repositorio en el dispositivo y no se sincroniza. En VS Code, los
+  repositorios dentro de carpetas de confianza ya lo son; los que se abren fuera de ellas pasan por
+  la misma comprobacion.
+
+### Version minima 2.34 y deteccion de capacidades
+
+- Git 2.34 es la primera con firma de commits por SSH, y es la que trae Ubuntu 22.04, la base
+  minima de Linux de Ramal ([ADR 0016](0016-actualizaciones-y-descargas.md)).
+- Al arrancar, el motor parsea `git --version`, rechaza cualquier version inferior con el error
+  `git_version_unsupported` (que la interfaz traduce y explica) y calcula `GitCapabilities`.
+- Lo que llego despues se detecta, no se supone: `merge-tree --write-tree` y
+  `rebase --update-refs` necesitan 2.38. Si faltan, el motor usa el camino alternativo o
+  desactiva la funcion con un motivo visible.
+- La CI corre la suite del motor contra git 2.34 y contra la ultima version
+  ([ADR 0006](0006-estrategia-de-testing.md)).
+
+### Que ejecutable de git se usa
+
+En este orden:
+
+1. El ajuste explicito del usuario, si existe. En VS Code es la ruta que expone la API
+   `vscode.git` (el ajuste `git.path` del editor), que el extension host pasa al sidecar al
+   arrancarlo: el usuario ya le dijo a su editor que git usar.
+2. El git del `PATH`, si cumple la version minima.
+3. Solo en Ramal Desktop para Windows, un MinGit empaquetado en el instalador, con la version
+   fijada y actualizada con cada publicacion.
+
+En macOS se usa el git del sistema, y si no existe se propone `xcode-select --install`. En Linux,
+el del gestor de paquetes: los paquetes `.deb` y `.rpm` lo declaran como dependencia y la
+AppImage lo pide si falta. La extension de VS Code nunca empaqueta git: VS Code ya lo necesita
+para su propia integracion.
+
+**Por que MinGit solo como respaldo en Windows y no siempre.** Un git del sistema ya trae la
+configuracion del usuario, su Git Credential Manager y sus hooks funcionando. Forzar el
+empaquetado siempre, como hace GitHub Desktop, garantiza la version a cambio de desentenderse de
+esa configuracion. Ramal prefiere respetar lo que el usuario tiene y solo trae git cuando no hay
+ninguno que valga, que es el caso normal en un Windows recien instalado.
+
+### Credenciales por cuenta y por repositorio
+
+Es la parte dificil: con dos cuentas de GitHub, el push de un repositorio tiene que usar una y el
+de otro la otra. Un helper de credenciales global no sabe hacerlo.
+
+**HTTPS.** Solo en los repositorios ligados a una cuenta de Ramal, cada operacion de red se lanza
+con `-c credential.helper=` (el valor vacio vacia la lista de helpers configurados) seguido de
+`-c credential.helper=<helper de Ramal>`. El helper habla el protocolo de credenciales de git:
+
+- Recibe protocolo, host y ruta y pide el token al motor que lanzo la operacion, por un canal
+  local (socket de dominio Unix en un directorio privado, tuberia con nombre en Windows)
+  autenticado con un token aleatorio por proceso que viaja en una variable de entorno. El motor
+  solo responde para las operaciones que el mismo lanzo, solo con el token de la cuenta ligada a
+  ese repositorio, y **solo si el protocolo es `https` y el host coincide exactamente con el de la
+  cuenta** despues de normalizarlo con IDNA. La plataforma que diga el repositorio no cuenta: un
+  host que se parece a `github.com` no recibe el token de GitHub
+  ([ADR 0018](0018-cuentas-de-plataformas-git.md)).
+- Cuando git le dice `erase` (la credencial fallo), el motor marca la cuenta como caducada y la
+  interfaz propone actualizar el token.
+- `GIT_ASKPASS` apunta al mismo helper para las preguntas interactivas que no pasan por el
+  protocolo de credenciales.
+
+El ejecutable del helper es el propio sidecar en modo helper en VS Code, y un binario pequeno que
+se empaqueta junto a la app en escritorio (Tauri lo lleva como binario externo): el binario de la
+app de escritorio en Windows es de subsistema grafico y no tiene un stdout donde hablar el
+protocolo. La logica vive en `ramal-git` (planificado, con el primer `GitWriter` de red).
+
+**SSH.** Por cuenta, con `GIT_SSH` apuntando al mismo helper en modo ssh, que recibe los
+argumentos de git como lista y lanza `ssh -i <llave> -o IdentitiesOnly=yes` sin pasar por un
+shell. No se usa `core.sshCommand`: git lo ejecuta con un shell, y una ruta de llave con espacios o
+comillas se convertiria en un comando. Si el repositorio no tiene llave ligada, se respeta el
+`~/.ssh/config` del usuario. Las llaves SSH viven en el equipo y nunca se sincronizan.
+
+**Repositorios no ligados a ninguna cuenta.** Se ejecutan con la configuracion del usuario
+intacta: Git Credential Manager, `osxkeychain`, el agente de SSH. Ramal no pisa lo que no es
+suyo.
+
+**Nunca** se escribe un token en `.git/config`, en la URL de un remoto ni en un argumento de
+linea de comandos, donde lo veria cualquier `ps`.
+
+### gix, mas tarde y solo en lecturas
+
+`gix` entra si un benchmark sobre un repositorio grande de prueba demuestra que una lectura
+concreta del CLI no alcanza (los candidatos son la ventana del grafo y el estado). Entra metodo a
+metodo, como otra implementacion de `GitReader`, con la del CLI como respaldo, y detras de una
+opcion que se puede apagar. `GitWriter` no se toca nunca.
+
+Motivos para no empezar con el: gix publica versiones con cambios incompatibles cada mes (de la
+0.84 a la 0.88 en cinco meses), su push no esta listo para produccion, su merge "necesita
+reescribirse para demostrar que es correcto" segun su propio estado de crates, y el rebase, el
+stash y los submodulos estan a medias. Y sobre todo: hasta que no haya un numero, no se sabe que
+lectura necesita ser mas rapida.
+
+### Nada de libgit2
+
+`git2` y `libgit2-sys` se vetan en todo el workspace con `cargo deny` (`deny.toml`), para que no
+entren por una dependencia transitiva.
+
+## Consecuencias
+
+A favor:
+
+- Semantica exacta de git en todo: hooks, firma, LFS, `.gitattributes`, `~/.ssh/config`, Git
+  Credential Manager y cada funcion nueva de git, gratis.
+- Varias cuentas por plataforma funcionan de verdad, repositorio a repositorio, sin tocar la
+  configuracion global del usuario.
+- Ningun codigo C que compilar en tres sistemas (OpenSSL, libssh2): Ramal no enlaza con nada de
+  git.
+- Cambiar una lectura a `gix` es un cambio en `ramal-git` y en el `EngineBuilder`, reversible con
+  una opcion.
+
+En contra:
+
+- Lanzar un proceso por llamada cuesta, sobre todo en Windows. Si el perfilado lo pide, las
+  lecturas repetidas pasan a un proceso de larga vida (`git cat-file --batch`) antes que a `gix`.
+- Parsear la salida de git es una fuente de errores. La mitigan los formatos de maquina y los
+  repositorios de prueba dorados con snapshots.
+- Depende de un git instalado de una version conocida. Un usuario con git 2.30 ve un error claro
+  y tiene que actualizar; en Windows con MinGit no le pasa.
+- MinGit en el instalador de Windows suma decenas de MB y obliga a vigilar sus avisos de
+  seguridad y a subirlo con cada publicacion.
+- El helper de credenciales es una pieza mas con su canal local. Cualquier proceso del mismo
+  usuario que lea el entorno de un git en marcha podria ver el token del canal mientras dura la
+  operacion; el motor solo responde dentro de esa operacion, y el mismo usuario ya puede leer su
+  llavero en muchos sistemas.
+
+## Alternativas descartadas
+
+**`git2` (libgit2).** Va por detras de git (secuenciador, sparse checkout, clonado parcial), no
+tiene LFS, su SSH ignora de formas sutiles `~/.ssh/config` y los agentes, no ejecuta hooks en
+muchas operaciones y trae dependencias de C en tres sistemas. GitKraken lo abandono por eso.
+
+**`gix` solo.** Push no listo, merge por reescribir, rebase y submodulos a medias, y versiones
+incompatibles cada mes.
+
+**`gix` para lecturas desde el primer dia.** Dos caminos de codigo antes de saber si hace falta,
+con el riesgo de que gix y git no coincidan en el estado del indice o de la configuracion.
+
+**Empaquetar git siempre, en todos los sistemas.** Garantiza la version, pero ignora la
+instalacion y la configuracion del usuario y multiplica lo que hay que actualizar por seguridad.
+
+**Un unico helper de credenciales global.** No puede elegir la cuenta segun el repositorio, que
+es lo que pide el diseno.

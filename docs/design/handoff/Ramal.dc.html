@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;
+--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);
+--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);
+--add-bg:oklch(0.76 0.15 150 / 0.13);--del-bg:oklch(0.7 0.17 25 / 0.14);
+--hatch:repeating-linear-gradient(135deg,transparent 0 6px,oklch(0.285 0.012 230) 6px 7px);
+--shadow:0 12px 40px oklch(0.05 0.01 230 / 0.5),0 2px 6px oklch(0.05 0.01 230 / 0.3);
+background:var(--bg);color:var(--text)}
+body[data-theme="light"]{--bg:oklch(0.965 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.94 0.006 230);--border:oklch(0.89 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);
+--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);
+--add-bg:oklch(0.62 0.15 150 / 0.13);--del-bg:oklch(0.6 0.18 25 / 0.12);
+--hatch:repeating-linear-gradient(135deg,transparent 0 6px,oklch(0.92 0.006 230) 6px 7px);
+--shadow:0 12px 40px oklch(0.3 0.02 230 / 0.16),0 2px 6px oklch(0.3 0.02 230 / 0.08)}
+*{box-sizing:border-box}
+a{color:var(--accent)} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;border:2px solid transparent;background-clip:padding-box}::-webkit-scrollbar-track{background:transparent}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="height:100vh;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px">
+
+  <div style="height:46px;flex-shrink:0;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:8px;padding-right:14px">
+      <div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div>
+      <span style="font-weight:600;font-size:14px;letter-spacing:-0.01em">Ramal</span>
+    </div>
+    <div onClick="{{ goHome }}" style="display:flex;align-items:center;padding:0 16px;margin-top:6px;border-radius:9px 9px 0 0;cursor:pointer;font-weight:500;background:{{ homeTab.bg }};color:{{ homeTab.color }};box-shadow:{{ homeTab.shadow }}">{{ t.home }}</div>
+    <sc-if value="{{ showSetTab }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ goSettings }}" style="display:flex;align-items:center;gap:8px;padding:0 6px 0 14px;margin-top:6px;border-radius:9px 9px 0 0;cursor:pointer;font-weight:500;background:{{ setTab.bg }};color:{{ setTab.color }};box-shadow:{{ setTab.shadow }}">
+        <span>⚙︎ {{ t.settings }}</span>
+        <span onClick="{{ closeSettings }}" style="width:22px;height:22px;border-radius:6px;display:grid;place-items:center;color:var(--faint);font-size:15px" style-hover="background:var(--surface2);color:var(--text)">×</span>
+      </div>
+    </sc-if>
+    <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="1">
+      <div onClick="{{ tb.onClick }}" onContextMenu="{{ tb.onMenu }}" style="display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;margin-top:6px;border-radius:9px 9px 0 0;cursor:pointer;max-width:220px;background:{{ tb.bg }};color:{{ tb.color }};box-shadow:{{ tb.shadow }}">
+        <span style="width:18px;height:18px;flex-shrink:0;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;background:{{ tb.badgeBg }};color:{{ tb.badgeColor }}">{{ tb.abbr }}</span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500">{{ tb.label }}</span>
+        <span onClick="{{ tb.onClose }}" style="width:22px;height:22px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;color:var(--faint);font-size:15px" style-hover="background:var(--surface2);color:var(--text)">×</span>
+      </div>
+    </sc-for>
+    <div onClick="{{ goHome }}" style="display:grid;place-items:center;width:32px;margin-top:6px;color:var(--faint);cursor:pointer;font-size:17px;border-radius:8px" style-hover="color:var(--text)">+</div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border);background:var(--bg)">
+        <button onClick="{{ setEs }}" style="height:24px;padding:0 9px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ esBg }};color:{{ esColor }}">ES</button>
+        <button onClick="{{ setEn }}" style="height:24px;padding:0 9px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ enBg }};color:{{ enColor }}">EN</button>
+      </div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border);background:var(--bg)">
+        <button onClick="{{ setLight }}" title="{{ t.light }}" style="width:30px;height:24px;border:0;border-radius:6px;cursor:pointer;font-size:13px;display:grid;place-items:center;background:{{ lightBg }};color:{{ lightColor }}">☀︎</button>
+        <button onClick="{{ setDark }}" title="{{ t.dark }}" style="width:30px;height:24px;border:0;border-radius:6px;cursor:pointer;font-size:13px;display:grid;place-items:center;background:{{ darkBg }};color:{{ darkColor }}">☾</button>
+      </div>
+      <button onClick="{{ goSettings }}" title="{{ t.settings }}" style="width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:15px;color:var(--muted);display:grid;place-items:center" style-hover="color:var(--text);background:var(--surface2)">⚙︎</button>
+      <div onClick="{{ goProfile }}" style="width:30px;height:30px;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px;cursor:pointer">MR</div>
+    </div>
+  </div>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:1;min-height:0;display:flex">
+      <div style="width:232px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="2">
+          <div onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}" style-hover="background:var(--surface2)">
+            <span style="flex:1">{{ n.label }}</span>
+            <span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ n.count }}</span>
+          </div>
+        </sc-for>
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:22px 12px 8px">{{ t.workspaces }}</div>
+        <sc-for list="{{ wsNav }}" as="n" hint-placeholder-count="3">
+          <div onClick="{{ n.onClick }}" onContextMenu="{{ n.onMenu }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}" style-hover="background:var(--surface2)">
+            <span style="width:8px;height:8px;border-radius:3px;background:{{ n.dot }}"></span>
+            <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.label }}</span>
+            <span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ n.count }}</span>
+          </div>
+        </sc-for>
+        <div onClick="{{ newWs }}" style="padding:9px 12px;border-radius:9px;cursor:pointer;color:var(--accent);font-weight:500" style-hover="background:var(--surface2)">+ {{ t.newWs }}</div>
+      </div>
+
+      <div style="flex:1;min-width:0;overflow:auto">
+        <sc-if value="{{ isReposView }}" hint-placeholder-val="{{ true }}">
+          <div style="max-width:1120px;margin:0 auto;padding:32px 36px 56px;display:flex;flex-direction:column;gap:20px">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:240px">
+                <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ t.repos }}</h1>
+                <p style="margin:6px 0 0;color:var(--muted)">{{ t.reposSub }}</p>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button onClick="{{ openRepoDialog }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);font-weight:500;cursor:pointer" style-hover="background:var(--surface2)">{{ t.openRepo }}</button>
+                <button onClick="{{ initDialog }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);font-weight:500;cursor:pointer" style-hover="background:var(--surface2)">{{ t.init }}</button>
+                <button onClick="{{ cloneDialog }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ t.clone }}</button>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px">
+              <div style="flex:1;min-width:140px;display:flex;align-items:center;gap:10px;padding:0 12px;height:38px;border-radius:9px;background:var(--bg);border:1px solid var(--border)">
+                <span style="color:var(--faint);font-size:16px">⌕</span>
+                <input value="{{ q }}" onChange="{{ onQ }}" placeholder="{{ t.search }}" style="flex:1;min-width:0;border:0;outline:0;background:transparent;height:100%;font-size:14px">
+              </div>
+              <sc-for list="{{ filterBtns }}" as="fb" hint-placeholder-count="5">
+                <button onClick="{{ fb.onClick }}" style="height:38px;padding:0 10px 0 12px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12.5px;white-space:nowrap;flex-shrink:1;min-width:64px;border:1px solid {{ fb.border }};background:{{ fb.bg }}">
+                  <span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;min-width:0;overflow:hidden;max-width:100%"><span style="font-size:10px;color:var(--faint)">{{ fb.label }}</span><span style="font-weight:600;max-width:120px;min-width:0;overflow:hidden;text-overflow:ellipsis">{{ fb.value }}</span></span><span style="color:var(--faint);font-size:9px">▾</span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:-10px;padding:0 4px;font-size:12px;color:var(--faint)">
+              <span>{{ resultsLabel }}</span>
+              <sc-if value="{{ hasFilters }}"><button onClick="{{ clearFilters }}" style="border:0;padding:0;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;font-weight:500">{{ t.clear }}</button></sc-if>
+            </div>
+            <sc-for list="{{ groups }}" as="g" hint-placeholder-count="1">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-if value="{{ g.showHeader }}">
+                  <div style="display:flex;align-items:center;gap:8px;padding:10px 4px 2px">
+                    <span style="width:8px;height:8px;border-radius:3px;background:{{ g.dot }}"></span>
+                    <span style="font-weight:600">{{ g.name }}</span>
+                    <span style="color:var(--faint);font-size:12px">{{ g.count }}</span>
+                  </div>
+                </sc-if>
+                <sc-for list="{{ g.repos }}" as="r" hint-placeholder-count="6">
+                  <div onClick="{{ r.onOpen }}" onContextMenu="{{ r.onMenu }}" style="display:grid;grid-template-columns:34px minmax(0,1.5fr) minmax(0,1.2fr) minmax(0,1fr) 224px;gap:14px;align-items:center;padding:14px 12px 14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer" style-hover="border-color:var(--accent)">
+                    <div style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:11px;font-weight:700;background:{{ r.badgeBg }};color:{{ r.badgeColor }}">{{ r.abbr }}</div>
+                    <div style="min-width:0;display:flex;flex-direction:column;gap:3px">
+                      <div style="display:flex;align-items:baseline;gap:8px;min-width:0">
+                        <span style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;max-width:100%">{{ r.displayName }}</span>
+                        <sc-if value="{{ r.hasSub }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis">{{ r.subName }}</span></sc-if>
+                      </div>
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.path }}</span>
+                    </div>
+                    <div style="min-width:0;display:flex;flex-direction:column;gap:3px">
+                      <span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.srcLine }}</span>
+                      <span style="font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.srcSub }}</span>
+                    </div>
+                    <div style="min-width:0;display:flex;flex-direction:column;gap:4px">
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">⎇ {{ r.branch }}</span>
+                      <span style="font-size:12px;color:var(--faint);white-space:nowrap">{{ r.stats }}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0">
+                      <sc-if value="{{ r.hasWs }}"><span style="height:22px;padding:0 8px;border-radius:6px;font-size:11px;font-weight:500;display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;white-space:nowrap;background:var(--bg);border:1px solid var(--border)"><span style="width:6px;height:6px;flex-shrink:0;border-radius:2px;background:{{ r.wsColor }}"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.wsName }}</span></span></sc-if>
+                      <sc-if value="{{ r.hasWsMore }}"><span title="{{ r.wsAll }}" style="height:22px;padding:0 6px;border-radius:6px;font-size:11px;display:flex;align-items:center;flex-shrink:0;color:var(--muted);background:var(--bg);border:1px solid var(--border)">{{ r.wsMore }}</span></sc-if>
+                      <span style="font-size:12px;color:var(--faint);white-space:nowrap;flex-shrink:0;text-align:right">{{ r.updated }}</span>
+                      <button onClick="{{ r.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noResults }}">
+              <div style="padding:48px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:14px">{{ t.noResults }}</div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isWsView }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width:1200px;margin:0 auto;padding:32px 36px 56px;display:flex;flex-direction:column;gap:28px">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:240px">
+                <div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:4px;background:{{ ws.color }}"></span><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ ws.name }}</h1></div>
+                <p style="margin:6px 0 0;color:var(--muted)">{{ ws.sub }}</p>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button onClick="{{ ws.onFetch }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);font-weight:500;cursor:pointer" style-hover="background:var(--surface2)">⟳ {{ t.fetchAll }}</button>
+                <button onClick="{{ ws.onOpenAll }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ t.openAll }}</button>
+                <button onClick="{{ ws.onMenu }}" style="width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:16px">⋯</button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px">
+              <sc-for list="{{ ws.repos }}" as="r" hint-placeholder-count="3">
+                <div onClick="{{ r.onOpen }}" onContextMenu="{{ r.onMenu }}" style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;cursor:pointer;display:flex;flex-direction:column;gap:12px" style-hover="border-color:var(--accent)">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:10px;font-weight:700;background:{{ r.badgeBg }};color:{{ r.badgeColor }}">{{ r.abbr }}</div>
+                    <div style="min-width:0;flex:1"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.displayName }}</div><div style="font-size:12px;color:var(--faint)">{{ r.srcLine }}</div></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+                    <span style="font-family:'IBM Plex Mono',monospace;color:var(--accent);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">⎇ {{ r.branch }}</span>
+                    <span style="color:var(--muted)">{{ r.prCount }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <h2 style="margin:0;font-size:17px;font-weight:600">{{ t.prsTitle }}</h2>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <sc-for list="{{ ws.chips }}" as="c" hint-placeholder-count="5">
+                    <button onClick="{{ c.onClick }}" style="height:28px;padding:0 10px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px;border:1px solid {{ c.border }};background:{{ c.bg }}">
+                      <span style="width:7px;height:7px;border-radius:50%;background:{{ c.color }}"></span>{{ c.label }}<span style="color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ c.count }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+                <div style="display:grid;grid-template-columns:minmax(140px,1fr) minmax(0,2.4fr) 120px 170px 120px 80px 100px;gap:14px;padding:10px 16px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border)">
+                  <span>{{ t.colRepo }}</span><span>{{ t.colPr }}</span><span>{{ t.colAuthor }}</span><span>{{ t.colState }}</span><span>{{ t.colChecks }}</span><span>{{ t.colReviews }}</span><span>{{ t.colUpdated }}</span>
+                </div>
+                <sc-for list="{{ ws.prs }}" as="p" hint-placeholder-count="5">
+                  <div onClick="{{ p.onClick }}" onContextMenu="{{ p.onMenu }}" style="display:grid;grid-template-columns:minmax(140px,1fr) minmax(0,2.4fr) 120px 170px 120px 80px 100px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer" style-hover="background:var(--surface2)">
+                    <div style="display:flex;align-items:center;gap:8px;min-width:0">
+                      <span style="width:20px;height:20px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:8px;font-weight:700;color:white;background:{{ p.badgeBg }}">{{ p.abbr }}</span>
+                      <span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.repoName }}</span>
+                    </div>
+                    <div style="min-width:0;display:flex;flex-direction:column;gap:3px">
+                      <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--faint);font-family:'IBM Plex Mono',monospace;margin-right:8px">{{ p.numLabel }}</span><span style="font-weight:500">{{ p.title }}</span></div>
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.from }} → {{ p.to }}</span>
+                    </div>
+                    <span style="color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@{{ p.author }}</span>
+                    <span style="justify-self:start;height:24px;padding:0 10px;border-radius:12px;display:flex;align-items:center;font-size:12px;font-weight:500;white-space:nowrap;color:{{ p.stateColor }};background:{{ p.stateBg }}">{{ p.stateLabel }}</span>
+                    <span style="font-size:12px;white-space:nowrap;color:{{ p.checksColor }}">{{ p.checksLabel }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">{{ p.reviews }}</span>
+                    <span style="font-size:12px;color:var(--faint);white-space:nowrap">{{ p.updated }}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ ws.noPrs }}"><div style="padding:32px;text-align:center;color:var(--muted)">{{ t.noPrs }}</div></sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;min-height:0;display:flex">
+      <div style="width:232px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto">
+        <div style="font-size:15px;font-weight:600;padding:2px 12px 6px">{{ t.settings }}</div>
+        <sc-for list="{{ setNav }}" as="n" hint-placeholder-count="8">
+          <sc-if value="{{ n.isGroup }}"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:16px 12px 6px">{{ n.label }}</div></sc-if>
+          <sc-if value="{{ n.notGroup }}"><div onClick="{{ n.onClick }}" style="padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}" style-hover="background:var(--surface2)">{{ n.label }}</div></sc-if>
+        </sc-for>
+      </div>
+      <div style="flex:1;min-width:0;overflow:auto">
+        <div style="max-width:900px;margin:0 auto;padding:32px 36px 64px;display:flex;flex-direction:column;gap:18px">
+          <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:4px">
+            <div style="flex:1;min-width:260px">
+              <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ sh.title }}</h1>
+              <p style="margin:6px 0 0;color:var(--muted);max-width:620px;text-wrap:pretty">{{ sh.sub }}</p>
+            </div>
+            <sc-if value="{{ sh.hasAction }}"><button onClick="{{ sh.onAction }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ sh.action }}</button></sc-if>
+          </div>
+
+          <sc-if value="{{ isProfile }}">
+            <div style="display:flex;align-items:center;gap:16px;padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:14px">
+              <div style="width:64px;height:64px;flex-shrink:0;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:20px">{{ pf.ini }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:16px">{{ pf.name }}</div>
+                <div style="color:var(--muted);font-size:12px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">@{{ pf.user }} · {{ pf.email }}</div>
+              </div>
+              <button onClick="{{ pf.onPhoto }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="background:var(--surface2)">{{ t.changePhoto }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isAccount }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+              <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ t.plan }}</span>
+                <span style="font-size:18px;font-weight:600">{{ t.planName }}</span>
+                <span style="color:var(--muted);font-size:12px">{{ t.planRenew }}</span>
+                <div style="margin-top:8px"><button onClick="{{ acct.onManage }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="background:var(--surface2)">{{ t.manageSub }}</button></div>
+              </div>
+              <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ t.session }}</span>
+                <span style="color:var(--muted);font-size:12px">{{ t.signedAs }}</span>
+                <span style="font-size:15px;font-weight:600;font-family:'IBM Plex Mono',monospace">{{ acct.email }}</span>
+                <div style="margin-top:8px"><button onClick="{{ acct.onSignOut }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap;color:var(--danger)" style-hover="border-color:var(--danger)">{{ t.signOut }}</button></div>
+              </div>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:12px;padding:14px 18px">
+                <div style="width:32px;height:32px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:12px">AS</div>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:14px">{{ acct.org }}</div><div style="font-size:12px;color:var(--muted)">{{ acct.count }}</div></div>
+                <button onClick="{{ acct.onInvite }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="border-color:var(--accent)">+ {{ t.invite }}</button>
+              </div>
+              <sc-for list="{{ acct.members }}" as="m" hint-placeholder-count="4">
+                <div onContextMenu="{{ m.onMenu }}" style="display:flex;align-items:center;gap:12px;padding:10px 18px;border-top:1px solid var(--border)">
+                  <span style="width:32px;height:32px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ m.avBg }};opacity:{{ m.opacity }}">{{ m.ini }}</span>
+                  <div style="flex:1;min-width:0"><div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.name }}</div><div style="font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.sub }}</div></div>
+                  <span style="height:22px;padding:0 10px;border-radius:11px;display:flex;align-items:center;font-size:12px;font-weight:500;white-space:nowrap;color:{{ m.roleColor }};background:{{ m.roleBg }}">{{ m.role }}</span>
+                  <button onClick="{{ m.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+              <div style="padding:14px 18px;font-weight:600;font-size:14px">{{ t.sessions }}</div>
+              <sc-for list="{{ acct.sessions }}" as="x" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--border)">
+                  <div style="flex:1;min-width:0"><div style="font-weight:500">{{ x.dev }}</div><div style="font-size:12px;color:var(--faint)">{{ x.where }}</div></div>
+                  <sc-if value="{{ x.current }}"><span style="height:22px;padding:0 10px;border-radius:11px;display:flex;align-items:center;font-size:12px;font-weight:500;background:var(--accent-soft);color:var(--accent)">{{ t.thisDevice }}</span></sc-if>
+                  <sc-if value="{{ x.other }}"><button onClick="{{ x.onRevoke }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="border-color:var(--danger)">{{ t.revoke }}</button></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isIntegrations }}">
+            <sc-for list="{{ accGroups }}" as="g" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ g.color }}">{{ g.abbr }}</span>
+                  <span style="font-weight:600;font-size:15px">{{ g.label }}</span>
+                  <span style="color:var(--faint);font-size:12px">{{ g.count }}</span>
+                  <div style="flex:1;height:1px;background:var(--border);margin:0 6px"></div>
+                  <button onClick="{{ g.onAdd }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500">+ {{ g.addLabel }}</button>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">
+                  <sc-for list="{{ g.accounts }}" as="a" hint-placeholder-count="2">
+                    <div onContextMenu="{{ a.onMenu }}" style="padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:14px">
+                      <div style="display:flex;align-items:center;gap:12px">
+                        <div style="width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;background:{{ a.avBg }};color:oklch(0.2 0.02 230)">{{ a.ini }}</div>
+                        <div style="flex:1;min-width:0">
+                          <div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600">@{{ a.user }}</span><sc-if value="{{ a.isDef }}"><span style="height:20px;padding:0 8px;border-radius:10px;font-size:11px;font-weight:600;display:flex;align-items:center;background:var(--accent-soft);color:var(--accent)">{{ t.isDefault }}</span></sc-if></div>
+                          <div style="font-size:12px;color:var(--muted)">{{ a.name }} · <span style="font-family:'IBM Plex Mono',monospace">{{ a.host }}</span></div>
+                        </div>
+                        <button onClick="{{ a.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                      </div>
+                      <div style="display:grid;grid-template-columns:100px 1fr;gap:6px 12px;font-size:12px">
+                        <span style="color:var(--faint)">{{ t.method }}</span><span>{{ a.method }}</span>
+                        <span style="color:var(--faint)">{{ t.scopes }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ a.scopes }}</span>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--border);font-size:12px">
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--ok)"></span>
+                        <span style="color:var(--muted);flex:1">{{ a.usedIn }}</span>
+                        <sc-if value="{{ a.notDef }}"><button onClick="{{ a.onMakeDef }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500;font-size:12px">{{ t.makeDefault }}</button></sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ g.empty }}"><div style="padding:18px;border:1px dashed var(--border);border-radius:12px;color:var(--faint);font-size:12px">{{ t.noAccounts }}</div></sc-if>
+              </div>
+            </sc-for>
+          </sc-if>
+
+          <sc-if value="{{ isAI }}">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:8px;padding:14px 18px"><span style="font-weight:600;font-size:14px;flex:1">{{ t.aiKeysTitle }}</span><span style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ ai.count }}</span></div>
+              <sc-for list="{{ ai.keys }}" as="k" hint-placeholder-count="3">
+                <div onContextMenu="{{ k.onMenu }}" style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--border)">
+                  <span style="width:34px;height:34px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;font-size:10px;font-weight:700;color:white;background:{{ k.color }}">{{ k.abbr }}</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:center;gap:8px;min-width:0"><span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ k.label }}</span><sc-if value="{{ k.isDef }}"><span style="height:20px;padding:0 8px;border-radius:10px;font-size:11px;font-weight:600;display:flex;align-items:center;flex-shrink:0;background:var(--accent-soft);color:var(--accent)">{{ t.isDefault }}</span></sc-if></div>
+                    <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ k.provider }} · <span style="font-family:'IBM Plex Mono',monospace">{{ k.model }}</span></div>
+                  </div>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint);white-space:nowrap">{{ k.masked }}</span>
+                  <span style="height:22px;padding:0 10px;border-radius:11px;display:flex;align-items:center;font-size:12px;font-weight:500;white-space:nowrap;background:var(--bg);border:1px solid var(--border)">{{ k.scope }}</span>
+                  <button onClick="{{ k.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+                </div>
+              </sc-for>
+              <sc-if value="{{ ai.noKeys }}"><div style="padding:18px;border-top:1px solid var(--border);color:var(--faint)">{{ t.noKeys }}</div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-for list="{{ cards }}" as="cd" hint-placeholder-count="2">
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+              <div style="padding:14px 18px">
+                <div style="font-weight:600;font-size:14px">{{ cd.title }}</div>
+                <sc-if value="{{ cd.hasSub }}"><div style="font-size:12px;color:var(--muted);margin-top:2px">{{ cd.sub }}</div></sc-if>
+              </div>
+              <sc-for list="{{ cd.rows }}" as="rw">
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;padding:12px 18px;border-top:1px solid var(--border)">
+                  <div style="flex:1 1 220px;min-width:0">
+                    <div style="font-weight:500;font-family:{{ rw.labelFont }}">{{ rw.label }}</div>
+                    <sc-if value="{{ rw.hasDesc }}"><div style="font-size:12px;color:var(--muted);margin-top:2px">{{ rw.desc }}</div></sc-if>
+                  </div>
+                  <sc-if value="{{ rw.isInput }}"><input value="{{ rw.value }}" onChange="{{ rw.onChange }}" placeholder="{{ rw.placeholder }}" style="flex:0 1 300px;min-width:0;height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);outline:0;font-family:{{ rw.font }}"></sc-if>
+                  <sc-if value="{{ rw.isSelect }}"><select value="{{ rw.value }}" onChange="{{ rw.onChange }}" style="height:34px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);max-width:260px"><sc-for list="{{ rw.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if>
+                  <sc-if value="{{ rw.isSeg }}"><div style="display:flex;padding:3px;border-radius:9px;background:var(--bg);border:1px solid var(--border)"><sc-for list="{{ rw.options }}" as="o"><button onClick="{{ o.onClick }}" style="height:26px;padding:0 12px;border:0;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div></sc-if>
+                  <sc-if value="{{ rw.isButton }}"><button onClick="{{ rw.onBtn }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="border-color:var(--accent)">{{ rw.btnLabel }}</button></sc-if>
+                  <sc-if value="{{ rw.isToggle }}"><button onClick="{{ rw.onToggle }}" style="width:38px;height:22px;flex-shrink:0;border-radius:11px;border:0;padding:0;cursor:pointer;position:relative;background:{{ rw.tbg }}"><span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transform:{{ rw.tx }};transition:transform .15s"></span></button></sc-if>
+                  <sc-if value="{{ rw.isArea }}"><textarea value="{{ rw.value }}" onChange="{{ rw.onChange }}" placeholder="{{ rw.placeholder }}" rows="3" style="flex:1 1 100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);outline:0;resize:vertical;line-height:1.5"></textarea></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isRepo }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <div style="height:62px;flex-shrink:0;display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid var(--border);background:var(--bg)">
+        <div style="display:flex;flex-direction:column;gap:3px;min-width:0;width:236px">
+          <button onClick="{{ onRepoSel }}" style="all:unset;cursor:pointer;display:flex;gap:6px;align-items:center;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden">{{ repoName }} <span style="color:var(--faint);font-size:10px">▾</span></button>
+          <button onClick="{{ onBranchSel }}" style="all:unset;cursor:pointer;display:flex;gap:6px;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);white-space:nowrap;overflow:hidden">⎇ {{ curBranch }} <span style="color:var(--faint);font-size:10px">▾</span></button>
+        </div>
+        <div style="flex:1;display:flex;justify-content:center;align-items:center;gap:2px">
+          <sc-for list="{{ tools }}" as="tl" hint-placeholder-count="9">
+            <sc-if value="{{ tl.isSep }}"><div style="width:1px;height:28px;background:var(--border);margin:0 8px"></div></sc-if>
+            <sc-if value="{{ tl.notSep }}">
+              <div style="position:relative;display:flex;align-items:stretch">
+                <button onClick="{{ tl.onClick }}" style="all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 10px;border-radius:9px;min-width:44px" style-hover="background:var(--surface2)">
+                  <span style="font-size:16px;line-height:20px">{{ tl.glyph }}</span>
+                  <span style="font-size:11px;color:var(--muted)">{{ tl.label }}</span>
+                </button>
+                <sc-if value="{{ tl.hasCaret }}"><button onClick="{{ tl.onCaret }}" style="all:unset;cursor:pointer;padding:0 4px;border-radius:6px;color:var(--faint);font-size:10px;display:grid;place-items:center" style-hover="background:var(--surface2)">▾</button></sc-if>
+                <sc-if value="{{ tl.hasBadge }}"><span style="position:absolute;top:1px;right:2px;min-width:16px;height:16px;border-radius:8px;background:var(--accent);color:var(--accent-ink);font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px;pointer-events:none">{{ tl.badge }}</span></sc-if>
+              </div>
+            </sc-if>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;width:230px;height:34px;padding:0 12px;border-radius:9px;background:var(--surface);border:1px solid var(--border)">
+          <span style="color:var(--faint)">⌕</span>
+          <input value="{{ cq }}" onChange="{{ onCq }}" placeholder="{{ t.searchCommits }}" style="flex:1;min-width:0;border:0;outline:0;background:transparent">
+        </div>
+      </div>
+
+      <div style="flex:1;min-height:0;display:flex">
+        <div style="width:clamp(200px,20vw,264px);flex-shrink:0;display:flex;flex-direction:column;background:var(--panel);border-right:1px solid var(--border)">
+          <div style="padding:12px">
+            <input value="{{ sbq }}" onChange="{{ onSbq }}" placeholder="{{ t.filterSb }}" style="width:100%;height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);outline:0">
+          </div>
+          <div style="flex:1;overflow:auto;padding:0 8px 16px">
+            <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="6">
+              <div style="margin-bottom:4px">
+                <div onClick="{{ sec.onToggle }}" style="display:flex;align-items:center;gap:6px;padding:8px 8px 6px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)" style-hover="color:var(--text)">
+                  <span style="width:10px;font-size:9px">{{ sec.chev }}</span><span style="flex:1">{{ sec.title }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ sec.count }}</span>
+                </div>
+                <sc-if value="{{ sec.open }}">
+                  <sc-for list="{{ sec.items }}" as="it">
+                    <div onClick="{{ it.onClick }}" onDoubleClick="{{ it.onDbl }}" onContextMenu="{{ it.onMenu }}" style="display:flex;align-items:center;gap:8px;height:30px;padding:0 8px 0 {{ it.pad }};border-radius:7px;cursor:pointer;background:{{ it.bg }}" style-hover="background:var(--surface2)">
+                      <span style="width:14px;flex-shrink:0;text-align:center;font-size:12px;color:{{ it.iconColor }}">{{ it.icon }}</span>
+                      <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:{{ it.weight }}">{{ it.label }}</span>
+                      <span style="font-size:11px;font-family:'IBM Plex Mono',monospace;white-space:nowrap;color:{{ it.rightColor }}">{{ it.right }}</span>
+                    </div>
+                  </sc-for>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)">
+          <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:200px 130px minmax(0,1fr) 150px 110px 76px;align-items:center;height:34px;flex-shrink:0;padding-right:12px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border);min-width:760px">
+              <span style="padding-left:14px">{{ t.colRefs }}</span><span style="padding-left:8px">{{ t.colGraph }}</span><span>{{ t.colMsg }}</span><span>{{ t.colAuthor }}</span><span>{{ t.colDate }}</span><span>{{ t.colSha }}</span>
+            </div>
+            <div style="flex:1;overflow:auto">
+              <div style="position:relative;min-width:760px">
+                <sc-for list="{{ rows }}" as="row" hint-placeholder-count="14">
+                  <div onClick="{{ row.onClick }}" onContextMenu="{{ row.onMenu }}" style="display:grid;grid-template-columns:200px 130px minmax(0,1fr) 150px 110px 76px;align-items:center;height:40px;padding-right:12px;cursor:pointer;background:{{ row.bg }};opacity:{{ row.opacity }}" style-hover="background:var(--surface2)">
+                    <div style="display:flex;gap:4px;padding-left:12px;overflow:hidden;min-width:0">
+                      <sc-for list="{{ row.refs }}" as="rf">
+                        <span onContextMenu="{{ rf.onMenu }}" style="display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 7px;border-radius:6px;font-size:11px;font-weight:500;white-space:nowrap;min-width:0;max-width:150px;overflow:hidden;text-overflow:ellipsis;background:{{ rf.bg }};border:1px solid {{ rf.color }}">{{ rf.icon }} {{ rf.label }}</span>
+                      </sc-for>
+                      <sc-if value="{{ row.hasMore }}"><span style="height:22px;padding:0 6px;border-radius:6px;font-size:11px;display:inline-flex;align-items:center;color:var(--muted);background:var(--surface2)">{{ row.more }}</span></sc-if>
+                    </div>
+                    <div></div>
+                    <div style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                      <sc-if value="{{ row.isWip }}"><span style="font-style:italic;font-weight:500;color:{{ row.wipColor }}">{{ row.wipText }}</span></sc-if>
+                      <sc-if value="{{ row.notWip }}"><span style="font-weight:{{ row.weight }}">{{ row.msg }}</span></sc-if>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;min-width:0">
+                      <sc-if value="{{ row.notWip }}">
+                        <span style="width:20px;height:20px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:8px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ row.avColor }}">{{ row.ini }}</span>
+                        <span style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.author }}</span>
+                      </sc-if>
+                    </div>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--faint);white-space:nowrap">{{ row.date }}</span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--faint)">{{ row.sha }}</span>
+                  </div>
+                </sc-for>
+                {{ graphSvg }}
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isDiff }}" hint-placeholder-val="{{ false }}">
+            <div style="height:50px;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--border)">
+              <button onClick="{{ closeDiff }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500" style-hover="background:var(--surface2)">← {{ t.backGraph }}</button>
+              <span style="width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:{{ df.stColor }};border:1px solid {{ df.stColor }}">{{ df.st }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">{{ df.path }}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap"><span style="color:var(--ok)">+{{ df.add }}</span> <span style="color:var(--danger)">−{{ df.del }}</span></span>
+              <div style="flex:1"></div>
+              <div style="display:flex;padding:3px;border-radius:9px;background:var(--surface);border:1px solid var(--border)">
+                <button onClick="{{ df.setSplit }}" style="height:24px;padding:0 10px;border:0;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;background:{{ df.splitBg }};color:{{ df.splitColor }}">{{ t.split }}</button>
+                <button onClick="{{ df.setUni }}" style="height:24px;padding:0 10px;border:0;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;background:{{ df.uniBg }};color:{{ df.uniColor }}">{{ t.unified }}</button>
+              </div>
+              <sc-if value="{{ df.canStage }}"><button onClick="{{ df.onStage }}" style="height:30px;padding:0 14px;border-radius:8px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600">{{ df.stageLabel }}</button></sc-if>
+            </div>
+            <sc-if value="{{ df.isSplit }}">
+              <div style="flex:1;overflow:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:24px">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--border);font-size:11.5px;color:var(--faint);z-index:1">
+                  <span style="padding:6px 14px;border-right:1px solid var(--border)">a/{{ df.path }}</span><span style="padding:6px 14px">b/{{ df.path }}</span>
+                </div>
+                <sc-for list="{{ df.split }}" as="d" hint-placeholder-count="12">
+                  <div style="display:grid;grid-template-columns:48px 18px minmax(0,1fr) 48px 18px minmax(0,1fr)">
+                    <span style="text-align:right;padding-right:10px;color:var(--faint);background:{{ d.lbg }}">{{ d.ln }}</span>
+                    <span style="color:var(--danger);background:{{ d.lbg }}">{{ d.ls }}</span>
+                    <span style="white-space:pre;overflow:hidden;border-right:1px solid var(--border);background:{{ d.lbg }}">{{ d.lt }}</span>
+                    <span style="text-align:right;padding-right:10px;color:var(--faint);background:{{ d.rbg }}">{{ d.rn }}</span>
+                    <span style="color:var(--ok);background:{{ d.rbg }}">{{ d.rs }}</span>
+                    <span style="white-space:pre;overflow:hidden;background:{{ d.rbg }}">{{ d.rt }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ df.isUni }}">
+              <div style="flex:1;overflow:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:24px">
+                <sc-for list="{{ df.uni }}" as="d">
+                  <div style="display:grid;grid-template-columns:48px 48px 20px minmax(0,1fr);background:{{ d.bg }}">
+                    <span style="text-align:right;padding-right:10px;color:var(--faint)">{{ d.o }}</span>
+                    <span style="text-align:right;padding-right:10px;color:var(--faint)">{{ d.n }}</span>
+                    <span style="color:{{ d.sc }}">{{ d.s }}</span>
+                    <span style="white-space:pre">{{ d.t }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </sc-if>
+
+          <sc-if value="{{ isConflict }}" hint-placeholder-val="{{ false }}">
+            <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)">
+              <button onClick="{{ backGraph }}" style="height:30px;flex-shrink:0;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="background:var(--surface2)">← {{ t.backGraph }}</button>
+              <span style="color:var(--warn);font-size:16px">⚠</span>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cf.title }}</div>
+                <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cf.sub }}</div>
+              </div>
+              <button onClick="{{ cf.takeA }}" style="height:30px;flex-shrink:0;white-space:nowrap;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500" style-hover="background:var(--surface2)">{{ t.takeAllA }}</button>
+              <button onClick="{{ cf.takeB }}" style="height:30px;flex-shrink:0;white-space:nowrap;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500" style-hover="background:var(--surface2)">{{ t.takeAllB }}</button>
+            </div>
+            <div style="flex:1;min-height:0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.15fr) minmax(0,1fr)">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0;border-bottom:2px solid var(--border)">
+                <sc-for list="{{ cf.panes }}" as="pn" hint-placeholder-count="2">
+                  <div style="display:flex;flex-direction:column;min-height:0;min-width:0;border-right:1px solid var(--border)">
+                    <div style="padding:8px 14px;font-size:12px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;min-width:0">
+                      <span style="width:18px;height:18px;flex-shrink:0;border-radius:5px;display:grid;place-items:center;font-size:10px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ pn.color }}">{{ pn.letter }}</span>
+                      <span style="font-weight:600;white-space:nowrap">{{ pn.label }}</span>
+                      <span style="font-family:'IBM Plex Mono',monospace;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pn.name }}</span>
+                    </div>
+                    <div style="flex:1;overflow:auto;padding:6px 0 12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:22px">
+                      <sc-for list="{{ pn.lines }}" as="l">
+                        <sc-if value="{{ l.isCtx }}">
+                          <div style="display:grid;grid-template-columns:40px 28px minmax(0,1fr)"><span style="text-align:right;padding-right:8px;color:var(--faint);font-size:11px">{{ l.n }}</span><span></span><span style="white-space:pre-wrap;word-break:break-word;padding-right:12px;color:var(--muted)">{{ l.text }}</span></div>
+                        </sc-if>
+                        <sc-if value="{{ l.isHead }}">
+                          <div style="display:flex;align-items:center;gap:8px;margin-top:4px;padding:2px 8px 2px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;font-weight:600;color:{{ l.color }};background:{{ l.headBg }}">
+                            <span style="flex:1">{{ l.title }}</span>
+                            <button onClick="{{ l.onPick }}" style="height:20px;padding:0 8px;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;border:1px solid {{ l.color }};background:{{ l.btnBg }};color:{{ l.btnColor }}">{{ l.btn }}</button>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ l.isHunk }}">
+                          <div style="display:grid;grid-template-columns:40px 28px minmax(0,1fr);align-items:start;background:{{ l.bg }};box-shadow:inset 3px 0 0 {{ l.color }}">
+                            <span style="text-align:right;padding-right:8px;color:var(--faint);font-size:11px">{{ l.n }}</span>
+                            <button onClick="{{ l.onToggle }}" title="{{ l.tip }}" style="width:20px;height:20px;margin-top:1px;padding:0;border-radius:5px;cursor:pointer;font-size:14px;font-weight:700;line-height:1;display:grid;place-items:center;border:1px solid {{ l.btnBorder }};background:{{ l.btnBg }};color:{{ l.btnColor }}">{{ l.mark }}</button>
+                            <span style="white-space:pre-wrap;word-break:break-word;padding-right:12px;opacity:{{ l.opacity }}">{{ l.text }}</span>
+                          </div>
+                        </sc-if>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;min-height:0;min-width:0">
+                <div style="padding:6px 10px 6px 14px;flex-wrap:wrap;font-size:12px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;min-width:0">
+                  <span style="font-weight:600">{{ t.output }}</span>
+                  <span style="color:var(--muted);flex:1 1 120px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cf.outSub }}</span>
+                  <span style="font-weight:600;white-space:nowrap;color:{{ cf.statusColor }}">{{ cf.status }}</span>
+                  <sc-if value="{{ cf.hasManual }}"><button onClick="{{ cf.onReset }}" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;white-space:nowrap">{{ t.resetManual }}</button></sc-if>
+                  <sc-if value="{{ cf.notEditing }}"><button onClick="{{ cf.onEdit }}" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;white-space:nowrap" style-hover="border-color:var(--accent)">✎ {{ t.editManual }}</button></sc-if>
+                  <sc-if value="{{ cf.editing }}"><button onClick="{{ cf.onDone }}" style="height:26px;padding:0 12px;border-radius:7px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:12px;font-weight:600">{{ t.doneEdit }}</button></sc-if>
+                </div>
+                <sc-if value="{{ cf.editing }}">
+                  <textarea value="{{ cf.editText }}" onChange="{{ cf.onEditText }}" spellcheck="false" style="flex:1;min-height:0;margin:0;padding:10px 14px 10px 54px;border:0;outline:0;resize:none;background:var(--bg);font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:22px;box-shadow:inset 3px 0 0 var(--info)"></textarea>
+                </sc-if>
+                <sc-if value="{{ cf.notEditing }}">
+                  <div style="flex:1;overflow:auto;padding:6px 0 12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:22px">
+                    <sc-for list="{{ cf.out }}" as="l">
+                      <sc-if value="{{ l.isLine }}">
+                        <div style="display:grid;grid-template-columns:40px 28px minmax(0,1fr);align-items:start;background:{{ l.bg }};box-shadow:inset 3px 0 0 {{ l.bar }}">
+                          <span style="text-align:right;padding-right:8px;color:var(--faint);font-size:11px">{{ l.n }}</span>
+                          <button onClick="{{ l.onRemove }}" title="{{ t.lgRemove }}" style="width:20px;height:20px;margin-top:1px;padding:0;border-radius:5px;cursor:pointer;font-size:14px;font-weight:700;line-height:1;display:grid;place-items:center;border:1px solid var(--border);background:var(--surface);color:var(--danger);visibility:{{ l.vis }}" style-hover="border-color:var(--danger)">−</button>
+                          <span style="white-space:pre-wrap;word-break:break-word;padding-right:12px;">{{ l.text }}</span>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ l.isGap }}">
+                        <div style="margin:4px 12px 4px 40px;padding:8px 12px;border-radius:8px;border:1px dashed var(--warn);background:color-mix(in oklch, var(--warn) 8%, transparent);color:var(--warn);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500">{{ l.text }}</div>
+                      </sc-if>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isRebase }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;overflow:auto">
+              <div style="max-width:860px;margin:0 auto;padding:28px 28px 40px;display:flex;flex-direction:column;gap:18px">
+                <div>
+                  <div style="font-size:12px;color:var(--faint);font-weight:600;letter-spacing:.05em;text-transform:uppercase">{{ t.rbTitle }}</div>
+                  <div style="font-size:20px;font-weight:600;margin-top:4px;font-family:'IBM Plex Mono',monospace">{{ rb.title }}</div>
+                  <div style="color:var(--muted);margin-top:6px">{{ t.rbOrder }}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <sc-for list="{{ rb.items }}" as="it" hint-placeholder-count="3">
+                    <div draggable="true" onDragStart="{{ it.onDragStart }}" onDragOver="{{ it.onDragOver }}" onDrop="{{ it.onDrop }}" style="display:grid;grid-template-columns:22px 110px 76px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;opacity:{{ it.opacity }}">
+                      <span style="color:var(--faint);cursor:grab;text-align:center;letter-spacing:-2px">⋮⋮</span>
+                      <select value="{{ it.action }}" onChange="{{ it.onAction }}" style="height:30px;padding:0 8px;border-radius:7px;border:1px solid {{ it.color }};background:var(--bg);color:{{ it.color }};font-family:'IBM Plex Mono',monospace;font-weight:600">
+                        <sc-for list="{{ it.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                      </select>
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ it.sha }}</span>
+                      <sc-if value="{{ it.isReword }}"><input value="{{ it.newMsg }}" onChange="{{ it.onMsg }}" style="height:30px;padding:0 10px;border-radius:7px;border:1px solid var(--accent);background:var(--bg);outline:0;min-width:0"></sc-if>
+                      <sc-if value="{{ it.notReword }}"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ it.deco }}">{{ it.msg }}</span></sc-if>
+                      <div style="display:flex;gap:4px">
+                        <button onClick="{{ it.onUp }}" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer" style-hover="background:var(--surface2)">↑</button>
+                        <button onClick="{{ it.onDown }}" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer" style-hover="background:var(--surface2)">↓</button>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding-top:6px">
+                  <span style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">{{ rb.summary }}</span>
+                  <button onClick="{{ rb.onCancel }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.cancel }}</button>
+                  <button onClick="{{ rb.onStart }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600">{{ t.startRebase }}</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="width:clamp(280px,26vw,360px);flex-shrink:0;display:flex;flex-direction:column;min-height:0;background:var(--panel);border-left:1px solid var(--border)">
+          <sc-if value="{{ showConflictPanel }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:10px;background:color-mix(in oklch, var(--warn) 12%, transparent);border:1px solid color-mix(in oklch, var(--warn) 40%, transparent)">
+                <span style="color:var(--warn)">⚠</span>
+                <div style="min-width:0"><div style="font-weight:600">{{ t.mergeInProgress }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:2px">{{ cfp.desc }}</div></div>
+              </div>
+              <div style="font-size:12px;color:var(--muted)">{{ cfp.progress }}</div>
+            </div>
+            <div style="flex:1;overflow:auto;padding:8px">
+              <sc-for list="{{ cfp.files }}" as="f">
+                <div onClick="{{ f.onClick }}" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;background:{{ f.bg }}" style-hover="background:var(--surface2)">
+                  <span style="width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:{{ f.iconColor }};border:1px solid {{ f.iconColor }}">{{ f.icon }}</span>
+                  <span style="flex:1;min-width:0;font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.path }}</span>
+                  <span style="font-size:11px;color:{{ f.iconColor }}">{{ f.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
+              <button onClick="{{ cfp.onComplete }}" style="height:38px;border-radius:9px;border:0;font-weight:600;cursor:pointer;background:{{ cfp.btnBg }};color:{{ cfp.btnColor }}">{{ t.completeMerge }}</button>
+              <button onClick="{{ cfp.onAbort }}" style="height:34px;border-radius:9px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--danger);font-weight:500">{{ t.abortMerge }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showStaging }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:16px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:600;font-size:14px">{{ stg.title }}</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:2px;font-family:'IBM Plex Mono',monospace">{{ stg.sub }}</div>
+              </div>
+              <button onClick="{{ stg.onMenu }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button>
+            </div>
+            <div style="flex:1;overflow:auto;min-height:0;padding:6px 8px">
+              <sc-for list="{{ stg.lists }}" as="ls" hint-placeholder-count="2">
+                <div style="margin-bottom:10px">
+                  <div style="display:flex;align-items:center;gap:8px;padding:8px 8px 6px">
+                    <span style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ ls.title }}</span>
+                    <sc-if value="{{ ls.hasFiles }}"><button onClick="{{ ls.onAll }}" style="height:24px;padding:0 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:500" style-hover="border-color:var(--accent)">{{ ls.allLabel }}</button></sc-if>
+                  </div>
+                  <sc-for list="{{ ls.files }}" as="f">
+                    <div onClick="{{ f.onOpen }}" onContextMenu="{{ f.onMenu }}" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 4px 0 8px;border-radius:7px;cursor:pointer;background:{{ f.bg }}" style-hover="background:var(--surface2)">
+                      <span style="width:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:{{ f.stColor }}">{{ f.st }}</span>
+                      <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:500">{{ f.base }}</span> <span style="color:var(--faint);font-size:11.5px">{{ f.dir }}</span></span>
+                      <button onClick="{{ f.onToggle }}" style="width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;color:var(--muted)" style-hover="border-color:var(--accent);color:var(--accent)">{{ f.btn }}</button>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ ls.empty }}"><div style="padding:6px 8px 4px;font-size:12px;color:var(--faint)">{{ t.noChanges }}</div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">Commit</span>
+                <button onClick="{{ stg.onAI }}" style="height:24px;padding:0 10px;border-radius:6px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap">✦ {{ stg.aiLabel }}</button>
+              </div>
+              <div style="position:relative">
+                <input value="{{ stg.msg }}" onChange="{{ stg.onMsg }}" placeholder="{{ t.summary }}" style="width:100%;height:36px;padding:0 44px 0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0;font-weight:500">
+                <span style="position:absolute;right:10px;top:10px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:{{ stg.countColor }}">{{ stg.count }}</span>
+              </div>
+              <textarea value="{{ stg.desc }}" onChange="{{ stg.onDesc }}" placeholder="{{ t.description }}" rows="3" style="width:100%;padding:8px 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0;resize:vertical;line-height:1.5"></textarea>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{ stg.amend }}" onChange="{{ stg.onAmend }}" style="accent-color:var(--accent)">{{ t.amend }}</label>
+              <button onClick="{{ stg.onCommit }}" style="height:38px;border-radius:9px;border:0;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 12px;background:{{ stg.btnBg }};color:{{ stg.btnColor }}">{{ stg.btnLabel }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ showDetail }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="height:24px;padding:0 8px;border-radius:6px;display:flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--surface);border:1px solid var(--border)">{{ dt.sha }}</span>
+                <button onClick="{{ dt.onCopy }}" style="height:24px;padding:0 8px;border-radius:6px;border:0;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;font-weight:500">{{ t.copy }}</button>
+                <div style="flex:1"></div>
+                <button onClick="{{ dt.onClose }}" style="width:28px;height:28px;border-radius:7px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">×</button>
+              </div>
+              <div style="font-size:16px;font-weight:600;line-height:1.4;text-wrap:pretty">{{ dt.msg }}</div>
+              <sc-if value="{{ dt.hasAI }}"><div style="padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:12.5px;line-height:1.55;text-wrap:pretty"><span style="color:var(--accent);font-weight:600">✦ IA · </span>{{ dt.aiText }}</div></sc-if>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ dt.avColor }}">{{ dt.ini }}</span>
+                <div><div style="font-weight:500">{{ dt.author }}</div><div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ dt.date }}</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:70px 1fr;gap:6px 12px;font-size:12px">
+                <span style="color:var(--faint)">{{ t.parents }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ dt.parents }}</span>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button onClick="{{ dt.onCherry }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500" style-hover="border-color:var(--accent)">{{ t.cherryBtn }}</button>
+                <button onClick="{{ dt.onRevert }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500" style-hover="border-color:var(--accent)">{{ t.revertBtn }}</button>
+                <button onClick="{{ dt.onBranch }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500" style-hover="border-color:var(--accent)">{{ t.branchBtn }}</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <div style="display:flex;align-items:center;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px">
+                  <span style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ dt.filesLabel }}</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px"><span style="color:var(--ok)">+{{ dt.add }}</span> <span style="color:var(--danger)">−{{ dt.del }}</span></span>
+                </div>
+                <sc-for list="{{ dt.files }}" as="f">
+                  <div onClick="{{ f.onOpen }}" onContextMenu="{{ f.onMenu }}" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border-radius:7px;cursor:pointer;background:{{ f.bg }}" style-hover="background:var(--surface2)">
+                    <span style="width:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:{{ f.stColor }}">{{ f.st }}</span>
+                    <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:500">{{ f.base }}</span> <span style="color:var(--faint);font-size:11.5px">{{ f.dir }}</span></span>
+                    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint)">{{ f.stat }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:40;background:oklch(0.1 0.01 230 / 0.5);display:grid;place-items:center;padding:24px">
+      <div onClick="{{ stop }}" style="width:100%;max-width:{{ modal.w }}px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;max-height:90vh">
+        <div style="padding:20px 22px 4px">
+          <div style="font-size:16px;font-weight:600">{{ modal.title }}</div>
+          <sc-if value="{{ modal.hasSub }}"><div style="color:var(--muted);margin-top:4px;text-wrap:pretty">{{ modal.sub }}</div></sc-if>
+        </div>
+        <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px;overflow:auto">
+          <sc-for list="{{ modal.fields }}" as="f">
+            <sc-if value="{{ f.isAction }}"><button onClick="{{ f.onClick }}" style="height:36px;border-radius:9px;border:1px dashed var(--accent);background:var(--accent-soft);color:var(--accent);cursor:pointer;font-weight:600">{{ f.label }}</button></sc-if>
+            <sc-if value="{{ f.isInfo }}"><div style="padding:10px 12px;border-radius:9px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--muted);line-height:1.5;font-family:{{ f.font }}">{{ f.text }}</div></sc-if>
+            <sc-if value="{{ f.isText }}">
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
+                <input value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" style="height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0;font-family:{{ f.font }}"></label>
+            </sc-if>
+            <sc-if value="{{ f.isArea }}">
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
+                <textarea value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" rows="4" style="padding:8px 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0;resize:vertical;line-height:1.5"></textarea></label>
+            </sc-if>
+            <sc-if value="{{ f.isSelect }}">
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
+                <select value="{{ f.value }}" onChange="{{ f.onChange }}" style="height:36px;padding:0 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg)">
+                  <sc-for list="{{ f.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </select></label>
+            </sc-if>
+            <sc-if value="{{ f.isSeg }}">
+              <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
+                <div style="display:flex;padding:3px;border-radius:9px;background:var(--bg);border:1px solid var(--border)">
+                  <sc-for list="{{ f.options }}" as="o"><button onClick="{{ o.onClick }}" style="flex:1;height:30px;border:0;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+                </div></div>
+            </sc-if>
+            <sc-if value="{{ f.isCheck }}"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onToggle }}" style="accent-color:var(--accent)"><span>{{ f.label }}</span></label></sc-if>
+          </sc-for>
+        </div>
+        <div style="padding:14px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+          <button onClick="{{ closeModal }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500" style-hover="background:var(--surface2)">{{ t.cancel }}</button>
+          <button onClick="{{ submitModal }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;cursor:pointer;font-weight:600;background:{{ modal.btnBg }};color:{{ modal.btnColor }}">{{ modal.submit }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasMenu }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenu }}" onContextMenu="{{ closeMenu }}" style="position:fixed;inset:0;z-index:50"></div>
+    <div style="position:fixed;left:{{ menu.x }}px;top:{{ menu.y }}px;z-index:51;min-width:236px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)">
+      <sc-for list="{{ menu.items }}" as="it">
+        <sc-if value="{{ it.isSep }}"><div style="height:1px;background:var(--border);margin:4px 6px"></div></sc-if>
+        <sc-if value="{{ it.notSep }}">
+          <div onClick="{{ it.onClick }}" onMouseEnter="{{ it.onEnter }}" style="position:relative;display:flex;align-items:center;gap:12px;height:32px;padding:0 10px;border-radius:7px;cursor:pointer;color:{{ it.color }};background:{{ it.bg }}" style-hover="background:var(--surface2)">
+            <span style="flex:1;white-space:nowrap">{{ it.label }}</span>
+            <span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ it.hint }}</span>
+            <sc-if value="{{ it.showSub }}">
+              <div style="position:absolute;left:100%;top:-6px;margin-left:6px;min-width:220px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)">
+                <sc-for list="{{ it.children }}" as="ch">
+                  <div onClick="{{ ch.onClick }}" style="display:flex;align-items:center;height:32px;padding:0 10px;border-radius:7px;cursor:pointer;white-space:nowrap;color:{{ ch.color }}" style-hover="background:var(--surface2)">{{ ch.label }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;right:20px;bottom:20px;z-index:60;display:flex;flex-direction:column;gap:8px;pointer-events:none">
+    <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0">
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:11px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-width:400px;animation:toastIn .2s ease-out">
+        <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ to.color }}"></span><span>{{ to.text }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;graphNodes&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;avatar&quot;,&quot;dot&quot;],&quot;default&quot;:&quot;avatar&quot;,&quot;tsType&quot;:&quot;'avatar'|'dot'&quot;}}">
+const STC = { M: 'var(--warn)', A: 'var(--ok)', D: 'var(--danger)', R: 'var(--info)' };
+const PRC = { open: 'var(--info)', draft: 'var(--faint)', approved: 'var(--ok)', changes: 'var(--warn)', merged: 'oklch(0.68 0.18 300)', closed: 'var(--danger)' };
+const CKC = { pass: 'var(--ok)', fail: 'var(--danger)', pending: 'var(--warn)' };
+const ACTC = { pick: 'var(--accent)', reword: 'var(--info)', edit: 'var(--warn)', squash: 'oklch(0.68 0.18 300)', fixup: 'oklch(0.68 0.18 300)', drop: 'var(--danger)' };
+const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
+const splitPath = p => { const a = p.split('/'); const base = a.pop(); return { base, dir: a.join('/') }; };
+const nowStr = () => { const d = new Date(); return `2026-09-30 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+const rsha = () => Math.random().toString(16).slice(2, 9).padEnd(7, '0');
+
+class Component extends DCLogic {
+  state = { ready: false };
+
+  componentDidMount() {
+    const go = () => window.RAMAL ? this.init() : setTimeout(go, 30);
+    go();
+    this._k = e => { if (e.key === 'Escape') this.setState({ menu: null, modal: null }); };
+    window.addEventListener('keydown', this._k);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._k); }
+  componentDidUpdate(pp) {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+    if (pp.theme !== this.props.theme && this.props.theme) this.setState({ theme: this.props.theme });
+    if (pp.lang !== this.props.lang && this.props.lang) this.setState({ lang: this.props.lang });
+  }
+  init() {
+    const R = window.RAMAL;
+    this.setState({
+      ready: true, theme: this.props.theme || 'dark', lang: this.props.lang || 'es',
+      tab: 'home', view: 'repos', wsId: 'w1', openTabs: ['r1'],
+      repos: R.REPOS.map(r => ({ ...r })), workspaces: R.WS.map(w => ({ ...w })), accounts: R.ACCOUNTS.map(a => ({ ...a })), prs: R.PRS.slice(),
+      q: '', fKind: 'all', fPlat: [], fAcc: '', fWs: '', groupBy: '', prState: 'all',
+      sel: 'wip', center: 'conflict', diffFile: null, diffMode: 'split',
+      unstaged: R.UNSTAGED.slice(), staged: R.STAGED.slice(), msg: '', desc: '', amend: false,
+      commits: R.mkCommits(), ahead: 2, current: 'feature/graph-ui',
+      setSec: 'profile', setOpen: false, graphNodes: this.props.graphNodes || 'avatar', aiBusy: null,
+      profile: { name: 'Marta Ruiz', user: 'marta', email: 'marta@ramal.dev', tz: 'Europe/Madrid' },
+      aiKeys: R.AIKEYS.map(k => ({ ...k })), members: R.MEMBERS.map(m => ({ ...m })), sessions: R.SESSIONS.slice(),
+      ai: { commit: true, pr: true, summary: true, commitKey: '', prKey: '', summaryKey: '', lang: 'app', conventional: true, instructions: '', exclude: true },
+      git: { name: 'Marta Ruiz', email: 'marta@ramal.dev', defBranch: 'main', sign: true, autoFetch: '15', pull: 'rebase', prune: true },
+      menu: null, modal: null, toasts: [], conflict: { src: 'hotfix/login', file: 0, choices: this.initChoices(), manual: {} }, conflictUsed: true, rebase: null,
+      sbq: '', cq: '', closed: {}, stashes: R.STASHES.slice(), repoPrs: R.REPO_PRS.slice()
+    });
+  }
+
+  tr(k, v) { const e = window.RAMAL.D[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  ago(m) { const en = this.state.lang === 'en'; if (m < 60) return en ? `${m} min ago` : `hace ${m} min`; if (m < 1440) { const h = Math.round(m / 60); return en ? `${h}h ago` : `hace ${h} h`; } const d = Math.round(m / 1440); return en ? `${d}d ago` : `hace ${d} d`; }
+  toast(text, kind = 'ok') { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
+  copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.toast(this.tr('copied', { x }), 'info'); }
+  done(label) { this.toast(this.tr('doneT', { x: label.replace('…', '') }), 'info'); }
+  disp(r) { return r.alias || r.name; }
+  head() { return this.state.commits.find(c => c.refs.some(r => r.head)) || this.state.commits[0]; }
+
+  openMenuAt(e, build) {
+    e.preventDefault(); e.stopPropagation();
+    const rc = e.currentTarget.getBoundingClientRect();
+    const items = build();
+    const h = items.reduce((a, i) => a + (i.sep ? 9 : 32), 14);
+    this.setState({ menu: { x: Math.min(rc.left, window.innerWidth - 260), y: Math.min(rc.bottom + 4, window.innerHeight - h - 8), items, build, sub: -1 } });
+  }
+  openMenu(e, items) {
+    e.preventDefault(); e.stopPropagation();
+    const build = typeof items === 'function' ? items : null; if (build) items = build();
+    const h = items.reduce((a, i) => a + (i.sep ? 9 : 32), 14);
+    const sub = items.some(i => i.children);
+    const x = Math.max(8, Math.min(e.clientX, window.innerWidth - (sub ? 490 : 250)));
+    const y = Math.max(8, Math.min(e.clientY, window.innerHeight - h - 8));
+    this.setState({ menu: { x, y, items, build, sub: -1 } });
+  }
+  closeMenu = e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ menu: null }); };
+
+  openForm(cfg) { const values = {}; cfg.fields.forEach(f => { if (f.key) values[f.key] = f.value !== undefined ? f.value : (f.type === 'check' ? false : ''); }); this.setState({ modal: { ...cfg, values }, menu: null }); }
+  setVal(k, v) { this.setState(s => ({ modal: { ...s.modal, values: { ...s.modal.values, [k]: v } } })); }
+  submitModal = () => { const m = this.state.modal; if (!m) return; if (m.onSubmit(m.values) !== false) this.setState({ modal: null }); };
+  confirm(title, info, label, fn, extra) { this.openForm({ title, danger: true, submitLabel: label, fields: [{ type: 'info', text: info }, ...(extra || [])], onSubmit: fn }); }
+
+  updRepo(id, patch) { this.setState(s => ({ repos: s.repos.map(r => r.id === id ? { ...r, ...patch } : r) })); }
+  openRepo(id) { this.setState(s => ({ openTabs: s.openTabs.includes(id) ? s.openTabs : [...s.openTabs, id], tab: id, center: s.conflict ? 'conflict' : 'graph', sel: 'wip', diffFile: null, menu: null })); }
+  closeTab(id, e) { e.stopPropagation(); this.setState(s => { const ot = s.openTabs.filter(x => x !== id); return { openTabs: ot, tab: s.tab === id ? (ot[ot.length - 1] || 'home') : s.tab }; }); }
+
+  aliasRepo(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('mAlias'), submitLabel: tr('save'), fields: [{ type: 'info', text: tr('aliasHint') }, { type: 'text', key: 'alias', label: tr('alias'), value: r.alias, placeholder: r.name }], onSubmit: v => { this.updRepo(r.id, { alias: v.alias.trim() }); this.toast(tr('saved')); } }); }
+  renameRepo(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('mRename'), submitLabel: tr('save'), fields: [{ type: 'info', text: tr('renameInfo') + '\n' + r.path, mono: true }, { type: 'text', key: 'name', label: tr('name'), value: r.name, mono: true }], onSubmit: v => { const n = v.name.trim(); if (!n) return false; this.updRepo(r.id, { name: n, path: r.path.replace(/[^/]+$/, n) }); this.toast(tr('saved')); } }); }
+  removeRepo(r) { const tr = this.tr.bind(this); this.confirm(tr('removeTitle', { n: this.disp(r) }), tr('removeInfo'), tr('remove'), () => { this.setState(s => { const ot = s.openTabs.filter(x => x !== r.id); return { repos: s.repos.filter(x => x.id !== r.id), openTabs: ot, tab: s.tab === r.id ? 'home' : s.tab }; }); this.toast(tr('removedT', { n: this.disp(r) })); }, [{ type: 'check', key: 'disk', label: tr('alsoDisk') }]); }
+  toggleWs(r, ws) { this.setState(s => ({ repos: s.repos.map(x => x.id !== r.id ? x : { ...x, wss: ws == null ? [] : x.wss.includes(ws) ? x.wss.filter(y => y !== ws) : [...x.wss, ws] }) })); }
+  newWs(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('newWsTitle'), submitLabel: tr('create'), fields: [{ type: 'text', key: 'name', label: tr('name'), placeholder: 'Frontend' }], onSubmit: v => { const n = v.name.trim(); if (!n) return false; const id = 'w' + Date.now(); const L = window.RAMAL.LANE; this.setState(s => ({ workspaces: [...s.workspaces, { id, name: n, color: L[s.workspaces.length % L.length] }], repos: r ? s.repos.map(x => x.id === r.id ? { ...x, wss: [...x.wss, id] } : x) : s.repos, view: r ? s.view : 'ws', wsId: r ? s.wsId : id })); this.toast(tr('wsCreatedT', { n })); } }); }
+  renameWs(w) { const tr = this.tr.bind(this); this.openForm({ title: tr('renameWsTitle'), submitLabel: tr('save'), fields: [{ type: 'text', key: 'name', label: tr('name'), value: w.name }], onSubmit: v => { this.setState(s => ({ workspaces: s.workspaces.map(x => x.id === w.id ? { ...x, name: v.name.trim() || w.name } : x) })); this.toast(tr('saved')); } }); }
+  deleteWs(w) { const tr = this.tr.bind(this); this.confirm(tr('deleteWsTitle', { n: w.name }), tr('deleteWsInfo'), tr('del'), () => { this.setState(s => ({ workspaces: s.workspaces.filter(x => x.id !== w.id), repos: s.repos.map(r => ({ ...r, wss: r.wss.filter(y => y !== w.id) })), view: 'repos' })); }); }
+  openAllWs(w) { this.state.repos.filter(r => r.wss.includes(w.id)).forEach(r => this.openRepo(r.id)); }
+
+  repoMenu(r) {
+    const tr = this.tr.bind(this);
+    return [
+      { label: tr('mOpen'), hint: '↵', action: () => this.openRepo(r.id) },
+      { label: tr('mAlias'), action: () => this.aliasRepo(r) },
+      { label: tr('mRename'), hint: 'F2', action: () => this.renameRepo(r) },
+      { sep: 1 },
+      { label: tr('mMoveWs'), children: (() => { const cur = this.state.repos.find(x => x.id === r.id) || r; return [...this.state.workspaces.map(w => ({ label: (cur.wss.includes(w.id) ? '✓  ' : '     ') + w.name, keep: 1, action: () => this.toggleWs(r, w.id) })), { label: '     ' + tr('mNoWsAll'), keep: 1, action: () => this.toggleWs(r, null) }, { label: '     + ' + tr('newWs'), action: () => this.newWs(r) }]; })() },
+      ...(r.acc ? [{ label: tr('mFetch'), action: () => this.toast(tr('fetchedT')) }] : []),
+      { label: tr('mReveal'), action: () => this.done(tr('mReveal')) },
+      { label: tr('mTerminal'), action: () => this.done(tr('mTerminal')) },
+      { label: tr('mCopyPath'), action: () => this.copy(r.path) },
+      { sep: 1 },
+      { label: tr('mRemove'), danger: 1, action: () => this.removeRepo(r) }
+    ];
+  }
+  wsMenu(w) {
+    const tr = this.tr.bind(this);
+    return [{ label: tr('openAll'), action: () => this.openAllWs(w) }, { label: tr('fetchAll'), action: () => this.toast(tr('fetchedT')) }, { sep: 1 }, { label: tr('mRenameWs'), action: () => this.renameWs(w) }, { label: tr('mDeleteWs'), danger: 1, action: () => this.deleteWs(w) }];
+  }
+  accMenu(a) {
+    const tr = this.tr.bind(this);
+    return [{ label: tr('mTest'), action: () => this.toast(tr('doneT', { x: tr('mTest') + ' @' + a.user })) }, ...(a.def ? [] : [{ label: tr('makeDefault'), action: () => this.makeDef(a) }]), { label: tr('mEditToken'), action: () => this.addAccount(a.platform, a) }, { sep: 1 }, { label: tr('mRemoveAcc'), danger: 1, action: () => this.confirm(tr('mRemoveAcc').replace('…', '') + ' @' + a.user, a.host, tr('remove'), () => { this.setState(s => ({ accounts: s.accounts.filter(x => x.id !== a.id) })); this.toast(tr('accRemovedT')); }) }];
+  }
+  makeDef(a) { this.setState(s => ({ accounts: s.accounts.map(x => x.platform === a.platform ? { ...x, def: x.id === a.id } : x) })); this.toast(this.tr('defT', { u: a.user })); }
+  addAccount(plat, edit) {
+    const tr = this.tr.bind(this), P = window.RAMAL.PLAT;
+    const hosts = { github: 'github.com', gitlab: 'gitlab.com', bitbucket: 'bitbucket.org', gitea: 'git.ejemplo.com', azure: 'dev.azure.com/org' };
+    this.openForm({
+      title: edit ? tr('mEditToken').replace('…', '') : tr('accTitleM'), submitLabel: edit ? tr('save') : tr('create'),
+      fields: [
+        { type: 'select', key: 'platform', label: tr('platform'), value: plat || 'github', options: Object.keys(P).map(k => ({ value: k, label: P[k].label })) },
+        { type: 'text', key: 'host', label: tr('host'), value: edit ? edit.host : '', placeholder: hosts[plat || 'github'], mono: true },
+        { type: 'seg', key: 'method', label: tr('method'), value: 'OAuth', options: [{ value: 'OAuth', label: 'OAuth' }, { value: 'Token (PAT)', label: 'Token' }, { value: 'SSH', label: 'SSH' }] },
+        { type: 'text', key: 'user', label: tr('user'), value: edit ? edit.user : '', placeholder: 'usuario' },
+        { type: 'text', key: 'token', label: tr('token'), placeholder: 'ghp_••••••••••••', mono: true, showIf: v => v.method !== 'OAuth' },
+        { type: 'text', key: 'name', label: tr('label'), value: edit ? edit.name : '', placeholder: tr('labelPh') }
+      ],
+      onSubmit: v => {
+        const user = (v.user || '').trim(); if (!user) return false;
+        if (edit) { this.setState(s => ({ accounts: s.accounts.map(x => x.id === edit.id ? { ...x, user, host: v.host || x.host, method: v.method, name: v.name || x.name } : x) })); this.toast(tr('saved')); return; }
+        const p = v.platform; const has = this.state.accounts.some(a => a.platform === p);
+        this.setState(s => ({ accounts: [...s.accounts, { id: 'a' + Date.now(), platform: p, user, name: v.name || '—', host: v.host || hosts[p], method: v.method, def: !has, scopes: 'repo' }] }));
+        this.toast(tr('accAddedT', { u: user }));
+      }
+    });
+  }
+  cloneDialog = () => {
+    const tr = this.tr.bind(this), P = window.RAMAL.PLAT;
+    this.openForm({ title: tr('cloneTitle'), submitLabel: tr('clone'), wide: true, fields: [
+      { type: 'select', key: 'acc', label: tr('asAccount'), value: 'a1', options: this.state.accounts.map(a => ({ value: a.id, label: `${P[a.platform].label} · @${a.user} (${a.host})` })) },
+      { type: 'text', key: 'url', label: tr('cloneUrl'), placeholder: 'acme/web-app', mono: true },
+      { type: 'text', key: 'dest', label: tr('cloneDest'), value: '~/code', mono: true },
+      { type: 'select', key: 'ws', label: tr('workspaces'), value: '', options: [{ value: '', label: tr('noWs') }, ...this.state.workspaces.map(w => ({ value: w.id, label: w.name }))] },
+      { type: 'check', key: 'sub', label: 'git clone --recurse-submodules', value: true }
+    ], onSubmit: v => { const n = (v.url || '').split('/').pop().replace(/\.git$/, '').trim(); if (!n) return false; this.addRepoItem({ name: n, path: `${v.dest}/${n}`, acc: v.acc, wss: v.ws ? [v.ws] : [] }); this.toast(tr('clonedT', { n })); } });
+  };
+  openRepoDialog = () => { const tr = this.tr.bind(this); this.openForm({ title: tr('openTitle'), submitLabel: tr('openRepo'), fields: [{ type: 'text', key: 'path', label: tr('openPath'), placeholder: '~/code/mi-proyecto', mono: true }], onSubmit: v => { const p = (v.path || '').trim(); if (!p) return false; this.addRepoItem({ name: p.split('/').pop(), path: p, acc: null, wss: [] }); } }); };
+  initDialog = () => {
+    const tr = this.tr.bind(this), P = window.RAMAL.PLAT;
+    this.openForm({ title: tr('initTitle'), submitLabel: tr('create'), fields: [
+      { type: 'text', key: 'path', label: tr('openPath'), value: '~/code/', mono: true },
+      { type: 'check', key: 'pub', label: tr('publish') },
+      { type: 'select', key: 'acc', label: tr('asAccount'), value: 'a1', options: this.state.accounts.map(a => ({ value: a.id, label: `${P[a.platform].label} · @${a.user}` })), showIf: v => v.pub }
+    ], onSubmit: v => { const p = (v.path || '').replace(/\/$/, ''); const n = p.split('/').pop(); if (!n || n === '~') return false; this.addRepoItem({ name: n, path: p, acc: v.pub ? v.acc : null, wss: [], _x: null }); } });
+  };
+  addRepoItem(o) { const id = 'r' + Date.now(); this.setState(s => ({ repos: [{ id, alias: '', wss: [], branch: 'main', ahead: 0, behind: 0, changes: 0, mins: 0, ...o }, ...s.repos] })); this.openRepo(id); }
+
+  select(id) { this.setState(s => ({ sel: id, center: s.center === 'diff' ? 'graph' : s.center, diffFile: null })); }
+  checkout(name, remote) {
+    const tr = this.tr.bind(this);
+    let local = remote ? name.split('/').slice(1).join('/') : name;
+    this.setState(s => {
+      let commits = s.commits;
+      const exists = commits.some(c => c.refs.some(r => r.type === 'local' && r.name === local));
+      if (!exists) { const src = commits.find(c => c.refs.some(r => r.name === name)); commits = commits.map(c => c === src ? { ...c, refs: [{ name: local, type: 'local' }, ...c.refs] } : c); }
+      commits = commits.map(c => ({ ...c, refs: c.refs.map(r => ({ ...r, head: r.type === 'local' && r.name === local })) }));
+      return { commits, current: local, ahead: local === 'feature/graph-ui' ? s.ahead : 0 };
+    });
+    this.toast(tr('checkoutT', { b: local }));
+  }
+  addCommit(msg, extra) {
+    this.setState(s => {
+      const head = s.commits.find(c => c.refs.some(r => r.head)); const id = 'n' + Date.now();
+      const refs = head.refs.filter(r => r.head).map(r => ({ ...r }));
+      const commits = s.commits.map(c => c === head ? { ...c, refs: c.refs.filter(r => !r.head) } : c);
+      const nc = { id, lane: head.lane, parents: extra ? [head.id, extra] : [head.id], msg, au: 'MR', date: nowStr(), sha: rsha(), refs };
+      return { commits: [nc, ...commits], ahead: s.ahead + 1 };
+    });
+  }
+  doCommit = () => {
+    const s = this.state, tr = this.tr.bind(this);
+    if (!s.msg.trim() || (!s.staged.length && !s.amend)) { this.toast(tr('noStagedT'), 'warn'); return; }
+    if (s.amend) { const h = this.head(); this.setState(x => ({ commits: x.commits.map(c => c.id === h.id ? { ...c, msg: x.msg.trim() } : c), staged: [], msg: '', desc: '', amend: false })); this.toast(tr('saved')); return; }
+    this.addCommit(s.msg.trim()); this.setState({ staged: [], msg: '', desc: '' });
+    setTimeout(() => this.toast(tr('committedT', { s: this.head().sha })), 0);
+  };
+  push(force) {
+    const tr = this.tr.bind(this); const nm = 'origin/' + this.state.current;
+    const go = () => { this.setState(s => { const h = s.commits.find(c => c.refs.some(r => r.head)); const commits = s.commits.map(c => { let refs = c.refs.filter(r => r.name !== nm); if (c.id === h.id) refs = [...refs, { name: nm, type: 'remote' }]; return { ...c, refs }; }); return { commits, ahead: 0 }; }); this.toast(tr('pushedT', { b: nm })); };
+    if (force) this.confirm(tr('forcePushTitle', { b: this.state.current }), tr('forcePushInfo'), 'Force push', go); else go();
+  }
+  pullMenu(e) { const tr = this.tr.bind(this); const p = () => this.toast(tr('pulledT', { b: this.state.current })); this.openMenu(e, [{ label: tr('mFetchAllR'), action: () => this.toast(tr('fetchedT')) }, { sep: 1 }, { label: tr('mPullFF'), action: p }, { label: tr('mPullOnly'), action: p }, { label: tr('mPullRebase'), action: p }]); }
+  pushMenu(e) { const tr = this.tr.bind(this); this.openMenu(e, [{ label: tr('mPush'), action: () => this.push() }, { label: tr('mForcePush'), danger: 1, action: () => this.push(true) }, { label: tr('mUpstream'), action: () => this.done(tr('mUpstream')) }]); }
+
+  stage(p) { this.setState(s => { const f = s.unstaged.find(x => x.path === p); return f ? { unstaged: s.unstaged.filter(x => x.path !== p), staged: [...s.staged, f] } : null; }); }
+  unstage(p) { this.setState(s => { const f = s.staged.find(x => x.path === p); return f ? { staged: s.staged.filter(x => x.path !== p), unstaged: [...s.unstaged, f] } : null; }); }
+  discard(p) { const tr = this.tr.bind(this); this.confirm(tr('discardTitle'), (p || '*') + '\n' + tr('discardInfo'), tr('del'), () => { this.setState(s => p ? { unstaged: s.unstaged.filter(x => x.path !== p), staged: s.staged.filter(x => x.path !== p), center: 'graph' } : { unstaged: [], staged: [], center: 'graph' }); this.toast(tr('discardedT')); }); }
+  fileMenu(f, staged) {
+    const tr = this.tr.bind(this);
+    return [
+      { label: staged ? tr('mUnstage') : tr('mStage'), hint: '⌘S', action: () => staged ? this.unstage(f.path) : this.stage(f.path) },
+      { label: tr('mViewDiff'), action: () => this.setState({ diffFile: { ...f, staged }, center: 'diff' }) },
+      { label: tr('mDiscard'), danger: 1, action: () => this.discard(f.path) },
+      { sep: 1 },
+      { label: tr('mHistory'), action: () => this.done(tr('mHistory')) },
+      { label: tr('mBlame'), action: () => this.done(tr('mBlame')) },
+      { label: tr('mIgnore'), action: () => this.done(tr('mIgnore')) },
+      { label: tr('mEditor'), action: () => this.done(tr('mEditor')) },
+      { label: tr('mCopyPath'), action: () => this.copy(f.path) }
+    ];
+  }
+  wipMenu() { const tr = this.tr.bind(this); return [{ label: tr('stageAll'), action: () => this.setState(s => ({ staged: [...s.staged, ...s.unstaged], unstaged: [] })) }, { label: tr('mStashAll'), action: () => this.stashDialog() }, { sep: 1 }, { label: tr('mDiscardAll'), danger: 1, action: () => this.discard(null) }]; }
+  stashDialog() {
+    const tr = this.tr.bind(this);
+    if (!this.state.unstaged.length && !this.state.staged.length) { this.toast(tr('noChanges'), 'warn'); return; }
+    this.openForm({ title: tr('stashTitle'), submitLabel: tr('stash'), fields: [{ type: 'text', key: 'msg', label: tr('stashMsg'), placeholder: 'WIP on ' + this.state.current }, { type: 'check', key: 'u', label: tr('untracked'), value: true }], onSubmit: v => { this.setState(s => ({ stashes: [{ msg: v.msg || 'WIP on ' + s.current, files: [...s.unstaged, ...s.staged] }, ...s.stashes], unstaged: [], staged: [], sel: s.sel === 'wip' ? (s.commits[0] && s.commits[0].id) : s.sel, center: 'graph' })); this.toast(tr('stashedT')); } });
+  }
+  applyStash(i, drop) {
+    const tr = this.tr.bind(this); const st = this.state.stashes[i]; if (!st) { this.toast(tr('nothingStashT'), 'warn'); return; }
+    const files = st.files || window.RAMAL.UNSTAGED.slice(0, 2);
+    this.setState(s => ({ unstaged: [...s.unstaged, ...files.filter(f => !s.unstaged.some(x => x.path === f.path))], stashes: drop ? s.stashes.filter((_, j) => j !== i) : s.stashes, sel: 'wip' }));
+    this.toast(tr('poppedT'));
+  }
+  stashMenu(i) { const tr = this.tr.bind(this); return [{ label: tr('mApply'), action: () => this.applyStash(i, false) }, { label: tr('mPop'), action: () => this.applyStash(i, true) }, { sep: 1 }, { label: tr('mDrop'), danger: 1, action: () => this.confirm(tr('mDrop').replace('…', '') + ` stash@{${i}}`, this.state.stashes[i].msg, tr('del'), () => { this.setState(s => ({ stashes: s.stashes.filter((_, j) => j !== i) })); this.toast(tr('droppedT')); }) }]; }
+
+  newBranch(c) {
+    const tr = this.tr.bind(this); const base = c || this.head();
+    this.openForm({ title: tr('branchTitle'), submitLabel: tr('create'), fields: [{ type: 'info', text: `${base.sha}  ${base.msg}`, mono: true }, { type: 'text', key: 'name', label: tr('branchName'), placeholder: 'feature/…', mono: true }, { type: 'check', key: 'co', label: tr('checkoutAfter'), value: true }], onSubmit: v => { const n = (v.name || '').trim().replace(/\s+/g, '-'); if (!n) return false; this.setState(s => ({ commits: s.commits.map(x => x.id === base.id ? { ...x, refs: [...x.refs, { name: n, type: 'local' }] } : x) })); this.toast(tr('branchT', { b: n })); if (v.co) setTimeout(() => this.checkout(n), 0); } });
+  }
+  newTag(c) { const tr = this.tr.bind(this); this.openForm({ title: tr('tagTitle'), submitLabel: tr('create'), fields: [{ type: 'info', text: `${c.sha}  ${c.msg}`, mono: true }, { type: 'text', key: 'name', label: tr('tagName'), placeholder: 'v2.4.0', mono: true }, { type: 'text', key: 'msg', label: tr('tagMsg') }, { type: 'check', key: 'push', label: tr('pushTagToo') }], onSubmit: v => { const n = (v.name || '').trim(); if (!n) return false; this.setState(s => ({ commits: s.commits.map(x => x.id === c.id ? { ...x, refs: [...x.refs, { name: n, type: 'tag' }] } : x) })); this.toast(tr('tagT', { b: n })); } }); }
+  cherry(c) { const tr = this.tr.bind(this); this.openForm({ title: tr('cherryTitle'), submitLabel: tr('cherryBtn'), fields: [{ type: 'info', text: `${c.sha}  ${c.msg}\n→ ${this.state.current}`, mono: true }, { type: 'check', key: 'x', label: tr('cherryX') }, { type: 'check', key: 'nc', label: tr('noCommit') }], onSubmit: v => { if (v.nc) { this.setState(s => ({ staged: [...s.staged, ...window.RAMAL.FILESETS[1].map(f => ({ path: f[0], st: f[1] }))], sel: 'wip' })); } else this.addCommit(c.msg + (v.x ? ` (cherry picked from ${c.sha})` : '')); this.toast(tr('cherryT', { s: c.sha })); } }); }
+  revert(c) { this.addCommit(`Revert "${c.msg}"`); this.toast(this.tr('revertT', { s: c.sha })); }
+  reset(c, mode) { const tr = this.tr.bind(this); const go = () => { if (mode === 'hard') this.setState({ unstaged: [], staged: [] }); this.toast(tr('resetT', { m: '--' + mode, s: c.sha })); }; if (mode === 'hard') this.confirm(tr('resetHardTitle', { s: c.sha }), tr('resetHardInfo'), 'Reset --hard', go); else go(); }
+  commitMenu(c) {
+    const tr = this.tr.bind(this), cur = this.state.current;
+    const br = c.refs.find(r => r.type === 'local');
+    return [
+      { label: tr('mCheckout') + (br ? ' ' + br.name : ` ${c.sha} (detached)`), action: () => br ? this.checkout(br.name) : this.toast(tr('checkoutT', { b: c.sha + ' (detached HEAD)' }), 'warn') },
+      { label: tr('mBranchHere'), action: () => this.newBranch(c) },
+      { label: tr('mTagHere'), action: () => this.newTag(c) },
+      { sep: 1 },
+      { label: tr('mCherry', { b: cur }), action: () => this.cherry(c) },
+      { label: tr('mRevert'), action: () => this.revert(c) },
+      { label: tr('mReset', { b: cur }), children: [{ label: tr('rSoft'), action: () => this.reset(c, 'soft') }, { label: tr('rMixed'), action: () => this.reset(c, 'mixed') }, { label: tr('rHard'), danger: 1, action: () => this.reset(c, 'hard') }] },
+      { label: tr('mRebaseI'), action: () => this.startInteractive(c.sha) },
+      ...(br && br.name !== cur ? [{ sep: 1 }, { label: tr('mMerge', { a: br.name, b: cur }), action: () => this.openMerge(br.name) }] : []),
+      { sep: 1 },
+      { label: tr('mCopySha'), hint: '⌘C', action: () => this.copy(c.sha) },
+      { label: tr('mCopyMsg'), action: () => this.copy(c.msg) }
+    ];
+  }
+  branchMenu(name, remote) {
+    const tr = this.tr.bind(this), cur = this.state.current, isCur = !remote && name === cur;
+    const it = [];
+    if (!isCur) it.push({ label: remote ? tr('mCheckoutTrack', { b: name.split('/').slice(1).join('/') }) : tr('mCheckout') + ' ' + name, action: () => this.checkout(name, remote) });
+    if (!isCur) it.push({ sep: 1 }, { label: tr('mMerge', { a: name, b: cur }), action: () => this.openMerge(name) }, { label: tr('mRebaseOnto', { a: cur, b: name }), action: () => this.openRebase(name) }, { label: tr('mRebaseIOnto', { a: cur, b: name }), action: () => this.startInteractive(name) });
+    it.push({ sep: 1 });
+    if (!remote) it.push({ label: tr('mPush'), action: () => this.push() }, { label: tr('mPull'), action: () => this.toast(tr('pulledT', { b: name })) }, { label: tr('mUpstream'), action: () => this.done(tr('mUpstream')) });
+    it.push({ label: tr('mCreatePR'), action: () => this.openPR(remote ? name.split('/').slice(1).join('/') : name) });
+    if (!isCur) it.push({ label: tr('mCompare', { b: cur }), action: () => this.setState({ diffFile: { path: 'src/graph/lanes.ts', st: 'M' }, center: 'diff' }) });
+    it.push({ sep: 1 });
+    if (!remote) it.push({ label: tr('mRename'), action: () => this.renameBranch(name) });
+    it.push({ label: tr('mCopySha').replace('SHA', tr('name')), action: () => this.copy(name) });
+    if (!isCur) it.push({ label: remote ? tr('mDeleteRemote') : tr('mDelete'), danger: 1, action: () => this.deleteBranch(name) });
+    return it;
+  }
+  remoteMenu(g) { const tr = this.tr.bind(this); return [{ label: tr('mFetchRemote', { r: g }), action: () => this.toast(tr('fetchedT')) }, { label: tr('mEditRemote'), action: () => this.openForm({ title: tr('mEditRemote').replace('…', ''), submitLabel: tr('save'), fields: [{ type: 'text', key: 'url', label: 'URL', value: `git@github.com:${g === 'origin' ? 'marta-dev' : 'ramal-app'}/gitflow-desktop.git`, mono: true }], onSubmit: () => this.toast(tr('saved')) }) }, { label: tr('mCopyLink'), action: () => this.copy(`github.com/${g}/gitflow-desktop`) }]; }
+  tagMenu(n) { const tr = this.tr.bind(this); return [{ label: tr('mCheckout') + ' ' + n, action: () => this.toast(tr('checkoutT', { b: n + ' (detached HEAD)' }), 'warn') }, { label: tr('mPushTag'), action: () => this.toast(tr('pushedT', { b: 'origin ' + n })) }, { label: tr('mCopySha').replace('SHA', tr('name')), action: () => this.copy(n) }, { sep: 1 }, { label: tr('mDeleteTag'), danger: 1, action: () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => !(r.type === 'tag' && r.name === n)) })) })); this.toast(tr('deletedT', { b: n })); } }]; }
+  renameBranch(n) { const tr = this.tr.bind(this); this.openForm({ title: tr('renameBranchTitle'), submitLabel: tr('save'), fields: [{ type: 'text', key: 'name', label: tr('branchName'), value: n, mono: true }], onSubmit: v => { const nn = (v.name || '').trim(); if (!nn) return false; this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.map(r => r.type === 'local' && r.name === n ? { ...r, name: nn } : r) })), current: s.current === n ? nn : s.current })); this.toast(tr('saved')); } }); }
+  deleteBranch(n) { const tr = this.tr.bind(this); this.confirm(tr('deleteBranchTitle', { b: n }), tr('deleteBranchInfo'), tr('del'), () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => r.name !== n) })) })); this.toast(tr('deletedT', { b: n })); }, [{ type: 'check', key: 'f', label: tr('forceDelete') }]); }
+
+  openMerge(src) {
+    const tr = this.tr.bind(this);
+    this.openForm({ title: tr('mergeTitle'), submitLabel: tr('mergeTitle'), fields: [{ type: 'info', text: `${src}  →  ${this.state.current}`, mono: true }, { type: 'seg', key: 'st', label: tr('strategy'), value: 'noff', options: [{ value: 'ff', label: tr('sFF') }, { value: 'noff', label: tr('sNoFF') }, { value: 'squash', label: tr('sSquash') }] }, { type: 'check', key: 'edit', label: tr('editMsg') }], onSubmit: () => {
+      if (!this.state.conflictUsed) { this.setState({ conflict: { src, file: 0, choices: this.initChoices(), manual: {} }, conflictUsed: true, center: 'conflict', sel: 'wip' }); this.toast(tr('conflictsT'), 'warn'); }
+      else { const t = this.state.commits.find(c => c.refs.some(r => r.name === src)); this.addCommit(`Merge branch '${src}' into ${this.state.current}`, t && t.id); this.toast(tr('mergedT', { a: src, b: this.state.current })); }
+    } });
+  }
+  openRebase(onto) { const tr = this.tr.bind(this); this.openForm({ title: tr('rebaseTitle'), submitLabel: tr('rebaseTitle'), fields: [{ type: 'info', text: `${this.state.current}  ⟶  ${onto}`, mono: true }, { type: 'check', key: 'as', label: tr('autostash'), value: true }, { type: 'check', key: 'i', label: tr('interactive') }], onSubmit: v => { if (v.i) setTimeout(() => this.startInteractive(onto), 0); else this.toast(tr('rebaseT', { a: this.state.current, b: onto })); } }); }
+  startInteractive(onto) {
+    const s = this.state; const h = this.head(); const byId = Object.fromEntries(s.commits.map(c => [c.id, c]));
+    const list = []; let c = h; while (c && c.lane === h.lane && list.length < 8) { list.push(c); c = byId[c.parents[0]]; }
+    const items = list.reverse().map(c => ({ id: c.id, sha: c.sha, msg: c.msg, action: 'pick', newMsg: c.msg }));
+    this.setState({ rebase: { onto, items }, center: 'rebase', menu: null });
+  }
+  rbSet(i, patch) { this.setState(s => ({ rebase: { ...s.rebase, items: s.rebase.items.map((x, j) => j === i ? { ...x, ...patch } : x) } })); }
+  rbMove(i, j) { this.setState(s => { const it = s.rebase.items.slice(); if (j < 0 || j >= it.length) return null; const [x] = it.splice(i, 1); it.splice(j, 0, x); return { rebase: { ...s.rebase, items: it } }; }); }
+  rbStart = () => {
+    const s = this.state; const tr = this.tr.bind(this); const items = s.rebase.items;
+    const order = items.map(x => x.id);
+    this.setState(x => ({ commits: x.commits.filter(c => !items.find(i => i.id === c.id && i.action === 'drop')).map(c => { const i = items.find(k => k.id === c.id); return i && i.action === 'reword' ? { ...c, msg: i.newMsg } : c; }), rebase: null, center: 'graph' }));
+    this.toast(tr('rebaseT', { a: s.current, b: s.rebase.onto }));
+  };
+
+  openPR(from) {
+    const tr = this.tr.bind(this), P = window.RAMAL.PLAT;
+    const rep = this.state.repos.find(r => r.id === this.state.tab); const acc = this.state.accounts.find(a => a.id === (rep && rep.acc));
+    const accs = this.state.accounts.filter(a => !acc || a.platform === acc.platform);
+    const locals = []; this.state.commits.forEach(c => c.refs.forEach(r => { if (r.type === 'local') locals.push(r.name); }));
+    const bo = locals.map(n => ({ value: n, label: n }));
+    const f0 = from || this.state.current;
+    this.openForm({ title: tr('prTitleM'), submitLabel: tr('create'), wide: true, fields: [
+      { type: 'action', label: tr('aiPR'), run: () => this.aiPR() },
+      { type: 'select', key: 'acc', label: tr('asAccount'), value: acc ? acc.id : (accs[0] && accs[0].id), options: accs.map(a => ({ value: a.id, label: `${P[a.platform].label} · @${a.user} · ${a.host}` })) },
+      { type: 'select', key: 'from', label: tr('fromB'), value: f0, options: bo },
+      { type: 'select', key: 'to', label: tr('toB'), value: f0 === 'develop' ? 'main' : 'develop', options: bo },
+      { type: 'text', key: 'title', label: tr('prTitle'), value: (this.state.commits.find(c => c.refs.some(r => r.name === f0)) || {}).msg || '' },
+      { type: 'area', key: 'desc', label: tr('prDesc'), placeholder: '## Cambios\n- …' },
+      { type: 'text', key: 'rev', label: tr('reviewers'), placeholder: tr('reviewersPh') },
+      { type: 'check', key: 'draft', label: tr('draft') }
+    ], onSubmit: v => {
+      if (!(v.title || '').trim()) return false;
+      const num = 143 + this.state.repoPrs.length - 2; const a = this.state.accounts.find(x => x.id === v.acc);
+      const pr = { num, title: v.title, from: v.from, to: v.to, state: v.draft ? 'draft' : 'open' };
+      this.setState(s => ({ repoPrs: [pr, ...s.repoPrs], prs: [{ repo: s.tab, ...pr, author: a ? a.user : 'marta-dev', checks: 'pending', reviews: '0/2', mins: 0 }, ...s.prs] }));
+      this.toast(tr('prT', { n: num, p: a ? P[a.platform].label : 'GitHub' }));
+    } });
+  }
+  prMenu(p, platLabel) { const tr = this.tr.bind(this); return [{ label: tr('mPrOpen', { p: platLabel }), action: () => this.done(tr('mPrOpen', { p: platLabel })) }, { label: tr('mPrCheckout'), action: () => this.checkout(p.from) }, { label: tr('mCopyLink'), action: () => this.copy(`https://github.com/marta-dev/gitflow-desktop/pull/${p.num}`) }]; }
+
+  initChoices() { const o = {}; window.RAMAL.CF.forEach((file, i) => { o[i] = file.segs.filter(sg => sg.h).map(sg => ({ ours: sg.h[0].map(() => false), theirs: sg.h[1].map(() => false) })); }); return o; }
+  updHunks(fn) { this.setState(s => { const cf = s.conflict; const manual = { ...cf.manual }; delete manual[cf.file]; return { conflict: { ...cf, manual, editing: false, choices: { ...cf.choices, [cf.file]: fn(cf.choices[cf.file].map(h => ({ ours: h.ours.slice(), theirs: h.theirs.slice() }))) } } }; }); }
+  pick(hi, side) { this.updHunks(hs => { const a = hs[hi][side]; const all = a.every(Boolean); hs[hi][side] = a.map(() => !all); return hs; }); }
+  pickLine(hi, side, li) { this.updHunks(hs => { hs[hi][side][li] = !hs[hi][side][li]; return hs; }); }
+  takeAll(side) { const o = side === 'ours' ? 'theirs' : 'ours'; this.updHunks(hs => hs.map(h => ({ [side]: h[side].map(() => true), [o]: h[o].map(() => false) }))); }
+  cfResolved(i) { const cf = this.state.conflict; if (cf.manual && cf.manual[i] != null) return !/^(<<<<<<<|=======|>>>>>>>)/m.test(cf.manual[i]); return cf.choices[i].every(h => h.ours.some(Boolean) || h.theirs.some(Boolean)); }
+  completeMerge = () => {
+    const tr = this.tr.bind(this); const cf = this.state.conflict;
+    if (!window.RAMAL.CF.every((_, i) => this.cfResolved(i))) { this.toast(tr('stillConflicts'), 'warn'); return; }
+    const t = this.state.commits.find(c => c.refs.some(r => r.name === cf.src));
+    this.addCommit(`Merge branch '${cf.src}' into ${this.state.current}`, t && t.id);
+    this.setState({ conflict: null, center: 'graph' }); this.toast(tr('mergeDoneT'));
+  };
+  abortMerge = () => { this.setState({ conflict: null, conflictUsed: false, center: 'graph' }); this.toast(this.tr('abortedT'), 'warn'); };
+
+  aiKey(feat) { const s = this.state; return s.aiKeys.find(k => k.id === s.ai[feat + 'Key']) || s.aiKeys.find(k => k.def) || s.aiKeys[0]; }
+  aiCheck(feat) { const tr = this.tr.bind(this); if (!this.state.ai[feat]) { this.toast(tr('aiDisabled'), 'warn'); return null; } const k = this.aiKey(feat); if (!k) { this.toast(tr('aiNoKey'), 'warn'); return null; } return k; }
+  aiEn() { const l = this.state.ai.lang === 'app' ? this.state.lang : this.state.ai.lang; return l === 'en'; }
+  aiCommit = () => {
+    const tr = this.tr.bind(this); const k = this.aiCheck('commit'); if (!k) return;
+    if (!this.state.staged.length) { this.toast(tr('aiNothing'), 'warn'); return; }
+    this.setState({ aiBusy: 'commit' });
+    setTimeout(() => { const en = this.aiEn(), cc = this.state.ai.conventional, files = this.state.staged.map(f => f.path.split('/').pop());
+      const msg = (cc ? 'feat(graph): ' : '') + (en ? 'add zoom and tooltip to commit graph' : 'añadir zoom y tooltip al grafo de commits');
+      const desc = files.map(n => '- ' + (en ? 'Update ' : 'Actualiza ') + n).join('\n') + (en ? '\n- Lanes now reuse free slots' : '\n- Los carriles reutilizan huecos libres');
+      this.setState({ msg: cc ? msg : msg.charAt(0).toUpperCase() + msg.slice(1), desc, aiBusy: null }); this.toast(tr('aiDoneT', { p: window.RAMAL.AIPROV[k.prov].label, m: k.model }), 'info'); }, 800);
+  };
+  aiPR() {
+    const tr = this.tr.bind(this); const k = this.aiCheck('pr'); if (!k) return;
+    this.setState({ aiBusy: 'pr' });
+    setTimeout(() => { const en = this.aiEn(), cc = this.state.ai.conventional, v = (this.state.modal || {}).values || {};
+      const title = (cc ? 'feat(graph): ' : '') + (en ? 'zoom, tooltip and reusable lanes' : 'zoom, tooltip y carriles reutilizables');
+      const desc = en ? `## Summary\nImproves the commit graph on ${v.from || 'this branch'}.\n\n## Changes\n- Mouse-wheel zoom and ⌘+/⌘− shortcuts\n- Commit tooltip with author and refs\n- Lanes reuse free slots\n\n## How to test\n1. Open a repo with several branches\n2. Zoom in/out and hover commits`
+        : `## Resumen\nMejora el grafo de commits en ${v.from || 'esta rama'}.\n\n## Cambios\n- Zoom con la rueda y atajos ⌘+/⌘−\n- Tooltip de commit con autor y refs\n- Los carriles reutilizan huecos libres\n\n## Cómo probar\n1. Abre un repo con varias ramas\n2. Haz zoom y pasa el ratón por los commits`;
+      this.setState(s => ({ aiBusy: null, modal: s.modal ? { ...s.modal, values: { ...s.modal.values, title, desc } } : s.modal })); this.toast(tr('aiDoneT', { p: window.RAMAL.AIPROV[k.prov].label, m: k.model }), 'info'); }, 800);
+  }
+  addKey(edit) {
+    const tr = this.tr.bind(this), AP = window.RAMAL.AIPROV;
+    this.openForm({ title: edit ? tr('editKeyTitle') : tr('addKey'), submitLabel: edit ? tr('save') : tr('create'), fields: [
+      { type: 'select', key: 'prov', label: tr('provider'), value: edit ? edit.prov : 'anthropic', options: Object.keys(AP).map(k => ({ value: k, label: AP[k].label })) },
+      { type: 'text', key: 'label', label: tr('label'), value: edit ? edit.label : '', placeholder: tr('keyLabelPh') },
+      { type: 'text', key: 'key', label: tr('apiKey'), placeholder: edit ? edit.masked : 'sk-…', mono: true },
+      { type: 'text', key: 'model', label: tr('model'), value: edit ? edit.model : '', placeholder: 'claude-sonnet-4-5', mono: true },
+      { type: 'text', key: 'url', label: tr('baseUrl'), placeholder: 'https://', mono: true, showIf: v => !!AP[v.prov].url },
+      { type: 'seg', key: 'scope', label: tr('scope'), value: edit ? edit.scope : 'personal', options: [{ value: 'personal', label: tr('sc_personal') }, { value: 'org', label: tr('sc_org') + ' · ACME' }] }
+    ], onSubmit: v => {
+      const p = AP[v.prov]; const raw = (v.key || '').trim(); if (!edit && !raw && v.prov !== 'ollama') return false;
+      const masked = raw ? (raw.slice(0, Math.min(7, raw.length)) + '••••••••' + raw.slice(-4)) : (edit ? edit.masked : '—');
+      const k = { prov: v.prov, label: (v.label || '').trim() || p.label, scope: v.scope, masked, model: (v.model || '').trim() || p.model };
+      if (edit) this.setState(s => ({ aiKeys: s.aiKeys.map(x => x.id === edit.id ? { ...x, ...k } : x) }));
+      else this.setState(s => ({ aiKeys: [...s.aiKeys, { id: 'k' + Date.now(), def: !s.aiKeys.length, ...k }] }));
+      this.toast(tr(edit ? 'saved' : 'keyAddedT', { p: p.label }));
+    } });
+  }
+  keyMenu(k) {
+    const tr = this.tr.bind(this), p = window.RAMAL.AIPROV[k.prov];
+    return [{ label: tr('mTest'), action: () => this.toast(tr('keyTestT', { p: p.label, m: k.model })) }, ...(k.def ? [] : [{ label: tr('mMakeDefKey'), action: () => { this.setState(s => ({ aiKeys: s.aiKeys.map(x => ({ ...x, def: x.id === k.id })) })); this.toast(tr('keyDefT', { l: k.label })); } }]), { label: tr('mEditKey'), action: () => this.addKey(k) }, { label: tr('mCopySha').replace('SHA', tr('model')), action: () => this.copy(k.model) }, { sep: 1 },
+      { label: tr('mRemoveKey'), danger: 1, action: () => this.confirm(tr('mRemoveKey').replace('…', '') + ' · ' + k.label, p.label + ' · ' + k.masked, tr('del'), () => { this.setState(s => { const ks = s.aiKeys.filter(x => x.id !== k.id); if (k.def && ks[0]) ks[0] = { ...ks[0], def: true }; return { aiKeys: ks }; }); this.toast(tr('keyRemovedT')); }) }];
+  }
+  invite() { const tr = this.tr.bind(this); this.openForm({ title: tr('inviteTitle', { o: 'ACME Studio' }), submitLabel: tr('invite'), fields: [{ type: 'text', key: 'email', label: tr('email'), placeholder: 'nombre@empresa.com' }, { type: 'seg', key: 'role', label: tr('role'), value: 'member', options: [{ value: 'member', label: tr('r_member') }, { value: 'admin', label: tr('r_admin') }] }], onSubmit: v => { const e = (v.email || '').trim(); if (!e.includes('@')) return false; this.setState(s => ({ members: [...s.members, { name: e, email: e, role: v.role, ini: e[0].toUpperCase(), lane: s.members.length % 5, pending: true }] })); this.toast(tr('invitedT', { e })); } }); }
+  memberMenu(m) {
+    const tr = this.tr.bind(this); if (m.role === 'owner') return [{ label: tr('mCopyPath').replace(tr('mCopyPath').split(' ').pop(), 'email'), action: () => this.copy(m.email) }];
+    const setRole = r => this.setState(s => ({ members: s.members.map(x => x.email === m.email ? { ...x, role: r } : x) }));
+    return [{ label: tr('role'), children: ['admin', 'member'].map(r => ({ label: (m.role === r ? '✓  ' : '     ') + tr('r_' + r), action: () => setRole(r) })) }, ...(m.pending ? [{ label: tr('mResend'), action: () => this.toast(tr('invitedT', { e: m.email })) }] : []), { sep: 1 },
+      { label: tr('mRemoveMember'), danger: 1, action: () => this.confirm(tr('mRemoveMember').replace('…', ''), m.name + ' · ' + m.email, tr('remove'), () => this.setState(s => ({ members: s.members.filter(x => x.email !== m.email) }))) }];
+  }
+
+  renderVals() {
+    const s = this.state;
+    if (!s.ready || !window.RAMAL) return { isHome: true, isReposView: true, t: {} };
+    const R = window.RAMAL, P = R.PLAT, LANE = R.LANE, L = s.lang === 'en' ? 1 : 0, tr = this.tr.bind(this);
+    const t = {}; for (const k in R.D) t[k] = R.D[k][L];
+    const accById = Object.fromEntries(s.accounts.map(a => [a.id, a]));
+    const wsById = Object.fromEntries(s.workspaces.map(w => [w.id, w]));
+    const repoById = Object.fromEntries(s.repos.map(r => [r.id, r]));
+    const disp = r => r.alias || r.name;
+    const isSettings = s.tab === 'settings';
+    const isHome = !isSettings && (s.tab === 'home' || !repoById[s.tab]);
+
+    const repoV = r => {
+      const a = accById[r.acc], p = a ? P[a.platform] : null, wl = r.wss.map(id => wsById[id]).filter(Boolean), w = wl[0];
+      const st = []; if (r.ahead || r.behind) st.push(`↑${r.ahead}  ↓${r.behind}`); if (r.changes) st.push(tr('changes', { n: r.changes }));
+      const open = s.prs.filter(x => x.repo === r.id && (x.state === 'open' || x.state === 'draft' || x.state === 'approved' || x.state === 'changes')).length;
+      return {
+        id: r.id, displayName: disp(r), subName: r.name, hasSub: !!r.alias, path: r.path,
+        abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)',
+        srcLine: p ? `${p.label} · @${a.user}` : t.localOnly, srcSub: p ? a.host + ' · ' + a.name : t.noRemote,
+        branch: r.branch, stats: st.join(' · ') || '—', hasWs: !!w, wsName: w ? w.name : '', wsColor: w ? w.color : '', hasWsMore: wl.length > 1, wsMore: '+' + (wl.length - 1), wsAll: wl.map(x => x.name).join(', '), updated: this.ago(r.mins),
+        prCount: open ? tr('openPrs', { n: open }) : '',
+        onOpen: () => this.openRepo(r.id), onMenu: e => this.openMenu(e, () => this.repoMenu(r))
+      };
+    };
+
+    const tabs = s.openTabs.filter(id => repoById[id]).map(id => { const r = repoById[id], a = accById[r.acc], p = a ? P[a.platform] : null, act = s.tab === id; return { label: disp(r), abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)', bg: act ? 'var(--bg)' : 'transparent', color: act ? 'var(--text)' : 'var(--muted)', shadow: act ? 'inset 0 2px 0 var(--accent)' : 'none', onClick: () => this.setState({ tab: id, menu: null }), onClose: e => this.closeTab(id, e), onMenu: e => this.openMenu(e, () => this.repoMenu(r)) }; });
+    const hAct = isHome;
+    const base = {
+      t, tabs, homeTab: { bg: hAct ? 'var(--bg)' : 'transparent', color: hAct ? 'var(--text)' : 'var(--muted)', shadow: hAct ? 'inset 0 2px 0 var(--accent)' : 'none' },
+      goHome: () => this.setState({ tab: 'home' }), goSettings: () => this.setState({ tab: 'settings', setOpen: true, menu: null }), goProfile: () => this.setState({ tab: 'settings', setOpen: true, setSec: 'profile' }),
+      closeSettings: e => { e.stopPropagation(); this.setState(x => ({ setOpen: false, tab: x.tab === 'settings' ? 'home' : x.tab })); },
+      showSetTab: s.setOpen || isSettings, setTab: { bg: isSettings ? 'var(--bg)' : 'transparent', color: isSettings ? 'var(--text)' : 'var(--muted)', shadow: isSettings ? 'inset 0 2px 0 var(--accent)' : 'none' }, isSettings,
+      setEs: () => this.setState({ lang: 'es' }), setEn: () => this.setState({ lang: 'en' }),
+      esBg: L ? 'transparent' : 'var(--accent)', esColor: L ? 'var(--muted)' : 'var(--accent-ink)', enBg: L ? 'var(--accent)' : 'transparent', enColor: L ? 'var(--accent-ink)' : 'var(--muted)',
+      setLight: () => this.setState({ theme: 'light' }), setDark: () => this.setState({ theme: 'dark' }),
+      lightBg: s.theme === 'light' ? 'var(--accent)' : 'transparent', lightColor: s.theme === 'light' ? 'var(--accent-ink)' : 'var(--muted)',
+      darkBg: s.theme === 'dark' ? 'var(--accent)' : 'transparent', darkColor: s.theme === 'dark' ? 'var(--accent-ink)' : 'var(--muted)',
+      isHome, isRepo: !isHome && !isSettings,
+      toasts: s.toasts.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : x.kind === 'err' ? 'var(--danger)' : x.kind === 'info' ? 'var(--accent)' : 'var(--ok)' })),
+      stop: e => e.stopPropagation(), closeModal: () => this.setState({ modal: null }), submitModal: this.submitModal, closeMenu: this.closeMenu,
+      hasMenu: !!s.menu, hasModal: !!s.modal
+    };
+
+    if (s.menu) {
+      const run = (it, e) => { if (e) e.stopPropagation(); if (!it.keep) this.setState({ menu: null }); it.action && it.action(); };
+      const mItems = s.menu.build ? s.menu.build() : s.menu.items;
+      base.menu = { x: s.menu.x, y: s.menu.y, items: mItems.map((it, i) => ({
+        isSep: !!it.sep, notSep: !it.sep, label: it.check === undefined ? it.label : (it.check ? '✓  ' : '     ') + it.label, hint: it.children ? '›' : (it.hint || ''), color: it.danger ? 'var(--danger)' : 'var(--text)',
+        bg: s.menu.sub === i ? 'var(--surface2)' : 'transparent', showSub: !!it.children && s.menu.sub === i,
+        children: (it.children || []).map(ch => ({ label: ch.label, color: ch.danger ? 'var(--danger)' : 'var(--text)', onClick: e => run(ch, e) })),
+        onEnter: () => this.setState(x => x.menu ? { menu: { ...x.menu, sub: it.children ? i : -1 } } : null),
+        onClick: e => { if (it.children) { e.stopPropagation(); return; } run(it, e); }
+      })) };
+    }
+    if (s.modal) {
+      const m = s.modal, mv = m.values;
+      base.modal = { title: m.title, sub: m.sub || '', hasSub: !!m.sub, w: m.wide ? 580 : 460, submit: m.submitLabel, btnBg: m.danger ? 'var(--danger)' : 'var(--accent)', btnColor: m.danger ? 'white' : 'var(--accent-ink)',
+        fields: m.fields.filter(f => !f.showIf || f.showIf(mv)).map(f => { const v = f.key ? mv[f.key] : undefined; return {
+          isAction: f.type === 'action', onClick: () => f.run && f.run(), isInfo: f.type === 'info', isText: f.type === 'text', isArea: f.type === 'area', isSelect: f.type === 'select', isSeg: f.type === 'seg', isCheck: f.type === 'check',
+          label: f.type === 'action' && s.aiBusy === 'pr' ? t.aiGenerating : (f.label || ''), text: f.text || '', font: f.mono ? "'IBM Plex Mono',monospace" : 'inherit', value: v == null ? '' : v, placeholder: f.placeholder || '', checked: !!v,
+          onChange: e => this.setVal(f.key, e.target.value), onToggle: e => this.setVal(f.key, e.target.checked),
+          options: (f.options || []).map(o => ({ value: o.value, label: o.label, bg: v === o.value ? 'var(--accent)' : 'transparent', color: v === o.value ? 'var(--accent-ink)' : 'var(--text)', onClick: () => this.setVal(f.key, o.value) }))
+        }; }) };
+    }
+
+    if (isSettings) {
+      const sec = s.setSec, AP = R.AIPROV;
+      base.setNav = [['g', t.sgUser], ['profile', t.secProfile], ['account', t.secAccount], ['g', t.sgConn], ['integrations', t.secIntegrations], ['ai', t.secAI], ['g', t.sgApp], ['git', t.secGit], ['appearance', t.secAppearance]].map(([k, l]) => ({ isGroup: k === 'g', notGroup: k !== 'g', label: l, bg: sec === k ? 'var(--accent-soft)' : 'transparent', color: sec === k ? 'var(--accent)' : 'var(--text)', onClick: () => this.setState({ setSec: k }) }));
+      Object.assign(base, { isProfile: sec === 'profile', isAccount: sec === 'account', isIntegrations: sec === 'integrations', isAI: sec === 'ai' });
+      const R0 = { isToggle: false, isSeg: false, isInput: false, isSelect: false, isButton: false, isArea: false, labelFont: 'inherit', desc: '', hasDesc: false };
+      const row = (label, desc, o) => ({ ...R0, label, desc: desc || '', hasDesc: !!desc, ...o });
+      const tog = (on, fn) => ({ isToggle: true, tbg: on ? 'var(--accent)' : 'var(--border)', tx: on ? 'translateX(16px)' : 'none', onToggle: fn });
+      const seg = (val, opts, fn) => ({ isSeg: true, options: opts.map(([v, l]) => ({ label: l, bg: val === v ? 'var(--accent)' : 'transparent', color: val === v ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => fn(v) })) });
+      const inp = (val, fn, mono, ph) => ({ isInput: true, value: val, placeholder: ph || '', font: mono ? "'IBM Plex Mono',monospace" : 'inherit', onChange: e => fn(e.target.value) });
+      const sel = (val, opts, fn) => ({ isSelect: true, value: val, options: opts.map(([v, l]) => ({ value: v, label: l })), onChange: e => fn(e.target.value) });
+      const card = (title, sub, rows) => ({ title, sub: sub || '', hasSub: !!sub, rows });
+      const setP = k => v => this.setState(x => ({ profile: { ...x.profile, [k]: v } }));
+      const setG = k => v => this.setState(x => ({ git: { ...x.git, [k]: v } }));
+      const setA = k => v => this.setState(x => ({ ai: { ...x.ai, [k]: v } }));
+      let sh = { title: '', sub: '', hasAction: false }, cards = [];
+      if (sec === 'profile') {
+        const p = s.profile;
+        sh = { title: t.secProfile, sub: t.profileSub, hasAction: true, action: t.saveChanges, onAction: () => this.toast(tr('saved')) };
+        base.pf = { ini: p.name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase(), name: p.name, user: p.user, email: p.email, onPhoto: () => this.done(t.changePhoto) };
+        cards = [card(t.secProfile, '', [row(t.fullName, '', inp(p.name, setP('name'))), row(t.username, '', inp(p.user, setP('user'), true)), row(t.email, '', inp(p.email, setP('email'))), row(t.timezone, '', sel(p.tz, ['Europe/Madrid', 'America/Mexico_City', 'America/Bogota', 'America/Buenos_Aires', 'America/New_York', 'UTC'].map(z => [z, z.replace('_', ' ')]), setP('tz')))])];
+      }
+      if (sec === 'account') {
+        sh = { title: t.secAccount, sub: t.accountSub, hasAction: false };
+        base.acct = { email: s.profile.email, org: 'ACME Studio', count: tr('members', { n: s.members.length }), onManage: () => this.done(t.manageSub), onSignOut: () => this.toast(tr('signedOutT'), 'warn'), onInvite: () => this.invite(),
+          members: s.members.map(m => { const rc = m.role === 'owner' ? 'var(--accent)' : m.role === 'admin' ? 'var(--info)' : 'var(--muted)'; return { ini: m.ini, name: m.name, sub: m.pending ? t.pending : m.email, avBg: LANE[m.lane], opacity: m.pending ? 0.5 : 1, role: t['r_' + m.role], roleColor: rc, roleBg: tint(rc, 14), onMenu: e => this.openMenu(e, () => this.memberMenu(this.state.members.find(x => x.email === m.email) || m)) }; }),
+          sessions: s.sessions.map((x, i) => ({ dev: x.dev, where: x.city + ' · ' + (x.current ? t.thisDevice : this.ago(x.mins)), current: !!x.current, other: !x.current, onRevoke: () => { this.setState(y => ({ sessions: y.sessions.filter((_, j) => j !== i) })); this.toast(tr('revokedT', { d: x.dev })); } })) };
+      }
+      if (sec === 'integrations') sh = { title: t.secIntegrations, sub: t.intSub, hasAction: true, action: '+ ' + t.addAccount, onAction: () => this.addAccount('github') };
+      if (sec === 'integrations') {
+        base.addAccount = () => this.addAccount('github');
+        base.accGroups = Object.keys(P).map(k => { const list = s.accounts.filter(a => a.platform === k); return {
+          label: P[k].label, abbr: P[k].abbr, color: P[k].color, count: list.length, empty: !list.length, addLabel: tr('addTo', { p: P[k].label }), onAdd: () => this.addAccount(k),
+          accounts: list.map((a, i) => ({ user: a.user, ini: a.user.slice(0, 2).toUpperCase(), avBg: LANE[(i + k.length) % LANE.length], name: a.name, host: a.host, method: a.method, scopes: a.scopes, isDef: a.def, notDef: !a.def, usedIn: tr('usedIn', { n: s.repos.filter(r => r.acc === a.id).length }), onMakeDef: () => this.makeDef(a), onMenu: e => this.openMenu(e, this.accMenu(a)) }))
+        }; });
+      }
+
+      if (sec === 'ai') {
+        sh = { title: t.secAI, sub: t.aiSub, hasAction: true, action: '+ ' + t.addKey, onAction: () => this.addKey() };
+        base.ai = { count: String(s.aiKeys.length), noKeys: !s.aiKeys.length, keys: s.aiKeys.map(k => ({ abbr: AP[k.prov].abbr, color: AP[k.prov].color, provider: AP[k.prov].label, label: k.label, model: k.model || '—', masked: k.masked, scope: k.scope === 'org' ? t.sc_org + ' · ACME' : t.sc_personal, isDef: k.def, onMenu: e => this.openMenu(e, () => this.keyMenu(this.state.aiKeys.find(x => x.id === k.id) || k)) })) };
+        const kOpts = [['', t.useDefaultKey], ...s.aiKeys.map(k => [k.id, `${k.label} · ${AP[k.prov].label}`])];
+        const feat = (k, l, dsc) => row(l, dsc, { ...sel(s.ai[k + 'Key'], kOpts, setA(k + 'Key')), ...tog(s.ai[k], () => setA(k)(!s.ai[k])) });
+        cards = [card(t.aiFeatures, t.aiFeaturesSub, [feat('commit', t.fCommit, t.fCommitD), feat('pr', t.fPR, t.fPRD), feat('summary', t.fSummary, t.fSummaryD)]),
+          card(t.aiPrefs, '', [row(t.aiLang, '', seg(s.ai.lang, [['app', t.langApp], ['es', 'Español'], ['en', 'English']], setA('lang'))), row(t.conventional, t.conventionalD, tog(s.ai.conventional, () => setA('conventional')(!s.ai.conventional))), row(t.excludeSens, t.excludeSensD, tog(s.ai.exclude, () => setA('exclude')(!s.ai.exclude))), row(t.instructions, '', { isArea: true, value: s.ai.instructions, placeholder: t.instructionsPh, onChange: e => setA('instructions')(e.target.value) })])];
+      }
+      if (sec === 'git') {
+        const g = s.git; sh = { title: t.secGit, sub: t.gitSub, hasAction: false };
+        cards = [card(t.identity, t.identityD, [row('user.name', '', { ...inp(g.name, setG('name')), labelFont: "'IBM Plex Mono',monospace" }), row('user.email', '', { ...inp(g.email, setG('email')), labelFont: "'IBM Plex Mono',monospace" }), row(t.defBranch, '', inp(g.defBranch, setG('defBranch'), true))]),
+          card(t.behavior, '', [row(t.signCommits, t.signCommitsD, tog(g.sign, () => setG('sign')(!g.sign))), row(t.autoFetch, '', sel(g.autoFetch, [['0', t.off], ['5', tr('everyN', { n: 5 })], ['15', tr('everyN', { n: 15 })], ['30', tr('everyN', { n: 30 })]], setG('autoFetch'))), row(t.pullDefault, '', seg(g.pull, [['merge', 'merge'], ['rebase', 'rebase'], ['ff', 'ff-only']], setG('pull'))), row(t.prune, '', tog(g.prune, () => setG('prune')(!g.prune)))]),
+          card(t.sshKeys, '', [...R.SSH.map(k => row(k.file, k.fp + ' · ' + tr('usedBy', { u: k.used }), { isButton: true, btnLabel: t.copy, onBtn: () => this.copy('ssh-ed25519 AAAAC3Nza… ' + s.profile.email), labelFont: "'IBM Plex Mono',monospace" })), row(t.genKey, 'ed25519', { isButton: true, btnLabel: '+ ' + t.create, onBtn: () => this.done(t.genKey) })])];
+      }
+      if (sec === 'appearance') {
+        sh = { title: t.secAppearance, sub: t.appearanceSub, hasAction: false };
+        cards = [card(t.display, '', [row(t.themeL, '', seg(s.theme, [['light', '☀︎  ' + t.light], ['dark', '☾  ' + t.dark]], v => this.setState({ theme: v }))), row(t.language, '', seg(s.lang, [['es', 'Español'], ['en', 'English']], v => this.setState({ lang: v }))), row(t.graphStyle, '', seg(s.graphNodes, [['avatar', t.nAvatar], ['dot', t.nDot]], v => this.setState({ graphNodes: v })))])];
+      }
+      base.sh = sh; base.cards = cards;
+      return base;
+    }
+
+    if (isHome) {
+      const nav = (label, count, active, onClick) => ({ label, count, bg: active ? 'var(--accent-soft)' : 'transparent', color: active ? 'var(--accent)' : 'var(--text)', onClick });
+      Object.assign(base, {
+        navItems: [nav(t.repos, s.repos.length, s.view !== 'ws', () => this.setState({ view: 'repos' }))],
+        wsNav: s.workspaces.map(w => ({ ...nav(w.name, s.repos.filter(r => r.wss.includes(w.id)).length, s.view === 'ws' && s.wsId === w.id, () => this.setState({ view: 'ws', wsId: w.id })), dot: w.color, onMenu: e => this.openMenu(e, this.wsMenu(w)) })),
+        newWs: () => this.newWs(null),
+        isReposView: s.view !== 'ws' || !wsById[s.wsId], isWsView: s.view === 'ws' && !!wsById[s.wsId]
+      });
+      if (s.view !== 'ws' || !wsById[s.wsId]) {
+        const q = s.q.trim().toLowerCase();
+        const list = s.repos.filter(r => {
+          const a = accById[r.acc];
+          if (s.fKind === 'local' && a) return false; if (s.fKind === 'remote' && !a) return false;
+          if (s.fPlat.length && (!a || !s.fPlat.includes(a.platform))) return false;
+          if (s.fAcc && r.acc !== s.fAcc) return false;
+          if (s.fWs === 'none' ? r.wss.some(id => wsById[id]) : (s.fWs && !r.wss.includes(s.fWs))) return false;
+          if (q) { const hay = [r.name, r.alias, r.path, r.branch, a ? a.user : '', a ? P[a.platform].label : '', a ? a.host : ''].join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
+          return true;
+        });
+        let groups;
+        let gdefs = null;
+        if (s.groupBy === 'ws') gdefs = [...s.workspaces.map(w => ({ name: w.name, dot: w.color, items: list.filter(r => r.wss.includes(w.id)) })), { name: t.noWs, dot: 'var(--border)', items: list.filter(r => !r.wss.some(id => wsById[id])) }];
+        if (s.groupBy === 'plat') gdefs = [...Object.keys(P).map(k => ({ name: P[k].label, dot: P[k].color, items: list.filter(r => accById[r.acc] && accById[r.acc].platform === k) })), { name: t.localOnly, dot: 'var(--border)', items: list.filter(r => !accById[r.acc]) }];
+        if (s.groupBy === 'acc') gdefs = [...s.accounts.map(a => ({ name: `${P[a.platform].label} · @${a.user}`, dot: P[a.platform].color, items: list.filter(r => r.acc === a.id) })), { name: t.localOnly, dot: 'var(--border)', items: list.filter(r => !accById[r.acc]) }];
+        if (gdefs) { groups = gdefs.filter(g => g.items.length).map(g => ({ showHeader: true, name: g.name, dot: g.dot, count: g.items.length, repos: g.items.map(repoV) })); }
+        else groups = [{ showHeader: false, name: '', dot: '', count: 0, repos: list.map(repoV) }];
+        const hasFilters = !!(q || s.fKind !== 'all' || s.fPlat.length || s.fAcc || s.fWs);
+        Object.assign(base, {
+          q: s.q, onQ: e => this.setState({ q: e.target.value }),
+          filterBtns: (() => {
+            const on = v => ({ border: v ? 'var(--accent)' : 'var(--border)', bg: v ? 'var(--accent-soft)' : 'var(--bg)' });
+            const kindL = { all: t.kAll, local: t.kLocal, remote: t.kRemote };
+            const fa = accById[s.fAcc], fw = wsById[s.fWs];
+            const platV = !s.fPlat.length ? t.allPlat : s.fPlat.length === 1 ? P[s.fPlat[0]].label : `${P[s.fPlat[0]].label} +${s.fPlat.length - 1}`;
+            const grpL = { '': t.gNone, ws: t.fWs, plat: t.fPlat, acc: t.fAcc };
+            return [
+              { label: t.fKind, value: kindL[s.fKind], ...on(s.fKind !== 'all'), onClick: e => this.openMenuAt(e, () => ['all', 'local', 'remote'].map(k => ({ label: kindL[k], check: this.state.fKind === k, action: () => this.setState({ fKind: k }) }))) },
+              { label: t.fPlat, value: platV, ...on(s.fPlat.length), onClick: e => this.openMenuAt(e, () => [...Object.keys(P).map(k => ({ label: P[k].label, check: this.state.fPlat.includes(k), keep: 1, action: () => this.setState(x => ({ fPlat: x.fPlat.includes(k) ? x.fPlat.filter(y => y !== k) : [...x.fPlat, k] })) })), { sep: 1 }, { label: t.allPlat, check: !this.state.fPlat.length, action: () => this.setState({ fPlat: [] }) }]) },
+              { label: t.fAcc, value: fa ? '@' + fa.user : t.anyShort, ...on(!!s.fAcc), onClick: e => this.openMenuAt(e, () => [{ label: t.anyAcc, check: !this.state.fAcc, action: () => this.setState({ fAcc: '' }) }, { sep: 1 }, ...this.state.accounts.map(a => ({ label: `${P[a.platform].label} · @${a.user}`, hint: a.host, check: this.state.fAcc === a.id, action: () => this.setState({ fAcc: a.id }) }))]) },
+              { label: t.fWs, value: fw ? fw.name : s.fWs === 'none' ? t.noWs : t.anyShort, ...on(!!s.fWs), onClick: e => this.openMenuAt(e, () => [{ label: t.anyWs, check: !this.state.fWs, action: () => this.setState({ fWs: '' }) }, { sep: 1 }, ...this.state.workspaces.map(w => ({ label: w.name, check: this.state.fWs === w.id, action: () => this.setState({ fWs: w.id }) })), { label: t.noWs, check: this.state.fWs === 'none', action: () => this.setState({ fWs: 'none' }) }]) },
+              { label: t.fGroup, value: grpL[s.groupBy], ...on(!!s.groupBy), onClick: e => this.openMenuAt(e, () => ['', 'ws', 'plat', 'acc'].map(k => ({ label: grpL[k], check: this.state.groupBy === k, action: () => this.setState({ groupBy: k }) }))) }
+            ];
+          })(),
+          resultsLabel: tr('results', { n: list.length }), hasFilters, clearFilters: () => this.setState({ q: '', fKind: 'all', fPlat: [], fAcc: '', fWs: '' }),
+          groups, noResults: !list.length, cloneDialog: this.cloneDialog, openRepoDialog: this.openRepoDialog, initDialog: this.initDialog
+        });
+      }
+      if (s.view === 'ws' && wsById[s.wsId]) {
+        const w = wsById[s.wsId]; const wr = s.repos.filter(r => r.wss.includes(w.id)); const ids = wr.map(r => r.id);
+        const prs = s.prs.filter(p => ids.includes(p.repo));
+        const openN = prs.filter(p => ['open', 'draft', 'approved', 'changes'].includes(p.state)).length;
+        const states = ['all', 'open', 'draft', 'approved', 'changes', 'merged', 'closed'];
+        const shown = prs.filter(p => s.prState === 'all' || p.state === s.prState);
+        base.ws = {
+          name: w.name, color: w.color, sub: tr('wsSub', { n: wr.length, p: openN }), repos: wr.map(repoV),
+          onFetch: () => this.toast(tr('fetchedT')), onOpenAll: () => this.openAllWs(w), onMenu: e => this.openMenu(e, this.wsMenu(w)),
+          chips: states.map(k => { const on = s.prState === k; return { label: k === 'all' ? t.prAll : t['st_' + k], count: k === 'all' ? prs.length : prs.filter(p => p.state === k).length, color: k === 'all' ? 'var(--muted)' : PRC[k], border: on ? 'var(--accent)' : 'var(--border)', bg: on ? 'var(--accent-soft)' : 'transparent', onClick: () => this.setState({ prState: k }) }; }),
+          prs: shown.map(p => { const r = repoById[p.repo], a = accById[r.acc], pl = a ? P[a.platform] : P.github; return {
+            repoName: disp(r), abbr: pl.abbr, badgeBg: pl.color, numLabel: (a && a.platform === 'gitlab' ? '!' : '#') + p.num, title: p.title, from: p.from, to: p.to, author: p.author,
+            stateLabel: t['st_' + p.state], stateColor: PRC[p.state], stateBg: tint(PRC[p.state], 14), checksLabel: t['ck_' + p.checks], checksColor: CKC[p.checks], reviews: p.reviews, updated: this.ago(p.mins),
+            onClick: () => this.openRepo(r.id), onMenu: e => this.openMenu(e, this.prMenu(p, pl.label)) }; }),
+          noPrs: !shown.length
+        };
+      }
+      return base;
+    }
+
+    // ---- repo view
+    const repo = repoById[s.tab];
+    const head = this.head();
+    const nCh = s.unstaged.length + s.staged.length;
+    const hasWip = nCh > 0 || !!s.conflict;
+    const rowsData = hasWip ? [{ wip: true, id: 'wip', lane: head.lane }, ...s.commits] : s.commits;
+    const sel = s.sel === 'wip' && !hasWip ? head.id : s.sel;
+    const cq = s.cq.trim().toLowerCase();
+    const rows = rowsData.map(c => {
+      const on = sel === c.id;
+      if (c.wip) return { isWip: true, notWip: false, bg: on ? 'var(--accent-soft)' : 'transparent', opacity: 1, refs: [], hasMore: false, wipText: s.conflict ? t.wipMerge : tr('wipText', { n: nCh }), wipColor: s.conflict ? 'var(--warn)' : 'var(--muted)', onClick: () => this.select('wip'), onMenu: e => this.openMenu(e, this.wipMenu()) };
+      const refs = c.refs.map(r => { const col = r.type === 'tag' ? 'var(--warn)' : LANE[c.lane]; return { label: r.name, icon: r.head ? '✓' : r.type === 'remote' ? '⇅' : r.type === 'tag' ? '◆' : '⎇', color: col, bg: tint(col, r.head ? 32 : 14), onMenu: e => this.openMenu(e, r.type === 'tag' ? this.tagMenu(r.name) : this.branchMenu(r.name, r.type === 'remote')) }; });
+      const match = !cq || (c.msg + ' ' + c.sha + ' ' + R.AUTH[c.au]).toLowerCase().includes(cq);
+      return { isWip: false, notWip: true, bg: on ? 'var(--accent-soft)' : 'transparent', opacity: match ? 1 : 0.28, refs: refs.slice(0, 2), hasMore: refs.length > 2, more: '+' + (refs.length - 2), msg: c.msg, weight: c.refs.some(r => r.head) ? 600 : 400, author: R.AUTH[c.au], ini: c.au, avColor: LANE[c.lane], date: c.date.slice(5), sha: c.sha, onClick: () => this.select(c.id), onMenu: e => this.openMenu(e, this.commitMenu(c)) };
+    });
+    const h = React.createElement, X = l => 16 + l * 20, Y = i => i * 40 + 20;
+    const idx = {}; rowsData.forEach((r, i) => { idx[r.id] = i; });
+    const paths = [], nodes = [], dot = s.graphNodes === 'dot';
+    rowsData.forEach((r, i) => {
+      if (r.wip) { const j = idx[head.id]; paths.push(h('path', { key: 'wp', d: `M${X(r.lane)} ${Y(i)} L${X(r.lane)} ${Y(j)}`, fill: 'none', stroke: LANE[r.lane], strokeWidth: 2, strokeDasharray: '3 4' })); nodes.push(h('circle', { key: 'wc', cx: X(r.lane), cy: Y(i), r: 8, fill: 'var(--bg)', stroke: s.conflict ? 'var(--warn)' : LANE[r.lane], strokeWidth: 2, strokeDasharray: '3 3' })); return; }
+      r.parents.forEach((pid, k) => {
+        const j = idx[pid]; if (j == null) return; const p = rowsData[j];
+        const x1 = X(r.lane), x2 = X(p.lane), y1 = Y(i), y2 = Y(j); let d, col;
+        if (x1 === x2) { d = `M${x1} ${y1} L${x2} ${y2}`; col = LANE[r.lane]; }
+        else if (k === 0 && p.lane < r.lane) { d = `M${x1} ${y1} L${x1} ${y2 - 40} C${x1} ${y2 - 18} ${x2} ${y2 - 22} ${x2} ${y2}`; col = LANE[r.lane]; }
+        else { d = `M${x1} ${y1} C${x1} ${y1 + 22} ${x2} ${y1 + 18} ${x2} ${y1 + 40} L${x2} ${y2}`; col = LANE[p.lane]; }
+        paths.push(h('path', { key: r.id + '-' + k, d, fill: 'none', stroke: col, strokeWidth: 2 }));
+      });
+      const cx = X(r.lane), cy = Y(i), merge = r.parents.length > 1, rad = merge ? 5 : (dot ? 6 : 9);
+      nodes.push(h('g', { key: 'n' + r.id },
+        sel === r.id ? h('circle', { cx, cy, r: rad + 4, fill: 'none', stroke: LANE[r.lane], strokeWidth: 2, opacity: 0.55 }) : null,
+        h('circle', { cx, cy, r: rad, fill: LANE[r.lane], stroke: 'var(--bg)', strokeWidth: 2 }),
+        !merge && !dot ? h('text', { x: cx, y: cy + 0.5, textAnchor: 'middle', dominantBaseline: 'central', fontSize: 7.5, fontWeight: 700, fill: 'oklch(0.2 0.02 230)', fontFamily: 'IBM Plex Sans' }, r.au) : null));
+    });
+    const graphSvg = h('svg', { width: 130, height: rowsData.length * 40, style: { position: 'absolute', left: 200, top: 0, pointerEvents: 'none', overflow: 'visible' } }, paths, nodes);
+
+    const all = []; s.commits.forEach(c => c.refs.forEach(r => all.push({ ...r, c })));
+    const sq = s.sbq.trim().toLowerCase(), m = x => !sq || x.toLowerCase().includes(sq);
+    const item = o => ({ pad: '8px', weight: 400, iconColor: 'var(--faint)', right: '', rightColor: 'var(--faint)', bg: 'transparent', onDbl: () => {}, onClick: () => {}, ...o });
+    const remoteGroups = {}; all.filter(r => r.type === 'remote').forEach(r => { const [g, ...rest] = r.name.split('/'); (remoteGroups[g] = remoteGroups[g] || []).push({ ...r, short: rest.join('/') }); });
+    const remoteItems = []; Object.keys(remoteGroups).forEach(g => { const list = remoteGroups[g].filter(r => m(r.name)); if (!list.length) return; remoteItems.push(item({ icon: '⇅', label: g, weight: 600, onMenu: e => this.openMenu(e, this.remoteMenu(g)) })); list.forEach(r => remoteItems.push(item({ pad: '26px', icon: '⎇', iconColor: LANE[r.c.lane], label: r.short, bg: sel === r.c.id ? 'var(--accent-soft)' : 'transparent', onClick: () => this.select(r.c.id), onDbl: () => this.checkout(r.name, true), onMenu: e => this.openMenu(e, this.branchMenu(r.name, true)) }))); });
+    const pl = repo && accById[repo.acc] ? P[accById[repo.acc].platform].label : 'GitHub';
+    const sections = [
+      { key: 'local', title: t.sLocal, items: all.filter(r => r.type === 'local' && m(r.name)).map(r => item({ icon: r.head ? '✓' : '⎇', iconColor: r.head ? 'var(--accent)' : LANE[r.c.lane], label: r.name, weight: r.head ? 600 : 400, right: r.head && s.ahead ? '↑' + s.ahead : '', rightColor: 'var(--accent)', bg: sel === r.c.id ? 'var(--accent-soft)' : 'transparent', onClick: () => this.select(r.c.id), onDbl: () => this.checkout(r.name), onMenu: e => this.openMenu(e, this.branchMenu(r.name, false)) })) },
+      { key: 'remote', title: t.sRemote, items: remoteItems },
+      { key: 'prs', title: t.sPrs, items: s.repoPrs.filter(p => m(p.title)).map(p => item({ icon: '⇄', iconColor: PRC[p.state], label: `#${p.num} ${p.title}`, right: t['st_' + p.state], rightColor: PRC[p.state], onClick: () => { const c = s.commits.find(c => c.refs.some(r => r.name === p.from)); if (c) this.select(c.id); }, onMenu: e => this.openMenu(e, this.prMenu(p, pl)) })) },
+      { key: 'stash', title: t.sStash, items: s.stashes.filter(x => m(x.msg)).map((x, i) => item({ icon: '≡', label: x.msg, right: `{${i}}`, onDbl: () => this.applyStash(i, false), onMenu: e => this.openMenu(e, this.stashMenu(i)) })) },
+      { key: 'tags', title: t.sTags, items: all.filter(r => r.type === 'tag' && m(r.name)).map(r => item({ icon: '◆', iconColor: 'var(--warn)', label: r.name, bg: sel === r.c.id ? 'var(--accent-soft)' : 'transparent', onClick: () => this.select(r.c.id), onMenu: e => this.openMenu(e, this.tagMenu(r.name)) })) },
+      { key: 'subs', title: t.sSubs, items: R.SUBS.filter(x => m(x.path)).map(x => item({ icon: '▣', label: x.path, right: x.st, rightColor: x.st === 'M' ? 'var(--warn)' : 'var(--ok)', onMenu: e => this.openMenu(e, [{ label: tr('mSubUpdate'), action: () => this.done(tr('mSubUpdate')) }, { label: tr('mSubOpen'), action: () => this.done(tr('mSubOpen')) }, { label: tr('mCopyPath'), action: () => this.copy(x.path) }]) })) }
+    ].map(sec => ({ ...sec, count: sec.key === 'remote' ? all.filter(r => r.type === 'remote').length : sec.items.length, open: !s.closed[sec.key], chev: s.closed[sec.key] ? '▸' : '▾', onToggle: () => this.setState(x => ({ closed: { ...x.closed, [sec.key]: !x.closed[sec.key] } })) }));
+
+    const tools = [
+      { glyph: '↶', label: t.undo, onClick: () => this.toast(tr('undoneT', { x: 'commit ' + head.sha }), 'info') },
+      { glyph: '↷', label: t.redo, onClick: () => this.toast(tr('redoneT'), 'info') },
+      { sep: 1 },
+      { glyph: '⟳', label: t.fetch, onClick: () => this.toast(tr('fetchedT')) },
+      { glyph: '↓', label: t.pull, onClick: () => this.toast(tr('pulledT', { b: s.current })), caret: e => this.pullMenu(e) },
+      { glyph: '↑', label: t.push, onClick: () => this.push(), caret: e => this.pushMenu(e), badge: s.ahead ? String(s.ahead) : '' },
+      { sep: 1 },
+      { glyph: '⎇', label: t.branch, onClick: () => this.newBranch(null) },
+      { glyph: '⊟', label: t.stash, onClick: () => this.stashDialog() },
+      { glyph: '⊞', label: t.pop, onClick: () => this.applyStash(0, true), badge: s.stashes.length ? String(s.stashes.length) : '' },
+      { sep: 1 },
+      { glyph: '⇄', label: t.pr, onClick: () => this.openPR(s.current) }
+    ].map(x => ({ isSep: !!x.sep, notSep: !x.sep, glyph: x.glyph, label: x.label, onClick: x.onClick, hasCaret: !!x.caret, onCaret: x.caret, hasBadge: !!x.badge, badge: x.badge }));
+
+    const center = s.center === 'diff' && !s.diffFile ? 'graph' : s.center;
+    Object.assign(base, {
+      repoName: disp(repo), curBranch: s.current,
+      onRepoSel: e => this.openMenu(e, s.repos.map(r => ({ label: (r.id === repo.id ? '✓  ' : '    ') + disp(r), action: () => this.openRepo(r.id) }))),
+      onBranchSel: e => this.openMenu(e, all.filter(r => r.type === 'local').map(r => ({ label: (r.head ? '✓  ' : '    ') + r.name, action: () => r.head ? null : this.checkout(r.name) }))),
+      tools, cq: s.cq, onCq: e => this.setState({ cq: e.target.value }), sbq: s.sbq, onSbq: e => this.setState({ sbq: e.target.value }), sections,
+      isGraph: center === 'graph', isDiff: center === 'diff', isConflict: center === 'conflict' && !!s.conflict, isRebase: center === 'rebase' && !!s.rebase,
+      rows, graphSvg, backGraph: () => this.setState({ center: 'graph' })
+    });
+
+    if (s.diffFile) {
+      const f = s.diffFile, fromStg = f.staged !== undefined; const isSplit = s.diffMode === 'split';
+      const add = R.DIFF.filter(d => d[4] === 'm' || d[4] === 'a').length, del = R.DIFF.filter(d => d[4] === 'm' || d[4] === 'd').length;
+      const uni = []; R.DIFF.forEach(([ln, lt, rn, rt, ty]) => { if (ty === 'c') uni.push({ o: ln, n: rn, s: '', t: lt, bg: 'transparent', sc: '' }); if (ty === 'm' || ty === 'd') uni.push({ o: ln, n: '', s: '−', t: lt, bg: 'var(--del-bg)', sc: 'var(--danger)' }); if (ty === 'm' || ty === 'a') uni.push({ o: '', n: rn, s: '+', t: rt, bg: 'var(--add-bg)', sc: 'var(--ok)' }); });
+      base.df = {
+        path: f.path, st: f.st, stColor: STC[f.st] || 'var(--muted)', add, del, isSplit, isUni: !isSplit,
+        splitBg: isSplit ? 'var(--accent)' : 'transparent', splitColor: isSplit ? 'var(--accent-ink)' : 'var(--muted)', uniBg: !isSplit ? 'var(--accent)' : 'transparent', uniColor: !isSplit ? 'var(--accent-ink)' : 'var(--muted)',
+        setSplit: () => this.setState({ diffMode: 'split' }), setUni: () => this.setState({ diffMode: 'uni' }),
+        canStage: fromStg, stageLabel: f.staged ? t.unstageFile : t.stageFile,
+        onStage: () => { f.staged ? this.unstage(f.path) : this.stage(f.path); this.setState(x => ({ diffFile: { ...x.diffFile, staged: !f.staged } })); },
+        split: R.DIFF.map(([ln, lt, rn, rt, ty]) => ({ ln: ln == null ? '' : ln, lt, rn: rn == null ? '' : rn, rt, ls: ty === 'm' || ty === 'd' ? '−' : '', rs: ty === 'm' || ty === 'a' ? '+' : '', lbg: ty === 'm' || ty === 'd' ? 'var(--del-bg)' : ty === 'a' ? 'var(--hatch)' : 'transparent', rbg: ty === 'm' || ty === 'a' ? 'var(--add-bg)' : ty === 'd' ? 'var(--hatch)' : 'transparent' })),
+        uni
+      };
+      base.closeDiff = () => this.setState({ center: 'graph', diffFile: null });
+    }
+
+    if (s.conflict) {
+      const cf = s.conflict, file = R.CF[cf.file], ch = cf.choices[cf.file];
+      const SC = { ours: LANE[2], theirs: LANE[4] }, INK = 'oklch(0.2 0.02 230)';
+      const pane = side => { const lines = []; let n = 0, hn = 0; const col = SC[side];
+        file.segs.forEach(sg => {
+          if (sg.c) { sg.c.forEach(x => lines.push({ isCtx: true, isHead: false, isHunk: false, n: ++n, text: x })); return; }
+          const hi = hn++, sel = ch[hi][side], all = sel.every(Boolean), anyH = ch[hi].ours.some(Boolean) || ch[hi].theirs.some(Boolean);
+          lines.push({ isCtx: false, isHead: true, isHunk: false, title: tr('hunk', { n: hi + 1 }), color: col, headBg: tint(col, 16), btn: all ? '− ' + t.dropBlock : '+ ' + t.takeBlock, btnBg: all ? col : 'transparent', btnColor: all ? INK : col, onPick: () => this.pick(hi, side) });
+          sg.h[side === 'ours' ? 0 : 1].forEach((x, li) => { const on = sel[li]; lines.push({ isCtx: false, isHead: false, isHunk: true, n: ++n, text: x, color: col, bg: tint(col, on ? 24 : 8), mark: on ? '−' : '+', tip: on ? t.lgRemove : t.lgAdd, btnBg: on ? col : 'transparent', btnBorder: col, btnColor: on ? INK : col, opacity: on || !anyH ? 1 : 0.5, onToggle: () => this.pickLine(hi, side, li) }); });
+        }); return lines; };
+      const manual = cf.manual && cf.manual[cf.file];
+      const out = []; const plain = [];
+      const noop = () => {};
+      if (manual != null) manual.split('\n').forEach(x => out.push({ isLine: true, isGap: false, text: x, bg: 'transparent', bar: 'var(--info)', vis: 'hidden', onRemove: noop }));
+      else { let hn = 0; file.segs.forEach(sg => {
+        if (sg.c) { sg.c.forEach(x => { out.push({ isLine: true, isGap: false, text: x, bg: 'transparent', bar: 'transparent', vis: 'hidden', onRemove: noop }); plain.push(x); }); return; }
+        const hi = hn++, c = ch[hi];
+        if (!c.ours.some(Boolean) && !c.theirs.some(Boolean)) { out.push({ isLine: false, isGap: true, text: tr('gapBlock', { n: hi + 1 }) }); plain.push('<<<<<<< ' + s.current, ...sg.h[0], '=======', ...sg.h[1], '>>>>>>> ' + cf.src); return; }
+        ['ours', 'theirs'].forEach((side, si) => sg.h[si].forEach((x, li) => { if (c[side][li]) { out.push({ isLine: true, isGap: false, text: x, bg: tint(SC[side], 12), bar: SC[side], vis: 'visible', onRemove: () => this.pickLine(hi, side, li) }); plain.push(x); } }));
+      }); }
+      let ln = 0; out.forEach(l => { if (l.isLine) l.n = ++ln; });
+      const res = this.cfResolved(cf.file);
+      const setCf = p => this.setState(x => ({ conflict: { ...x.conflict, ...p } }));
+      base.cf = { title: tr('conflictTitle', { f: file.path }), sub: `A: ${s.current}  ←  B: ${cf.src}`, takeA: () => this.takeAll('ours'), takeB: () => this.takeAll('theirs'),
+        panes: [{ letter: 'A', label: t.yours, name: s.current, color: SC.ours, lines: pane('ours') }, { letter: 'B', label: t.theirs, name: cf.src, color: SC.theirs, lines: pane('theirs') }], out,
+        outSub: tr('outputSub', { f: file.path.split('/').pop() }) + (manual != null ? ' · ' + t.manualNote : ''),
+        status: res ? '✓ ' + t.resolved : t.conflicted, statusColor: res ? 'var(--ok)' : 'var(--warn)',
+        editing: !!cf.editing, notEditing: !cf.editing, hasManual: manual != null && !cf.editing, editText: cf.editText || '',
+        onEdit: () => setCf({ editing: true, editText: manual != null ? manual : plain.join('\n') }),
+        onEditText: e => setCf({ editText: e.target.value }),
+        onDone: () => this.setState(x => ({ conflict: { ...x.conflict, editing: false, manual: { ...x.conflict.manual, [x.conflict.file]: x.conflict.editText } } })),
+        onReset: () => this.setState(x => { const m = { ...x.conflict.manual }; delete m[x.conflict.file]; return { conflict: { ...x.conflict, manual: m } }; }) };
+      const nRes = R.CF.filter((_, i) => this.cfResolved(i)).length, allRes = nRes === R.CF.length;
+      base.cfp = { desc: `${cf.src} → ${s.current}`, progress: tr('cfProgress', { n: nRes, m: R.CF.length }),
+        files: R.CF.map((f, i) => { const ok = this.cfResolved(i); return { path: f.path, icon: ok ? '✓' : '!', iconColor: ok ? 'var(--ok)' : 'var(--warn)', status: ok ? t.resolved : t.conflicted, bg: cf.file === i && center === 'conflict' ? 'var(--accent-soft)' : 'transparent', onClick: () => this.setState(x => ({ conflict: { ...x.conflict, file: i, editing: false }, center: 'conflict' })) }; }),
+        btnBg: allRes ? 'var(--accent)' : 'var(--surface2)', btnColor: allRes ? 'var(--accent-ink)' : 'var(--faint)', onComplete: this.completeMerge, onAbort: this.abortMerge };
+    }
+
+    if (s.rebase) {
+      const its = s.rebase.items; const acts = ['pick', 'reword', 'edit', 'squash', 'fixup', 'drop'];
+      base.rb = { title: `${s.current} → ${s.rebase.onto}`,
+        items: its.map((x, i) => ({ ...x, color: ACTC[x.action], opacity: x.action === 'drop' ? 0.5 : 1, isReword: x.action === 'reword', notReword: x.action !== 'reword', deco: x.action === 'drop' ? 'line-through' : 'none',
+          options: acts.map(a => ({ value: a, label: t['act_' + a] })), onAction: e => this.rbSet(i, { action: e.target.value }), onMsg: e => this.rbSet(i, { newMsg: e.target.value }),
+          onUp: () => this.rbMove(i, i - 1), onDown: () => this.rbMove(i, i + 1),
+          onDragStart: e => { this._drag = i; e.dataTransfer.effectAllowed = 'move'; }, onDragOver: e => e.preventDefault(), onDrop: e => { e.preventDefault(); if (this._drag != null) this.rbMove(this._drag, i); this._drag = null; } })),
+        summary: tr('rbSummary', { p: its.filter(x => x.action === 'pick' || x.action === 'reword' || x.action === 'edit').length, s: its.filter(x => x.action === 'squash' || x.action === 'fixup').length, d: its.filter(x => x.action === 'drop').length }),
+        onCancel: () => this.setState({ rebase: null, center: 'graph' }), onStart: this.rbStart };
+    }
+
+    const showConflictPanel = !!s.conflict && sel === 'wip';
+    const showStaging = !s.conflict && sel === 'wip';
+    const fv = (f, staged) => { const sp = splitPath(f.path); return { ...sp, st: f.st, stColor: STC[f.st], btn: staged ? '−' : '+', bg: center === 'diff' && s.diffFile && s.diffFile.path === f.path ? 'var(--accent-soft)' : 'transparent', onToggle: e => { e.stopPropagation(); staged ? this.unstage(f.path) : this.stage(f.path); }, onOpen: () => this.setState({ diffFile: { ...f, staged }, center: 'diff' }), onMenu: e => this.openMenu(e, this.fileMenu(f, staged)) }; };
+    const ok = (s.staged.length || s.amend) && s.msg.trim();
+    Object.assign(base, { showConflictPanel, showStaging, showDetail: sel !== 'wip' });
+    if (showStaging) base.stg = {
+      title: tr('stgTitle', { n: nCh }), sub: tr('stgSub', { b: s.current }), onMenu: e => this.openMenu(e, this.wipMenu()),
+      lists: [
+        { title: `${t.unstaged} (${s.unstaged.length})`, hasFiles: !!s.unstaged.length, empty: !s.unstaged.length, allLabel: t.stageAll, onAll: () => this.setState(x => ({ staged: [...x.staged, ...x.unstaged], unstaged: [] })), files: s.unstaged.map(f => fv(f, false)) },
+        { title: `${t.staged} (${s.staged.length})`, hasFiles: !!s.staged.length, empty: !s.staged.length, allLabel: t.unstageAll, onAll: () => this.setState(x => ({ unstaged: [...x.unstaged, ...x.staged], staged: [] })), files: s.staged.map(f => fv(f, true)) }
+      ],
+      msg: s.msg, onMsg: e => this.setState({ msg: e.target.value }), desc: s.desc, onDesc: e => this.setState({ desc: e.target.value }),
+      count: String(72 - s.msg.length), countColor: s.msg.length > 72 ? 'var(--danger)' : 'var(--faint)',
+      amend: s.amend, onAmend: e => this.setState({ amend: e.target.checked, msg: e.target.checked && !s.msg ? head.msg : s.msg }),
+      btnLabel: s.amend ? t.amendBtn : tr('commitBtn', { n: s.staged.length, b: s.current }), btnBg: ok ? 'var(--accent)' : 'var(--surface2)', btnColor: ok ? 'var(--accent-ink)' : 'var(--faint)', onCommit: this.doCommit, onAI: this.aiCommit, aiLabel: s.aiBusy === 'commit' ? t.aiGenerating : t.aiGenerate
+    };
+    if (sel !== 'wip') {
+      const c = s.commits.find(x => x.id === sel) || head; const i = s.commits.indexOf(c);
+      const fs = R.FILESETS[c.id.startsWith('n') ? 0 : i % R.FILESETS.length];
+      const byId = Object.fromEntries(s.commits.map(x => [x.id, x]));
+      base.dt = {
+        sha: c.sha, msg: c.msg, author: R.AUTH[c.au], ini: c.au, avColor: LANE[c.lane], date: c.date, parents: c.parents.map(p => byId[p] ? byId[p].sha : p).join('  ') || '—',
+        filesLabel: tr('filesChanged', { n: fs.length }), add: fs.reduce((a, f) => a + f[2], 0), del: fs.reduce((a, f) => a + f[3], 0),
+        files: fs.map(([p, st, a, d]) => ({ ...splitPath(p), st, stColor: STC[st], stat: `+${a} −${d}`, bg: center === 'diff' && s.diffFile && s.diffFile.path === p ? 'var(--accent-soft)' : 'transparent', onOpen: () => this.setState({ diffFile: { path: p, st }, center: 'diff' }), onMenu: e => this.openMenu(e, [{ label: tr('mViewDiff'), action: () => this.setState({ diffFile: { path: p, st }, center: 'diff' }) }, { label: tr('mHistory'), action: () => this.done(tr('mHistory')) }, { label: tr('mBlame'), action: () => this.done(tr('mBlame')) }, { label: tr('mCopyPath'), action: () => this.copy(p) }]) })),
+        hasAI: s.ai.summary && !!s.aiKeys.length, aiText: L ? `Changes ${fs.length} files (+${fs.reduce((a, f) => a + f[2], 0)} −${fs.reduce((a, f) => a + f[3], 0)}). Main change: “${c.msg}”, mostly in ${fs[0][0].split('/').slice(0, -1).join('/') || 'the project root'}.` : `Modifica ${fs.length} archivos (+${fs.reduce((a, f) => a + f[2], 0)} −${fs.reduce((a, f) => a + f[3], 0)}). Cambio principal: «${c.msg}», sobre todo en ${fs[0][0].split('/').slice(0, -1).join('/') || 'la raíz del proyecto'}.`,
+        onCopy: () => this.copy(c.sha), onClose: () => this.select('wip'), onCherry: () => this.cherry(c), onRevert: () => this.revert(c), onBranch: () => this.newBranch(c)
+      };
+    }
+    return base;
+  }
+}
+</script>
+</body>
+</html>
