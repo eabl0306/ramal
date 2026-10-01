@@ -1,7 +1,8 @@
 # Workspace unico de Rust para todo el monorepo: el motor de Git compartido
-# (crates/*), la API (apps/api/crates/*), el sidecar de la extension de VS Code
-# y el lado nativo de la app de escritorio. Un solo Cargo.lock y un solo target/:
-# las versiones de las dependencias comunes no pueden divergir entre apps.
+# (crates/*), la API (apps/api/crates/*), el sidecar de la extension de VS Code,
+# el lado nativo de la app de escritorio y la herramienta que mide la complejidad
+# del Rust (tools/rust-complexity). Un solo Cargo.lock y un solo target/: las
+# versiones de las dependencias comunes no pueden divergir entre apps.
 [workspace]
 resolver = "3"
 members = [
@@ -17,6 +18,7 @@ members = [
   "apps/api/crates/api",
   "apps/vscode-engine",
   "apps/desktop/src-tauri",
+  "tools/rust-complexity",
 ]
 # Todos menos el de escritorio. Tauri enlaza con webkit2gtk, que no esta en todas
 # las maquinas ni en los runners de la CI que no son de escritorio: sin esta lista,
@@ -35,6 +37,7 @@ default-members = [
   "apps/api/crates/http",
   "apps/api/crates/api",
   "apps/vscode-engine",
+  "tools/rust-complexity",
 ]
 
 [workspace.package]
@@ -106,6 +109,11 @@ tauri-plugin-opener = "2.7.0"
 # entra con la feature `e2e` de ramal-desktop, nunca en el binario publicado.
 tauri-plugin-wdio-webdriver = "1.4.0"
 
+# Solo tools/rust-complexity: lee los fuentes de Rust para medir su complejidad.
+# Sin las features por defecto, que traen el soporte de macros procedurales.
+proc-macro2 = { version = "1.0.107", default-features = false, features = ["span-locations"] }
+syn = { version = "2.0.119", default-features = false, features = ["full", "parsing", "visit"] }
+
 # Solo tests.
 pretty_assertions = "1.4.1"
 tempfile = "3.27.0"
@@ -129,6 +137,8 @@ unimplemented = "deny"
 dbg_macro = "deny"
 print_stdout = "deny"
 print_stderr = "deny"
+# Conteo plano y mas laxo que el de Sonar (ver clippy.toml): la cognitiva y la
+# ciclomatica de verdad las mide tools/rust-complexity.
 cognitive_complexity = "deny"
 # Restriction lint: no entra por `all`/`pedantic`/`nursery`, hay que pedirlo.
 # Sin esta linea el umbral de clippy.toml no hace nada.

@@ -1,0 +1,21 @@
+[package]
+name = "ramal-rust-complexity"
+description = "Complejidad cognitiva (al estilo Sonar) y ciclomatica de cada funcion de Rust del repo, con los limites de ADR 0005."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+# Lee los fuentes con syn, el mismo parser que usan las macros del ecosistema: no
+# compila nada, asi que tambien mide ramal-desktop en maquinas sin webkit2gtk.
+# span-locations da la linea de cada funcion fuera de una macro procedural.
+[dependencies]
+proc-macro2 = { workspace = true }
+syn = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+[lints]
+workspace = true

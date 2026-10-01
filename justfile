@@ -91,7 +91,7 @@ doctor:
 
 # Todo el enforcement del monorepo, igual que la CI pero en local.
 [group('monorepo')]
-check: guard root-lint lint-css fmt-check tools-test knip rust-lint rust-test api-check engine-check packages-check web-check desktop-check vscode-check
+check: guard root-lint lint-css fmt-check tools-test knip rust-lint rust-complexity rust-test api-check engine-check packages-check web-check desktop-check vscode-check
 
 # Lo mismo que check mas lo que la CI corre aparte: auditoria, protocolo, e2e, builds y la pila.
 [group('monorepo')]
@@ -111,7 +111,7 @@ fmt-check:
 
 # Lint de todo: raiz, CSS, Rust, paquetes y apps.
 [group('monorepo')]
-lint: root-lint lint-css rust-lint packages-lint web-lint desktop-lint vscode-lint
+lint: root-lint lint-css rust-lint rust-complexity packages-lint web-lint desktop-lint vscode-lint
 
 # Tests unitarios de todo.
 [group('monorepo')]
@@ -177,6 +177,14 @@ rust-fmt:
 [group('rust')]
 rust-lint:
     cargo clippy --all-targets --all-features -- -D warnings
+
+# clippy no mide ni la cognitiva al estilo Sonar ni la ciclomatica: su
+# cognitive_complexity es un conteo plano. tools/rust-complexity las mide con syn
+# sobre los fuentes, sin compilar, asi que cubre tambien ramal-desktop.
+[group('rust')]
+[doc('Complejidad cognitiva (15) y ciclomatica (10) de cada funcion de Rust.')]
+rust-complexity:
+    cargo run --quiet -p ramal-rust-complexity -- crates apps tools
 
 # Tests de Rust de default-members (todo menos el escritorio).
 [group('rust')]

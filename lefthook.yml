@@ -109,10 +109,11 @@ pre-push:
   parallel: true
   jobs:
     # Sin --workspace: los default-members dejan fuera el escritorio, que
-    # necesita webkit2gtk.
+    # necesita webkit2gtk. La complejidad (just rust-complexity) si lo mide: lee
+    # los fuentes sin compilarlos.
     - name: rust
       glob: '*.{rs,toml}'
-      run: cargo clippy --all-targets --all-features -- -D warnings && cargo test
+      run: cargo clippy --all-targets --all-features -- -D warnings && just rust-complexity && cargo test
 
     - name: typescript
       glob: '*.{ts,tsx,mts,cts}'

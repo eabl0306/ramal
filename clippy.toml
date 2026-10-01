@@ -1,3 +1,11 @@
+# Umbrales de clippy para todo el workspace (ADR 0005). Los nucleos los repiten
+# en su propio clippy.toml porque clippy no fusiona ficheros.
+#
+# cognitive-complexity-threshold no es la cognitiva de Sonar que mide el
+# TypeScript: clippy cuenta plano, sin penalizar el anidamiento ni los `&&` y
+# `||`, y no tiene lint ciclomatico. La cognitiva de Sonar (15) y la ciclomatica
+# (10) las hace cumplir tools/rust-complexity (just rust-complexity); este umbral
+# queda como aviso temprano en el editor.
 cognitive-complexity-threshold = 15
 too-many-arguments-threshold = 5
 too-many-lines-threshold = 50
