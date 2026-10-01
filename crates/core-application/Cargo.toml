@@ -6,5 +6,18 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[features]
+# Expone los dobles de test (FakeGitReader, block_on) a los adaptadores y al
+# motor. Nunca se activa en un binario: solo lo encienden las dev-dependencies.
+testing = []
+
+# Lista blanca estricta: el dominio, async-trait para los puertos y thiserror.
+# Sin tokio: los puertos son asincronos y los ejecuta el runtime del host. Sin
+# dev-dependencies, porque Cargo.lock las cuenta como dependencias directas.
+[dependencies]
+async-trait = { workspace = true }
+ramal-core-domain = { workspace = true }
+thiserror = { workspace = true }
+
 [lints]
 workspace = true

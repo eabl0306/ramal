@@ -1,10 +1,11 @@
-//! Sidecar de la extension de VS Code: sirve el motor de Git por JSON-RPC sobre
-//! stdio. La extension lo arranca como proceso hijo.
+//! Binario del sidecar. Todo el arranque vive en la biblioteca para que los tests
+//! lo cubran; aqui solo se le pasan los argumentos.
 
-// Clippy (nursery) propone `const fn` para un main vacio al compilar el arnes de
-// tests, pero Rust no deja que main sea const. El allow se va con el stub.
-#[allow(
-    clippy::missing_const_for_fn,
-    reason = "main cannot be const; this stub is empty until the binary is implemented"
+#![allow(
+    unused_crate_dependencies,
+    reason = "the binary only calls the library, which is where the dependencies are used"
 )]
-fn main() {}
+
+fn main() -> std::process::ExitCode {
+    ramal_vscode_engine::run(std::env::args_os())
+}

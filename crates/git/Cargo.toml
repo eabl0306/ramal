@@ -1,10 +1,24 @@
 [package]
 name = "ramal-git"
-description = "Adaptador de Git: implementa los puertos del motor sobre el repositorio real."
+description = "Adaptador del git CLI: implementa los puertos del motor lanzando git."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+
+[dependencies]
+# async-trait hace falta para implementar los puertos, que se declaran con
+# #[async_trait] en ramal-core-application.
+async-trait = { workspace = true }
+ramal-core-application = { workspace = true }
+ramal-core-domain = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["process", "io-util", "fs"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+tempfile = { workspace = true }
 
 [lints]
 workspace = true

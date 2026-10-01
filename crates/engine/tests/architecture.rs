@@ -1,0 +1,319 @@
+//! Reglas de dependencia del hexagono del cliente (docs/architecture.md 5.1).
+//!
+//! Lee el `Cargo.lock` de la raiz linea a linea, sin crate de TOML, construye el
+//! grafo y comprueba: que las dependencias directas de los nucleos son un
+//! subconjunto de su lista blanca, que el cierre transitivo de cada crate no
+//! contiene nada de su lista negra, que los hosts solo hablan con el motor y que
+//! ninguna familia (cliente y API) alcanza a la otra salvo `ramal-ai`. Puede mirar
+//! `ramal-desktop` sin compilar Tauri porque `Cargo.lock` describe a todos los
+//! miembros del workspace. Tambien vigila que los `clippy.toml` de los nucleos
+//! repitan los umbrales de la raiz (clippy no los fusiona).
+
+#![allow(
+    clippy::unwrap_used,
+    clippy::expect_used,
+    reason = "tests fail loudly on purpose; a panic here is the assertion"
+)]
+#![allow(
+    unused_crate_dependencies,
+    reason = "the lint runs per target and this test only reads files"
+)]
+
+use std::collections::{BTreeMap, BTreeSet, VecDeque};
+use std::path::PathBuf;
+
+type Graph = BTreeMap<String, BTreeSet<String>>;
+
+/// Crates del hexagono del cliente.
+const CLIENT_CRATES: &[&str] = &[
+    "ramal-core-domain",
+    "ramal-core-application",
+    "ramal-protocol",
+    "ramal-git",
+    "ramal-engine",
+    "ramal-vscode-engine",
+    "ramal-desktop",
+];
+
+/// Lo que ningun nucleo del cliente puede alcanzar. `serde` si entra: su cierre
+/// es diminuto y ningun crate permitido lo trae.
+const CORE_FORBIDDEN: &[&str] = &[
+    "serde",
+    "serde_json",
+    "ts-rs",
+    "tokio",
+    "reqwest",
+    "hyper",
+    "sqlx",
+    "salvo",
+    "tauri",
+    "gix",
+    "git2",
+    "libgit2-sys",
+    "keyring-core",
+];
+
+const DOMAIN_ALLOWED: &[&str] = &["thiserror"];
+const APPLICATION_ALLOWED: &[&str] = &["ramal-core-domain", "async-trait", "thiserror"];
+
+/// Umbrales de clippy que los nucleos repiten de la raiz.
+const THRESHOLDS: &[&str] = &[
+    "cognitive-complexity-threshold",
+    "too-many-arguments-threshold",
+    "too-many-lines-threshold",
+    "type-complexity-threshold",
+    "excessive-nesting-threshold",
+    "avoid-breaking-exported-api",
+];
+
+/// APIs de la biblioteca estandar que los nucleos tienen prohibidas.
+const DISALLOWED_IN_CORE: &[&str] = &[
+    "std::process::Command::new",
+    "std::fs::read_to_string",
+    "std::env::var",
+    "std::time::SystemTime::now",
+    "std::thread::spawn",
+    "std::fs::File",
+    "std::net::TcpStream",
+];
+
+fn root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
+}
+
+fn unquote(raw: &str) -> String {
+    raw.trim()
+        .trim_end_matches(',')
+        .trim_matches('"')
+        .to_owned()
+}
+
+/// Mapa `paquete -> dependencias directas` (incluidas las de desarrollo).
+fn dependency_graph(lock: &str) -> Graph {
+    let mut graph = Graph::new();
+    let mut current: Option<String> = None;
+    let mut in_dependencies = false;
+    for line in lock.lines().map(str::trim) {
+        if line == "[[package]]" {
+            current = None;
+            in_dependencies = false;
+        } else if let Some(name) = line.strip_prefix("name = ") {
+            current = Some(unquote(name));
+            graph.entry(unquote(name)).or_default();
+        } else if line == "dependencies = [" {
+            in_dependencies = true;
+        } else if in_dependencies && line == "]" {
+            in_dependencies = false;
+        } else if in_dependencies && let Some(owner) = &current {
+            let entry = unquote(line);
+            let name = entry
+                .split_whitespace()
+                .next()
+                .unwrap_or_default()
+                .to_owned();
+            graph.entry(owner.clone()).or_default().insert(name);
+        }
+    }
+    graph
+}
+
+fn graph() -> Graph {
+    let lock = std::fs::read_to_string(root().join("Cargo.lock"))
+        .expect("Cargo.lock should exist at the workspace root");
+    dependency_graph(&lock)
+}
+
+fn closure(graph: &Graph, crate_name: &str) -> BTreeSet<String> {
+    let mut seen = BTreeSet::new();
+    let mut queue = VecDeque::from([crate_name.to_owned()]);
+    while let Some(package) = queue.pop_front() {
+        for dependency in graph.get(&package).into_iter().flatten() {
+            if seen.insert(dependency.clone()) {
+                queue.push_back(dependency.clone());
+            }
+        }
+    }
+    seen
+}
+
+fn direct<'a>(graph: &'a Graph, crate_name: &str) -> &'a BTreeSet<String> {
+    graph
+        .get(crate_name)
+        .unwrap_or_else(|| unreachable!("{crate_name} should be in Cargo.lock"))
+}
+
+fn assert_never_reaches(graph: &Graph, crate_name: &str, forbidden: impl Fn(&str) -> bool) {
+    for reached in closure(graph, crate_name) {
+        assert!(
+            !forbidden(&reached),
+            "{crate_name} reaches `{reached}`. The hexagon leaks: move that code to an adapter"
+        );
+    }
+}
+
+fn is_tauri(name: &str) -> bool {
+    name == "tauri" || name.starts_with("tauri-")
+}
+
+fn is_api(name: &str) -> bool {
+    name.starts_with("ramal-api")
+}
+
+#[test]
+fn the_lock_file_describes_every_client_crate() {
+    let graph = graph();
+    for crate_name in CLIENT_CRATES {
+        assert!(
+            graph.contains_key(*crate_name),
+            "{crate_name} is missing from Cargo.lock"
+        );
+    }
+}
+
+#[test]
+fn the_parser_sees_real_edges() {
+    let graph = graph();
+    assert!(closure(&graph, "ramal-git").contains("tokio"));
+    assert!(closure(&graph, "ramal-protocol").contains("serde"));
+    assert!(closure(&graph, "ramal-protocol").contains("ts-rs"));
+    assert!(direct(&graph, "ramal-engine").contains("ramal-git"));
+    assert!(direct(&graph, "ramal-vscode-engine").contains("ramal-engine"));
+    assert!(closure(&graph, "ramal-vscode-engine").contains("ramal-core-domain"));
+}
+
+#[test]
+fn the_core_only_declares_its_allow_list() {
+    let graph = graph();
+    for (crate_name, allowed) in [
+        ("ramal-core-domain", DOMAIN_ALLOWED),
+        ("ramal-core-application", APPLICATION_ALLOWED),
+    ] {
+        for dependency in direct(&graph, crate_name) {
+            assert!(
+                allowed.contains(&dependency.as_str()),
+                "{crate_name} declares `{dependency}`; allowed: {allowed:?}. \
+                 The hexagon leaks: move that code to an adapter"
+            );
+        }
+    }
+}
+
+#[test]
+fn the_core_never_reaches_infrastructure() {
+    let graph = graph();
+    assert_never_reaches(&graph, "ramal-core-domain", |name| {
+        CORE_FORBIDDEN.contains(&name) || name == "async-trait" || name.starts_with("ramal-")
+    });
+    assert_never_reaches(&graph, "ramal-core-application", |name| {
+        CORE_FORBIDDEN.contains(&name)
+            || (name.starts_with("ramal-") && name != "ramal-core-domain")
+    });
+}
+
+#[test]
+fn the_protocol_does_not_know_the_engine() {
+    let graph = graph();
+    assert_never_reaches(&graph, "ramal-protocol", |name| {
+        name.starts_with("ramal-") || ["tokio", "salvo", "sqlx"].contains(&name) || is_tauri(name)
+    });
+}
+
+#[test]
+fn the_git_adapter_does_not_know_the_protocol_or_the_hosts() {
+    let graph = graph();
+    let forbidden = [
+        "ramal-protocol",
+        "ramal-engine",
+        "ramal-desktop",
+        "ramal-vscode-engine",
+    ];
+    assert_never_reaches(&graph, "ramal-git", |name| {
+        forbidden.contains(&name)
+            || ["salvo", "sqlx", "git2", "libgit2-sys"].contains(&name)
+            || is_tauri(name)
+    });
+}
+
+#[test]
+fn the_engine_stays_out_of_hosts_and_the_server() {
+    let graph = graph();
+    assert_never_reaches(&graph, "ramal-engine", |name| {
+        is_tauri(name) || is_api(name) || ["salvo", "sqlx", "git2", "libgit2-sys"].contains(&name)
+    });
+}
+
+#[test]
+fn the_hosts_only_talk_to_the_engine() {
+    let graph = graph();
+    for host in ["ramal-vscode-engine", "ramal-desktop"] {
+        for dependency in direct(&graph, host) {
+            assert!(
+                !dependency.starts_with("ramal-core-") && dependency != "ramal-git",
+                "{host} declares `{dependency}`: the host talks to the engine, not to its parts"
+            );
+        }
+        assert_never_reaches(&graph, host, |name| {
+            ["salvo", "sqlx"].contains(&name) || is_api(name)
+        });
+    }
+    assert_never_reaches(&graph, "ramal-vscode-engine", is_tauri);
+}
+
+#[test]
+fn the_client_and_the_server_never_reach_each_other() {
+    let graph = graph();
+    for crate_name in CLIENT_CRATES {
+        assert_never_reaches(&graph, crate_name, is_api);
+    }
+    for api_crate in graph.keys().filter(|name| is_api(name)) {
+        assert_never_reaches(&graph, api_crate, |name| CLIENT_CRATES.contains(&name));
+    }
+    if graph.contains_key("ramal-ai") {
+        assert_never_reaches(&graph, "ramal-ai", |name| name.starts_with("ramal-"));
+    }
+}
+
+fn thresholds(path: &str) -> BTreeMap<String, String> {
+    let text = std::fs::read_to_string(root().join(path)).expect("clippy.toml should exist");
+    text.lines()
+        .filter_map(|line| line.split_once('='))
+        .map(|(key, value)| (key.trim().to_owned(), value.trim().to_owned()))
+        .filter(|(key, _)| THRESHOLDS.contains(&key.as_str()))
+        .collect()
+}
+
+#[test]
+fn the_core_clippy_files_repeat_the_root_thresholds() {
+    let expected = thresholds("clippy.toml");
+    assert_eq!(
+        expected.len(),
+        THRESHOLDS.len(),
+        "the root clippy.toml lost a threshold"
+    );
+    for core in [
+        "crates/core-domain/clippy.toml",
+        "crates/core-application/clippy.toml",
+    ] {
+        assert_eq!(
+            thresholds(core),
+            expected,
+            "{core} drifted from the root clippy.toml"
+        );
+    }
+}
+
+#[test]
+fn the_core_clippy_files_forbid_io_in_the_standard_library() {
+    for core in [
+        "crates/core-domain/clippy.toml",
+        "crates/core-application/clippy.toml",
+    ] {
+        let text = std::fs::read_to_string(root().join(core)).unwrap();
+        for path in DISALLOWED_IN_CORE {
+            assert!(
+                text.contains(&format!("\"{path}\"")),
+                "{core} does not forbid {path}"
+            );
+        }
+    }
+}

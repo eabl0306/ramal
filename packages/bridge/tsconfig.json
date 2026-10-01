@@ -1,0 +1,15 @@
+// Proyecto compuesto: lo referencian el tsconfig raiz y las apps que usan el
+// puente. Solo emite declaraciones, y fuera del arbol de fuentes, para que las
+// project references funcionen sin un paso de build que orquestar.
+{
+  "extends": "@ramal/tsconfig/library.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./node_modules/.tmp/tsc",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "include": ["src"]
+}
