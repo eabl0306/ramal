@@ -30,6 +30,19 @@ export interface WebviewPanelsOptions {
   readonly devServer?: string | undefined;
 }
 
+/**
+ * Un panel abierto. Se sustituye por otro con el `repoId` nuevo si el host
+ * vuelve a abrir su raiz tras reiniciar el motor y este le da otro id; el canal
+ * del router lo lee siempre del mapa.
+ */
+interface OpenPanel {
+  readonly panel: vscode.WebviewPanel;
+  readonly surface: Surface;
+  readonly root: string;
+  readonly title: string;
+  readonly repoId: string;
+}
+
 /** Entrada de Vite de cada superficie (`build.rolldownOptions.input`). */
 function entryOf(surface: Surface): string {
   return `src/webview/app/entries/${surface}.tsx`;
@@ -40,11 +53,15 @@ function entryOf(surface: Surface): string {
  * canal y su superficie, y solo se escucha lo que llega de los paneles que crea
  * este adaptador (architecture.md 6.7, paso 1). Todo mensaje pasa por el
  * esquema de zod antes de llegar al router.
+ *
+ * Un panel se identifica por superficie y raiz del repositorio, no por `repoId`:
+ * el id es del proceso del motor, y con el se llego a revelar el panel de otro
+ * repositorio tras un reinicio.
  */
 export class VsCodeWebviewPanels implements WebviewSurface, vscode.Disposable {
   readonly #options: WebviewPanelsOptions;
   readonly #webviewRoot: vscode.Uri;
-  readonly #panels = new Map<string, vscode.WebviewPanel>();
+  readonly #panels = new Map<string, OpenPanel>();
   #manifest: ViteManifest | undefined;
   #nextId = 0;
 
@@ -54,21 +71,49 @@ export class VsCodeWebviewPanels implements WebviewSurface, vscode.Disposable {
   }
 
   show(request: ShowSurfaceRequest): void {
-    const key = `${request.surface}:${request.repoId}`;
+    const key = `${request.surface}:${request.root}`;
     const existing = this.#panels.get(key);
-    if (existing !== undefined) {
-      existing.reveal();
+    if (existing === undefined) {
+      this.#panels.set(key, this.#create(request, key));
       return;
     }
-    this.#panels.set(key, this.#create(request, key));
+    this.#adopt(key, request.repoId);
+    existing.panel.reveal();
+  }
+
+  openRoots(): readonly string[] {
+    return [...new Set([...this.#panels.values()].map((open) => open.root))];
+  }
+
+  rebind(root: string, repoId: string): void {
+    for (const [key, open] of this.#panels) {
+      if (open.root === root) this.#adopt(key, repoId);
+    }
+  }
+
+  close(root: string): void {
+    for (const open of [...this.#panels.values()]) {
+      if (open.root === root) open.panel.dispose();
+    }
   }
 
   dispose(): void {
-    for (const panel of [...this.#panels.values()]) panel.dispose();
+    for (const open of [...this.#panels.values()]) open.panel.dispose();
     this.#panels.clear();
   }
 
-  #create(request: ShowSurfaceRequest, key: string): vscode.WebviewPanel {
+  /**
+   * Si el repositorio tiene otro id, el panel lo adopta y se recarga: el webview
+   * solo lee el primer `init` y su cache es del id viejo.
+   */
+  #adopt(key: string, repoId: string): void {
+    const open = this.#panels.get(key);
+    if (open === undefined || open.repoId === repoId) return;
+    this.#panels.set(key, { ...open, repoId });
+    open.panel.webview.html = this.#html(open.panel.webview, open);
+  }
+
+  #create(request: ShowSurfaceRequest, key: string): OpenPanel {
     const panel = vscode.window.createWebviewPanel(
       `ramal.${request.surface}`,
       request.title,
@@ -77,10 +122,20 @@ export class VsCodeWebviewPanels implements WebviewSurface, vscode.Disposable {
     );
     panel.iconPath = vscode.Uri.joinPath(this.#options.extensionUri, 'media', 'ramal.svg');
     this.#nextId += 1;
+    const open: OpenPanel = {
+      panel,
+      surface: request.surface,
+      root: request.root,
+      title: request.title,
+      repoId: request.repoId,
+    };
+    const panels = this.#panels;
     const channel: PanelChannel = {
       id: `panel-${String(this.#nextId)}`,
       surface: request.surface,
-      repoId: request.repoId,
+      get repoId() {
+        return panels.get(key)?.repoId ?? request.repoId;
+      },
       post: (message) => {
         void panel.webview.postMessage(message);
       },
@@ -97,11 +152,11 @@ export class VsCodeWebviewPanels implements WebviewSurface, vscode.Disposable {
       router.detach(channel.id);
       this.#panels.delete(key);
     });
-    panel.webview.html = this.#html(panel.webview, request);
-    return panel;
+    panel.webview.html = this.#html(panel.webview, open);
+    return open;
   }
 
-  #html(webview: vscode.Webview, request: ShowSurfaceRequest): string {
+  #html(webview: vscode.Webview, request: Pick<OpenPanel, 'surface' | 'title'>): string {
     const nonce = createNonce();
     const common = { title: request.title, lang: this.#options.locale, nonce };
     const { devServer } = this.#options;

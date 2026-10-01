@@ -63,7 +63,7 @@ describe('Ramal: Open Graph', () => {
       { jsonrpc: '2.0', id: 1, method: 'repo/open', params: { path: '/work/ramal' } },
     ]);
     expect(d.panels.shown).toEqual([
-      { surface: 'graph', repoId: 'repo-1', title: 'Grafo de Ramal' },
+      { surface: 'graph', repoId: 'repo-1', root: '/work/ramal', title: 'Grafo de Ramal' },
     ]);
     expect(d.dialogs.shown).toEqual([]);
   });

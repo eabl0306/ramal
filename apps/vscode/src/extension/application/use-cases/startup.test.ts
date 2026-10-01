@@ -1,9 +1,11 @@
 import { PROTOCOL_VERSION } from '@ramal/bridge';
 import { describe, expect, it } from 'vitest';
 
-import { FakeLauncher, infoResponder } from '../../../test/engine-fakes';
+import { FakeLauncher, fail, infoResponder } from '../../../test/engine-fakes';
 import {
+  FakeDialogs,
   FakeNotifications,
+  FakePanels,
   FakeTimer,
   RecordingLogger,
   fakeChannel,
@@ -12,6 +14,7 @@ import {
 import { EngineUnavailableError } from '../engine-errors';
 
 import { createHostProbe } from './host-probe';
+import { openGraph } from './open-graph';
 import { createWebviewRouter } from './route-webview-message';
 import { startup } from './startup';
 
@@ -81,6 +84,29 @@ describe('arranque del host', () => {
     ]);
     expect(runtime.engine.state).toBe('running');
     expect(launcher.processes).toHaveLength(6);
+  });
+
+  it('sin git, Open Graph dice que falta git y el motor no entra en bucle de reinicios', async () => {
+    const { runtime, launcher, timer, notifications } = boot('es');
+    launcher.responder = (request) => Promise.resolve(fail(request, 'git_not_found'));
+    const result = await openGraph({
+      engine: runtime.engine,
+      ids: runtime.ids,
+      repositories: { list: () => [{ name: 'ramal', path: '/work/ramal' }] },
+      dialogs: new FakeDialogs(),
+      notifications,
+      panels: new FakePanels(),
+      translate: runtime.translate,
+      logger: new RecordingLogger(),
+    });
+    expect(result).toEqual({ outcome: 'failed', kind: 'git_not_found' });
+    expect(notifications.errors).toEqual([
+      { message: 'No se encuentra Git en este equipo.', actions: [] },
+    ]);
+    launcher.last.exit();
+    await flush();
+    expect(timer.pending).toEqual([]);
+    expect(launcher.processes).toHaveLength(1);
   });
 });
 

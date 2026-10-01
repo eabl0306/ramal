@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 import { defineConfig } from '@vscode/test-cli';
 
+import { createGitPathProfile } from './scripts/fixture-git-path.mjs';
 import { createFixtureRepo } from './scripts/fixture-repo.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
@@ -29,6 +30,10 @@ function engineBinary() {
   return found;
 }
 
+// Perfil propio con un `git.path` distinto del git del PATH (ver el script).
+// Pasar --user-data-dir evita que @vscode/test-electron use el suyo.
+const profile = createGitPathProfile();
+
 export default defineConfig({
   label: 'integration',
   files: 'out/test/integration/**/*.test.cjs',
@@ -37,11 +42,12 @@ export default defineConfig({
   extensionDevelopmentPath: root,
   workspaceFolder: createFixtureRepo(),
   launchArgs: [
+    `--user-data-dir=${profile.userDataDir}`,
     '--disable-extensions',
     '--disable-workspace-trust',
     '--skip-welcome',
     '--skip-release-notes',
   ],
-  env: { RAMAL_ENGINE_PATH: engineBinary() },
+  env: { RAMAL_ENGINE_PATH: engineBinary(), RAMAL_IT_GIT_PATH: profile.gitPath },
   mocha: { ui: 'tdd', timeout: 60_000 },
 });

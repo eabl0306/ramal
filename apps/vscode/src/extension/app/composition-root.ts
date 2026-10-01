@@ -3,16 +3,19 @@ import * as vscode from 'vscode';
 import type { Logger } from '../application/ports/logger';
 import { type HostProbe, createHostProbe } from '../application/use-cases/host-probe';
 import { type OpenGraphDeps, openGraph } from '../application/use-cases/open-graph';
+import { reopenRepositories } from '../application/use-cases/reopen-repositories';
 import {
   type WebviewRouter,
   createWebviewRouter,
 } from '../application/use-cases/route-webview-message';
 import { type HostRuntime, startup } from '../application/use-cases/startup';
+import { engineArgs } from '../infrastructure/engine/engine-args';
 import { type HostMode, resolveEngineBinary } from '../infrastructure/engine/engine-binary';
 import { createSidecarLauncher } from '../infrastructure/engine/sidecar-launcher';
 import { systemTimer } from '../infrastructure/system-timer';
 import { vscodeHostRequests } from '../infrastructure/vscode/clipboard-host-requests';
 import { hostMode, readEngineSettings } from '../infrastructure/vscode/engine-settings';
+import { resolveGitPath } from '../infrastructure/vscode/git-path';
 import {
   vscodeDialogs,
   vscodeNotifications,
@@ -30,16 +33,21 @@ import { devServerOrigin } from '../infrastructure/webview/webview-html';
  * motor incluido: cerrar su stdin lo termina).
  *
  * Devuelve la sonda de los tests de integracion solo con `ExtensionMode.Test`.
+ * Es asincrono por el git de VS Code: el lanzador del motor es sincrono y la API
+ * de `vscode.git` no, asi que se resuelve una vez antes de construirlo.
  */
-export function composeExtension(context: vscode.ExtensionContext): HostProbe | undefined {
+export async function composeExtension(
+  context: vscode.ExtensionContext,
+): Promise<HostProbe | undefined> {
   const hostLog = vscode.window.createOutputChannel('Ramal', { log: true });
   // El sidecar ya escribe su log con hora y nivel (tracing): va tal cual.
   const engineLog = vscode.window.createOutputChannel('Ramal Engine');
   const logger = createOutputLogger(hostLog);
   const mode = hostMode(context.extensionMode);
+  const gitPath = await resolveGitPath(logger);
   const runtime = startup({
     language: vscode.env.language,
-    launcher: engineLauncher(context, mode, logger, engineLog),
+    launcher: engineLauncher({ context, mode, gitPath, logger, engineLog }),
     timer: systemTimer,
     notifications: vscodeNotifications,
     logger,
@@ -53,10 +61,21 @@ export function composeExtension(context: vscode.ExtensionContext): HostProbe | 
     protocolVersion: runtime.protocolVersion,
   });
   const panels = webviewPanels(context, mode, runtime, router, logger);
+  // Los paneles nacen despues que el motor, asi que el gancho se engancha aqui.
+  const stopReopening = runtime.engine.onRestarted((connection) =>
+    reopenRepositories(connection, {
+      ids: runtime.ids,
+      panels,
+      notifications: vscodeNotifications,
+      translate: runtime.translate,
+      logger,
+    }),
+  );
   const graphDeps = openGraphDeps(runtime, panels, logger);
   const commands = registerCommands({ openGraph: () => openGraph(graphDeps) }, logger);
   context.subscriptions.push(hostLog, engineLog, panels, registerWelcomeView(), ...commands, {
     dispose: () => {
+      stopReopening();
       router.dispose();
       runtime.engine.stop();
     },
@@ -64,13 +83,23 @@ export function composeExtension(context: vscode.ExtensionContext): HostProbe | 
   return mode === 'test' ? createHostProbe(router, runtime.engine, runtime.ids) : undefined;
 }
 
-/** El lanzador del sidecar con el binario que toca segun el modo. */
-function engineLauncher(
-  context: vscode.ExtensionContext,
-  mode: HostMode,
-  logger: Logger,
-  engineLog: vscode.OutputChannel,
-): ReturnType<typeof createSidecarLauncher> {
+interface EngineLauncherInput {
+  readonly context: vscode.ExtensionContext;
+  readonly mode: HostMode;
+  /** El git de VS Code; sin el, el sidecar usa el primero del `PATH`. */
+  readonly gitPath: string | undefined;
+  readonly logger: Logger;
+  readonly engineLog: vscode.OutputChannel;
+}
+
+/** El lanzador del sidecar con el binario que toca segun el modo y el git de VS Code. */
+function engineLauncher({
+  context,
+  mode,
+  gitPath,
+  logger,
+  engineLog,
+}: EngineLauncherInput): ReturnType<typeof createSidecarLauncher> {
   const settings = readEngineSettings();
   const binaryPath = resolveEngineBinary({
     extensionPath: context.extensionPath,
@@ -80,9 +109,10 @@ function engineLauncher(
     environmentPath: process.env['RAMAL_ENGINE_PATH'],
   });
   logger.info(`engine binary: ${binaryPath}`);
+  logger.info(`git: ${gitPath ?? 'the first one on PATH (vscode.git gave none)'}`);
   return createSidecarLauncher({
     binaryPath,
-    args: ['--log-level', settings.logLevel],
+    args: engineArgs({ gitPath, logLevel: settings.logLevel }),
     logger,
     onEngineLog: (line) => {
       engineLog.appendLine(line);

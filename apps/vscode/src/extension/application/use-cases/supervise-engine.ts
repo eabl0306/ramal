@@ -1,7 +1,7 @@
-import type { RpcNotification, RpcResponse } from '@ramal/bridge';
+import type { EngineInfo, RpcNotification, RpcResponse } from '@ramal/bridge';
 
 import type { IdentifiedRpcRequest } from '../../../shared/messages';
-import { EngineUnavailableError, describeError } from '../engine-errors';
+import { type EngineCallError, EngineUnavailableError, describeError } from '../engine-errors';
 import type { EngineConnection, Unsubscribe } from '../ports/engine-connection';
 import type { EngineExit, EngineLauncher, EngineProcess } from '../ports/engine-launcher';
 import type { Logger } from '../ports/logger';
@@ -11,6 +11,9 @@ import { type RestartPolicy, createRestartPolicy } from '../restart-policy';
 import type { ProtocolCheck } from './check-engine-protocol';
 
 type Mismatch = Extract<ProtocolCheck, { outcome: 'mismatch' }>;
+
+/** Lo que hay que preparar en un proceso reiniciado antes de que reciba peticiones. */
+export type RestartHook = (connection: EngineConnection) => Promise<void>;
 
 export interface SuperviseEngineDeps {
   readonly launcher: EngineLauncher;
@@ -30,6 +33,12 @@ export type EngineStateKind = 'idle' | 'starting' | 'running' | 'waiting' | 'fai
 /** El motor visto desde el resto del host: una conexion que se repara sola. */
 export interface SupervisedEngine extends EngineConnection {
   readonly state: EngineStateKind;
+  /**
+   * `hook` corre con la conexion de cada proceso que arranca despues del primero
+   * (un reinicio tras una caida o tras Reintentar), antes de dejar pasar las
+   * peticiones que esperan. Un fallo del gancho se registra y no para el arranque.
+   */
+  onRestarted(hook: RestartHook): Unsubscribe;
   /** Vuelve a arrancar despues de que el host dejara de intentarlo. */
   retry(): void;
   /** Para el motor para siempre (al desactivar la extension). */
@@ -57,8 +66,11 @@ class EngineSupervisor implements SupervisedEngine {
   readonly #deps: SuperviseEngineDeps;
   readonly #policy: RestartPolicy;
   readonly #listeners = new Set<(notification: RpcNotification) => void>();
+  readonly #restartHooks = new Set<RestartHook>();
   #state: State = { kind: 'idle' };
   #startedAt = 0;
+  /** Algun proceso llego a estar listo: el siguiente que arranque es un reinicio. */
+  #hasRun = false;
 
   constructor(deps: SuperviseEngineDeps) {
     this.#deps = deps;
@@ -78,6 +90,13 @@ class EngineSupervisor implements SupervisedEngine {
     this.#listeners.add(listener);
     return () => {
       this.#listeners.delete(listener);
+    };
+  }
+
+  onRestarted(hook: RestartHook): Unsubscribe {
+    this.#restartHooks.add(hook);
+    return () => {
+      this.#restartHooks.delete(hook);
     };
   }
 
@@ -137,26 +156,75 @@ class EngineSupervisor implements SupervisedEngine {
     if (!this.#isCurrent(process)) {
       throw new EngineUnavailableError('the engine stopped while starting');
     }
-    if (check.outcome === 'compatible') {
-      this.#state = { kind: 'running', process };
-      const { engineVersion, git } = check.info;
-      this.#deps.logger.info(`engine ${engineVersion} ready with git ${git.version}`);
-      return process.connection;
+    switch (check.outcome) {
+      case 'compatible':
+        return this.#becomeReady(process, check.info);
+      case 'mismatch':
+        throw this.#refuseMismatch(process, check);
+      case 'engine-error':
+        throw this.#refuseEngineError(process, check.error);
+      case 'failed':
+        // engine/info no llego a contestarse y el proceso sigue vivo: se para y
+        // su salida cuenta como una caida que pasa por la politica de reinicio.
+        this.#deps.logger.error(`engine handshake failed: ${describeError(check.error)}`);
+        process.stop();
+        throw new EngineUnavailableError('the engine did not answer engine/info');
     }
-    if (check.outcome === 'mismatch') {
-      this.#state = { kind: 'failed' };
-      process.stop();
-      this.#deps.logger.error(
-        `engine speaks protocol ${String(check.engineVersion)}, expected ${String(check.expected)}`,
-      );
-      this.#deps.onProtocolMismatch(check);
-      throw new EngineUnavailableError('the engine speaks another protocol version');
+  }
+
+  /**
+   * Un proceso compatible. Si es un reinicio, antes corren los ganchos (volver a
+   * abrir los repositorios de los paneles): las peticiones que esperan en `ready`
+   * no pasan hasta entonces, asi ninguna llega a un registro vacio.
+   */
+  async #becomeReady(process: EngineProcess, info: EngineInfo): Promise<EngineConnection> {
+    if (this.#hasRun) {
+      await this.#runRestartHooks(process.connection);
+      if (!this.#isCurrent(process)) {
+        throw new EngineUnavailableError('the engine stopped while starting');
+      }
     }
-    // Si engine/info fallo y el proceso sigue vivo, se para: su salida cuenta
-    // como una caida y pasa por la politica de reinicio.
-    this.#deps.logger.error(`engine handshake failed: ${describeError(check.error)}`);
+    this.#hasRun = true;
+    this.#state = { kind: 'running', process };
+    this.#deps.logger.info(`engine ${info.engineVersion} ready with git ${info.git.version}`);
+    return process.connection;
+  }
+
+  async #runRestartHooks(connection: EngineConnection): Promise<void> {
+    const runs = [...this.#restartHooks].map((hook) =>
+      hook(connection).catch((error: unknown) => {
+        this.#deps.logger.error(`could not prepare the restarted engine: ${describeError(error)}`);
+      }),
+    );
+    await Promise.all(runs);
+  }
+
+  /** Otra version del protocolo: fallo de empaquetado, no se reintenta. */
+  #refuseMismatch(process: EngineProcess, mismatch: Mismatch): Error {
+    this.#state = { kind: 'failed' };
     process.stop();
-    throw new EngineUnavailableError('the engine did not answer engine/info');
+    this.#deps.logger.error(
+      `engine speaks protocol ${String(mismatch.engineVersion)}, expected ${String(mismatch.expected)}`,
+    );
+    this.#deps.onProtocolMismatch(mismatch);
+    return new EngineUnavailableError('the engine speaks another protocol version');
+  }
+
+  /**
+   * El motor contesto engine/info con un error (sin git, un git que no
+   * arranca): el proceso esta sano y reiniciarlo no arregla nada. Existe por
+   * un fallo real: contarlo como caida metia el motor en el bucle de reinicios
+   * y el usuario veia "motor no disponible", nunca "no se encuentra Git". Se
+   * para sin contarlo (el estado cambia antes, asi su salida no es una caida),
+   * la peticion recibe el error del motor y la siguiente vuelve a probar con un
+   * proceso nuevo, que ya ve el arreglo (un git recien instalado en el PATH; el
+   * `git.path` de VS Code se lee al activar la extension).
+   */
+  #refuseEngineError(process: EngineProcess, error: EngineCallError): Error {
+    this.#state = { kind: 'idle' };
+    process.stop();
+    this.#deps.logger.error(`the engine cannot work: ${describeError(error)}`);
+    return error;
   }
 
   #onExit(process: EngineProcess, exit: EngineExit): void {

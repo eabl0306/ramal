@@ -5,6 +5,11 @@
   "version": "0.1.0",
   "publisher": "ramal",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eabl0306/ramal",
+    "directory": "apps/vscode"
+  },
   "type": "module",
   "engines": {
     "vscode": "^1.138.0"
@@ -106,7 +111,7 @@
     "e2e": "playwright test",
     "e2e:install": "playwright install chromium",
     "test:integration": "node scripts/build-integration.mjs && vscode-test",
-    "package": "vsce package --no-dependencies --skip-license --allow-missing-repository"
+    "package": "vsce package --no-dependencies --skip-license"
   },
   "dependencies": {
     "@ramal/bridge": "workspace:*",

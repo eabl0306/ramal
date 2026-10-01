@@ -1,4 +1,5 @@
 import * as assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 
 import { PROTOCOL_VERSION } from '@ramal/bridge';
 import * as vscode from 'vscode';
@@ -18,6 +19,21 @@ async function probe(): Promise<HostProbe> {
   return api;
 }
 
+/** Lo poco que se usa de la API de la extension integrada `vscode.git`. */
+interface GitExtension {
+  readonly enabled: boolean;
+  getAPI(version: 1): { readonly git: { readonly path: string } };
+}
+
+/** El git que usa VS Code, segun su extension integrada. */
+async function vscodeGitPath(): Promise<string> {
+  const extension = vscode.extensions.getExtension<GitExtension>('vscode.git');
+  assert.ok(extension, 'the built-in git extension is installed');
+  const git = await extension.activate();
+  assert.ok(git.enabled, 'the built-in git extension is enabled');
+  return git.getAPI(1).git.path;
+}
+
 function workspacePath(): string {
   const folder = vscode.workspace.workspaceFolders?.[0];
   assert.ok(folder, 'the tests open the fixture repository as workspace');
@@ -31,6 +47,33 @@ async function waitFor(condition: () => boolean, what: string, timeoutMs = 30_00
     if (Date.now() > deadline) assert.fail(`timed out waiting for ${what}`);
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
+}
+
+/**
+ * Repite `call` mientras el motor no este (reiniciandose) y devuelve lo que
+ * conteste. Cualquier otro error, como `repo_not_open`, falla el test.
+ */
+async function whenAvailable<T>(call: () => Promise<T>, timeoutMs = 30_000): Promise<T> {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    try {
+      return await call();
+    } catch (error) {
+      const restarting = error instanceof Error && error.name === 'EngineUnavailableError';
+      if (!restarting || Date.now() > deadline) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  }
+}
+
+/** Mata con SIGKILL los sidecars que cuelgan de este extension host, como una caida. */
+function killSidecar(): void {
+  const output = execFileSync('pgrep', ['-P', String(process.pid), 'ramal-vscode'], {
+    encoding: 'utf8',
+  });
+  const pids = output.split('\n').filter((line) => line.trim() !== '');
+  assert.ok(pids.length > 0, 'the engine sidecar is running');
+  for (const pid of pids) process.kill(Number(pid), 'SIGKILL');
 }
 
 function graphTabOpen(): boolean {
@@ -53,6 +96,16 @@ suite('Ramal dentro de un VS Code de verdad', () => {
     const info = await (await probe()).call('engine/info', {});
     assert.equal(info.protocolVersion, PROTOCOL_VERSION);
     assert.equal(info.git.supported, true);
+  });
+
+  test('el sidecar usa el git de VS Code, no el primero del PATH', async () => {
+    const info = await (await probe()).call('engine/info', {});
+    const expected = await vscodeGitPath();
+    // .vscode-test.mjs configura un git.path que no es el del PATH (salvo en
+    // Windows): si VS Code lo respeta, el sidecar solo lo ve si el host se lo pasa.
+    const configured = process.env['RAMAL_IT_GIT_PATH'] ?? '';
+    if (configured !== '') assert.equal(expected, configured);
+    assert.equal(info.git.path, expected);
   });
 
   test('el sidecar abre el repositorio de prueba y devuelve su grafo', async () => {
@@ -81,5 +134,20 @@ suite('Ramal dentro de un VS Code de verdad', () => {
       'graph/window from the webview to be answered by the engine',
     );
     assert.ok(host.routed().every((entry) => entry.outcome === 'answered'));
+  });
+
+  test('si el sidecar se cae, el host lo reinicia y vuelve a abrir el repo del panel', async () => {
+    const host = await probe();
+    assert.ok(graphTabOpen(), 'the previous test left the graph panel open');
+    const { repoId } = await host.call('repo/open', { path: workspacePath() });
+    killSidecar();
+    // Sin volver a abrirlo, el motor nuevo contesta repo_not_open y el panel muere.
+    const window = await whenAvailable(() =>
+      host.call('graph/window', { repoId, offset: 0, limit: 50 }),
+    );
+    assert.deepEqual(
+      window.rows.map((row) => row.summary),
+      SUMMARIES,
+    );
   });
 });

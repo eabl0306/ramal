@@ -1,9 +1,10 @@
 import { PROTOCOL_VERSION, type RpcNotification } from '@ramal/bridge';
 import { describe, expect, it } from 'vitest';
 
-import { FakeLauncher, infoResponder, ok } from '../../../test/engine-fakes';
+import { FakeLauncher, fail, infoResponder, ok } from '../../../test/engine-fakes';
 import { FakeTimer, RecordingLogger, flush } from '../../../test/host-fakes';
-import { EngineUnavailableError } from '../engine-errors';
+import { EngineCallError, EngineUnavailableError, errorKindOf } from '../engine-errors';
+import type { EngineConnection } from '../ports/engine-connection';
 import { createRequestIds } from '../request-ids';
 
 import { checkEngineProtocol } from './check-engine-protocol';
@@ -142,6 +143,31 @@ describe('supervision del motor', () => {
     expect(h.timer.pending).toEqual([1000]);
   });
 
+  it('sin git, engine/info contesta con error: no hay reinicios y la peticion recibe ese error', async () => {
+    const h = harness();
+    h.launcher.responder = (request) => Promise.resolve(fail(request, 'git_not_found'));
+    const error = await h.engine.request(WINDOW_REQUEST).catch((caught: unknown) => caught);
+    expect(errorKindOf(error)).toBe('git_not_found');
+    expect(h.launcher.last.stopped).toBe(true);
+    h.launcher.last.exit({ code: 0, signal: null });
+    await flush();
+    expect(h.engine.state).toBe('idle');
+    expect(h.timer.pending).toEqual([]);
+    expect(h.giveUps).toHaveLength(0);
+    expect(h.launcher.processes).toHaveLength(1);
+    expect(h.logger.messages('warn')).toEqual([]);
+  });
+
+  it('tras ese error, la siguiente peticion prueba con un proceso nuevo', async () => {
+    const h = harness();
+    h.launcher.responder = (request) => Promise.resolve(fail(request, 'git_failed'));
+    await expect(h.engine.request(WINDOW_REQUEST)).rejects.toBeInstanceOf(EngineCallError);
+    h.launcher.responder = infoResponder(1);
+    await h.engine.request(WINDOW_REQUEST);
+    expect(h.launcher.processes).toHaveLength(2);
+    expect(h.engine.state).toBe('running');
+  });
+
   it('una caida durante el arranque no deja la peticion colgada', async () => {
     const h = harness();
     let rejectInfo: (error: Error) => void = () => undefined;
@@ -173,6 +199,75 @@ describe('supervision del motor', () => {
     unsubscribe();
     h.launcher.last.connection.emit(changed);
     expect(received).toEqual([changed, changed]);
+  });
+
+  it('tras reiniciar vuelve a abrir lo que hiciera falta antes de dejar pasar peticiones', async () => {
+    const h = harness();
+    const reopened: EngineConnection[] = [];
+    let finish: () => void = () => undefined;
+    h.engine.onRestarted((connection) => {
+      reopened.push(connection);
+      return new Promise((resolve) => {
+        finish = resolve;
+      });
+    });
+    await h.engine.request(WINDOW_REQUEST);
+    expect(reopened).toEqual([]);
+    await crash(h);
+    h.timer.advance(1000);
+    await flush();
+    expect(reopened).toEqual([h.launcher.last.connection]);
+    const pending = h.engine.request({ ...WINDOW_REQUEST, id: 902 });
+    await flush();
+    const methods = (): string[] => h.launcher.last.connection.requests.map((r) => r.method);
+    expect(methods()).toEqual(['engine/info']);
+    expect(h.engine.state).toBe('starting');
+    finish();
+    await pending;
+    expect(methods()).toEqual(['engine/info', 'graph/window']);
+    expect(h.engine.state).toBe('running');
+  });
+
+  it('si se cae mientras vuelve a abrir, no lo da por listo', async () => {
+    const h = harness();
+    let finish: () => void = () => undefined;
+    h.engine.onRestarted(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    await h.engine.request(WINDOW_REQUEST);
+    await crash(h);
+    h.timer.advance(1000);
+    await flush();
+    const pending = h.engine.request({ ...WINDOW_REQUEST, id: 903 });
+    await crash(h);
+    finish();
+    await expect(pending).rejects.toBeInstanceOf(EngineUnavailableError);
+    expect(h.engine.state).toBe('waiting');
+  });
+
+  it('un fallo al volver a abrir se registra y no impide arrancar; sin suscripcion no se llama', async () => {
+    const h = harness();
+    const unsubscribe = h.engine.onRestarted(() => Promise.reject(new Error('boom')));
+    const calls: number[] = [];
+    const second = h.engine.onRestarted(() => {
+      calls.push(1);
+      return Promise.resolve();
+    });
+    second();
+    await h.engine.request(WINDOW_REQUEST);
+    await crash(h);
+    h.timer.advance(1000);
+    await flush();
+    await h.engine.request({ ...WINDOW_REQUEST, id: 904 });
+    expect(h.engine.state).toBe('running');
+    expect(h.logger.messages('error')).toEqual([
+      'could not prepare the restarted engine: Error: boom',
+    ]);
+    expect(calls).toEqual([]);
+    unsubscribe();
   });
 
   it('parar cancela el reinicio pendiente y para el proceso en marcha', async () => {

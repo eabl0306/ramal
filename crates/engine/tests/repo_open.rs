@@ -56,10 +56,11 @@ async fn opening_a_repository_returns_its_handle() {
 
     let handle = open(&engine, &path_text(&repo.path())).await.unwrap();
 
+    assert!(handle.repo_id.starts_with("repo-"));
     assert_eq!(
         handle,
         RepoHandle {
-            repo_id: "repo-1".to_owned(),
+            repo_id: handle.repo_id.clone(),
             root: path_text(&repo.canonical_path()),
             head_ref: Some("main".to_owned()),
             head_sha: Some(repo.rev("main")),
@@ -81,6 +82,25 @@ async fn opening_the_same_repository_twice_keeps_its_id() {
         .unwrap();
 
     assert_eq!(first.repo_id, again.repo_id);
+}
+
+#[tokio::test]
+async fn a_restarted_engine_gives_a_repository_the_same_id() {
+    // El host de VS Code vuelve a abrir los repos de sus paneles tras reiniciar el
+    // sidecar, quiza en otro orden: un panel tiene que seguir con su id.
+    let first_repo = FixtureRepo::with_merged_feature();
+    let second_repo = FixtureRepo::with_merged_feature();
+    let before = engine();
+    open(&before, &path_text(&first_repo.path())).await.unwrap();
+    let second = open(&before, &path_text(&second_repo.path()))
+        .await
+        .unwrap();
+
+    let again = open(&engine(), &path_text(&second_repo.path()))
+        .await
+        .unwrap();
+
+    assert_eq!(again.repo_id, second.repo_id);
 }
 
 #[tokio::test]

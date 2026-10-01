@@ -1,4 +1,4 @@
-import type { RequestId, RpcResponse } from '@ramal/bridge';
+import type { JsonValue, RequestId, RpcError, RpcResponse } from '@ramal/bridge';
 import type { Locale } from '@ramal/i18n';
 
 import type {
@@ -8,7 +8,7 @@ import type {
   WebviewLocale,
   WebviewToHostMessage,
 } from '../../../shared/messages';
-import { describeError } from '../engine-errors';
+import { EngineCallError, describeError } from '../engine-errors';
 import type { EngineConnection, Unsubscribe } from '../ports/engine-connection';
 import type { HostRequests } from '../ports/host-requests';
 import type { Logger } from '../ports/logger';
@@ -18,7 +18,7 @@ import { isMethodAllowed } from '../surfaces';
 
 /** Codigo JSON-RPC de metodo inexistente, el que recibe un metodo no permitido. */
 const METHOD_NOT_FOUND = -32_601;
-/** Codigo de error del motor; el host lo usa para `engine_unavailable`. */
+/** Codigo de error del motor; el host lo usa para `engine_unavailable` y `repo_not_open`. */
 const ENGINE_ERROR = -32_000;
 
 /** Que paso con una peticion de un webview, para el log y los tests de integracion. */
@@ -136,9 +136,10 @@ class Router implements WebviewRouter {
   }
 
   async #forward(panel: PanelChannel, request: IdentifiedRpcRequest): Promise<void> {
-    if (!isMethodAllowed(panel.surface, request.method)) {
-      this.#deps.logger.warn(`${request.method} is not allowed on ${panel.surface}; rejected`);
-      panel.post({ type: 'rpc/response', response: notAllowed(request, panel.surface) });
+    const refusal = refuse(panel, request);
+    if (refusal !== undefined) {
+      this.#deps.logger.warn(`${refusal.error.message}; rejected`);
+      panel.post({ type: 'rpc/response', response: refusal });
       this.#emit({ panelId: panel.id, method: request.method, outcome: 'rejected' });
       return;
     }
@@ -149,7 +150,7 @@ class Router implements WebviewRouter {
       response = await this.#deps.engine.request({ ...request, id: hostId });
     } catch (error) {
       this.#deps.logger.warn(`${request.method} failed: ${describeError(error)}`);
-      this.#deliver(hostId, unavailable(hostId, error));
+      this.#deliver(hostId, failure(hostId, error));
       this.#emit({ panelId: panel.id, method: request.method, outcome: 'unavailable' });
       return;
     }
@@ -181,12 +182,47 @@ class Router implements WebviewRouter {
   }
 }
 
-function notAllowed(request: IdentifiedRpcRequest, surface: string): RpcResponse {
+type Refusal = RpcResponse & { readonly error: RpcError };
+
+/**
+ * Por que una peticion de un webview no llega al motor, si no llega. El metodo
+ * tiene que ser de su superficie y el `repoId`, si lo lleva, el de su panel: asi
+ * un webview no puede leer otro repositorio que el host haya abierto, ni uno con
+ * un id viejo de antes de reiniciar el motor.
+ */
+function refuse(panel: PanelChannel, request: IdentifiedRpcRequest): Refusal | undefined {
+  const { id, method } = request;
+  if (!isMethodAllowed(panel.surface, method)) {
+    const message = `${method} is not allowed on ${panel.surface}`;
+    return { jsonrpc: '2.0', id, error: { code: METHOD_NOT_FOUND, message } };
+  }
+  const repoId = repoIdOf(request.params);
+  if (repoId === undefined || repoId === panel.repoId) return undefined;
   return {
     jsonrpc: '2.0',
-    id: request.id,
-    error: { code: METHOD_NOT_FOUND, message: `${request.method} is not allowed on ${surface}` },
+    id,
+    error: {
+      code: ENGINE_ERROR,
+      message: `${method} asks for a repository that is not the one of ${panel.id}`,
+      data: { kind: 'repo_not_open' },
+    },
   };
+}
+
+/** El `repoId` de unos parametros, si lo llevan. */
+function repoIdOf(params: JsonValue): JsonValue | undefined {
+  if (typeof params !== 'object' || params === null || Array.isArray(params)) return undefined;
+  return params['repoId'];
+}
+
+/**
+ * La respuesta cuando la peticion no llego al motor. Si el motor contesto con
+ * error al arrancar (sin git), el webview recibe ese error con su tipo: con
+ * `engine_unavailable` lo reintentaria en vano y ensenaria el texto equivocado.
+ */
+function failure(id: number, error: unknown): RpcResponse | HostFailureResponse {
+  if (error instanceof EngineCallError) return { jsonrpc: '2.0', id, error: error.rpc };
+  return unavailable(id, error);
 }
 
 function unavailable(id: number, error: unknown): HostFailureResponse {
