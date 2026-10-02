@@ -139,6 +139,11 @@ Borrador · Checks: 2 correctos, 1 en curso · Revisiones: 1 de 2".
 **Menus contextuales.** Las etiquetas son fijas (un comando no puede tener titulo dinamico). Grupos en
 este orden; lo destructivo, al final y con "…" (abre confirmacion).
 
+En un menu nativo el titulo de cada comando es fijo (sale de `package.json`), asi que "Push" o "Pull"
+no pueden llevar el nombre de la rama. El comando recibe el elemento del arbol y actua sobre esa rama,
+no sobre la actual (B-26). Borrar la rama local y la remota son entradas distintas, cada una con su
+confirmacion (B-27).
+
 | Donde                          | Entradas                                                                                                                                                                                                         |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Rama local                     | Checkout · Merge en la rama actual… · Rebase de la actual sobre esta… · Push · Pull · Configurar upstream… · Crear pull request… · Copiar nombre · Renombrar rama… · Eliminar rama…                              |
