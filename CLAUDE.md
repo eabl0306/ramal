@@ -229,6 +229,10 @@ Los hooks se saltan con `LEFTHOOK=0` y solo en emergencias. La CI no se puede sa
   en cada reintento y `/health/ready` se quedaria en 503.
 - No toques `pnpm-workspace.yaml` a mano salvo que sepas lo que haces: cada `allowBuilds` es una
   decision de seguridad.
+- No esperes a un diseno que no esta: la fase de diseno se cerro el 2026-10-02. Si una pantalla o
+  un estado no sale en los prototipos de `docs/design/handoff/`, disenalo en codigo con los tokens,
+  los componentes y la densidad del prototipo mas parecido. Antes, mira el issue #523 y el
+  comentario de diseno pendiente del issue de implementacion.
 
 ## Detalles del entorno que sorprenden
 

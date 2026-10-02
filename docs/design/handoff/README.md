@@ -13,6 +13,16 @@ porque de cada pantalla esta en [`../gaps.md`](../gaps.md) y lo que se pidio, en
 [Cambios del 2026-10-02](#cambios-del-2026-10-02), y la lista del propio disenador, en
 [`CAMBIOS-pendientes.md`](CAMBIOS-pendientes.md).
 
+## Fase de diseno cerrada
+
+La fase de diseno se cerro el 2026-10-02, sin mas rondas con Claude Design. Lo que no se llego a
+disenar esta en el issue #523, que es el indice, y en el comentario de diseno pendiente de cada issue
+de implementacion, con el prototipo y la seccion del brief que hay que seguir.
+
+La regla: si una pantalla o un estado no esta en los prototipos, se disena en codigo con los tokens,
+los componentes y la densidad del prototipo mas parecido. Antes de empezar, mira #523 y el
+comentario de diseno pendiente del issue.
+
 ## Indice
 
 | Fichero                        | Producto               | Issue          | Props y valores                                                                                                                                                                                                                                                              | Pantallas o estados                                                       |
@@ -118,8 +128,8 @@ En resumen:
   lateral.
 - **#71 Ramal.** "Cerrar sesión" abre K-09 y los correos de muestra son de `example.com`.
 
-Tras la revision se cerraron #64, #68 y #70. Siguen abiertos #63, #66, #67 y #71 con lo que dice
-"Para cerrar" en su apartado, y lo menor de todos esta en #523. El README que traia la entrega es el
+Tras la revision se cerraron #64, #68 y #70. #63, #66, #67 y #71 se cerraron el mismo dia sin otra
+ronda: lo que dice "Para cerrar" en su apartado y lo menor de todos se resuelven al implementar (#523). El README que traia la entrega es el
 indice corto de 25 lineas de la primera ronda: no sustituye a este.
 
 ## Que se diseno en cada issue
@@ -131,8 +141,8 @@ del 2026-10-02 (cada pantalla y estado renderizado en claro y oscuro, castellano
 errores de pagina). El estado fila a fila esta en la columna "Diseno" de [`../gaps.md`](../gaps.md).
 Los valores de `screen` empiezan por el id de `gaps.md` en minusculas: `d12-token` es D-12.
 
-Cada apartado acaba con lo que falta. "Para cerrar" es lo que mantiene abierto el issue; "Menor" es
-lo que no bloquea y se sigue en el issue #523.
+Cada apartado acaba con lo que falta. "Para cerrar" es lo que mantenia abierto el issue y "Menor", lo
+que no bloqueaba. Las dos cosas se disenan en codigo al implementar y su indice es el issue #523.
 
 ### #62 Estados comunes: `Ramal Estados.dc.html`
 
