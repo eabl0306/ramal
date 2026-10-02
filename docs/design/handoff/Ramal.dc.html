@@ -875,10 +875,10 @@ class Component extends DCLogic {
       unstaged: R.UNSTAGED.slice(), staged: R.STAGED.slice(), msg: '', desc: '', amend: false,
       commits: R.mkCommits(), ahead: 2, current: 'feature/graph-ui',
       setSec: 'profile', setOpen: false, graphNodes: this.props.graphNodes || 'avatar', aiBusy: null,
-      profile: { name: 'Marta Ruiz', user: 'marta', email: 'marta@ramal.dev', tz: 'Europe/Madrid' },
+      profile: { name: 'Marta Ruiz', user: 'marta', email: 'marta@example.com', tz: 'Europe/Madrid' },
       aiKeys: R.AIKEYS.map(k => ({ ...k })), members: R.MEMBERS.map(m => ({ ...m })), sessions: R.SESSIONS.slice(),
       ai: { commit: true, pr: true, summary: true, commitKey: '', prKey: '', summaryKey: '', lang: 'app', conventional: true, instructions: '', exclude: true },
-      git: { name: 'Marta Ruiz', email: 'marta@ramal.dev', defBranch: 'main', sign: true, autoFetch: '15', pull: 'rebase', prune: true },
+      git: { name: 'Marta Ruiz', email: 'marta@example.com', defBranch: 'main', sign: true, autoFetch: '15', pull: 'rebase', prune: true },
       menu: null, modal: null, toasts: [], conflict: null, rebase: null,
       sbq: '', cq: '', closed: {}, stashes: R.STASHES.slice(), repoPrs: R.REPO_PRS.slice()
     });
@@ -1229,19 +1229,20 @@ class Component extends DCLogic {
       this.setState(s => ({ aiBusy: null, modal: s.modal ? { ...s.modal, values: { ...s.modal.values, title, desc } } : s.modal })); this.toast(tr('aiDoneT', { p: window.RAMAL.AIPROV[k.prov].label, m: k.model }), 'info'); }, 800);
   }
   addKey(edit) {
-    const tr = this.tr.bind(this), AP = window.RAMAL.AIPROV;
+    const tr = this.tr.bind(this), AP = window.RAMAL.AIPROV, L = this.state.lang === 'en';
+    const PM = { anthropic: ['claude-haiku-4-5', 'claude-sonnet-4-5', 'claude-opus-4-1'], openai: ['gpt-5-mini', 'gpt-5'], groq: ['llama-3.3-70b-versatile'], google: ['gemini-2.5-flash', 'gemini-2.5-pro'], mistral: ['mistral-large-latest'], openrouter: ['openrouter/auto'], ollama: ['qwen2.5-coder:14b'] };
     this.openForm({ title: edit ? tr('editKeyTitle') : tr('addKey'), submitLabel: edit ? tr('save') : tr('create'), fields: [
       { type: 'select', key: 'prov', label: tr('provider'), value: edit ? edit.prov : 'anthropic', options: Object.keys(AP).map(k => ({ value: k, label: AP[k].label })) },
       { type: 'text', key: 'label', label: tr('label'), value: edit ? edit.label : '', placeholder: tr('keyLabelPh') },
       { type: 'secret', key: 'key', label: tr('apiKey'), placeholder: edit ? '' : 'sk-…', help: edit ? tr('secretSaved') : '' },
-      { type: 'text', key: 'model', label: tr('model'), value: edit ? edit.model : '', placeholder: 'claude-sonnet-4-5', mono: true },
+      { type: 'select', key: 'model', label: tr('model'), value: edit ? edit.model : '', options: [{ value: '', label: L ? 'Choose after the provider returns its models' : 'Elige cuando el proveedor devuelva sus modelos' }, ...(PM[edit ? edit.prov : 'anthropic'] || []).map(m => ({ value: m, label: m }))], showIf: v => !!(v.key || edit) },
       { type: 'text', key: 'url', label: tr('baseUrl'), placeholder: 'https://', mono: true, showIf: v => !!AP[v.prov].url },
-      { type: 'seg', key: 'scope', label: tr('scope'), value: edit ? edit.scope : 'personal', options: [{ value: 'personal', label: tr('sc_personal') }, { value: 'org', label: tr('sc_org') + ' · ACME' }] }
+      { type: 'info', text: L ? 'Keys you add here are always personal. Organization keys are managed on the web (Organization AI).' : 'Las llaves que añades aquí son siempre personales. Las de la organización se gestionan en la web (IA de la organización).' }
     ], onSubmit: v => {
       const p = AP[v.prov]; const raw = (v.key || '').trim(); if (!edit && !raw && v.prov !== 'ollama') return this.fieldErr({ key: tr('reqKey') });
       const pre = (raw.match(/^(sk-ant-|sk-proj-|sk-or-|gsk_|AIza|sk-)/) || [''])[0];
       const masked = raw ? (raw.length < 12 ? '••••••••' : pre + '…' + raw.slice(-4)) : (edit ? edit.masked : '—');
-      const k = { prov: v.prov, label: (v.label || '').trim() || p.label, scope: v.scope, masked, model: (v.model || '').trim() || p.model };
+      const k = { prov: v.prov, label: (v.label || '').trim() || p.label, scope: 'personal', masked, model: (v.model || '').trim() };
       if (edit) this.setState(s => ({ aiKeys: s.aiKeys.map(x => x.id === edit.id ? { ...x, ...k } : x) }));
       else this.setState(s => ({ aiKeys: [...s.aiKeys, { id: 'k' + Date.now(), def: !s.aiKeys.length, ...k }] }));
       this.toast(tr(edit ? 'saved' : 'keyAddedT', { p: p.label }));
@@ -1355,7 +1356,7 @@ class Component extends DCLogic {
         sh = { title: t.secAccount, sub: t.accountSub, hasAction: false };
         const nMem = s.members.filter(x => !x.pending).length, nPend = s.members.filter(x => x.pending).length, SEATS = 6;
         base.acct = { email: s.profile.email, org: 'ACME Studio', renew: tr('planRenew', { date: L ? 'October 12, 2026' : '12 de octubre de 2026', seats: SEATS }),
-          count: tr('teamLine', { members: tr(nMem === 1 ? 'members_one' : 'members_other', { count: nMem }), pending: tr(nPend === 1 ? 'pendingInv_one' : 'pendingInv_other', { count: nPend }), seats: tr('seatsUsed', { used: nMem + nPend, seats: SEATS }) }), onManage: () => this.done(t.manageSub), onSignOut: () => this.toast(tr('signedOutT'), 'warn'), onInvite: () => this.invite(),
+          count: tr('teamLine', { members: tr(nMem === 1 ? 'members_one' : 'members_other', { count: nMem }), pending: tr(nPend === 1 ? 'pendingInv_one' : 'pendingInv_other', { count: nPend }), seats: tr('seatsUsed', { used: nMem + nPend, seats: SEATS }) }), onManage: () => this.done(t.manageSub), onSignOut: () => { const V = window.RAMAL.VAULT || {}, vv = k => V[k] ? V[k][L ? 1 : 0] : k; this.confirm(vv('k9Title'), vv('k9Body'), L ? 'Sign out' : 'Cerrar sesión', () => this.toast(tr('signedOutT'), 'warn'), [{ type: 'check', key: 'wipe', label: vv('k9Check'), value: false }]); }, onInvite: () => this.invite(),
           members: s.members.map(m => { const rc = m.role === 'owner' ? 'var(--accent)' : m.role === 'admin' ? 'var(--info)' : 'var(--muted)'; return { ini: m.ini, name: m.name, sub: m.pending ? t.pending : m.email, avBg: LANE[m.lane], opacity: m.pending ? 0.5 : 1, role: t['r_' + m.role], roleColor: rc, roleBg: tint(rc, 14), onMenu: e => this.openMenu(e, () => this.memberMenu(this.state.members.find(x => x.email === m.email) || m)) }; }),
           sessions: s.sessions.map((x, i) => ({ dev: x.dev, where: x.app + ' · ' + this.ago(x.mins), current: !!x.current, other: !x.current, onRevoke: () => this.confirm(tr('c_sessTitle', { device: x.dev }), tr('c_sessInfo'), tr('c_signOut'), () => { this.setState(y => ({ sessions: y.sessions.filter((_, j) => j !== i) })); this.toast(tr('revokedT', { d: x.dev })); }) })) };
       }

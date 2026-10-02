@@ -4,43 +4,49 @@ Prototipos de Claude Design de los tres productos: Ramal Desktop, Ramal for VS C
 Son la fuente de verdad visual. Donde el texto de este README y un prototipo no coinciden, manda el
 prototipo.
 
-Esta carpeta es el handoff consolidado que llego el 2026-10-01 ("Cliente Git estilo GitKraken.zip").
-Sustituye al handoff original de tres prototipos, que sigue en el historial de git (commit
-`df1666a`). Trae los tres prototipos base corregidos (#71) y once prototipos nuevos, uno o varios
-por cada issue de diseno de la epica #2 (#62 a #71). El porque de cada pantalla esta en
-[`../gaps.md`](../gaps.md) y lo que se pidio, en [`../briefs/`](../briefs/README.md).
+Esta carpeta es el handoff consolidado que llego el 2026-10-01 ("Cliente Git estilo GitKraken.zip"),
+con la segunda ronda del 2026-10-02 ya integrada. Sustituye al handoff original de tres prototipos,
+que sigue en el historial de git (commit `df1666a`). Trae los tres prototipos base corregidos (#71)
+y once prototipos nuevos, uno o varios por cada issue de diseno de la epica #2 (#62 a #71). El
+porque de cada pantalla esta en [`../gaps.md`](../gaps.md) y lo que se pidio, en
+[`../briefs/`](../briefs/README.md). Lo que cambio en la segunda ronda esta resumido en
+[Cambios del 2026-10-02](#cambios-del-2026-10-02), y la lista del propio disenador, en
+[`CAMBIOS-pendientes.md`](CAMBIOS-pendientes.md).
 
 ## Indice
 
-| Fichero                        | Producto               | Issue          | Props y valores                                                                                                                                                                                                            | Pantallas o estados                                       |
-| ------------------------------ | ---------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `Ramal.dc.html`                | Desktop                | base, #71      | `theme` (dark, light), `lang` (es, en), `graphNodes` (avatar, dot)                                                                                                                                                         | App interactiva sin prop de pantalla: se navega con clics |
-| `Ramal VS Code.dc.html`        | VS Code                | base, #68, #71 | `vsTheme` (dark, light), `vsLanguage` (en, es), `state` (14 valores)                                                                                                                                                       | 14 estados                                                |
-| `Ramal Web.dc.html`            | Web                    | base, #70, #71 | `theme`, `lang`, `startPage` (landing, login, signup), `os` (mac, win, linux, mobile, unknown), `downloads` (normal, api-caida, sin-version)                                                                               | 3 paginas de entrada                                      |
-| `Ramal Estados.dc.html`        | Los tres               | #62            | `product` (desktop, vscode, web), `theme`, `lang`, `state` (all, C-01 a C-10)                                                                                                                                              | 10 laminas; `all` las apila                               |
-| `Ramal Boveda.dc.html`         | Desktop, VS Code y web | #63            | `product` (desktop, vscode, web), `theme`, `lang`, `screen` (K-01 a K-10, X-04)                                                                                                                                            | 11 pantallas mas la rotacion (boton ROT)                  |
-| `Ramal Entrada.dc.html`        | Desktop                | #64            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedOut, signedIn), `screen` (28 valores)                                                                                                                      | 28 pantallas                                              |
-| `Ramal Git.dc.html`            | Desktop                | #65            | `theme`, `lang`, `density` (desktop, vscode), `screen` (33 valores)                                                                                                                                                        | 33 pantallas                                              |
-| `Ramal Vistas.dc.html`         | Desktop                | #66            | `theme`, `lang`, `density` (desktop, vscode), `screen` (26 valores)                                                                                                                                                        | 26 pantallas                                              |
-| `Ramal Ajustes.dc.html`        | Desktop                | #67            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedIn, signedOut), `role` (personal, member, admin, owner), `install` (dmg, nsis, msi, appimage, deb, rpm), `screen` (25 valores)                             | 25 pantallas                                              |
-| `Ramal Correcciones.dc.html`   | Los tres               | #71            | Ninguna. Solo en castellano y pensada en oscuro: abrela con `?theme=dark`                                                                                                                                                  | 1 pagina con 11 grupos                                    |
-| `Ramal Web Auth.dc.html`       | Web                    | #69            | `theme`, `lang`, `screen` (15 valores), `state` (texto libre, el subestado), `client` (desktop, vscode)                                                                                                                    | 15 pantallas y 92 subestados                              |
-| `Ramal Web Panel.dc.html`      | Web                    | #70            | `theme`, `lang`, `screen` (15 valores), `context` (personal, org), `role` (owner, admin, member), `plan` (none, trialing, active, past_due, cancel_scheduled, canceled, inactive), `state` (normal, empty, loading, error) | 15 pantallas, mas variantes por chips                     |
-| `Ramal Web Paginas.dc.html`    | Web                    | #70            | `theme`, `lang`, `screen` (10 valores), `state` (texto libre, el subestado)                                                                                                                                                | 10 pantallas y 35 subestados                              |
-| `Ramal Local Callback.dc.html` | Motor (pagina local)   | #69            | `kind` (signin, platform), `client` (desktop, vscode), `result` (success, cancelled, error), `platform` (GitLab, Bitbucket), `lang`. El tema sale de `prefers-color-scheme`                                                | 12 combinaciones                                          |
+| Fichero                        | Producto               | Issue          | Props y valores                                                                                                                                                                                                                                                              | Pantallas o estados                                                       |
+| ------------------------------ | ---------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `Ramal.dc.html`                | Desktop                | base, #71      | `theme` (dark, light), `lang` (es, en), `graphNodes` (avatar, dot)                                                                                                                                                                                                           | App interactiva sin prop de pantalla: se navega con clics                 |
+| `Ramal VS Code.dc.html`        | VS Code                | base, #68, #71 | `vsTheme` (dark, light), `vsLanguage` (en, es), `state` (16 valores)                                                                                                                                                                                                         | 16 estados                                                                |
+| `Ramal Web.dc.html`            | Web                    | base, #70, #71 | `theme`, `lang`, `startPage` (landing, login, signup), `os` (mac, win, linux, mobile, unknown), `downloads` (normal, api-caida, sin-version)                                                                                                                                 | 3 paginas de entrada. Ya no tiene panel: iniciar sesion lleva a Web Panel |
+| `Ramal Estados.dc.html`        | Los tres               | #62            | `product` (desktop, vscode, web), `theme`, `lang`, `state` (all, C-01 a C-10)                                                                                                                                                                                                | 10 laminas; `all` las apila                                               |
+| `Ramal Boveda.dc.html`         | Desktop, VS Code y web | #63            | `product` (desktop, vscode, web), `theme`, `lang`, `screen` (K-01 a K-10, X-04)                                                                                                                                                                                              | 11 pantallas mas la rotacion (boton ROT) y 77 subestados                  |
+| `Ramal Entrada.dc.html`        | Desktop                | #64            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedOut, signedIn), `screen` (28 valores)                                                                                                                                                                        | 28 pantallas y 78 subestados                                              |
+| `Ramal Git.dc.html`            | Desktop                | #65            | `theme`, `lang`, `density` (desktop, vscode), `screen` (33 valores)                                                                                                                                                                                                          | 33 pantallas y 64 subestados                                              |
+| `Ramal Vistas.dc.html`         | Desktop                | #66            | `theme`, `lang`, `density` (desktop, vscode), `screen` (26 valores)                                                                                                                                                                                                          | 26 pantallas y 55 subestados                                              |
+| `Ramal Ajustes.dc.html`        | Desktop                | #67            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedIn, signedOut), `role` (personal, member, admin, owner), `install` (dmg, nsis, msi, appimage, deb, rpm), `screen` (25 valores)                                                                               | 25 pantallas y 66 subestados                                              |
+| `Ramal Correcciones.dc.html`   | Los tres               | #71            | Ninguna. Solo en castellano y pensada en oscuro: abrela con `?theme=dark`                                                                                                                                                                                                    | 1 pagina con 11 grupos y 36 entradas                                      |
+| `Ramal Web Auth.dc.html`       | Web                    | #69            | `theme`, `lang`, `screen` (15 valores), `state` (texto libre, el subestado), `client` (desktop, vscode)                                                                                                                                                                      | 15 pantallas y 92 subestados                                              |
+| `Ramal Web Panel.dc.html`      | Web                    | #70            | `theme`, `lang`, `screen` (15 valores), `context` (personal, org), `role` (owner, admin, member), `plan` (none, trialing, active, past_due, cancel_scheduled, canceled, inactive; los chips anaden trial_last_day y active_monthly), `state` (normal, empty, loading, error) | 15 pantallas y 26 subestados por chips                                    |
+| `Ramal Web Paginas.dc.html`    | Web                    | #70            | `theme`, `lang`, `screen` (10 valores), `state` (texto libre, el subestado)                                                                                                                                                                                                  | 10 pantallas y 35 subestados                                              |
+| `Ramal Local Callback.dc.html` | Motor (pagina local)   | #69            | `kind` (signin, platform), `client` (desktop, vscode), `result` (success, cancelled, error), `platform` (GitLab, Bitbucket), `lang`. El tema sale de `prefers-color-scheme`                                                                                                  | 12 combinaciones                                                          |
 
-En total, 204 pantallas o estados en el eje principal y 351 contando los subestados de Web Auth, Web
-Paginas y Web Panel. Ademas:
+En total, 206 pantallas o estados en el eje principal. En la revision de la segunda ronda se
+renderizaron los 223 valores de pantalla o estado de las props y los 329 subestados internos
+(chips), todos sin errores. Ademas:
 
 - `ramal-data.js`: datos de muestra y todos los textos en castellano e ingles. Al diccionario `D`
   original se suman las claves nuevas de Desktop (prefijos `e_`, `g_`, `v_` y `a_`) y cinco objetos:
   `STATES` (#62), `VAULT` (#63), `VS` (#68, claves `vscode.*`), `WAUTH` (#69, claves `auth.*`) y
   `WEB70` (#70, espacios `dashboard`, `team`, `orgAi`, `billing`, `pricing`, `account`, `legal` y
-  `download`). No se borro ninguna clave original.
+  `download`). No se borro ninguna clave original. En la segunda ronda solo cambia `AIPROV`, que ya
+  no trae un modelo por defecto para cada proveedor (X-10).
 - `support.js`: el runtime que pinta los prototipos. Igual byte a byte que el original.
 - `local-callback.template.html`: la pagina estatica que sirve el receptor local del motor, sin
   JavaScript ni recursos externos (CSP `default-src 'none'`).
-- `img/`: capturas de la landing (`landing-{desktop,vscode}-{dark,light}.png`, 924x540).
+- `img/`: capturas de la landing (`landing-{desktop,vscode}-{dark,light}.png`, 924x540, a 1x). Faltan
+  las de 2x y sin las anotaciones del prototipo (#523).
 - `media/`: imagenes del recorrido de bienvenida de VS Code
   (`walkthrough-{1-grafo,2-plataforma,3-ia,4-cuenta}-{dark,light}.svg`, 480x300, sin texto). Van con
   los pasos `vscode.walkthrough.step1` a `step4` de `ramal-data.js`.
@@ -78,21 +84,55 @@ Paginas y Web Panel. Ademas:
 
 4. Muchos prototipos traen arriba una barra propia con chips de pantalla, tema, idioma y variante, y
    los flujos se recorren con clics. Las variantes de `Ramal Web Panel.dc.html` (por ejemplo
-   `email-sin-confirmar` en W-12 o `checkout-202` en W-18) solo se eligen con esos chips.
+   `email-sin-confirmar` en W-12, `checkout-202` en W-18, `rotacion-recomendada` en W-22 o los planes
+   `trial_last_day` y `active_monthly`) y el chip Estado de `Ramal Vistas.dc.html` solo se eligen con
+   esos chips.
    `Ramal.dc.html` no tiene prop de pantalla: el resolvedor se abre con el merge del menu de la rama
    `hotfix/login` y los ajustes con el engranaje.
 
 5. Algunos estados avanzan solos con un temporizador (1 a 4 s): los de carga de Web Paginas y Web
    Panel y el progreso de `d17-progreso` en Git. Para capturarlos, haz la captura enseguida.
 
+## Cambios del 2026-10-02
+
+La segunda ronda llego el mismo dia que la revision de la primera. Cambia diez prototipos y
+`ramal-data.js`; Estados, Web Auth, Local Callback, Correcciones, `support.js`, `img/` y `media/` son
+identicos byte a byte. La lista del disenador esta en [`CAMBIOS-pendientes.md`](CAMBIOS-pendientes.md).
+En resumen:
+
+- **#63 Boveda.** K-05 sin boveda y con la categoria apagada ya no pinta la boveda bloqueada; K-04
+  suma la fila de token rotado, los permisos y "Usada en N repos"; en VS Code, el aviso de K-01 y la
+  notificacion de K-04 se especifican en texto.
+- **#64 Entrada.** D-03 dentro de la tarjeta de D-01 (chip `onboarding`), D-05 a 1024 px (chip
+  `narrow`) y la rejilla de D-06 (chip `grid`).
+- **#65 y #71 Git.** Abortar y Eliminar stash confirman con el modal de peligro y los titulos de
+  peligro ya no se concatenan.
+- **#66 Vistas.** Chip Estado en D-27 a D-31; primera carga, error y "Cargar más" en D-40; 14
+  carriles en D-41; un diff por archivo en D-33 y D-37, y el modal de stash de los seleccionados.
+- **#67 Ajustes.** D-42 a 1024 px sin cortar los mensajes. `AIPROV` sin modelo por defecto y el
+  formulario de llave de `Ramal.dc.html` sin alcance.
+- **#68 VS Code.** V-13 (`V-13` y `V-13-sin-historial`), sin llave de la organizacion cuando no hay
+  sesion y B-10 con Reintentar.
+- **#70 Web.** `Ramal Web.dc.html` sin el panel antiguo; Web Panel con los planes `trial_last_day` y
+  `active_monthly`, W-22 `rotacion-recomendada` y los tres textos rotos arreglados; W-28 con barra
+  lateral.
+- **#71 Ramal.** "Cerrar sesión" abre K-09 y los correos de muestra son de `example.com`.
+
+Tras la revision se cerraron #64, #68 y #70. Siguen abiertos #63, #66, #67 y #71 con lo que dice
+"Para cerrar" en su apartado, y lo menor de todos esta en #523. El README que traia la entrega es el
+indice corto de 25 lineas de la primera ronda: no sustituye a este.
+
 ## Que se diseno en cada issue
 
 El zip traia un README de indice que remite a los README de cada handoff (`ramal-handoff-NN-*`), con
-el detalle de pantallas, estados y claves. Esos README no venian en el zip entregado. Esta seccion
-los sustituye con lo que se lee en los prototipos y en la revision del 2026-10-02 (cada pantalla y
-estado renderizado en claro y oscuro, castellano e ingles, sin errores de pagina). El estado fila a
-fila esta en la columna "Diseno" de [`../gaps.md`](../gaps.md). Los valores de `screen` empiezan por
-el id de `gaps.md` en minusculas: `d12-token` es D-12.
+el detalle de pantallas, estados y claves. Esos README no venian en el zip entregado, ni en la
+segunda ronda. Esta seccion los sustituye con lo que se lee en los prototipos y en las dos revisiones
+del 2026-10-02 (cada pantalla y estado renderizado en claro y oscuro, castellano e ingles, sin
+errores de pagina). El estado fila a fila esta en la columna "Diseno" de [`../gaps.md`](../gaps.md).
+Los valores de `screen` empiezan por el id de `gaps.md` en minusculas: `d12-token` es D-12.
+
+Cada apartado acaba con lo que falta. "Para cerrar" es lo que mantiene abierto el issue; "Menor" es
+lo que no bloquea y se sigue en el issue #523.
 
 ### #62 Estados comunes: `Ramal Estados.dc.html`
 
@@ -115,54 +155,68 @@ el `viewsWelcome` que toca.
 
 Tambien corrige B-61 en `Ramal.dc.html` (toast de informacion en `--info`).
 
-Pendiente: el error en textarea y en select de C-03; los bordes de las cajas de error y aviso mezclan
+Menor (#523): el error en textarea y en select de C-03; los bordes de las cajas de error y aviso mezclan
 el color con `--border` en oklch y salen violeta y verdoso (pasa tambien en Boveda, Git, Ajustes,
 Entrada y Vistas); tokens nuevos fuera de la tabla (`--sk-hi`, `--danger-ink`).
 
 ### #63 Boveda: `Ramal Boveda.dc.html`
 
-| Valor  | Id   | Que ensena                                                                                            |
-| ------ | ---- | ----------------------------------------------------------------------------------------------------- |
-| `K-01` | K-01 | Crear la frase: medidor, reglas, "Ahora no", sin conexion y 409                                       |
-| `K-02` | K-02 | Codigo de recuperacion: copiar, descargar, casilla, error al subir y exito                            |
-| `K-03` | K-03 | Desbloquear con la frase o con el codigo, con errores, 429 y llave cambiada                           |
-| `K-04` | K-04 | Listas con cuentas y llaves bloqueadas, "Probar conexión" desactivado y estados de la tarjeta Boveda  |
-| `K-05` | K-05 | "Solo en este equipo", sin sesion, otra cuenta de Ramal y subida pendiente de decidir (ADR 0012)      |
-| `K-06` | K-06 | Cambiar la frase, con la pregunta de si alguien la conoce                                             |
-| `K-07` | K-07 | Regenerar el codigo                                                                                   |
-| `K-08` | K-08 | "Olvidé la frase": otro equipo, codigo y reinicio en la web                                           |
-| `K-09` | K-09 | Cerrar sesion: que se borra y que se queda, con la casilla apagada                                    |
-| `K-10` | K-10 | Web: tarjeta Boveda y restablecer con confirmacion literal                                            |
-| `X-04` | X-04 | Interruptores de secretos en web y Desktop con el estado de la boveda y el aviso de peligro al apagar |
+| Valor  | Id   | Que ensena                                                                                                                                                                                |
+| ------ | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `K-01` | K-01 | Crear la frase: medidor, reglas, "Ahora no", sin conexion y 409                                                                                                                           |
+| `K-02` | K-02 | Codigo de recuperacion: copiar, descargar, casilla, error al subir y exito                                                                                                                |
+| `K-03` | K-03 | Desbloquear con la frase o con el codigo, con errores, 429 y llave cambiada                                                                                                               |
+| `K-04` | K-04 | Listas con cuentas y llaves bloqueadas, fila de token rotado en otro equipo con "Reconectar", permisos y "Usada en N repos", "Probar conexión" desactivado y estados de la tarjeta Boveda |
+| `K-05` | K-05 | "Solo en este equipo", sin sesion, sin boveda y categoria apagada (una nota, sin boveda bloqueada), otra cuenta de Ramal y subida pendiente de decidir (ADR 0012)                         |
+| `K-06` | K-06 | Cambiar la frase, con la pregunta de si alguien la conoce                                                                                                                                 |
+| `K-07` | K-07 | Regenerar el codigo                                                                                                                                                                       |
+| `K-08` | K-08 | "Olvidé la frase": otro equipo, codigo y reinicio en la web                                                                                                                               |
+| `K-09` | K-09 | Cerrar sesion: que se borra y que se queda, con la casilla apagada                                                                                                                        |
+| `K-10` | K-10 | Web: tarjeta Boveda y restablecer con confirmacion literal                                                                                                                                |
+| `X-04` | X-04 | Interruptores de secretos en web y Desktop con el estado de la boveda y el aviso de peligro al apagar                                                                                     |
 
 El boton ROT de la barra recorre la rotacion de la llave. Los textos X-03 son `VAULT.x3_1` a `x3_9`.
-En VS Code (`product=vscode`) los modales son paneles con "← Volver".
+En VS Code (`product=vscode`) los modales son paneles con "← Volver", las listas van a una columna y
+el aviso de K-01 (`vsSyncPrompt`, en `empty`) y la notificacion de K-04 (`useLocked`) se especifican
+en texto, como pide X-11.
 
-Pendiente: en K-05, "Sin bóveda" y "Categoría apagada" pintan una boveda bloqueada; K-04 sin la fila
-de token rotado, permisos ni "Usada en N repos"; en VS Code, el aviso nativo de K-01, la notificacion
-de K-04 y las filas de entidad.
+Para cerrar: "Sincronizar esta llave" no existe en las filas de llave de K-04 y K-05 (la clave
+`syncThisKey` esta en `ramal-data.js`, pero ningun prototipo la usa); en VS Code cada cuenta sigue
+siendo la tarjeta de Desktop en una columna, no la fila de entidad de V-22 (estado y chips a la
+derecha y menu ⋯), y las llaves tampoco llevan ⋯.
+
+Menor (#523): "Usada en 1 repos" sin plural y los textos de la fila rotada escritos en el prototipo,
+fuera de `VAULT`; "Reconectar" abre `Ramal Git.dc.html` en D-12 y no en D-14, porque Git no lee el
+hash; en VS Code la tarjeta nativa de K-01 queda debajo del panel y solo se ve tras "← Atrás", y K-04
+`useLocked` saca ademas el toast del webview; en K-05 sin sesion sigue la llave de la organizacion;
+en VS Code la pagina de la tarjeta Boveda se titula "Cuenta y equipo" y no "Cuenta de Ramal".
 
 ### #64 Entrada y ciclo de vida del repo: `Ramal Entrada.dc.html`
 
-| Ids  | Valores de `screen`                                                      |
-| ---- | ------------------------------------------------------------------------ |
-| D-01 | `d01-cuenta`, `d01-identidad`, `d01-repos`, `d01-plataformas`, `d01-ia`  |
-| D-02 | `d02-ausente`, `d02-antiguo` (con `os` cambia el comando de instalacion) |
-| D-03 | `d03-navegador`, `d03-codigo`, `d03-error`                               |
-| D-04 | `d04-sin-sesion`                                                         |
-| D-05 | `d05-vacio`, `d05-solo-nube`                                             |
-| D-06 | `d06-lista`, `d06-abrir-todos`                                           |
-| D-07 | `d07-tarjeta`, `d07-vista`                                               |
-| D-08 | `d08-formulario`, `d08-progreso`, `d08-error`                            |
-| D-09 | `d09-no-repo`, `d09-confianza`, `d09-solo-lectura`, `d09-iniciar`        |
-| D-10 | `d10-vacio`                                                              |
-| D-11 | `d11-formulario`, `d11-progreso`, `d11-error`                            |
+| Ids  | Valores de `screen`                                                                                               |
+| ---- | ----------------------------------------------------------------------------------------------------------------- |
+| D-01 | `d01-cuenta`, `d01-identidad`, `d01-repos`, `d01-plataformas`, `d01-ia`                                           |
+| D-02 | `d02-ausente`, `d02-antiguo` (con `os` cambia el comando de instalacion)                                          |
+| D-03 | `d03-navegador` (chips `base`, el modal, y `onboarding`, dentro de la tarjeta de D-01), `d03-codigo`, `d03-error` |
+| D-04 | `d04-sin-sesion`                                                                                                  |
+| D-05 | `d05-vacio` (el chip `narrow` es la ventana de 1024 px), `d05-solo-nube`                                          |
+| D-06 | `d06-lista` (el chip `grid` es la rejilla), `d06-abrir-todos`                                                     |
+| D-07 | `d07-tarjeta`, `d07-vista`                                                                                        |
+| D-08 | `d08-formulario`, `d08-progreso`, `d08-error`                                                                     |
+| D-09 | `d09-no-repo`, `d09-confianza`, `d09-solo-lectura`, `d09-iniciar`                                                 |
+| D-10 | `d10-vacio`                                                                                                       |
+| D-11 | `d11-formulario`, `d11-progreso`, `d11-error`                                                                     |
 
 Cada pantalla tiene chips de variante (por ejemplo los siete errores de clonado de `d08-error`).
 `session=signedIn` cambia la barra de titulo y las zonas de nube.
 
-Pendiente: D-03 dentro de la tarjeta de D-01; D-05 a 1024 px (la variante es igual a la de 1280); la
-tarjeta de rejilla de D-06.
+Desde "Iniciar sesión" de D-01 se llega a D-03 dentro de la tarjeta: Cancelar vuelve a D-01 y el
+exito pasa a `d01-identidad` con los datos de la cuenta.
+
+Menor (#523): D-03 dentro de D-01 ensena la barra de titulo de Inicio (pestana, idioma, engranaje e
+"Iniciar sesión") y pierde la linea de Git del pie; tras elegir `onboarding`, el chip Modal no sale
+de la version en tarjeta; la rejilla de D-06 no tiene menu ⋯ ni los estados clonando y error, ni un
+caso sin cuenta para el host; D-05 a 1024 px apila las tarjetas en vez de usar tercios.
 
 ### #65 Credenciales y operaciones de Git: `Ramal Git.dc.html`
 
@@ -182,9 +236,20 @@ tarjeta de rejilla de D-06.
 | D-24 | `d24-upstream`                                                                                                                                         |
 | D-25 | `d25-historial`                                                                                                                                        |
 
-Pendiente: los botones "Abortar" no piden confirmacion de peligro; los titulos de confirmacion se
-arman concatenando texto (en ingles sale "¿Remove lock and retry?"); detalles de D-15 (menu de la
-tarjeta), D-17 ("cancelando"), D-20 (anillo del commit) y D-23 (checkout desde el menu de commit).
+Abortar (merge, rebase, cherry-pick, revert y el rebase del squash) y Eliminar stash confirman con el
+modal de peligro (`abortQ`), con el foco en Cancelar. Los titulos de peligro (`dangerQ`) van enteros
+en cada idioma.
+
+Para cerrar #71 (B-29): "Abortar rebase" de `d20-edit` y "Force push con lease…" de
+`d18-push-rechazado` no hacen nada ni piden confirmacion.
+
+Menor (#523): el titulo de D-25 se sigue armando concatenando ("Deshacer hasta aquí?"); D-15 sin
+entrada en el menu de la tarjeta, D-17 sin "cancelando", D-20 sin anillo en el commit detenido y
+D-23 sin el checkout en el menu de commit; el modal de Abortar sigue abierto al cambiar de pantalla;
+tras eliminar un stash el toast dice "Abortado"; en ingles el cuerpo de Eliminar stash mezcla los dos
+idiomas; el titulo del bloqueo ("¿Quitar el bloqueo…?") no coincide con su boton ("Borrar el
+bloqueo…") y el foco de ese modal queda en el boton de peligro; el texto de abortar el squash habla
+de resoluciones que no hay.
 
 ### #66 Vistas de los menus y diff real: `Ramal Vistas.dc.html`
 
@@ -215,10 +280,31 @@ funcion en `--fn` y el resto en `--text`. El cambio por palabra es el color de l
 en claro `oklch(0.5 0.2 300)`, que no esta en la tabla de tokens. El contraste sobre `--add-bg` y
 `--del-bg` no esta comprobado y en claro baja de 4,5:1.
 
-Pendiente: los estados de carga, vacio, error y sin cuenta de D-27 a D-31; el modal de stash de los
-seleccionados; varios casos de D-32, D-35, D-36 y D-38; primera carga, error, "Cargar más" y aristas
-en D-40; filtros y 14 carriles en D-41; un diff distinto por archivo; plurales; el repaso de
-formularios de B-04.
+Chips internos de la segunda ronda: Estado en D-27, D-28 y D-29 (Normal, Cargando, Vacio y Error) y
+en D-30 y `d31-nuevo-pr` (ademas Sin cuenta); en D-40, Cargando mas, Cargar mas, Primera carga y
+Error, con las aristas siguiendo por las filas de carga; en D-41, 8 o 14 carriles (desde el decimo a
+12 px y el color con modulo). En D-33 y D-37, pulsar un archivo del panel derecho cambia el diff, con
+su cabecera @@ y sus contadores (datos en `FD`). En `d37-staging`, "Stash de los seleccionados…"
+abre su modal.
+
+Para cerrar: las pestanas Commits, Archivos y Checks y los menus Revisar y Fusionar de D-30 no hacen
+nada; los casos de D-32 (lista vacia, URL no reconocida, Renombrar y Editar URL), D-35 (archivo
+preparado con "Quitar bloque" y el motivo para binarios), D-36 (menu de espacios, solo CRLF,
+renombrado sin cambios, nuevo y borrado) y D-38 (renombrado en los dos lados; pulsar un archivo no
+cambia el centro); los filtros de D-41 (Autor, Fecha y "Mostrar solo esta rama"); el repaso de
+formularios de B-04. El modal de stash de los seleccionados cambia las opciones del brief por
+"Mantener los cambios en el árbol de trabajo", que `git stash push` no tiene.
+
+Para cerrar #71 (B-29): "Descartar…" de `d37-staging` no pide confirmacion.
+
+Menor (#523): D-27 sin el estado binario, y pulsar un commit no cambia nada; D-28 sin binario ni
+archivo enorme; D-29 sin "una contiene a la otra" y con la pestana Archivos inerte; D-30 y D-31 sin
+borrador, PR ya abierto, sin permiso, campos segun la plataforma ni los errores 401, limite y SSO, y
+en "Sin cuenta" la cabecera ensena el titulo y el estado del PR; D-33 abre con Tooltip.tsx elegido y
+el diff de lanes.ts; la nota del modal de stash usa el tinte de `--danger` sin ser destructiva; D-40
+sin aviso de `stale_window`, con el esqueleto generico y el error a toda la vista en vez de error de
+pagina; D-41 sin divisor arrastrable, sin tooltips de ref ni de "+n" y sin "Sin coincidencias en el
+historial"; plurales ("1 ramas ocultas") y unos 40 textos nuevos escritos en el prototipo.
 
 ### #67 Ventana, ajustes y equipo: `Ramal Ajustes.dc.html`
 
@@ -240,9 +326,28 @@ Trae la navegacion nueva de Ajustes: Usuario (Perfil, Cuenta, Equipo), Conexione
 IA) y Aplicacion (Git, Herramientas externas, Apariencia, Atajos de teclado, Actualizaciones). La
 barra de titulo de `d42-barra` es el bloque que copian Entrada y Git.
 
-Pendiente: D-42 a 1024 px; casos de D-44 a D-49 y D-51 (ver `gaps.md`); la pastilla beta de arm64;
-`ramal-data.js` conserva los modelos por defecto de cada proveedor y `Ramal.dc.html` el formulario
-viejo de llaves con alcance (X-10).
+`d42-minimo` se dibuja a 1024 px de ancho, con barra lateral de 196, panel de 252, busqueda de 132 y
+sin columna de autor: los mensajes ya no se cortan.
+
+Para cerrar: D-42 a 1024 x 640 (se dibuja a 780 de alto y el panel baja de los 280 px del brief);
+D-44 sin "Detectando" ni las opciones del desplegable; D-45 sin la pastilla beta de arm64 (nunca
+sale) y con el aviso de version minima solo en Ajustes; D-46 sin el grupo Grafo, Deshacer, Rehacer
+ni "Pestaña anterior"; D-47 sin el selector de organizaciones, los menus de la organizacion y de cada
+fila, las invitaciones con correo sin verificar ni confirmar "Cerrar todas las demás"; D-48 sin el
+resumen de "Fetch de todos" (el toast nunca se pinta), "Ver errores", reordenar, borrar un compartido
+ni el estado sin sesion; D-49 sin clonar sin cuenta, punycode, ref no encontrada ni "Copiar enlace de
+Ramal"; D-51 con el interruptor de cuentas encendido sin boveda, y encender un secreto no lleva a
+K-01. Del brief faltan tambien los errores de generacion con la llave de la organizacion (X-05) y el
+estado "sin recomendaciones" (X-10).
+
+Menor (#523): en `Ramal.dc.html` la lista de modelos del formulario de llave no sigue al proveedor
+elegido y la llave de la organizacion sigue como fila editable (la referencia es Ajustes `x05-ia`);
+en `Ramal VS Code.dc.html`, al quitar `AIPROV.model`, el paso de modelo de "Añadir llave" ensena
+"model" para Gemini, Mistral, OpenRouter y Ollama; "1 invitaciones"; el estado de D-51 empieza con un
+punto suelto; "Email" en vez de "Correo" en el modal de invitar; D-45 no liga `install` a `os`; la
+titular sin ⋯ en la vista de admin; X-05 con llave personal y modelo fijado por la organizacion a la
+vez; "Cerrar sesión…" de Ajustes no abre K-09; el borde verdoso del aviso de version minima; un guion
+delante de los grupos de workspaces.
 
 ### #68 Contribuciones de VS Code: `Ramal VS Code.dc.html`
 
@@ -258,6 +363,7 @@ viejo de llaves con alcance (X-10).
 | `V-15`                                 | V-15                                          |
 | `V-16-ia`                              | V-16                                          |
 | `V-22-sin-sesion`, `V-22-nube-apagada` | V-22                                          |
+| `V-13`, `V-13-sin-historial`           | V-13                                          |
 
 Solo se dibujan los webviews: Cambios, el grafo con su detalle, el editor de merge, Crear pull request
 y Configuracion de Ramal. Lo nativo (paleta, QuickInput, modales, notificaciones, menus) sale como
@@ -266,11 +372,22 @@ nativos estan en `VS` de `ramal-data.js`: comandos (`vscode.command.*`, categori
 menus, barra de estado, QuickInput, confirmaciones, recorrido y manifiesto. El atajo del grafo es
 Ctrl+K Ctrl+G (Cmd+K Cmd+G en macOS), sin choque en VS Code 1.138.
 
-Pendiente: la especificacion de contribuciones pasada a limpio (icono y `when` de cada comando,
-acciones de titulo de cada vista, elementos de los arboles, cuando se ve cada elemento de la barra de
-estado, esquema de `contributes.configuration` y condiciones de `viewsWelcome`). Hoy esa estructura
-solo esta en el brief #68. V-02, V-03, V-04, V-10 y V-17 existen solo como textos, y sin sesion se ve
-una llave de la organizacion.
+V-13 es la pestana "Historial: {file}" del grafo, que se abre desde "Ver historial del archivo" en
+Cambios: carga con esqueleto, filas filtradas, detalle de un solo archivo y vacio para un archivo
+nuevo (`noHistory`). Sin sesion ya no aparece la llave de la organizacion, tampoco al cerrar sesion.
+El primer "Resumir con IA" falla con Reintentar y "no se ha cobrado" (B-10).
+
+La especificacion de contribuciones es el brief
+[`68-contribuciones-vscode.md`](../briefs/68-contribuciones-vscode.md): comandos con icono y `when`,
+acciones de titulo, arboles, barra de estado, ajustes y `viewsWelcome`. V-02, V-03, V-04 y V-10 son
+nativos y se especifican en texto (X-11); la vista completa de V-17 se aplazo.
+
+Menor (#523): la cabecera, el esqueleto y el vacio del historial salen tambien en la vista Cambios
+(bloques `isHist`, `histLoading` y `histNone` de las lineas 60 a 62); el grafo de V-13 conserva los
+carriles del grafo completo; "1 ARCHIVOS" sin plural; al volver a iniciar sesion la llave de la
+organizacion no reaparece; con la nube apagada se ve la llave de la organizacion (confirmar que se
+quiere); el texto del fallo de B-10 y un color literal de la pestana de historial estan en el
+prototipo, fuera de `VS` y de los tokens.
 
 ### #69 Autenticacion web: `Ramal Web Auth.dc.html` y `Ramal Local Callback.dc.html`
 
@@ -295,7 +412,7 @@ Las rutas de cada pantalla estan en la constante `ROUTES` y en la barra del prot
 receptor local del motor al volver del navegador (inicio de sesion y plataforma, con exito, cancelado
 o error) y `local-callback.template.html` es su version estatica.
 
-Pendiente: a 375 px la barra superior desborda; W-35 ofrece la contrasena a una cuenta que no la
+Menor (#523): a 375 px la barra superior desborda; W-35 ofrece la contrasena a una cuenta que no la
 tiene.
 
 ### #70 Panel, sitio publico y equipo: `Ramal Web Panel.dc.html`, `Ramal Web Paginas.dc.html` y `Ramal Web.dc.html`
@@ -317,12 +434,23 @@ cargando, sin-sesion, mismo-email, uniendote, unido, otro-email, caducada, no-ex
 404-publica, 404-panel, 500, sin-conexion; W-29-docs indice, articulo; W-29-releases lista, detalle,
 cargando, vacia, error. Los tres ficheros se pueden ver a 768 y 375 px (W-30).
 
-Pendiente: `Ramal Web.dc.html` conserva el panel antiguo, al que se llega tras iniciar sesion, con
-"Compartir con el equipo", "Probar conexión" y el token a la vista (X-01, X-02, B-37, B-38, B-58);
-tres textos rotos en el panel (el selector de organizacion dice `newOrg`, el aviso de correo sin
-confirmar sale con un texto de relleno y la etiqueta del proveedor como `{serviceProvider}`); W-18 sin
-plan mensual ni aviso del ultimo dia; W-22 sin la banda de rotar la llave; W-28 sin barra lateral;
-capturas de la landing a 1x y con anotaciones del prototipo.
+`Ramal Web.dc.html` ya no tiene panel: iniciar sesion, OAuth y `startPage=dashboard` llevan a
+`Ramal Web Panel.dc.html`. En Web Panel, los chips de plan suman `trial_last_day` (banda `--warn`) y
+`active_monthly`, y el modal de asientos cobra segun el ciclo; W-22 tiene el chip
+`rotacion-recomendada`; el selector dice "Nueva organización…", el aviso de correo sin confirmar usa
+`auth.vBanner` y la etiqueta del proveedor ya no sale como `{serviceProvider}`. En Web Paginas,
+`404-panel` de W-28 lleva la barra lateral del panel desde 900 px.
+
+Menor (#523): capturas de la landing a 2x y sin anotaciones (las de `img/` siguen a 1x y las de VS
+Code con notas del prototipo); W-28 `404-panel` dice "Sincronización" donde el panel dice
+"Configuración en la nube", su barra superior esta simplificada y bajo 900 px no hay boton de menu;
+la prop `plan` no lista los planes nuevos; `trial_last_day` ensena la misma fecha que la prueba de 3
+dias; "1 invitaciones pendientes"; "+ Invitar miembro" sigue habilitado con el correo sin confirmar;
+el salto de Ramal Web al panel no pasa tema ni idioma y cae en Equipo; al eliminar la organizacion
+(W-12), la reautenticacion habla de eliminar la cuenta; codigo muerto del panel antiguo en
+`Ramal Web.dc.html` (`addAcc`, `teamAcc`, `test`); `cancel_scheduled` dice a la vez que se cancela
+y que se renueva; "All platforms" duplicado en el hero movil; el placeholder "ACME producción" sin
+traducir.
 
 ### #71 Revision de bugs: `Ramal Correcciones.dc.html` y los tres prototipos base
 
@@ -335,10 +463,21 @@ La tabla de 62 filas que pedia el brief (cada bug corregido en el diseno o regla
 no venia en el zip. El estado de cada bug esta ahora en la columna "Estado en el diseno" de la
 seccion 3 de [`../gaps.md`](../gaps.md).
 
-Pendiente: en VS Code, B-10 (error del resumen), B-23, B-26 y B-27; "Cerrar sesión" de
-`Ramal.dc.html` sin confirmar y "Abortar" de Git sin confirmar (B-29); `marta@ramal.dev` en
-`Ramal.dc.html`; el panel antiguo de `Ramal Web.dc.html` (B-37, B-38, B-58); el septimo carril de
-B-14.
+La segunda ronda corrige: "Cerrar sesión" de `Ramal.dc.html` abre K-09 y el correo de muestra es
+`marta@example.com`; Abortar y Eliminar stash de Git confirman; Web Panel pone el foco en Cancelar;
+en VS Code, B-10 (error con Reintentar), B-23 (etiquetas segun la operacion), B-26 (el menu actua
+sobre la rama pulsada) y B-27 ("Eliminar rama remota…" aparte); el panel antiguo de
+`Ramal Web.dc.html` se quito (B-37, B-38 en la web, B-58); B-14 con los 14 carriles de Vistas
+`d41-filtros`.
+
+Para cerrar: sin confirmacion en "Abortar rebase" de Git `d20-edit`, "Force push con lease…" de Git
+`d18-push-rechazado` y "Descartar…" de Vistas `d37-staging` (B-29); en VS Code el placeholder de
+host es siempre `gitlab.acme.dev`, sin la tabla por plataforma (B-38); Estados usa aun la mascara
+vieja `sk-ant-••••••••9c1e` (B-34).
+
+Menor (#523): `Ramal Correcciones.dc.html` no se actualizo en la segunda ronda; Git `d19-pull` llama
+"Entrante" a B y la tabla de #71 pide "Remoto ({upstream})", mientras #68 agrupa merge y pull como
+"Entrante": hay que alinear los briefs.
 
 ## Notas para implementar
 
@@ -349,6 +488,11 @@ B-14.
 - La paleta de VS Code no coincide entre `Ramal VS Code.dc.html` y el modo `product=vscode` de
   Boveda y Estados. En la extension se usan las variables `--vscode-*`, asi que solo afecta a los
   prototipos.
+- La segunda ronda trae unos 60 textos nuevos escritos dentro de los prototipos y no en
+  `ramal-data.js` (unos 40 en Vistas, 14 en Git, 9 en Web Paginas, 5 en Ramal, 2 en Boveda y 2 en VS
+  Code). Algunos se arman pegando trozos. Pasan a `@ramal/i18n` con el resto (#522).
+- `AIPROV` ya no trae modelo por defecto: el modelo sale siempre de la lista del proveedor (X-10).
+  Los modelos que aun aparecen en `Ramal.dc.html` y `Ramal VS Code.dc.html` son de muestra.
 - Lo que no se debe copiar de los prototipos sigue en la seccion 3 de [`../gaps.md`](../gaps.md).
 
 ## Especificacion base (handoff original)
@@ -362,8 +506,8 @@ tablas de tokens, medidas y componentes siguen valiendo. Lo que ha cambiado desd
   menus) ya no se dibuja: lo especifica `Ramal VS Code.dc.html` (X-11). `vsLanguage` solo admite `en`
   y `es` y el atajo del grafo es Ctrl+K Ctrl+G.
 - **Panel web.** Lo sustituye `Ramal Web Panel.dc.html`. La web ya no conecta, prueba ni comparte
-  cuentas de plataforma (X-01, X-02). El panel que aun queda dentro de `Ramal Web.dc.html` no es
-  referencia. `startPage` ya no tiene `dashboard`.
+  cuentas de plataforma (X-01, X-02). `Ramal Web.dc.html` ya no tiene panel: iniciar sesion y OAuth
+  llevan a `Ramal Web Panel.dc.html`, y `startPage` ya no ofrece `dashboard`.
 - **Landing y descargas.** La vista previa son las imagenes de `img/`, no el prototipo en un iframe
   (X-12). Sin Windows portable, macOS Universal en `.dmg`, un VSIX por plataforma y Linux desde Ubuntu
   22.04 y Debian 12 (X-09, ADR 0016).
@@ -377,7 +521,6 @@ tablas de tokens, medidas y componentes siguen valiendo. Lo que ha cambiado desd
   `--scrim`, `--sk-hi` y `--fn`, que la tabla no recoge.
 - **Assets y ficheros.** Ya hay imagenes (`img/`, `media/`) y catorce prototipos: ver el indice de
   arriba.
-
 ### Handoff: Ramal — cliente Git (Desktop, extensión VS Code y web)
 
 #### Overview

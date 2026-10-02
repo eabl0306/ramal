@@ -331,8 +331,9 @@ button:disabled{cursor:default}
 <script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;W-11&quot;,&quot;W-12&quot;,&quot;W-13&quot;,&quot;W-14&quot;,&quot;W-15&quot;,&quot;W-16&quot;,&quot;W-36&quot;,&quot;W-18&quot;,&quot;W-19&quot;,&quot;W-21&quot;,&quot;W-22&quot;,&quot;W-23&quot;,&quot;W-24&quot;,&quot;W-25&quot;,&quot;X-02&quot;],&quot;default&quot;:&quot;W-14&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;context&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;personal&quot;,&quot;org&quot;],&quot;default&quot;:&quot;org&quot;,&quot;tsType&quot;:&quot;'personal'|'org'&quot;},&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;owner&quot;,&quot;admin&quot;,&quot;member&quot;],&quot;default&quot;:&quot;owner&quot;,&quot;tsType&quot;:&quot;'owner'|'admin'|'member'&quot;},&quot;plan&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;trialing&quot;,&quot;active&quot;,&quot;past_due&quot;,&quot;cancel_scheduled&quot;,&quot;canceled&quot;,&quot;inactive&quot;],&quot;default&quot;:&quot;trialing&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;empty&quot;,&quot;loading&quot;,&quot;error&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;'normal'|'empty'|'loading'|'error'&quot;}}">
 const SCREENS = ['W-11', 'W-12', 'W-13', 'W-14', 'W-15', 'W-16', 'W-36', 'W-18', 'W-19', 'W-21', 'W-22', 'W-23', 'W-24', 'W-25', 'X-02'];
 const SEC_OF = { 'W-11': 'overview', 'W-12': 'team', 'W-13': 'team', 'W-14': 'team', 'W-15': 'team', 'W-16': 'orgAi', 'W-36': 'orgAi', 'W-18': 'billing', 'W-19': 'overview', 'W-21': 'account', 'W-22': 'account', 'W-23': 'repos', 'W-24': 'account', 'W-25': 'sync', 'X-02': 'accounts' };
-const VARIANTS = { 'W-12': ['normal', 'email-sin-confirmar', 'limite-5'], 'W-25': ['todo-sincronizado', 'dispositivo-atrasado', 'sin-boveda', 'fallo-al-guardar'], 'W-21': ['normal', 'email-pendiente', 'email-sin-confirmar', 'usuario-cogido'], 'W-16': ['normal', 'modelo-retirado'], 'W-18': ['normal', 'checkout-202'] };
-const PLANS = ['none', 'trialing', 'active', 'past_due', 'cancel_scheduled', 'canceled', 'inactive'];
+const VARIANTS = { 'W-12': ['normal', 'email-sin-confirmar', 'limite-5'], 'W-25': ['todo-sincronizado', 'dispositivo-atrasado', 'sin-boveda', 'fallo-al-guardar'], 'W-21': ['normal', 'email-pendiente', 'email-sin-confirmar', 'usuario-cogido'], 'W-16': ['normal', 'modelo-retirado'], 'W-18': ['normal', 'checkout-202'], 'W-22': ['normal', 'rotacion-recomendada'] };
+const PLANS = ['none', 'trialing', 'trial_last_day', 'active', 'active_monthly', 'past_due', 'cancel_scheduled', 'canceled', 'inactive'];
+const PLAN_OF = { trial_last_day: { plan: 'trialing', trialDays: 1, cycle: 'annual' }, trialing: { plan: 'trialing', trialDays: 3, cycle: 'annual' }, active: { plan: 'active', cycle: 'annual', trialDays: 3 }, active_monthly: { plan: 'active', cycle: 'monthly', trialDays: 3 } };
 const LX = {
   dOverview: ['Resumen', 'Overview'], dWorkspaces: ['Workspaces', 'Workspaces'], dRepos: ['Repositorios', 'Repositories'], dAccounts: ['Cuentas vinculadas', 'Linked accounts'], dTeam: ['Equipo', 'Team'], dSync: ['Configuración en la nube', 'Cloud settings'],
   hello: ['Hola, {n}', 'Hi, {n}'], ovSub: ['Esto es lo que se sincroniza con tus dispositivos.', 'This is what syncs to your devices.'], wsSub: ['Los workspaces agrupan repositorios. Los compartidos aparecen para todo el equipo.', 'Workspaces group repositories. Shared ones show up for the whole team.'],
@@ -341,7 +342,7 @@ const LX = {
   teamSub: ['Miembros de {o}, sus roles e invitaciones.', 'Members of {o}, their roles and invitations.'], invite: ['Invitar miembro', 'Invite member'], syncSub: ['Qué se guarda en tu cuenta y se aplica en cada dispositivo al iniciar sesión.', 'What is stored in your account and applied on each device when you sign in.'],
   sWs: ['Workspaces y repositorios', 'Workspaces and repositories'], sAcc: ['Cuentas vinculadas', 'Linked accounts'], sAccD: ['Tokens cifrados de extremo a extremo', 'End-to-end encrypted tokens'], since: ['Conectado desde', 'Connected since'], lastSync: ['Última sincronización', 'Last sync'], sAiPrefs: ['Preferencias de IA', 'AI preferences'], sAiKeys: ['Llaves de IA', 'AI keys'], sGit: ['Preferencias de Git', 'Git preferences'], sLook: ['Apariencia', 'Appearance'],
   shared: ['Compartido con {o}', 'Shared with {o}'], onlyYou: ['Solo tú', 'Only you'], newWs: ['Nuevo workspace', 'New workspace'], cancel: ['Cancelar', 'Cancel'], save: ['Guardar', 'Save'], download: ['Descargar', 'Download'], signOut: ['Cerrar sesión', 'Sign out'],
-  personal: ['Personal', 'Personal'], devicesT: ['Dispositivos', 'Devices'], name: ['Nombre', 'Name'], email: ['Email', 'Email'], role: ['Rol', 'Role'], copied: ['Copiado: {x}', 'Copied: {x}'], provider: ['Proveedor', 'Provider'], label: ['Etiqueta', 'Label'], apiKey: ['API key', 'API key'], baseUrl: ['URL base', 'Base URL'],
+  personal: ['Personal', 'Personal'], orgNewMenu: ['Nueva organización…', 'New organization…'], aiProvider: ['Proveedor', 'Provider'], devicesT: ['Dispositivos', 'Devices'], name: ['Nombre', 'Name'], email: ['Email', 'Email'], role: ['Rol', 'Role'], copied: ['Copiado: {x}', 'Copied: {x}'], provider: ['Proveedor', 'Provider'], label: ['Etiqueta', 'Label'], apiKey: ['API key', 'API key'], baseUrl: ['URL base', 'Base URL'],
   colMember: ['Miembro', 'Member'], colFn: ['Función', 'Function'], colKey: ['Llave', 'Key'], dlSub: ['La última versión de Ramal para tus equipos.', 'The latest version of Ramal for your devices.'], allOpts: ['Ver todas las opciones', 'See all options'], yours: ['Tu sistema', 'Your system'],
   export: ['Exportar configuración', 'Export settings'], dataT: ['Datos', 'Data'], tz: ['Zona horaria', 'Time zone'], pwRow: ['Contraseña y formas de entrar', 'Password and sign-in methods'], pwRowD: ['Contraseña, GitHub vinculado. Se gestionan en Cuenta › Contraseña y Formas de entrar.', 'Password, GitHub linked. Managed in Account › Password and Sign-in methods.'],
   typeD: ['Escritorio', 'Desktop'], typeV: ['VS Code', 'VS Code'], typeB: ['Navegador', 'Browser'], sysArch: ['Sistema', 'System'], version: ['Versión', 'Version'], typeL: ['Tipo', 'Type'], platAcc: ['Plataforma y cuenta', 'Platform and account'], remoteUrl: ['Remoto', 'Remote'],
@@ -382,7 +383,8 @@ class Component extends DCLogic {
   t(k, v) {
     const R = window.RAMAL, W = R.WEB70, n = v && (v.count ?? v.days);
     const look = key => W[key] || (n != null ? W[key + (n === 1 ? '_one' : '_other')] : null);
-    let e = null;
+    let e = k.startsWith('auth.') && R.WAUTH ? R.WAUTH[k] : null;
+    if (e) return fill(e[this.L], v);
     for (const ns of ['dashboard', 'team', 'orgAi', 'billing', 'pricing', 'account', 'legal', 'download']) { e = look(ns + '.' + k); if (e) break; }
     if (!e) e = LX[k] || R.D[k] || (R.STATES || {})[k] || (R.WAUTH && R.WAUTH['auth.' + k]); if (!e) return k;
     return fill(e[this.L], v);
@@ -425,7 +427,8 @@ class Component extends DCLogic {
       emailPending: screen === 'W-21' && variant === 'email-pendiente' ? 'marta.ruiz@example.com' : '', exportState: 'idle', invitesForMe: [{ org: 'Estudio Norte', role: 'member', inviter: 'Ana Gil' }]
     };
     if (screen === 'W-15') { n.modal = { kind: 'invite', email: '', role: 'member' }; n.seats = members.filter(m => !m.pending || !m.expired).length; }
-    if (screen === 'W-22') n.side = { kind: 'device', id: 'd3' };
+    if (screen === 'W-22') n.side = { kind: 'device', id: 'd3', rotate: variant === 'rotacion-recomendada' };
+    Object.assign(n, PLAN_OF[plan] || { plan, cycle: ['past_due', 'cancel_scheduled'].includes(plan) ? 'monthly' : 'annual', trialDays: 3 }, { rotateFor: '' });
     if (screen === 'W-23') n.side = { kind: 'repo', id: 'r1' };
     if (screen === 'W-24') this.later(80, () => { const el = document.getElementById('danger'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80 }); });
     if (screen === 'W-18' && variant === 'checkout-202') n.modal = { kind: 'seats', n: 9 };
@@ -490,7 +493,7 @@ class Component extends DCLogic {
       };
     }
     if (m.kind === 'seats') {
-      const trial = s.plan === 'trialing', price = s.plan === 'past_due' ? 10 : 96, per = s.plan === 'past_due' ? 'month' : 'year', diff = m.n - s.seats;
+      const trial = s.plan === 'trialing', price = s.cycle === 'monthly' ? 10 : 96, per = s.cycle === 'monthly' ? 'month' : 'year', diff = m.n - s.seats;
       base.title = T('seTitle', { org });
       base.fields.push({ isCounter: 1, label: T('addSeats'), value: String(m.n), onDec: () => this.setM({ n: Math.max(c.used, m.n - 1), err: '' }), onInc: () => this.setM({ n: m.n + 1 }), decDisabled: m.n <= c.used, decOpacity: m.n <= c.used ? 0.4 : 1, hasHint: true, hint: T('seMin', { used: c.used, members: c.mem, pending: c.pend }) });
       if (trial) base.fields.push(box('info', T('seTrial')));
@@ -535,7 +538,7 @@ class Component extends DCLogic {
     if (m.kind === 'key' || m.kind === 'editKey') {
       const AP = R.AIPROV, provs = ['anthropic', 'openai', 'google', 'mistral', 'groq', 'openrouter', 'custom'], edit = m.kind === 'editKey', p = m.prov || 'anthropic', models = MODELS[p] || [['custom-model', '']];
       base.title = edit ? T('oaiEdit').replace('…', '') + ' · ' + m.label : T('oaiAdd'); base.width = 580;
-      base.fields.push(sel(T('provider'), p, provs.map(k => ({ value: k, label: AP[k].label })), e => this.setM({ prov: e.target.value, loaded: false, err: '', def: '' }), { disabled: edit, hint: edit ? '' : T('oaiOllama') }));
+      base.fields.push(sel(T('aiProvider'), p, provs.map(k => ({ value: k, label: AP[k].label })), e => this.setM({ prov: e.target.value, loaded: false, err: '', def: '' }), { disabled: edit, hint: edit ? '' : T('oaiOllama') }));
       if (p === 'custom' && !edit) base.fields.push(txt(T('baseUrl'), 'url', { ph: 'https://', mono: true }));
       base.fields.push(txt(T('label'), 'label', { ph: 'ACME producción' }));
       if (!edit) {
@@ -696,11 +699,11 @@ class Component extends DCLogic {
       out.dh = { title: T('biTitle'), sub: T('biSub', { org }), btns: [] };
       if (st === 'loading') { out.items.push(this.skel('minmax(0,1fr)', [190])); return out; }
       if (st === 'error') { out.items.push(...err()); return out; }
-      const isOwn = s.role === 'owner', pl = s.plan, seats = s.seats;
+      const isOwn = s.role === 'owner', pl = s.plan, seats = s.seats, mon = s.cycle === 'monthly', td = s.trialDays || 3;
       const CH = { trialing: [T('stTrial'), 'var(--info)'], active: [T('stActive'), 'var(--ok)'], past_due: [T('stPastDue'), 'var(--warn)'], cancel_scheduled: [T('stCancelAt', { date: this.date('cancelAt') }), 'var(--warn)'], canceled: [T('stCanceled'), 'var(--danger)'], inactive: [T('stInactive'), 'var(--danger)'] }[pl];
       const seatsLine = T('tmLine', { members: T('tmMembers', { count: cnt.mem }), pending: T('tmPending', { count: cnt.pend }), seats: T('tmSeats', { used: cnt.used, total: seats }) });
-      const lines = pl === 'trialing' ? [T('biTrialLine', { date: this.date('trialEnd'), days: 3 }), seatsLine] : pl === 'active' ? [T('biAnnualLine', { seats, date: this.date('renewY') }), seatsLine] : pl === 'past_due' || pl === 'cancel_scheduled' ? [T('biMonthlyLine', { seats, date: this.date('renewM') }), seatsLine] : [seatsLine];
-      const price = pl === 'active' ? T('biPriceYear', { total: seats * 96 }) : pl === 'past_due' || pl === 'cancel_scheduled' ? T('biPriceMonth', { total: seats * 10 }) : '';
+      const lines = pl === 'trialing' ? [T('biTrialLine', { date: this.date('trialEnd'), days: td }), seatsLine] : pl === 'active' ? [mon ? T('biMonthlyLine', { seats, date: this.date('renewM') }) : T('biAnnualLine', { seats, date: this.date('renewY') }), seatsLine] : pl === 'past_due' || pl === 'cancel_scheduled' ? [T('biMonthlyLine', { seats, date: this.date('renewM') }), seatsLine] : [seatsLine];
+      const price = pl === 'active' ? (mon ? T('biPriceMonth', { total: seats * 10 }) : T('biPriceYear', { total: seats * 96 })) : pl === 'past_due' || pl === 'cancel_scheduled' ? T('biPriceMonth', { total: seats * 10 }) : '';
       const checkout = () => { location.href = './Ramal Web Paginas.dc.html#W-18'; }, portal = () => this.toast('Paddle · customer portal ↗');
       const btns = !isOwn ? [] : pl === 'trialing' || pl === 'canceled' || pl === 'inactive' || pl === 'none' ? [this.B(T('biChoose'), checkout, 'primary'), ...(pl === 'trialing' ? [this.B(T('biSeats'), () => this.openModal({ kind: 'seats', n: seats }))] : [])] : pl === 'active' ? [this.B(T('biSeats'), () => this.openModal({ kind: 'seats', n: seats }), 'primary'), this.B(T('biPortal') + ' ↗', portal)] : pl === 'past_due' ? [this.B(T('biUpdatePay') + ' ↗', portal, 'primary')] : [this.B(T('biPortal') + ' ↗', portal)];
       out.items.push({ isPlan: 1, name: 'Ramal Pro', hasChip: !!CH, chip: CH ? CH[0] : '', chipColor: CH ? CH[1] : '', chipBg: CH ? tint(CH[1], 16) : '', lines, hasPrice: !!price, price, hasBtns: btns.length > 0, btns });
@@ -762,7 +765,7 @@ class Component extends DCLogic {
         onName: e => this.setState({ side: { ...sd, name: e.target.value } }), onNameBlur: () => { const v = (sd.name || '').trim(); if (sd.name == null || !v || v === d.name) return; this.setState({ side: { ...sd, note: T('saving') } }); this.later(700, () => { this.setState(x => ({ devices: x.devices.map(y => y.id === d.id ? { ...y, name: v } : y), side: { ...x.side, note: '✓ ' + T('saved') } })); }); },
         rows: [{ label: T('typeL'), value: typeL, font: 'inherit', chips: d.current ? [ch(T('dsThisBrowser'), 'var(--accent)')] : [], hasBtn: false }, { label: T('sysArch'), value: `${d.os} · ${d.arch}`, font: 'inherit', chips: [], hasBtn: false }, { label: T('version'), value: d.app, font: "'IBM Plex Mono',monospace", chips: d.update ? [ch(T('dsUpdate', { version: d.update }), 'var(--warn)')] : [], hasBtn: false }, { label: T('since'), value: d.since[L], font: 'inherit', chips: [], hasBtn: false }, { label: T('lastSync'), value: this.ago(d.sync), font: 'inherit', chips: [], hasBtn: false }],
         hasNote: false, note: '', hasLink: false,
-        btns: [{ label: d.current ? T('signOut') : T('dvSignOut'), bg: 'transparent', color: 'var(--danger)', border: 'var(--danger)', onClick: () => d.current ? this.toast(T('signOut')) : this.confirm(T('dvOutT', { device: d.name }), T('dvOutI'), T('dvOutB'), () => { this.setState(x => ({ devices: x.devices.filter(y => y.id !== d.id), side: null })); this.toast(T('dvOutDone', { device: d.name })); }) }] };
+        btns: [{ label: d.current ? T('signOut') : T('dvSignOut'), bg: 'transparent', color: 'var(--danger)', border: 'var(--danger)', onClick: () => d.current ? this.toast(T('signOut')) : this.confirm(T('dvOutT', { device: d.name }), T('dvOutI'), T('dvOutB'), () => { this.setState(x => ({ devices: x.devices.filter(y => y.id !== d.id), side: null, rotateFor: d.name })); this.toast(T('dvOutDone', { device: d.name })); }) }] };
     }
     if (sd.kind === 'repo') {
       const r = s.repos.find(x => x.id === sd.id); if (!r) return null;
@@ -788,7 +791,7 @@ class Component extends DCLogic {
       { label: 'screen', chips: SCREENS.map(id => chip(id, s.screen === id, () => this.apply({ screen: id, ctx: id === 'W-13' ? 'personal' : (s.ctx === 'personal' && s.screen === 'W-13' ? 'org' : s.ctx), role: s.role, plan: s.plan }))) },
       { label: 'context', chips: ['personal', 'org'].map(id => chip(id, s.ctx === id, () => this.setState({ ctx: id, sec: id === 'personal' && ['orgAi', 'billing'].includes(s.sec) ? 'overview' : s.sec }))) },
       { label: 'role', chips: ['owner', 'admin', 'member'].map(id => chip(id, s.role === id, () => this.apply({ screen: s.screen, ctx: s.ctx, role: id, plan: s.plan, dstate: s.dstate }))) },
-      { label: 'plan', chips: PLANS.map(id => chip(id, s.plan === id, () => this.setState({ plan: id }))) },
+      { label: 'plan', chips: PLANS.map(id => chip(id, (s.plan === 'trialing' && s.trialDays === 1 ? 'trial_last_day' : s.plan === 'active' && s.cycle === 'monthly' ? 'active_monthly' : s.plan) === id, () => this.setState(PLAN_OF[id] || { plan: id, cycle: 'monthly', trialDays: 3 }))) },
       { label: 'state', chips: ['normal', 'empty', 'loading', 'error'].map(id => chip(id, s.dstate === id, () => { this.setState({ dstate: id }); if (id === 'loading') this.later(1600, () => this.setState({ dstate: 'normal' })); })) }];
     if (VARIANTS[s.screen]) proto.push({ label: 'variante', chips: VARIANTS[s.screen].map(id => chip(id, s.variant === id, () => this.apply({ screen: s.screen, ctx: s.ctx, role: s.role, plan: s.plan, dstate: s.dstate, variant: id }))) });
     const sec = (!isOrg && ['orgAi', 'billing'].includes(s.sec)) ? 'overview' : s.sec;
@@ -799,20 +802,21 @@ class Component extends DCLogic {
     const orgChip = isOrg ? { ini: curOrg.ini, name: org, bg: 'var(--accent)', color: 'var(--accent-ink)' } : { ini: 'MR', name: T('personal'), bg: 'oklch(0.68 0.2 300)', color: 'oklch(0.2 0.02 300)' };
     const roleL = r => T(r === 'owner' ? 'roleOwner' : r === 'admin' ? 'roleAdmin' : 'roleMember');
     const onOrg = e => this.openMenu(e, [{ label: T('personal'), ini: 'MR', iniBg: 'oklch(0.68 0.2 300)', iniInk: 'oklch(0.2 0.02 300)', hint: !isOrg ? '✓' : '', run: () => this.setState({ ctx: 'personal' }) }, ...s.orgs.map(o => ({ label: o.name, ini: o.ini, iniBg: 'var(--accent)', iniInk: 'var(--accent-ink)', hint: (isOrg && o.name === org ? '✓  ' : '') + roleL(o.name === org ? s.role : o.role), run: () => this.setState({ ctx: 'org', orgName: o.name, role: o.name === 'ACME Studio' ? (s.orgs[0].role) : o.role }) })), { sep: 1 },
-      { label: T('newOrg'), disabled: !s.verified, tip: s.verified ? '' : T('vNeedTip'), run: () => this.createOrg() }]);
+      { label: T('orgNewMenu'), disabled: !s.verified, tip: s.verified ? '' : T('vNeedTip'), run: () => this.createOrg() }]);
     const onUser = e => this.openMenu(e, [{ label: 'marta@example.com', disabled: true }, { sep: 1 }, { label: T('nav.account'), run: () => this.go('account') }, { label: T('dSync'), run: () => this.go('sync') }, { sep: 1 }, { label: T('signOut'), danger: 1, run: () => this.toast(T('signOut')) }], true);
     const banners = [];
     const bn = (kind, text, btn, onBtn) => { const c = { info: 'var(--info)', warn: 'var(--warn)', danger: 'var(--danger)' }[kind]; banners.push({ text, color: c, bg: tint(c, 10), border: tint(c, 30), icon: kind === 'info' ? 'i' : '!', hasBtn: !!btn, btn: btn || '', onBtn }); };
     if (isOrg) {
       const isOwn = s.role === 'owner', ck = () => { location.href = './Ramal Web Paginas.dc.html#W-18'; };
-      if (s.plan === 'trialing') bn('info', isOwn ? T('bnTrialOwner', { org, days: 3 }) : T('bnTrialMember', { org, days: 3, owner: own.name }), isOwn ? T('biChoose') : '', ck);
+      if (s.plan === 'trialing') { const td = s.trialDays || 3; bn(td <= 1 ? 'warn' : 'info', isOwn ? T('bnTrialOwner', { org, days: td }) : T('bnTrialMember', { org, days: td, owner: own.name }), isOwn ? T('biChoose') : '', ck); }
       if (s.plan === 'past_due') bn('warn', isOwn ? T('bnPastOwner', { org }) : T('bnPastMember', { org }), isOwn ? T('biUpdatePay') + ' ↗' : '', () => this.toast('Paddle · customer portal ↗'));
       if (s.plan === 'inactive' || s.plan === 'canceled') bn('danger', T('bnEnded', { org }), isOwn ? T('biChoose') : '', ck);
       if (sec === 'team' && s.role === 'member') bn('info', T('roTeam', { org }));
       if (sec === 'orgAi' && !adm) bn('info', T('roOrgKeys'));
       if (sec === 'billing' && s.role !== 'owner') bn('info', T('roBilling'));
     }
-    if (!s.verified && (sec === 'team' || sec === 'overview' || sec === 'account')) bn('info', T('vBanner', { email: 'marta@example.com' }), T('vResend'), () => this.toast(T('vResent', { email: 'marta@example.com' })));
+    if (s.rotateFor && sec === 'account') bn('warn', T('dvRotate', { device: s.rotateFor }));
+    if (!s.verified && (sec === 'team' || sec === 'overview' || sec === 'account')) bn('info', T('auth.vBanner', { email: 'marta@example.com' }), T('auth.vResend'), () => this.toast(T('auth.vResent', { email: 'marta@example.com' })));
     const body = this.section(), sd = this.sideView(), md = this.modalView();
     return { t, proto, wide, narrow: !wide, pad: vw < 600 ? 16 : 28, nav, orgChip, onOrg, onUser, banners, dh: body.dh, items: body.items, hasTabs: body.tabs.length > 0, tabs: body.tabs,
       langOpts: [['es', 'ES'], ['en', 'EN']].map(([k, l]) => ({ label: l, bg: s.lang === k ? 'var(--accent)' : 'transparent', color: s.lang === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ lang: k }) })),

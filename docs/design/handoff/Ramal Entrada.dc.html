@@ -50,7 +50,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
     </div>
   </header>
 
-  <div style="width:1280px;height:780px;position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;box-shadow:var(--shadow)">
+  <div style="width:{{ frameW }}px;height:780px;position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;box-shadow:var(--shadow)">
     <div style="height:46px;flex-shrink:0;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
       <sc-if value="{{ win.mac }}"><div style="display:flex;align-items:center;gap:8px;padding-right:12px"><span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span></div></sc-if>
       <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Ramal</span></div>
@@ -96,10 +96,10 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
               </div>
             </sc-if>
             <sc-if value="{{ hm.isEmpty }}">
-              <div style="padding:44px 32px;border:1.5px dashed var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+              <div style="padding:{{ hm.emptyPad }};border:1.5px dashed var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
                 <div style="font-size:20px;font-weight:600;letter-spacing:-0.01em">{{ t.e_emptyTitle }}</div>
                 <div style="color:var(--muted);max-width:440px;line-height:1.5">{{ t.e_emptyText }}</div>
-                <div style="width:100%;max-width:760px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">
+                <div style="width:100%;max-width:{{ hm.tileW }};display:grid;grid-template-columns:repeat({{ hm.tileCols }},minmax(0,1fr));gap:12px;margin-top:14px">
                   <sc-for list="{{ hm.tiles }}" as="ti" hint-placeholder-count="3"><button onClick="{{ ti.onClick }}" style="padding:20px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left" style-hover="border-color:var(--accent)"><span aria-hidden="true" style="width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:16px">{{ ti.glyph }}</span><span style="font-weight:600;font-size:14px">{{ ti.title }}</span><span style="font-size:12.5px;color:var(--muted);line-height:1.4">{{ ti.sub }}</span></button></sc-for>
                 </div>
                 <button onClick="{{ act.findRepos }}" style="margin-top:8px;border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500">{{ t.e_findLink }}</button>
@@ -107,6 +107,23 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
             </sc-if>
             <sc-if value="{{ hm.isNoMatch }}"><div style="padding:44px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:10px">{{ t.e_noMatch }}<button style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-weight:500">{{ t.e_clearFilters }}</button></div></sc-if>
             <sc-if value="{{ hm.isLoading }}"><sc-for list="{{ hm.skel }}" as="k" hint-placeholder-count="4"><div aria-busy="true" style="height:70px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:grid;grid-template-columns:34px 1.5fr 1.2fr 1fr 224px;gap:14px;align-items:center;padding:0 16px;opacity:{{ k.op }}"><span style="width:34px;height:34px;border-radius:10px;background:var(--surface2)"></span><span style="height:11px;width:60%;border-radius:6px;background:var(--surface2)"></span><span style="height:10px;width:70%;border-radius:6px;background:var(--surface2)"></span><span style="height:10px;width:50%;border-radius:6px;background:var(--surface2)"></span><span style="height:10px;width:60%;justify-self:end;border-radius:6px;background:var(--surface2)"></span></div></sc-for></sc-if>
+            <sc-if value="{{ hm.isGrid }}">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px">
+                <sc-for list="{{ hm.gridCards }}" as="r" hint-placeholder-count="4">
+                  <div style="padding:16px;border-radius:12px;background:var(--surface);border:{{ r.gridBorder }};display:flex;flex-direction:column;gap:12px;min-height:168px">
+                    <div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;flex-shrink:0;border-radius:10px;display:grid;place-items:center;font-size:11px;font-weight:700;background:{{ r.badgeBg }};color:{{ r.badgeColor }};opacity:{{ r.dim }}">{{ r.abbr }}</div><div style="min-width:0;flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ r.pathColor }}">{{ r.path }}</span></div><button onClick="{{ r.onMenu }}" aria-label="{{ t.moreActions }}" style="width:28px;height:28px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px">⋯</button></div>
+                    <span style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ r.srcColor }}">{{ r.src }}</span>
+                    <div style="flex:1"></div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                      <sc-if value="{{ r.hasPill }}"><span style="height:22px;padding:0 8px;border-radius:6px;display:flex;align-items:center;font-size:11.5px;font-weight:500;white-space:nowrap;color:{{ r.pillColor }};background:{{ r.pillBg }};border:1px solid {{ r.pillBorder }}">{{ r.pill }}</span></sc-if>
+                      <sc-if value="{{ r.hasBranch }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">⎇ {{ r.branch }}</span></sc-if>
+                      <div style="flex:1"></div>
+                      <sc-if value="{{ r.hasAct }}"><button onClick="{{ r.onAct }}" style="height:28px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;border:1px solid {{ r.actBorder }};background:{{ r.actBg }};color:{{ r.actColor }}">{{ r.act }}</button></sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
             <sc-if value="{{ hm.isList }}">
               <div style="display:grid;grid-template-columns:repeat({{ hm.cols }},minmax(0,1fr));gap:8px">
               <sc-for list="{{ hm.cards }}" as="r" hint-placeholder-count="5">
@@ -251,7 +268,7 @@ const SCR = [
   ['d01-ia', 'D-01', ['Primer arranque · IA', 'First run · AI'], []],
   ['d02-ausente', 'D-02', ['Git ausente', 'Git missing'], [['base', 'Ausente', 'Missing'], ['still', 'Sigue sin aparecer', 'Still missing'], ['found', 'Encontrado', 'Found']]],
   ['d02-antiguo', 'D-02', ['Git antiguo', 'Old Git'], []],
-  ['d03-navegador', 'D-03', ['Iniciar sesión · navegador', 'Sign in · browser'], []],
+  ['d03-navegador', 'D-03', ['Iniciar sesión · navegador', 'Sign in · browser'], [['base', 'Modal', 'Modal'], ['onboarding', 'En la bienvenida (D-01)', 'In onboarding (D-01)']]],
   ['d03-codigo', 'D-03', ['Iniciar sesión · código', 'Sign in · code'], [['base', 'Código', 'Code'], ['noReceiver', 'Sin receptor local', 'No local receiver'], ['success', 'Éxito', 'Success']]],
   ['d03-error', 'D-03', ['Iniciar sesión · errores', 'Sign in · errors'], [['cancelled', 'Cancelado', 'Cancelled'], ['expired', 'Caducado', 'Expired'], ['offline', 'Sin conexión', 'Offline'], ['generic', 'Genérico', 'Generic']]],
   ['d04-sin-sesion', 'D-04', ['App sin sesión', 'Signed-out app'], [['profile', 'Perfil', 'Profile'], ['account', 'Cuenta', 'Account'], ['team', 'Equipo', 'Team'], ['platforms', 'Plataformas', 'Platforms'], ['ai', 'IA', 'AI'], ['ws', 'Workspace', 'Workspace']]],
@@ -306,7 +323,7 @@ class Component extends DCLogic {
     if (id === 'd09-iniciar') st.initBranch = 'main';
     return st;
   }
-  go(id, v) { this.setState(v ? this.variantState(id, v) : this.screenState(id)); }
+  go(id, v) { const keep = id.startsWith('d03') && this.state.inD01; this.setState({ ...(v ? this.variantState(id, v) : this.screenState(id)), inD01: keep || (id === 'd03-navegador' && v === 'onboarding') }); }
   closePanel = () => this.setState({ panelOff: true });
   runClone() { clearInterval(this._iv); this._iv = setInterval(() => { const s = this.state; let pct = s.pct + 6 + Math.random() * 6, ph = pct < 12 ? 1 : pct < 22 ? 2 : pct < 72 ? 3 : pct < 88 ? 4 : pct < 98 ? 5 : 6; if (pct >= 100) { clearInterval(this._iv); this.toast(this.T('e_cloned', { repo: 'web-app' })); this.setState({ screen: 'd06-lista', v: 'base', panelOff: false, pct: 100 }); return; } this.setState({ pct, phase: ph }); }, 260); }
   runPublish() { clearInterval(this._iv); let n = 0; this._iv = setInterval(() => { n++; this.setState({ pubStep: n }); if (n >= 3) { clearInterval(this._iv); this.setState({ v: 'done' }); this.toast(this.T('e_published', { url: 'github.com/marta-dev/nuevo-proyecto' })); } }, 900); }
@@ -363,7 +380,7 @@ class Component extends DCLogic {
         hm.typeOpts = ['all', 'local', 'remote', 'notCloned'].map(k => ({ label: tv[k], check: s.typeVal === k ? '✓' : '', onClick: () => this.setState({ typeVal: k, typeMenuClosed: true }) }));
         hm.fakeFilters = [[t.platform || 'Plataforma', t.allPlat || (L ? 'All' : 'Todas')], [t.e_account, L ? 'Any' : 'Cualquiera'], ['Workspace', L ? 'Any' : 'Cualquiera'], [L ? 'Group' : 'Agrupar', L ? 'None' : 'Nada']].map(([l, val]) => ({ l, v: val }));
         hm.cards = s.typeVal === 'notCloned' ? clouds : [...local, ...clouds];
-        if (id === 'd06-abrir-todos' || v === 'grid') { hm.navBg = 'transparent'; hm.navColor = 'var(--text)'; hm.title = 'Producto'; hm.isWs = true; hm.sub = L ? '4 repositories · 3 open PRs' : '4 repositorios · 3 PRs abiertos'; hm.hasFilters = false; hm.btns = [btnS('⟳ ' + (L ? 'Fetch all' : 'Fetch de todos'), () => {}), btnS(t.e_openAll, () => this.go('d06-abrir-todos'), 'p')]; hm.cards = [local[0], clouds[0], local[1], clouds[2]]; hm.cols = v === 'grid' ? 2 : 1; }
+        if (id === 'd06-abrir-todos' || v === 'grid') { hm.navBg = 'transparent'; hm.navColor = 'var(--text)'; hm.title = 'Producto'; hm.isWs = true; hm.sub = L ? '4 repositories · 3 open PRs' : '4 repositorios · 3 PRs abiertos'; hm.hasFilters = false; hm.btns = [btnS('⟳ ' + (L ? 'Fetch all' : 'Fetch de todos'), () => {}), btnS(t.e_openAll, () => this.go('d06-abrir-todos'), 'p')]; hm.cards = [local[0], clouds[0], local[1], clouds[2]]; hm.cols = 1; hm.isGrid = v === 'grid'; }
       }
       if (id === 'd07-tarjeta') { hm.isList = true; hm.hasFilters = false; hm.count = '3'; hm.cards = [local[0], missing, local[1]]; hm.wsEmpty = true; }
       if (['d03-navegador', 'd03-codigo', 'd03-error', 'd08-formulario', 'd08-progreso', 'd08-error', 'd09-no-repo', 'd09-confianza', 'd09-iniciar', 'd04-sin-sesion'].includes(id)) { hm.isList = true; hm.count = '2'; hm.cards = local; hm.hasFilters = true; hm.q = t.e_searchPh; hm.qColor = 'var(--faint)'; hm.typeVal = t.e_all; hm.fakeFilters = []; hm.typeBorder = 'var(--border)'; hm.typeBg = 'var(--bg)'; }
@@ -425,7 +442,7 @@ class Component extends DCLogic {
         if (id === 'd01-cuenta') {
           const si = v === 'signedIn' || signed;
           blocks = [{ isLogo: true }, { isTitle: true, text: t.e_welcome }, P_(t.e_welcomeSub),
-            ...(si ? [BOX(T('e_success', { email: 'marta@example.com' }) + '\n' + t.e_cloudApplied, 'var(--ok)', '✓')] : [{ isBtnRow: true, cols: 2, btns: [btnS(t.e_signIn, () => this.setState({ screen: 'd03-navegador', v: 'base', panelOff: false }), 'p', { h: '42px' }), btnS(t.e_noAcc, () => this.go('d01-identidad'), null, { h: '42px' })] }]),
+            ...(si ? [BOX(T('e_success', { email: 'marta@example.com' }) + '\n' + t.e_cloudApplied, 'var(--ok)', '✓')] : [{ isBtnRow: true, cols: 2, btns: [btnS(t.e_signIn, () => this.setState({ screen: 'd03-navegador', v: 'onboarding', panelOff: false, inD01: true }), 'p', { h: '42px' }), btnS(t.e_noAcc, () => this.go('d01-identidad'), null, { h: '42px' })] }]),
             { isLines: true, lines: [t.e_acc1, t.e_acc2, t.e_acc3].map(x => ({ g: '·', c: 'var(--accent)', t: x })) }];
           if (v === 'checking') blocks = [{ isLogo: true }, { isSpin: true, text: t.e_checking + ' Git' }];
           pn = modal('560px', '', [stepper, ...blocks], si ? foot : [], { hasTitle: false, pad: '26px 30px 14px', scrim: 'var(--bg)', hasGit: true, git: v === 'checking' ? '… git --version' : gitLine, gitColor: 'var(--faint)' });
@@ -480,7 +497,11 @@ class Component extends DCLogic {
           blocks = [BOX(E[0], E[2], '!', v === 'generic' ? [[t.e_copyDetail, () => this.toast(t.detailCopied, 'info')]] : [])];
           btns = [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(E[1], () => this.go(v === 'expired' ? 'd03-codigo' : 'd03-navegador'), 'p')];
         }
-        pn = modal('460px', t.e_siTitle, blocks, btns, { canClose: v !== 'success' });
+        const inD = s.inD01 || (id === 'd03-navegador' && v === 'onboarding');
+        if (inD) { const back = () => this.go('d01-cuenta'); btns = btns.map(b => b.label === t.e_cancel ? { ...b, onClick: back } : b); if (v === 'success') this._t2 = setTimeout(() => { if (this.state.v === 'success' && this.state.inD01) this.go('d01-identidad'); }, 1700);
+          const stepper = { isStepper: true, steps: [t.e_s1, t.e_s2, t.e_s3, t.e_s4, t.e_s5].map((l, i) => ({ label: l, bar: i === 0 ? 'var(--accent)' : 'var(--surface2)', color: i === 0 ? 'var(--text)' : 'var(--faint)' })) };
+          pn = modal('560px', '', [stepper, { isLogo: true }, { isTitle: true, text: t.e_siTitle }, ...blocks], btns, { hasTitle: false, pad: '26px 30px 14px', scrim: 'var(--bg)', canClose: false }); }
+        else pn = modal('460px', t.e_siTitle, blocks, btns, { canClose: v !== 'success' });
       }
       if (id === 'd04-sin-sesion' && v === 'ws') pn = modal('460px', t.e_editWs, [FIELD({ label: t.e_name, value: 'Producto' }), BOX(t.e_inv_ws + ' ' + t.e_noteGit, 'var(--info)', '☁', [[t.e_signIn, () => this.go('d03-navegador')]])], [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.save || 'Guardar', () => this.setState({ panelOff: true }), 'p')]);
       if (id === 'd06-abrir-todos') pn = modal('580px', T('e_missingTitle', { count: 2, total: 4 }), [{ isList: true, hasHead: false, items: [['web-app', 'github.com/acme/web-app', 'github'], ['infra-terraform', 'gitlab.empresa.com/infra/terraform', 'gitlab']].map(([name, path, pl]) => ({ hasCheck: true, checked: true, onToggle: () => {}, abbr: P[pl].abbr, bg: P[pl].color, fg: 'white', name, path, status: '', stColor: '' })) }, FIELD({ label: t.e_dest, value: '~/code', ro: true, font: "'IBM Plex Mono',monospace", inColor: 'var(--muted)', hasBtn: true, btn: t.e_choose, onBtn: () => {} })],
@@ -550,9 +571,12 @@ class Component extends DCLogic {
       if (s.confirm) pn = modal('460px', s.confirm.title, [BOX(s.confirm.body, 'var(--danger)', '!')], [btnS(t.e_cancel, () => this.setState({ confirm: null }), null, { mr: 'auto', focus: true }), btnS(t.e_remove, () => { this.setState({ confirm: null }); this.toast(T('removedT', { n: '' }).trim() || 'OK'); }, 'd')]);
     }
     const act = { close: () => this.setState({ panelOff: true, confirm: null }), signIn: () => this.go('d03-navegador'), findRepos: () => this.go('d01-repos'), typeMenu: () => this.setState({ v: 'type', typeMenuClosed: !(s.v === 'type' && s.typeMenuClosed) ? true : false }), trust: () => this.go('d09-confianza'), locate: () => this.toast(t.e_pathUpdated), removeList: () => this.setState({ confirm: { title: T('e_rmListTitle', { name: 'design-tokens' }), body: t.e_rmListBody }, panelOff: false }) };
-    if (id === 'd05-vacio' && v === 'narrow') { hm.cols = 1; }
+    hm.tileCols = 3; hm.tileW = '760px'; hm.emptyPad = '44px 32px';
+    if (id === 'd05-vacio' && v === 'narrow') { hm.cols = 1; hm.tileCols = 1; hm.tileW = '420px'; hm.emptyPad = '28px 20px'; }
+    if (hm.isGrid) { hm.gridCards = hm.cards.map(r => ({ ...r, gridBorder: r.hasPill ? '1px dashed var(--border)' : '1px solid var(--border)' })); hm.cards = []; } else hm.gridCards = [];
     const toasts = s.toasts.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : x.kind === 'info' ? 'var(--info)' : 'var(--ok)' }));
-    return { ch, t, segs, nav, vars, cur, win, pg, hm, rp, st: stp, hasPanel: !!pn, pn: pn || { blocks: [], btns: [] }, act, toasts };
+    const frameW = id === 'd05-vacio' && v === 'narrow' ? 1024 : 1280;
+    return { frameW, ch, t, segs, nav, vars, cur, win, pg, hm, rp, st: stp, hasPanel: !!pn, pn: pn || { blocks: [], btns: [] }, act, toasts };
   }
 }
 </script>

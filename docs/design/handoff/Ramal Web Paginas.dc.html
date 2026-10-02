@@ -68,7 +68,9 @@ button:disabled{cursor:default}
     </sc-if>
   </sc-if>
 
-  <main style="flex:1;display:flex;flex-direction:column">
+  <div style="flex:1;display:flex;min-height:0">
+  <sc-if value="{{ panelSide }}"><nav aria-label="Panel" style="width:232px;flex-shrink:0;padding:14px 10px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px"><sc-for list="{{ panelNav }}" as="n"><a href="./Ramal Web Panel.dc.html" style="height:34px;padding:0 10px;border-radius:8px;display:flex;align-items:center;font-weight:500;color:var(--text)" style-hover="background:var(--surface2)">{{ n }}</a></sc-for></nav></sc-if>
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column">
     <sc-if value="{{ isPricing }}" hint-placeholder-val="{{ true }}">
       <section style="max-width:1080px;width:100%;margin:0 auto;padding:64px {{ pad }}px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
         <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">{{ t.prKicker }}</span>
@@ -196,8 +198,7 @@ button:disabled{cursor:default}
       </section>
     </sc-if>
   </main>
-
-  <sc-if value="{{ inPanel }}"><span></span></sc-if>
+  </div>
   <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
     <footer class="noprint" style="border-top:1px solid var(--border);padding:24px {{ pad }}px;display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap;color:var(--faint);font-size:13px">
       <span style="font-weight:600;color:var(--text)">Ramal</span>
@@ -289,7 +290,7 @@ class Component extends DCLogic {
     const loggedIn = (sc === 'W-17' && st !== 'sin-sesion') || sc === 'W-18' || (sc === 'W-11' && ['mismo-email', 'uniendote', 'unido', 'otro-email', 'ya-miembro'].includes(st));
     const toWeb = () => { location.href = './Ramal Web.dc.html'; }, toAuth = h => { location.href = './Ramal Web Auth.dc.html#' + h; }, toPanel = () => { location.href = './Ramal Web Panel.dc.html'; };
     const inPanel = sc === 'W-28' && st === '404-panel';
-    const base = { t, proto, wide, narrow: !wide, pad, wideDoc: vw >= 1100, isPublic: !inPanel, inPanel, toasts: s.toasts.map(x => ({ text: x.text })),
+    const base = { t, proto, wide, narrow: !wide, pad, wideDoc: vw >= 1100, isPublic: !inPanel, inPanel, panelSide: inPanel && vw >= 900, panelNav: [['Resumen', 'Overview'], ['Workspaces', 'Workspaces'], ['Repositorios', 'Repositories'], ['Cuentas vinculadas', 'Linked accounts'], ['Equipo', 'Team'], ['IA de la organización', 'Organization AI'], ['Facturación', 'Billing'], ['Sincronización', 'Sync'], ['Cuenta', 'Account']].map(x => x[s.lang === 'en' ? 1 : 0]), toasts: s.toasts.map(x => ({ text: x.text })),
       navLinks: [[T('features'), toWeb], [T('prNav'), () => this.apply('W-17', loggedIn ? 'con-sesion' : 'sin-sesion')], [T('download'), toWeb], ['VS Code', toWeb]].map(([label, onClick]) => ({ label, onClick })),
       authBtns: loggedIn ? [this.B(T('openDash'), toPanel, 'primary')] : [this.B(T('login'), () => toAuth('login')), this.B(T('signup'), () => toAuth('signup'), 'primary')],
       langOpts: [['es', 'ES'], ['en', 'EN']].map(([k, l]) => ({ label: l, bg: s.lang === k ? 'var(--accent)' : 'transparent', color: s.lang === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ lang: k }) })),

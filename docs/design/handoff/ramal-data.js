@@ -112,15 +112,15 @@ window.RAMAL = (function () {
       { c: ['  "auth.retry": "Reintentar"', '}'] }
     ] }
   ];
-  const AIPROV = {
-    anthropic: { label: 'Anthropic', abbr: 'AN', color: 'oklch(0.66 0.13 45)', model: 'claude-sonnet-4-5', ph: 'sk-ant-…' },
-    openai: { label: 'OpenAI', abbr: 'OA', color: 'oklch(0.55 0.02 180)', model: 'gpt-5-mini', ph: 'sk-proj-…' },
-    groq: { label: 'Groq', abbr: 'GQ', color: 'oklch(0.62 0.18 30)', model: 'llama-3.3-70b-versatile', ph: 'gsk_…' },
-    google: { label: 'Google Gemini', abbr: 'GG', color: 'oklch(0.6 0.15 255)', model: 'gemini-2.5-flash', ph: 'AIza…' },
-    mistral: { label: 'Mistral', abbr: 'MI', color: 'oklch(0.7 0.16 60)', model: 'mistral-large-latest', ph: '…' },
-    openrouter: { label: 'OpenRouter', abbr: 'OR', color: 'oklch(0.55 0.12 280)', model: 'openrouter/auto', ph: 'sk-or-…', url: 'https://openrouter.ai/api/v1' },
-    ollama: { label: 'Ollama (local)', abbr: 'OL', color: 'oklch(0.5 0.01 230)', model: 'qwen2.5-coder:14b', ph: '(sin llave)', url: 'http://localhost:11434' },
-    custom: { label: 'Compatible con OpenAI', abbr: 'API', color: 'oklch(0.58 0.08 200)', model: '', ph: '…', url: 'https://' }
+  const AIPROV = { // Sin modelo por defecto: la lista de modelos la devuelve el proveedor al validar la llave (X-10).
+    anthropic: { label: 'Anthropic', abbr: 'AN', color: 'oklch(0.66 0.13 45)', ph: 'sk-ant-…' },
+    openai: { label: 'OpenAI', abbr: 'OA', color: 'oklch(0.55 0.02 180)', ph: 'sk-proj-…' },
+    groq: { label: 'Groq', abbr: 'GQ', color: 'oklch(0.62 0.18 30)', ph: 'gsk_…' },
+    google: { label: 'Google Gemini', abbr: 'GG', color: 'oklch(0.6 0.15 255)', ph: 'AIza…' },
+    mistral: { label: 'Mistral', abbr: 'MI', color: 'oklch(0.7 0.16 60)', ph: '…' },
+    openrouter: { label: 'OpenRouter', abbr: 'OR', color: 'oklch(0.55 0.12 280)', ph: 'sk-or-…', url: 'https://openrouter.ai/api/v1' },
+    ollama: { label: 'Ollama (local)', abbr: 'OL', color: 'oklch(0.5 0.01 230)', ph: '(sin llave)', url: 'http://localhost:11434' },
+    custom: { label: 'Compatible con OpenAI', abbr: 'API', color: 'oklch(0.58 0.08 200)', ph: '…', url: 'https://' }
   };
   const AIKEYS = [
     { id: 'k1', prov: 'anthropic', label: 'Personal', scope: 'personal', masked: 'sk-ant-…4f2a', model: 'claude-sonnet-4-5', def: true },
