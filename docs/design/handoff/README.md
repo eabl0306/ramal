@@ -345,7 +345,7 @@ B-14.
 - Los textos de `ramal-data.js` son la base, no el resultado: unas 30 claves nuevas con contador no
   tienen `_one` y `_other`, algunas llevan glifos o atajos dentro, ocho claves de `STATES` y `D` se
   llaman igual con otro texto, y varios prototipos recortan o pegan traducciones para fabricar otras.
-  En `@ramal/i18n` se arregla al copiarlas (ADR 0017).
+  En `@ramal/i18n` se arregla al copiarlas (ADR 0017, issue #522).
 - La paleta de VS Code no coincide entre `Ramal VS Code.dc.html` y el modo `product=vscode` de
   Boveda y Estados. En la extension se usan las variables `--vscode-*`, asi que solo afecta a los
   prototipos.

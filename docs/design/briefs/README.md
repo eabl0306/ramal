@@ -4,20 +4,25 @@ Un brief por cada issue de diseno de la epica #2 (#62 a #71). Cada uno lleva lo 
 Claude Design dibuje lo que falta sin adivinar: pantallas, estados, textos en castellano e ingles,
 reglas y que exportar. El detalle de por que falta cada cosa esta en [`../gaps.md`](../gaps.md).
 
+**Estado (2026-10-02).** El handoff de los diez briefs llego el 2026-10-01 en un solo zip y ya esta
+en [`../handoff/`](../handoff/README.md): sustituye al original e incluye los prototipos base
+corregidos. La columna "Estado" del [indice](#indice) dice que issues quedan disenados y que falta en
+los demas; el detalle fila a fila esta en la columna "Diseno" de [`../gaps.md`](../gaps.md).
+
 ## Como usarlos
 
-1. Abre en Claude Design **el mismo proyecto** donde se hizo el handoff original
-   ([`../handoff/`](../handoff/README.md)). Los tres prototipos (`Ramal.dc.html`,
-   `Ramal VS Code.dc.html` y `Ramal Web.dc.html`) son la fuente de verdad visual: tokens, medidas y
-   componentes se reutilizan, no se reinventan.
+1. Abre en Claude Design **el mismo proyecto** donde se hizo el handoff
+   ([`../handoff/`](../handoff/README.md)). Sus prototipos son la fuente de verdad visual: tokens,
+   medidas y componentes se reutilizan, no se reinventan.
 2. Pega un brief entero como mensaje. Uno cada vez: espera el resultado y compruebalo contra su
    seccion "Hecho cuando" antes de pasar al siguiente.
 3. Orden: **empieza por #62**, porque sus estados (carga, error, validacion, vacios, sin conexion,
    sincronizacion, foco) los usan todos los demas. Despues, cualquier orden. Sugerencia: #71 justo
    despues de #62, para que el resto parta de los prototipos ya corregidos.
-4. Exporta el zip con el nombre que pide la seccion "Entregable" del brief y traelo al repo:
-   descomprimelo en `docs/design/handoff/<issue>-<slug>/` (esa carpeta ya la ignora prettier). El de
-   #71 sustituye los ficheros base de `docs/design/handoff/`.
+4. Exporta el zip y traelo al repo. La primera entrega llego como un solo zip con todo el proyecto y
+   sus ficheros sustituyeron los de `docs/design/handoff/` (la carpeta la ignoran prettier y las
+   comprobaciones). Comprueba que trae el README de pantallas y estados que pide la seccion
+   "Entregable": en la primera entrega faltaba.
 5. Marca el checklist del issue en GitHub.
 
 ## Reglas comunes a todos los briefs
@@ -91,15 +96,15 @@ Cada brief repite las que mas le afectan; estas valen siempre.
 
 ## Indice
 
-| Issue | Brief                                                                              | Pantallas o estados                                              |
-| ----- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| #62   | [62-estados-comunes.md](62-estados-comunes.md)                                     | 10 (C-01 a C-10), mas la regla B-61                              |
-| #63   | [63-boveda.md](63-boveda.md)                                                       | 10 (K-01 a K-10), mas los cambios X-03 y X-04                    |
-| #64   | [64-entrada-y-ciclo-de-vida-del-repo.md](64-entrada-y-ciclo-de-vida-del-repo.md)   | 11 (D-01 a D-11)                                                 |
-| #65   | [65-credenciales-y-operaciones-de-git.md](65-credenciales-y-operaciones-de-git.md) | 13 (D-12 a D-15, D-17 a D-25)                                    |
-| #66   | [66-vistas-de-los-menus-y-diff-real.md](66-vistas-de-los-menus-y-diff-real.md)     | 13 (D-27 a D-33, D-35 a D-38, D-40 y D-41)                       |
-| #67   | [67-ventana-ajustes-y-equipo.md](67-ventana-ajustes-y-equipo.md)                   | 9 (D-42 a D-49 y D-51)                                           |
-| #68   | [68-contribuciones-vscode.md](68-contribuciones-vscode.md)                         | 22 estados (V-01 a V-22), mas la especificacion de X-11          |
-| #69   | [69-autenticacion-web.md](69-autenticacion-web.md)                                 | 12 (W-01 a W-09, W-33 a W-35)                                    |
-| #70   | [70-panel-sitio-equipo.md](70-panel-sitio-equipo.md)                               | 21 (W-11 a W-30 y W-36)                                          |
-| #71   | [71-revision-de-bugs.md](71-revision-de-bugs.md)                                   | Ninguna nueva: 62 bugs revisados y las confirmaciones de peligro |
+| Issue | Brief                                                                              | Pantallas o estados                                              | Estado                                                                                                                                                                               |
+| ----- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| #62   | [62-estados-comunes.md](62-estados-comunes.md)                                     | 10 (C-01 a C-10), mas la regla B-61                              | Disenado. Queda menor: el error en textarea y select y el color de los bordes de error y aviso                                                                                       |
+| #63   | [63-boveda.md](63-boveda.md)                                                       | 10 (K-01 a K-10), mas los cambios X-03 y X-04                    | Pendiente: K-04 y K-05 parciales, el aviso nativo de VS Code de K-01 y las filas de VS Code                                                                                          |
+| #64   | [64-entrada-y-ciclo-de-vida-del-repo.md](64-entrada-y-ciclo-de-vida-del-repo.md)   | 11 (D-01 a D-11)                                                 | Pendiente: D-03 dentro de la tarjeta de D-01, D-05 a 1024 px y la tarjeta de rejilla de D-06                                                                                         |
+| #65   | [65-credenciales-y-operaciones-de-git.md](65-credenciales-y-operaciones-de-git.md) | 13 (D-12 a D-15, D-17 a D-25)                                    | Disenado. Queda menor: confirmar "Abortar" (#71), titulos sin concatenar y detalles de D-15, D-17, D-20 y D-23                                                                       |
+| #66   | [66-vistas-de-los-menus-y-diff-real.md](66-vistas-de-los-menus-y-diff-real.md)     | 13 (D-27 a D-33, D-35 a D-38, D-40 y D-41)                       | Pendiente: carga, vacio, error y sin cuenta en D-27 a D-31; stash de seleccionados; casos de D-32, D-35, D-36 y D-38; D-40 y D-41; un diff por archivo; repaso de formularios (B-04) |
+| #67   | [67-ventana-ajustes-y-equipo.md](67-ventana-ajustes-y-equipo.md)                   | 9 (D-42 a D-49 y D-51)                                           | Pendiente: D-42 a 1024 px, casos de D-44 a D-49 y D-51, y los modelos por defecto de `ramal-data.js`                                                                                 |
+| #68   | [68-contribuciones-vscode.md](68-contribuciones-vscode.md)                         | 22 estados (V-01 a V-22), mas la especificacion de X-11          | Pendiente: la especificacion de contribuciones pasada a limpio; V-02, V-03, V-04, V-10 y V-17 solo en textos; llave de la organizacion sin sesion                                    |
+| #69   | [69-autenticacion-web.md](69-autenticacion-web.md)                                 | 12 (W-01 a W-09, W-33 a W-35)                                    | Disenado. Queda menor: la barra superior a 375 px y W-35 ofrece contrasena a quien no la tiene                                                                                       |
+| #70   | [70-panel-sitio-equipo.md](70-panel-sitio-equipo.md)                               | 21 (W-11 a W-30 y W-36)                                          | Pendiente: quitar el panel antiguo de Ramal Web, tres textos rotos del panel, W-18, W-22, W-28 y capturas a 2x                                                                       |
+| #71   | [71-revision-de-bugs.md](71-revision-de-bugs.md)                                   | Ninguna nueva: 62 bugs revisados y las confirmaciones de peligro | Pendiente: B-10, B-23, B-26 y B-27 en VS Code; confirmar "Cerrar sesión" y "Abortar"; `marta@ramal.dev`; panel antiguo de la web (B-37, B-38, B-58)                                  |
