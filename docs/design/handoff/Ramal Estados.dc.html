@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;--fs:13px;--row:40px;--menu:32px;--sbh:30px;--bar:62px;--btn:34px;--r-sm:6px;--r-ctl:9px;--r-card:12px;--r-panel:14px;--r-modal:16px;
+--canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);--focus:var(--accent);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);--danger-ink:oklch(0.99 0 0);
+--sk-hi:oklch(0.33 0.012 230);--shadow:0 12px 40px oklch(0.05 0.01 230 / 0.5),0 2px 6px oklch(0.05 0.01 230 / 0.3);
+font-family:var(--font);font-size:var(--fs);background:var(--canvas);color:var(--text)}
+body[data-theme="light"]{--canvas:oklch(0.935 0.005 230);--bg:oklch(0.965 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.94 0.006 230);--border:oklch(0.89 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);--sk-hi:oklch(0.97 0.004 230);--shadow:0 12px 40px oklch(0.3 0.02 230 / 0.16),0 2px 6px oklch(0.3 0.02 230 / 0.08)}
+body[data-product="web"]{--fs:14px}
+body[data-product="web"][data-theme="light"]{--bg:oklch(0.975 0.004 230)}
+body[data-product="vscode"]{--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--mono:Menlo,Consolas,monospace;--fs:13px;--row:28px;--menu:24px;--sbh:22px;--bar:34px;--btn:26px;--r-sm:2px;--r-ctl:2px;--r-card:4px;--r-panel:4px;--r-modal:6px;
+--canvas:#141414;--bg:#1f1f1f;--panel:#181818;--surface:#202020;--surface2:#2a2d2e;--border:#2b2b2b;--text:#cccccc;--muted:#9d9d9d;--faint:#8b8b8b;--accent:#0078d4;--accent-ink:#ffffff;--accent-soft:rgba(0,120,212,.18);--focus:#0078d4;
+--ok:#73c991;--warn:#cca700;--danger:#f85149;--info:#3794ff;--sk-hi:#34383a;--shadow:0 8px 24px rgba(0,0,0,.5)}
+body[data-product="vscode"][data-theme="light"]{--canvas:#ececec;--bg:#ffffff;--panel:#f8f8f8;--surface:#f8f8f8;--surface2:#f0f0f0;--border:#e5e5e5;--text:#3b3b3b;--muted:#616161;--faint:#6f6f6f;--accent:#005fb8;--accent-soft:rgba(0,95,184,.12);--focus:#005fb8;
+--ok:#388a34;--warn:#9a6b00;--danger:#c72e0f;--info:#005fb8;--sk-hi:#fafafa;--shadow:0 8px 24px rgba(0,0,0,.16)}
+*{box-sizing:border-box}
+a{color:var(--accent)} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+@keyframes sk{from{background-position:100% 0}to{background-position:0 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeOut{0%,70%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){@keyframes sk{from{}to{}}@keyframes spin{from{}to{}}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:40px 48px 96px;display:flex;flex-direction:column;gap:64px;background:var(--canvas);color:var(--text);font-family:var(--font);font-size:var(--fs)">
+
+  <header style="display:flex;flex-direction:column;gap:18px;max-width:1240px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:28px;height:28px;border-radius:var(--r-ctl);background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:14px">R</div>
+      <span style="font-weight:600;font-size:15px">Ramal</span>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">#62 · C-01 – C-10 · B-61</span>
+    </div>
+    <div>
+      <h1 style="margin:0;font-size:28px;font-weight:600;letter-spacing:-0.02em">{{ s.sheetTitle }}</h1>
+      <p style="margin:8px 0 0;max-width:760px;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.sheetSub }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end">
+      <sc-for list="{{ segs }}" as="g" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ g.label }}</span>
+          <div style="display:flex;padding:2px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg)">
+            <sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.onClick }}" style="height:28px;padding:0 12px;border:0;border-radius:var(--r-sm);cursor:pointer;font-size:12px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="11">
+        <button onClick="{{ n.onClick }}" title="{{ n.title }}" style="height:30px;padding:0 12px;border-radius:var(--r-sm);cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:600;border:1px solid {{ n.border }};background:{{ n.bg }};color:{{ n.color }}">{{ n.label }}</button>
+      </sc-for>
+    </div>
+  </header>
+
+  <sc-if value="{{ show.c01 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-01" data-screen-label="C-01" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-01</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c01T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c01P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+      <div style="width:780px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vRepoCard }}</div>
+        <div aria-busy="true" aria-label="{{ s.loading }}" style="display:flex;flex-direction:column;gap:8px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <sc-for list="{{ sk3 }}" as="k" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:34px minmax(0,1.5fr) minmax(0,1.2fr) minmax(0,1fr) 224px;gap:14px;align-items:center;padding:14px 12px 14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);opacity:{{ k.op }}">
+              <span style="width:34px;height:34px;border-radius:10px;background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="height:12px;width:{{ k.a }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:9px;width:{{ k.b }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="height:10px;width:{{ k.c }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:9px;width:50%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+              <div style="display:flex;flex-direction:column;gap:8px"><span style="height:10px;width:70%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:9px;width:46%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+              <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px"><span style="height:22px;width:78px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:9px;width:52px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="width:24px;height:9px"></span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:560px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vGraph }}</div>
+        <div aria-busy="true" aria-label="{{ s.loading }}" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+          <div style="height:2px;background:var(--border);position:relative;overflow:hidden"><div style="position:absolute;top:0;bottom:0;width:30%;background:var(--accent);animation:sk 1.2s linear infinite;background:linear-gradient(90deg,transparent,var(--accent),transparent);background-size:300% 100%;left:0;right:0;width:100%"></div></div>
+          <sc-for list="{{ skGraph }}" as="k" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:110px 60px minmax(0,1fr) 110px 60px;gap:10px;align-items:center;height:var(--row);padding:0 12px;opacity:{{ k.op }}">
+              <span style="display:block;height:18px;width:{{ k.ref }}px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+              <div style="position:relative;height:var(--row)"><span style="position:absolute;left:9px;top:0;bottom:0;width:2px;background:var(--surface2)"></span><span style="position:absolute;left:{{ k.x }}px;top:50%;margin-top:-8px;width:16px;height:16px;border-radius:50%;background:var(--surface2)"></span></div>
+              <span style="height:10px;width:{{ k.msg }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;background:var(--surface2)"></span><span style="height:9px;width:64px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+              <span style="height:9px;width:48px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:640px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vPrRow }}</div>
+        <div aria-busy="true" aria-label="{{ s.loading }}" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.2fr) 90px 100px 70px;gap:14px;padding:12px 16px;border-bottom:1px solid var(--border)"><span style="height:8px;width:50%;border-radius:4px;background:var(--surface2)"></span><span style="height:8px;width:20%;border-radius:4px;background:var(--surface2)"></span><span style="height:8px;width:60%;border-radius:4px;background:var(--surface2)"></span><span style="height:8px;width:50%;border-radius:4px;background:var(--surface2)"></span><span style="height:8px;width:60%;border-radius:4px;background:var(--surface2)"></span></div>
+          <sc-for list="{{ sk4 }}" as="k" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.2fr) 90px 100px 70px;gap:14px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);opacity:{{ k.op }}">
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:20px;height:20px;flex-shrink:0;border-radius:var(--r-sm);background:var(--surface2)"></span><span style="height:10px;width:70%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+              <div style="display:flex;flex-direction:column;gap:7px"><span style="height:10px;width:{{ k.a }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:8px;width:40%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+              <span style="height:9px;width:70%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+              <span style="height:22px;width:76px;border-radius:11px;background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+              <span style="height:9px;width:44px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:420px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vLists }}</div>
+        <div aria-busy="true" aria-label="{{ s.loading }}" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+          <sc-for list="{{ skList }}" as="k" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px;min-height:calc(var(--row) + 16px);padding:8px 16px;border-bottom:1px solid var(--border)">
+              <span style="width:32px;height:32px;flex-shrink:0;border-radius:{{ k.r }};background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+              <div style="flex:1;display:flex;flex-direction:column;gap:7px"><span style="height:10px;width:{{ k.a }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:8px;width:{{ k.b }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+              <span style="height:22px;width:{{ k.c }}px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+              <span style="font-family:var(--mono);font-size:10.5px;color:var(--faint);width:52px;text-align:right">{{ k.tag }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:320px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vDetail }}</div>
+        <div aria-busy="true" aria-label="{{ s.loading }}" style="padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:8px"><span style="height:12px;width:70px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="flex:1"></span><span style="height:24px;width:60px;border-radius:var(--r-sm);background:var(--surface2)"></span></div>
+          <div style="display:flex;flex-direction:column;gap:8px"><span style="height:13px;width:92%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:13px;width:58%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="width:28px;height:28px;border-radius:50%;background:var(--surface2)"></span><div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="height:9px;width:50%;border-radius:var(--r-sm);background:var(--surface2)"></span><span style="height:8px;width:36%;border-radius:var(--r-sm);background:var(--surface2)"></span></div></div>
+          <div style="height:1px;background:var(--border)"></div>
+          <sc-for list="{{ sk4 }}" as="k" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:8px;height:var(--menu);opacity:{{ k.op }}"><span style="width:12px;height:12px;border-radius:3px;background:var(--surface2)"></span><span style="height:9px;width:{{ k.a }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="flex:1"></span><span style="height:8px;width:34px;border-radius:var(--r-sm);background:var(--surface2)"></span></div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:520px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vTiles }}</div>
+        <div aria-busy="true" aria-label="{{ s.loading }}" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <sc-for list="{{ sk4 }}" as="k" hint-placeholder-count="4">
+            <div style="padding:14px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:12px"><span style="height:24px;width:44%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span><span style="height:8px;width:{{ k.a }}%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span></div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:520px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vVariants }}</div>
+        <div style="display:flex;flex-direction:column;gap:16px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:10px;height:var(--row);padding:0 14px;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:12px;color:var(--faint)">a41f9c2</span><span>Fix login redirect loop</span></div>
+            <div style="display:flex;align-items:center;gap:10px;height:var(--row);padding:0 14px;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:12px;color:var(--faint)">7c03be1</span><span>Add OAuth token refresh</span></div>
+            <div role="status" style="display:flex;align-items:center;justify-content:center;gap:8px;height:var(--row);color:var(--muted);font-size:12.5px"><span style="width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span>{{ s.loadingMore }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500">{{ s.cancel }}</button>
+            <button disabled="{{ true }}" style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;display:flex;align-items:center;gap:8px;opacity:.8;cursor:default"><span style="width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span>{{ s.busySaving }}</button>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--faint)">disabled · aria-busy</span>
+          </div>
+          <div aria-busy="true" style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border)">
+            <span style="height:10px;width:80%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+            <span style="height:10px;width:56%;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--surface2) 25%,var(--sk-hi) 45%,var(--surface2) 65%);background-size:300% 100%;animation:sk 1.2s linear infinite"></span>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:4px"><span style="flex:1;color:var(--muted);font-size:12.5px">{{ s.slowLoad }}</span><button style="height:28px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);font-weight:500;font-size:12px;cursor:pointer">{{ s.retry }}</button><span style="font-family:var(--mono);font-size:11px;color:var(--faint)">≥ 10 s</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c01Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c02 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-02" data-screen-label="C-02" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-02</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c02T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c02P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+      <div style="width:440px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vToasts }}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;min-height:42px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)">
+                <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ to.color }}"></span>
+                <span style="flex:1;min-width:0;line-height:1.4;padding:4px 0">{{ to.text }}</span>
+                <sc-if value="{{ to.hasAction }}"><button style="height:26px;padding:0 10px;border-radius:var(--r-sm);border:0;background:var(--accent-soft);color:var(--accent);font-weight:600;cursor:pointer;white-space:nowrap">{{ to.action }}</button></sc-if>
+                <sc-if value="{{ to.hasClose }}"><button aria-label="{{ s.closeLabel }}" style="width:24px;height:24px;flex-shrink:0;border-radius:var(--r-sm);border:0;background:transparent;color:var(--faint);cursor:pointer;font-size:15px">×</button></sc-if>
+              </div>
+              <span style="width:54px;font-family:var(--mono);font-size:11px;color:var(--faint)">{{ to.kind }}<br>{{ to.dur }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:580px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vDlgFolded }}</div>
+        <div role="alertdialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow);display:flex;flex-direction:column">
+          <div style="padding:20px 22px 4px"><div style="font-size:16px;font-weight:600">{{ s.saveFailTitle }}</div><div style="color:var(--muted);margin-top:6px;line-height:1.5">{{ s.apiDownHelp }}</div></div>
+          <div style="padding:14px 22px;display:flex;flex-direction:column;gap:8px">
+            <button onClick="{{ toggleDlg }}" style="align-self:flex-start;height:26px;padding:0 8px 0 4px;border:0;background:transparent;color:var(--accent);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px"><span style="font-size:9px;width:12px">{{ dlgChev }}</span>{{ s.showDetail }}</button>
+            <sc-if value="{{ dlgOpen }}">
+              <div style="border:1px solid var(--border);border-radius:var(--r-ctl);background:var(--bg);overflow:hidden">
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.detail }}</span><button onClick="{{ copyDetail }}" style="height:26px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer">{{ copyLabel }}</button></div>
+                <pre style="margin:0;padding:10px 12px;font-family:var(--mono);font-size:12px;line-height:18px;white-space:pre-wrap;max-height:240px;overflow:auto;color:var(--text)">PATCH https://api.ramal.bahoque.com/v1/me/settings
+status: 500
+code: internal
+detail: The settings write could not be completed.
+request_id: req_8f2c91d04a</pre>
+              </div>
+            </sc-if>
+          </div>
+          <div style="padding:10px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500;cursor:pointer">{{ s.close }}</button>
+            <button style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ s.retry }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:580px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vDlgOpen }}</div>
+        <div role="alertdialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow);display:flex;flex-direction:column">
+          <div style="padding:20px 22px 4px"><div style="font-size:16px;font-weight:600">{{ f.hookTitle }}</div><div style="color:var(--muted);margin-top:6px;line-height:1.5">{{ s.hookHelp }}</div></div>
+          <div style="padding:14px 22px">
+            <div style="border:1px solid var(--border);border-radius:var(--r-ctl);background:var(--bg);overflow:hidden">
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.detail }}</span><button onClick="{{ copyDetail }}" style="height:26px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer">{{ copyLabel }}</button></div>
+              <pre style="margin:0;padding:10px 12px;font-family:var(--mono);font-size:12px;line-height:18px;white-space:pre-wrap;max-height:240px;overflow:auto;color:var(--text)">$ git push origin feature/graph-ui
+husky - pre-push hook
+&gt; ramal@2.4.0 lint
+&gt; eslint . --max-warnings 0
+
+src/graph/lanes.ts
+  14:7   error  'unused' is assigned a value but never used  no-unused-vars
+  41:19  error  Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+src/graph/GraphView.tsx
+  88:3   warning  React Hook useEffect has a missing dependency: 'rows'  react-hooks/exhaustive-deps
+ 112:11  error  'onSelect' is not defined                     no-undef
+
+✖ 4 problems (3 errors, 1 warning)
+husky - pre-push script failed (code 1)
+error: failed to push some refs to 'github.com:acme/ramal.git'</pre>
+            </div>
+          </div>
+          <div style="padding:6px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500;cursor:pointer">{{ s.close }}</button>
+            <button style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ s.retry }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:580px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vBanner }}</div>
+        <div style="padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:12px">
+          <div role="alert" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 10px 10px 14px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--danger) 10%, transparent);border:1px solid color-mix(in oklch, var(--danger) 45%, var(--border))">
+            <span style="width:20px;height:20px;flex-shrink:0;border-radius:50%;background:var(--danger);color:var(--danger-ink);display:grid;place-items:center;font-weight:700;font-size:12px">!</span>
+            <span style="flex:1;min-width:180px">{{ s.sectionFail }}</span>
+            <button style="height:28px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-weight:500;font-size:12.5px;cursor:pointer">{{ s.viewDetail }}</button>
+            <button style="height:28px;padding:0 12px;border-radius:var(--r-sm);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:12.5px;cursor:pointer">{{ s.retry }}</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;opacity:.5"><span style="height:10px;width:70%;border-radius:var(--r-sm);background:var(--surface2)"></span><span style="height:10px;width:45%;border-radius:var(--r-sm);background:var(--surface2)"></span></div>
+        </div>
+      </div>
+
+      <div style="width:580px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vCodes }}</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+          <sc-for list="{{ codes }}" as="c" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px;align-items:center;min-height:var(--row);padding:8px 16px;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:12px;color:var(--muted)">{{ c.code }}</span><span style="line-height:1.45">{{ c.text }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c02Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c03 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-03" data-screen-label="C-03" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-03</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c03T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c03P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+      <div style="width:460px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vBranch }}</div>
+        <div role="dialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow)">
+          <div style="padding:20px 22px 4px;font-size:16px;font-weight:600">{{ s.newBranch }}</div>
+          <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px">
+            <div style="padding:10px 12px;border-radius:var(--r-ctl);background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--muted);font-family:var(--mono)">a41f9c2  Fix login redirect loop</div>
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.branchName }}</span>
+              <input ref="{{ brRef }}" value="{{ br.val }}" onChange="{{ onBr }}" onBlur="{{ blurBr }}" onKeyDown="{{ keyBr }}" aria-invalid="{{ br.invalid }}" placeholder="feature/…" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);outline:0;background:var(--bg);font-family:var(--mono);border:1px solid {{ br.border }}">
+              <sc-if value="{{ br.hasErr }}"><span role="alert" style="display:flex;gap:6px;align-items:flex-start;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ br.err }}</span></span></sc-if>
+              <sc-if value="{{ br.noErr }}"><span style="font-size:12px;color:var(--faint)">{{ s.branchHelp }}</span></sc-if>
+            </label>
+            <sc-if value="{{ br.hasOk }}"><div style="display:flex;align-items:center;gap:8px;color:var(--ok);font-family:var(--mono);font-size:12px"><span>✓</span><span>{{ br.ok }}</span></div></sc-if>
+          </div>
+          <div style="padding:6px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+            <button onClick="{{ resetBr }}" style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500;cursor:pointer">{{ s.cancel }}</button>
+            <button onClick="{{ submitBr }}" disabled="{{ br.checking }}" style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;opacity:{{ br.op }}"><sc-if value="{{ br.checking }}"><span style="width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span></sc-if>{{ br.btn }}</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--faint)">{{ s.vTryHint }}</div>
+      </div>
+
+      <div style="width:460px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vChecking }}</div>
+        <div role="dialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow)">
+          <div style="padding:20px 22px 4px;font-size:16px;font-weight:600">{{ s.newBranch }}</div>
+          <div style="padding:14px 22px;display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.branchName }}</span>
+            <div style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);font-family:var(--mono);display:flex;align-items:center">feature/login-oauth</div>
+            <span style="font-size:12px;color:var(--faint)">{{ s.branchHelp }}</span>
+          </div>
+          <div style="padding:6px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500">{{ s.cancel }}</button>
+            <button disabled="{{ true }}" style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;display:flex;align-items:center;gap:8px;opacity:.75"><span style="width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span>{{ s.busyChecking }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:460px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vClone }}</div>
+        <div role="dialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow)">
+          <div style="padding:20px 22px 4px;font-size:16px;font-weight:600">{{ s.cloneTitle }}</div>
+          <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.cloneUrl }}</span>
+              <div aria-invalid="true" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--danger);background:var(--bg);font-family:var(--mono);display:flex;align-items:center">htps//github.com/acme/ramal</div>
+              <span style="display:flex;gap:6px;align-items:flex-start;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ s.badUrl }}</span></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.destDir }}</span>
+              <div style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);font-family:var(--mono);display:flex;align-items:center">~/code</div>
+              <span style="font-size:12px;color:var(--faint)">{{ s.destHelp }}</span>
+            </div>
+          </div>
+          <div style="padding:6px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500">{{ s.cancel }}</button>
+            <button style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.clone }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:460px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vInvite }}</div>
+        <div role="dialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow)">
+          <div style="padding:20px 22px 4px;font-size:16px;font-weight:600">{{ s.inviteTitle }}</div>
+          <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px">
+            <div role="alert" style="padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--danger) 10%, transparent);border:1px solid color-mix(in oklch, var(--danger) 45%, var(--border));color:var(--danger);font-size:12.5px;line-height:1.45">{{ f.serverErr }}</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.name }}</span>
+              <div aria-invalid="true" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--danger);background:var(--bg)"></div>
+              <span style="display:flex;gap:6px;color:var(--danger);font-size:12px"><span aria-hidden="true">⚠</span><span>{{ s.reqName }}</span></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.email }}</span>
+              <div aria-invalid="true" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--danger);background:var(--bg);display:flex;align-items:center">dani@example</div>
+              <span style="display:flex;gap:6px;color:var(--danger);font-size:12px"><span aria-hidden="true">⚠</span><span>{{ s.errEmail }}</span></span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.role }}</span>
+              <div style="display:flex;padding:3px;border-radius:var(--r-ctl);background:var(--bg);border:1px solid var(--border)">
+                <span style="flex:1;height:30px;border-radius:var(--r-sm);display:grid;place-items:center;font-size:12px;font-weight:500;background:var(--accent);color:var(--accent-ink)">{{ s.roleMember }}</span>
+                <span style="flex:1;height:30px;border-radius:var(--r-sm);display:grid;place-items:center;font-size:12px;font-weight:500;color:var(--muted)">{{ s.roleAdmin }}</span>
+              </div>
+            </div>
+          </div>
+          <div style="padding:6px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500">{{ s.cancel }}</button>
+            <button style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.invite }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:420px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vTerms }}</div>
+        <div style="padding:22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:17px;font-weight:600">{{ s.signupTitle }}</div>
+          <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;line-height:1.4"><span aria-invalid="true" style="width:16px;height:16px;flex-shrink:0;margin-top:1px;border-radius:4px;border:1.5px solid var(--danger);background:var(--bg)"></span><span>{{ s.terms }}</span></label>
+          <span style="display:flex;gap:6px;color:var(--danger);font-size:12px;margin-top:-4px;padding-left:26px"><span aria-hidden="true">⚠</span><span>{{ s.termsReq }}</span></span>
+          <button style="height:42px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.signupTitle }}</button>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c03Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c04 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-04" data-screen-label="C-04" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-04</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c04T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c04P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+      <div style="width:280px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vSidebar }}</div>
+        <div style="padding:8px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <sc-for list="{{ sbEmpty }}" as="e" hint-placeholder-count="3">
+            <div style="margin-bottom:6px">
+              <div style="display:flex;align-items:center;gap:6px;height:var(--sbh);padding:0 8px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)"><span style="width:10px;font-size:9px">▾</span><span style="flex:1">{{ e.title }}</span><span style="font-family:var(--mono)">0</span></div>
+              <div style="padding:2px 8px 6px 24px;font-size:12px;color:var(--faint);line-height:1.45">{{ e.line }}</div>
+              <sc-if value="{{ e.hasSub }}"><div style="padding:0 8px 6px 24px;font-size:12px;color:var(--faint);line-height:1.45">{{ e.sub }}</div></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:440px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vPanel }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <sc-for list="{{ panelEmpty }}" as="e" hint-placeholder-count="5">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <sc-if value="{{ e.hasHead }}"><div style="display:flex;align-items:center;gap:8px;font-weight:600"><span style="width:20px;height:20px;border-radius:var(--r-sm);display:grid;place-items:center;font-size:8px;font-weight:700;color:white;background:{{ e.badge }}">{{ e.abbr }}</span>{{ e.head }}</div></sc-if>
+              <div style="padding:16px;border:1px dashed var(--border);border-radius:var(--r-card);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:3px"><span style="font-weight:600">{{ e.title }}</span><sc-if value="{{ e.hasLine }}"><span style="font-size:12.5px;color:var(--muted);line-height:1.45">{{ e.line }}</span></sc-if></div>
+                <sc-if value="{{ e.hasBtn }}"><button style="height:30px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-weight:500;font-size:12.5px;cursor:pointer">{{ e.btn }}</button></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:560px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vLarge }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="min-height:240px;padding:32px 24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center">
+            <span aria-hidden="true" style="font-size:24px;line-height:1;color:var(--faint)">▢</span>
+            <div style="font-size:15px;font-weight:600">{{ s.wsEmpty }}</div>
+            <div style="display:flex;gap:8px;margin-top:6px"><button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.addRepos }}</button></div>
+          </div>
+          <div style="min-height:240px;padding:32px 24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center">
+            <span aria-hidden="true" style="font-size:24px;line-height:1;color:var(--faint)">⇅</span>
+            <div style="font-size:15px;font-weight:600">{{ s.noAccountsAll }}</div>
+            <div style="max-width:380px;color:var(--muted);line-height:1.5">{{ f.prsNeedGh }}</div>
+            <div style="display:flex;gap:8px;margin-top:6px"><button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.connectAcc }}</button></div>
+          </div>
+          <div style="display:flex;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+            <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:2px;border-right:1px solid var(--border)"><span style="font-weight:600;font-size:14px">{{ s.staging }}</span><span style="font-family:var(--mono);font-size:12px;color:var(--muted)">feature/graph-ui</span></div>
+            <div style="flex:2;min-height:150px;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center"><span aria-hidden="true" style="font-size:24px;line-height:1;color:var(--ok)">✓</span><span style="color:var(--muted);line-height:1.5;max-width:280px">{{ s.cleanTree }}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:560px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vSearch }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <div style="display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;border-radius:var(--r-ctl);background:var(--surface);border:1px solid var(--border)"><span style="color:var(--faint)">⌕</span><span style="flex:1">kubernetes</span><span style="color:var(--faint)">×</span></div>
+          <div style="padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;border:1px dashed var(--border);border-radius:var(--r-card)">
+            <span aria-hidden="true" style="font-size:24px;line-height:1;color:var(--faint)">⌕</span>
+            <div style="font-size:15px;font-weight:600">{{ f.noResultsQ }}</div>
+            <button style="margin-top:4px;height:30px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-weight:500;font-size:12.5px">{{ s.clearSearch }}</button>
+          </div>
+          <div style="padding:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px dashed var(--border);border-radius:var(--r-card)">
+            <span style="flex:1;min-width:220px;color:var(--muted)">{{ s.noResults }}</span>
+            <button style="height:30px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-weight:500;font-size:12.5px">{{ s.clearFilters }}</button>
+          </div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:8px;height:var(--row);padding:0 12px;border-bottom:1px solid var(--border)"><span style="color:var(--faint)">⌕</span><span style="flex:1;font-family:var(--mono);font-size:12.5px">oauth refresh</span></div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px"><span style="flex:1;min-width:220px;color:var(--muted)">{{ f.noCommitsQ }}</span><button style="height:28px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);font-weight:500;font-size:12px">{{ s.clearSearch }}</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c04Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c05 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-05" data-screen-label="C-05" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-05</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c05T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c05P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+      <div style="width:780px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:12px"><div style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vTitleBar }}</div><button onClick="{{ resetNet }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;font-weight:500;padding:0">{{ s.reset }}</button></div>
+        <div style="height:380px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden;position:relative">
+          <div style="height:46px;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Ramal</span></div>
+            <div style="display:flex;align-items:center;padding:0 16px;margin-top:6px;border-radius:9px 9px 0 0;background:var(--bg);box-shadow:inset 0 2px 0 var(--accent);font-weight:500">{{ s.home }}</div>
+            <div style="flex:1"></div>
+            <div style="display:flex;align-items:center;gap:10px;position:relative">
+              <sc-if value="{{ net.chip }}">
+                <button onClick="{{ togglePop }}" aria-expanded="{{ net.popOpen }}" style="height:28px;padding:0 10px;border-radius:var(--r-sm);border:0;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;background:color-mix(in oklch, var(--warn) 14%, transparent);color:var(--text)">
+                  <sc-if value="{{ net.spin }}"><span style="width:12px;height:12px;border-radius:50%;border:2px solid var(--warn);border-right-color:transparent;animation:spin .8s linear infinite"></span></sc-if>
+                  <sc-if value="{{ net.cloudOff }}"><span aria-hidden="true" style="position:relative;color:var(--warn);font-size:14px;line-height:1">☁<span style="position:absolute;left:-1px;right:-1px;top:50%;height:1.5px;background:var(--warn);transform:rotate(-35deg)"></span></span></sc-if>
+                  {{ net.chipLabel }}
+                </button>
+              </sc-if>
+              <sc-if value="{{ net.ok }}"><span title="{{ f.syncedAgo }}" aria-label="{{ f.syncedAgo }}" style="width:28px;height:28px;display:grid;place-items:center;color:var(--muted);font-size:15px">☁</span></sc-if>
+              <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border);background:var(--bg)"><span style="height:24px;padding:0 9px;border-radius:6px;font-size:11px;font-weight:600;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink)">ES</span><span style="height:24px;padding:0 9px;font-size:11px;font-weight:600;display:grid;place-items:center;color:var(--muted)">EN</span></div>
+              <div style="width:30px;height:30px;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px">MR</div>
+              <sc-if value="{{ net.popOpen }}">
+                <div role="dialog" style="position:absolute;top:40px;right:40px;width:340px;padding:16px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;z-index:2">
+                  <div style="font-weight:600;font-size:14px">{{ net.title }}</div>
+                  <div style="color:var(--muted);line-height:1.5;font-size:12.5px">{{ s.offlineD }}</div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12.5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--warn)"></span>{{ f.pending3 }}</div>
+                  <button onClick="{{ retryNet }}" disabled="{{ net.spin }}" style="align-self:flex-start;height:30px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px"><sc-if value="{{ net.spin }}"><span style="width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span></sc-if>{{ net.btn }}</button>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="padding:24px;display:flex;flex-direction:column;gap:10px;opacity:.55"><span style="height:12px;width:30%;border-radius:var(--r-sm);background:var(--surface2)"></span><span style="height:46px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border)"></span><span style="height:46px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border)"></span></div>
+          <sc-if value="{{ net.toast }}">
+            <div role="status" style="position:absolute;right:16px;bottom:16px;display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);animation:fadeOut 3.2s forwards"><span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span>{{ s.backOnline }}</div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="width:360px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vApiDown }}</div>
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
+          <span style="height:28px;padding:0 10px;border-radius:var(--r-sm);display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;background:color-mix(in oklch, var(--warn) 14%, transparent)"><span aria-hidden="true" style="color:var(--warn)">!</span>{{ s.apiDown }}</span>
+          <div style="width:100%;padding:16px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px">
+            <div style="font-weight:600;font-size:14px">{{ s.apiDown }}</div>
+            <div style="color:var(--muted);line-height:1.5;font-size:12.5px">{{ s.apiDownD }}</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12.5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--warn)"></span>{{ f.pending1 }}</div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button style="height:30px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);font-weight:500">{{ s.retryNow }}</button><a href="https://ramal.bahoque.com/status" style="font-size:12.5px;font-weight:500">{{ s.statusLink }} ↗</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:520px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vCloudZone }}</div>
+        <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:10px"><span style="flex:1;font-weight:600;font-size:14px">ACME Studio · {{ s.teamT }}</span>
+            <span style="position:relative;display:inline-flex"><button disabled="{{ true }}" aria-describedby="tip-net" style="height:30px;padding:0 12px;border-radius:var(--r-sm);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;opacity:.45;cursor:not-allowed">{{ s.invite }}</button><span id="tip-net" role="tooltip" style="position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap;padding:6px 10px;border-radius:var(--r-sm);background:var(--text);color:var(--bg);font-size:12px;font-weight:500">{{ s.needsNet }}</span></span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--warn) 12%, transparent);border:1px solid color-mix(in oklch, var(--warn) 40%, var(--border));font-size:12.5px;line-height:1.45"><span aria-hidden="true" style="color:var(--warn)">☁</span><span>{{ f.cachedCopy }}</span></div>
+          <sc-for list="{{ members }}" as="m" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;min-height:var(--row)"><span style="width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ m.color }}">{{ m.ini }}</span><div style="flex:1;min-width:0"><div style="font-weight:500">{{ m.name }}</div><div style="font-size:12px;color:var(--faint)">{{ m.email }}</div></div><span style="font-size:12px;color:var(--muted)">{{ m.role }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:600px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vWeb }}</div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <div role="status" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--warn) 12%, transparent);border:1px solid color-mix(in oklch, var(--warn) 40%, var(--border));font-size:13px">
+            <span style="width:12px;height:12px;border-radius:50%;border:2px solid var(--warn);border-right-color:transparent;animation:spin .8s linear infinite"></span>
+            <span style="font-weight:600">{{ s.apiDown }}</span><span style="color:var(--muted)">{{ s.reconnecting }}</span><span style="flex:1"></span><a href="https://ramal.bahoque.com/status" style="font-weight:500">{{ s.statusLink }} ↗</a>
+          </div>
+          <div style="align-self:center;width:360px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:18px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em">{{ s.login }}</div>
+            <div role="alert" style="padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--danger) 10%, transparent);border:1px solid color-mix(in oklch, var(--danger) 45%, var(--border));color:var(--danger);font-size:13px;line-height:1.45">{{ s.loginNoApi }} <a href="https://ramal.bahoque.com/status" style="color:inherit;font-weight:600">{{ s.statusLink }}</a></div>
+            <div style="height:40px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;color:var(--muted)">marta@example.com</div>
+            <div style="height:40px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;color:var(--muted);letter-spacing:.2em">••••••••••</div>
+            <button style="height:42px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.signIn }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c05Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c06 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-06" data-screen-label="C-06" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-06</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c06T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c06P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+      <div style="width:700px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vIcon }}</div>
+        <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <sc-for list="{{ syncIcons }}" as="i" hint-placeholder-count="5">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+              <div style="height:32px;display:flex;align-items:center">
+                <sc-if value="{{ i.isChip }}"><span style="height:28px;padding:0 10px;border-radius:var(--r-sm);display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;white-space:nowrap;background:color-mix(in oklch, var(--warn) 14%, transparent)"><span aria-hidden="true" style="color:var(--warn)">☁</span>{{ s.offline }}</span></sc-if>
+                <sc-if value="{{ i.isIcon }}"><span style="position:relative;width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg);display:grid;place-items:center;color:var(--muted);font-size:15px"><span style="display:inline-block;animation:{{ i.anim }}">{{ i.glyph }}</span><sc-if value="{{ i.hasBadge }}"><span style="position:absolute;top:-6px;right:-7px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--warn);color:oklch(0.2 0.03 80);font-size:10px;font-weight:700;display:grid;place-items:center">3</span></sc-if><sc-if value="{{ i.hasDot }}"><span style="position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--danger);border:2px solid var(--panel)"></span></sc-if></span></sc-if>
+              </div>
+              <span style="font-size:12px;font-weight:600">{{ i.label }}</span>
+              <span style="padding:5px 8px;border-radius:var(--r-sm);background:var(--text);color:var(--bg);font-size:11px;line-height:1.35">{{ i.tip }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="width:520px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vHeaders }}</div>
+        <div style="display:flex;flex-direction:column;gap:18px;padding:20px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <div><div style="font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.secGit }}</div><div style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px;color:var(--faint)"><span aria-hidden="true">☁</span>{{ f.syncsWith }}</div></div>
+          <div><div style="font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.secAppearance }}</div><div style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px;color:var(--faint)"><span aria-hidden="true">⌂</span>{{ s.localOnly }} · {{ s.localOnlyD }}</div></div>
+        </div>
+      </div>
+
+      <div style="width:560px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vRemote }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border);background:color-mix(in oklch, var(--info) 10%, transparent)">
+              <div style="flex:1;min-width:200px"><div style="font-weight:500">{{ s.rowDefBranch }}</div><div style="font-size:12px;color:var(--info);margin-top:2px">{{ s.updatedElse }}</div></div>
+              <div style="height:32px;width:160px;padding:0 10px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;font-family:var(--mono)">trunk</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;padding:14px 18px"><div style="flex:1"><div style="font-weight:500">user.name</div></div><div style="height:32px;width:160px;padding:0 10px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center">Marta Ruiz</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><span style="width:8px;height:8px;border-radius:50%;background:var(--info)"></span>{{ s.updatedElse }}</div>
+          <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><span style="width:8px;height:8px;flex-shrink:0;border-radius:50%;background:var(--warn)"></span><span style="line-height:1.4">{{ f.discarded }}</span></div>
+        </div>
+      </div>
+
+      <div style="width:520px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vField }}</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border)">
+            <div style="flex:1;min-width:120px;font-weight:500">{{ s.name }}</div>
+            <input value="{{ fld.val }}" onChange="{{ onFld }}" onBlur="{{ blurFld }}" style="height:32px;width:180px;padding:0 10px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);outline:0">
+            <div style="width:150px;display:flex;align-items:center;gap:6px;font-size:12px">
+              <sc-if value="{{ fld.saving }}"><span style="width:12px;height:12px;border-radius:50%;border:2px solid var(--muted);border-right-color:transparent;animation:spin .8s linear infinite"></span><span style="color:var(--muted)">{{ s.saving }}</span></sc-if>
+              <sc-if value="{{ fld.saved }}"><span style="display:flex;align-items:center;gap:6px;color:var(--ok);animation:fadeOut 2s forwards"><span>✓</span>{{ s.saved }}</span></sc-if>
+              <sc-if value="{{ fld.fail }}"><span style="color:var(--danger)">{{ s.saveFail }}</span><button onClick="{{ blurFld }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:600;padding:0;font-size:12px">{{ s.retry }}</button></sc-if>
+            </div>
+          </div>
+          <div style="padding:10px 18px;font-size:12px;color:var(--faint)">{{ s.vFieldHint }}</div>
+          <div style="display:flex;flex-direction:column;border-top:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:8px;height:var(--row);padding:0 18px;font-size:12px"><span style="width:12px;height:12px;border-radius:50%;border:2px solid var(--muted);border-right-color:transparent"></span><span style="color:var(--muted)">{{ s.saving }}</span></div>
+            <div style="display:flex;align-items:center;gap:8px;height:var(--row);padding:0 18px;font-size:12px;color:var(--ok)"><span>✓</span>{{ s.saved }}<span style="font-family:var(--mono);font-size:11px;color:var(--faint)">→ 2 s</span></div>
+            <div style="display:flex;align-items:center;gap:8px;height:var(--row);padding:0 18px;font-size:12px"><span style="color:var(--danger)">{{ s.saveFail }}</span><span style="color:var(--accent);font-weight:600">{{ s.retry }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c06Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c07 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-07" data-screen-label="C-07" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-07</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c07T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c07P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+      <div style="width:460px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vSessEnded }}</div>
+        <div role="alertdialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow)">
+          <div style="padding:20px 22px 4px"><div style="font-size:16px;font-weight:600">{{ s.sessEndTitle }}</div><div style="color:var(--muted);margin-top:6px;line-height:1.5">{{ s.sessEnded }}</div></div>
+          <div style="padding:14px 22px"><div style="padding:10px 12px;border-radius:var(--r-ctl);background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--muted);line-height:1.5">{{ s.sessCleanup }}</div></div>
+          <div style="padding:6px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500">{{ s.noAccount }}</button>
+            <button style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.signIn }}</button>
+          </div>
+        </div>
+      </div>
+      <div style="width:460px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vSessOther }}</div>
+        <div role="alertdialog" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-modal);box-shadow:var(--shadow)">
+          <div style="padding:20px 22px 4px"><div style="font-size:16px;font-weight:600">{{ s.sessEndTitle }}</div><div style="color:var(--muted);margin-top:6px;line-height:1.5">{{ s.sessRenewFail }}</div></div>
+          <div style="padding:20px 22px;display:flex;justify-content:flex-end;gap:8px">
+            <button style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);font-weight:500">{{ s.noAccount }}</button>
+            <button style="height:var(--btn);padding:0 18px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.signIn }}</button>
+          </div>
+        </div>
+      </div>
+      <div style="width:460px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vSessWeb }}</div>
+        <div style="padding:24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div role="status" style="width:380px;display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--info) 10%, transparent);border:1px solid color-mix(in oklch, var(--info) 40%, var(--border));line-height:1.45"><span aria-hidden="true" style="color:var(--info);font-weight:700">i</span><span>{{ s.webExpired }}</span></div>
+          <div style="width:380px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:18px;display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:18px;font-weight:600">{{ s.login }}</div>
+            <div style="height:40px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center">marta@example.com</div>
+            <div style="height:40px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;color:var(--faint)">{{ s.password }}</div>
+            <button style="height:42px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.signIn }}</button>
+            <span style="font-family:var(--mono);font-size:11px;color:var(--faint)">?next=/dashboard/team</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c07Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c08 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-08" data-screen-label="C-08" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-08</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c08T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c08P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+      <div style="width:580px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vTeamRo }}</div>
+        <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:12px">
+          <div style="font-weight:600;font-size:14px">ACME Studio · {{ s.teamT }}</div>
+          <div role="note" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--info) 10%, transparent);border:1px solid color-mix(in oklch, var(--info) 40%, var(--border));font-size:12.5px;line-height:1.45"><span aria-hidden="true" style="color:var(--info);font-weight:700">i</span><span>{{ f.roTeam }}</span></div>
+          <sc-for list="{{ members }}" as="m" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;min-height:var(--row)">
+              <span style="width:28px;height:28px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ m.color }}">{{ m.ini }}</span>
+              <div style="flex:1;min-width:0"><div style="font-weight:500">{{ m.name }}</div><div style="font-size:12px;color:var(--faint)">{{ m.email }}</div></div>
+              <span style="position:relative;display:inline-flex">
+                <span aria-disabled="true" title="{{ s.onlyAdmins }}" style="height:30px;width:120px;padding:0 10px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;opacity:.5;cursor:not-allowed;font-size:12.5px">{{ m.role }}<span style="font-size:9px">▾</span></span>
+                <sc-if value="{{ m.tip }}"><span role="tooltip" style="position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap;padding:6px 10px;border-radius:var(--r-sm);background:var(--text);color:var(--bg);font-size:12px;font-weight:500">{{ s.onlyAdmins }}</span></sc-if>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="width:520px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vKeysRo }}</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+          <div style="padding:14px 18px;font-weight:600;font-size:14px">{{ s.orgKeysT }}</div>
+          <div role="note" style="margin:0 18px 12px;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--info) 10%, transparent);border:1px solid color-mix(in oklch, var(--info) 40%, var(--border));font-size:12.5px"><span aria-hidden="true" style="color:var(--info);font-weight:700">i</span><span>{{ s.roOrgKeys }}</span></div>
+          <sc-for list="{{ orgKeys }}" as="k" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:12px;min-height:calc(var(--row) + 14px);padding:8px 18px;border-top:1px solid var(--border)">
+              <span style="width:30px;height:30px;flex-shrink:0;border-radius:var(--r-sm);display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ k.color }}">{{ k.abbr }}</span>
+              <div style="flex:1;min-width:0"><div style="font-weight:500">{{ k.label }}</div><div style="font-family:var(--mono);font-size:11.5px;color:var(--faint)">{{ k.masked }}</div></div>
+              <span style="height:22px;padding:0 8px;border-radius:var(--r-sm);display:flex;align-items:center;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);white-space:nowrap">{{ s.orgChip }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="width:520px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vBillRo }}</div>
+        <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:12px">
+          <div style="font-weight:600;font-size:14px">{{ s.billingT }}</div>
+          <div role="note" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--info) 10%, transparent);border:1px solid color-mix(in oklch, var(--info) 40%, var(--border));font-size:12.5px"><span aria-hidden="true" style="color:var(--info);font-weight:700">i</span><span>{{ s.roBilling }}</span></div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-top:4px">
+            <div style="flex:1;min-width:200px"><div style="font-weight:600">{{ s.planName }}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">{{ s.planSub }}</div></div>
+            <span style="position:relative;display:inline-flex"><button disabled="{{ true }}" style="height:32px;padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);font-weight:500;opacity:.45;cursor:not-allowed">{{ s.manageSub }}</button><span role="tooltip" style="position:absolute;right:0;bottom:calc(100% + 8px);white-space:nowrap;padding:6px 10px;border-radius:var(--r-sm);background:var(--text);color:var(--bg);font-size:12px;font-weight:500">{{ s.onlyOwner }}</span></span>
+          </div>
+        </div>
+      </div>
+      <div style="width:440px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.v403 }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><span style="width:8px;height:8px;flex-shrink:0;border-radius:50%;background:var(--danger)"></span><span style="flex:1;line-height:1.4">{{ f.forbidden }}</span><button aria-label="{{ s.closeLabel }}" style="width:24px;height:24px;border-radius:var(--r-sm);border:0;background:transparent;color:var(--faint);font-size:15px">×</button></div>
+          <div style="padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;border:1px dashed var(--border);border-radius:var(--r-card)"><span aria-hidden="true" style="font-size:24px;line-height:1;color:var(--faint)">∅</span><span style="color:var(--muted)">{{ s.notFound }}</span></div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c08Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c09 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-09" data-screen-label="C-09" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-09</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c09T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c09P }}</p>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+      <div style="width:600px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vSegmented }}</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 18px;border-bottom:1px solid var(--border)">
+            <div style="flex:1;min-width:200px"><div style="font-weight:500">{{ s.themeL }}</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45">{{ s.themeSystemD }}</div></div>
+            <div role="radiogroup" style="display:flex;padding:3px;border-radius:var(--r-ctl);background:var(--bg);border:1px solid var(--border)">
+              <sc-for list="{{ themeOpts }}" as="o" hint-placeholder-count="3"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="height:30px;padding:0 14px;border:0;border-radius:var(--r-sm);cursor:pointer;font-size:12px;font-weight:500;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 18px">
+            <div style="flex:1;min-width:200px"><div style="font-weight:500">{{ s.langL }}</div><div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--info);margin-top:2px"><span aria-hidden="true">i</span>{{ s.langDetected }}</div></div>
+            <div style="height:32px;width:150px;padding:0 10px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between">{{ langName }}<span style="font-size:9px;color:var(--faint)">▾</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="width:420px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vSwitch }}</div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-panel)">
+          <sc-for list="{{ switchRows }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div role="radiogroup" style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border);background:var(--bg)">
+                <sc-for list="{{ r.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" title="{{ o.label }}" aria-label="{{ o.label }}" style="width:30px;height:24px;border:0;border-radius:6px;cursor:pointer;font-size:13px;display:grid;place-items:center;background:{{ o.bg }};color:{{ o.color }}">{{ o.glyph }}</button></sc-for>
+              </div>
+              <span style="font-size:12px;color:var(--muted)">{{ r.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c09Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ show.c10 }}" hint-placeholder-val="{{ true }}">
+  <section id="C-10" data-screen-label="C-10" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:860px">
+      <div style="display:flex;align-items:center;gap:12px"><span style="font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent)">C-10</span><h2 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.02em">{{ s.c10T }}</h2></div>
+      <p style="margin:0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ s.c10P }}</p>
+    </div>
+    <div style="width:1240px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vMatrix }}</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+        <div style="display:grid;grid-template-columns:170px repeat(5,minmax(0,1fr));gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">
+          <span></span><sc-for list="{{ stCols }}" as="c" hint-placeholder-count="5"><span>{{ c }}</span></sc-for>
+        </div>
+        <sc-for list="{{ matrix }}" as="row" hint-placeholder-count="14">
+          <div style="display:grid;grid-template-columns:170px repeat(5,minmax(0,1fr));gap:12px;align-items:center;min-height:64px;padding:10px 18px;border-bottom:1px solid var(--border)">
+            <span style="font-weight:500;color:var(--muted)">{{ row.label }}</span>
+            <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;min-width:0;padding:4px">
+                <div style="display:flex;align-items:center;justify-content:{{ c.jc }};gap:8px;flex-shrink:0;max-width:100%;min-width:0;width:{{ c.w }};height:{{ c.h }};padding:{{ c.pad }};border-radius:{{ c.r }};background:{{ c.bg }};color:{{ c.fg }};border:1px solid {{ c.bd }};box-shadow:{{ c.ring }};outline:{{ c.outline }};outline-offset:{{ c.oo }};opacity:{{ c.op }};font-weight:{{ c.fw }};font-family:{{ c.ff }};font-size:12.5px;white-space:nowrap;overflow:hidden">
+                  <sc-if value="{{ c.isToggle }}"><span style="width:16px;height:16px;border-radius:50%;background:white;margin-left:18px;box-shadow:0 1px 2px rgba(0,0,0,.3)"></span></sc-if>
+                  <sc-if value="{{ c.isCheck }}"><span style="color:var(--accent-ink);font-size:11px;font-weight:700">✓</span></sc-if>
+                  <sc-if value="{{ c.isSeg }}"><span style="height:22px;padding:0 9px;border-radius:5px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:600">ES</span><span style="height:22px;padding:0 9px;display:grid;place-items:center;color:var(--muted);font-size:11px;font-weight:600">EN</span></sc-if>
+                  <sc-if value="{{ c.isNode }}"><span style="width:14px;height:14px;flex-shrink:0;border-radius:50%;background:oklch(0.72 0.15 190)"></span></sc-if>
+                  <sc-if value="{{ c.hasText }}"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis">{{ c.text }}</span></sc-if>
+                  <sc-if value="{{ c.hasCaret }}"><span style="margin-left:auto;font-size:9px;color:var(--faint)">▾</span></sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+      <div style="width:600px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vKeys }}</div>
+        <div style="padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:10px;line-height:1.5">
+          <span>{{ s.keysD }}</span>
+          <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">{{ s.kbdNote }}</span>
+          <div style="display:flex;gap:8px;align-items:center"><button aria-label="{{ s.moreActions }}" style="width:30px;height:30px;border-radius:8px;border:0;background:var(--surface2);color:var(--muted);font-size:16px;outline:2px solid var(--focus);outline-offset:2px">⋯</button><span style="font-family:var(--mono);font-size:12px;color:var(--faint)">aria-label="{{ s.moreActions }}"</span></div>
+        </div>
+      </div>
+      <div style="width:600px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">Web · {{ s.skipContent }}</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden;position:relative">
+          <a href="#C-10" style="position:absolute;left:16px;top:12px;z-index:1;padding:8px 14px;border-radius:var(--r-ctl);background:var(--accent);color:var(--accent-ink);font-weight:600;text-decoration:none;outline:2px solid var(--focus);outline-offset:2px">{{ s.skipContent }}</a>
+          <div style="height:64px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid var(--border);opacity:.4"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent)"></div><span style="font-weight:600">Ramal</span></div>
+          <div style="padding:24px 20px;display:flex;flex-direction:column;gap:10px;opacity:.4"><span style="height:16px;width:60%;border-radius:var(--r-sm);background:var(--surface2)"></span><span style="height:10px;width:40%;border-radius:var(--r-sm);background:var(--surface2)"></span></div>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ isVs }}"><div style="max-width:860px;padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)">{{ s.vsNative }}</div><div style="white-space:pre-line;line-height:1.55">{{ s.c10Vs }}</div></div></sc-if>
+  </section>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;product&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;desktop&quot;,&quot;vscode&quot;,&quot;web&quot;],&quot;default&quot;:&quot;desktop&quot;,&quot;tsType&quot;:&quot;'desktop'|'vscode'|'web'&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;all&quot;,&quot;C-01&quot;,&quot;C-02&quot;,&quot;C-03&quot;,&quot;C-04&quot;,&quot;C-05&quot;,&quot;C-06&quot;,&quot;C-07&quot;,&quot;C-08&quot;,&quot;C-09&quot;,&quot;C-10&quot;],&quot;default&quot;:&quot;all&quot;,&quot;tsType&quot;:&quot;'all'|'C-01'|'C-02'|'C-03'|'C-04'|'C-05'|'C-06'|'C-07'|'C-08'|'C-09'|'C-10'&quot;}}">
+const IDS = ['C-01', 'C-02', 'C-03', 'C-04', 'C-05', 'C-06', 'C-07', 'C-08', 'C-09', 'C-10'];
+const EXISTING = ['main', 'develop', 'feature/graph-ui', 'hotfix/login'];
+const BAD = /(\s|\.\.|[~^:?*\[\\]|\/$|\.lock$|^\/|^-|@\{)/;
+
+class Component extends DCLogic {
+  state = { product: 'desktop', theme: 'dark', lang: 'es', sel: 'all', dlgOpen: false, copied: false, br: { val: '', err: '', checking: false, ok: '' }, net: 'offline', popOpen: true, netToast: false, fld: { val: 'Marta Ruiz', st: 'idle' }, themeOpt: 'system', ready: false };
+  brRef = React.createRef();
+
+  componentDidMount() {
+    const p = this.props;
+    this.setState({ product: p.product || 'desktop', theme: p.theme || 'dark', lang: p.lang || 'es', sel: p.state || 'all' });
+    const go = () => (window.RAMAL && window.RAMAL.STATES) ? this.setState({ ready: true }) : setTimeout(go, 30);
+    go();
+    this.syncBody();
+  }
+  componentDidUpdate(pp) {
+    const p = this.props, up = {};
+    ['product', 'theme', 'lang'].forEach(k => { if (pp[k] !== p[k] && p[k]) up[k] = p[k]; });
+    if (pp.state !== p.state && p.state) up.sel = p.state;
+    if (Object.keys(up).length) this.setState(up);
+    this.syncBody();
+  }
+  componentWillUnmount() { clearTimeout(this._t1); clearTimeout(this._t2); clearTimeout(this._t3); }
+  syncBody() { document.body.dataset.theme = this.state.theme; document.body.dataset.product = this.state.product; }
+
+  fmt(str, v) { let x = str || ''; for (const k in v) x = x.split('{' + k + '}').join(v[k]); return x; }
+
+  validateBr(val) {
+    const t = this.T; const v = val.trim();
+    if (!v) return t.reqName;
+    if (BAD.test(v)) return t.badBranch;
+    return '';
+  }
+  onBr = e => this.setState({ br: { ...this.state.br, val: e.target.value, ok: '' } });
+  blurBr = () => { const b = this.state.br; if (!b.val && !b.err) return; this.setState({ br: { ...b, err: this.validateBr(b.val) } }); };
+  keyBr = e => { if (e.key === 'Enter') this.submitBr(); };
+  submitBr = () => {
+    const b = this.state.br; if (b.checking) return;
+    const err = this.validateBr(b.val);
+    if (err) { this.setState({ br: { ...b, err, ok: '' } }); if (this.brRef.current) this.brRef.current.focus(); return; }
+    this.setState({ br: { ...b, err: '', checking: true } });
+    this._t1 = setTimeout(() => {
+      const v = this.state.br.val.trim();
+      if (EXISTING.includes(v)) { this.setState({ br: { ...this.state.br, checking: false, err: this.T.branchExists } }); if (this.brRef.current) this.brRef.current.focus(); }
+      else this.setState({ br: { val: '', err: '', checking: false, ok: v } });
+    }, 800);
+  };
+  resetBr = () => this.setState({ br: { val: '', err: '', checking: false, ok: '' } });
+
+  retryNet = () => {
+    if (this.state.net === 'reconnecting') return;
+    this.setState({ net: 'reconnecting' });
+    this._t2 = setTimeout(() => this.setState({ net: 'online', popOpen: false, netToast: true }), 1400);
+  };
+  resetNet = () => this.setState({ net: 'offline', popOpen: true, netToast: false });
+
+  blurFld = () => {
+    const v = this.state.fld.val;
+    this.setState({ fld: { val: v, st: 'saving' } });
+    clearTimeout(this._t3);
+    this._t3 = setTimeout(() => this.setState({ fld: { val: this.state.fld.val, st: /error/i.test(v) ? 'fail' : 'saved' } }), 900);
+  };
+
+  renderVals() {
+    const st = this.state;
+    const R = window.RAMAL;
+    const L = st.lang === 'en' ? 1 : 0;
+    const s = {};
+    if (R && R.STATES) for (const k in R.STATES) s[k] = R.STATES[k][L];
+    this.T = s;
+    const fm = (k, v) => this.fmt(s[k], v);
+    const ago2 = L ? '2 min ago' : 'hace 2 min';
+    const isVs = st.product === 'vscode';
+
+    const seg = (label, key, opts) => ({ label, opts: opts.map(([v, l]) => { const on = st[key] === v; return { label: l, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ [key]: v }) }; }) });
+    const segs = [
+      seg(s.lblProduct, 'product', [['desktop', 'Desktop'], ['vscode', 'VS Code'], ['web', 'Web']]),
+      seg(s.lblTheme, 'theme', [['dark', s.themeDark], ['light', s.themeLight]]),
+      seg(s.lblLang, 'lang', [['es', 'ES'], ['en', 'EN']])
+    ];
+    const titles = { 'C-01': s.c01T, 'C-02': s.c02T, 'C-03': s.c03T, 'C-04': s.c04T, 'C-05': s.c05T, 'C-06': s.c06T, 'C-07': s.c07T, 'C-08': s.c08T, 'C-09': s.c09T, 'C-10': s.c10T };
+    const nav = ['all', ...IDS].map(id => { const on = st.sel === id; return { label: id === 'all' ? s.all : id, title: titles[id] || '', bg: on ? 'var(--accent-soft)' : 'var(--surface)', border: on ? 'var(--accent)' : 'var(--border)', color: on ? 'var(--accent)' : 'var(--text)', onClick: () => this.setState({ sel: id }) }; });
+    const show = {}; IDS.forEach(id => { show['c' + id.slice(2)] = st.sel === 'all' || st.sel === id; });
+
+    const f = {
+      hookTitle: fm('hookTitle', { hook: 'pre-push' }), serverErr: fm('serverErr', { reason: s.seatReason }),
+      prsNeedGh: fm('prsNeedAcc', { platform: 'GitHub' }), noResultsQ: fm('noResultsQ', { query: 'kubernetes' }), noCommitsQ: fm('noCommitsQ', { query: 'oauth refresh' }),
+      pending3: fm('pending_other', { count: 3 }), pending1: fm('pending_one', { count: 1 }), cachedCopy: fm('cachedCopy', { ago: L ? '12 min ago' : 'hace 12 min' }),
+      syncedAgo: fm('syncedAgo', { ago: ago2 }), syncsWith: fm('syncsWith', { ago: ago2 }), discarded: fm('discarded', { category: s.secAiKeys }),
+      roTeam: fm('roTeam', { org: 'ACME Studio' }), forbidden: fm('forbidden', { org: 'ACME Studio' })
+    };
+
+    const op = i => (1 - i * 0.18).toFixed(2);
+    const sk3 = [[60, 44, 72], [48, 56, 64], [66, 38, 58]].map(([a, b, c], i) => ({ a, b, c, op: op(i) }));
+    const sk4 = [72, 54, 66, 48].map((a, i) => ({ a, op: op(i) }));
+    const skGraph = [[96, 0, 64], [0, 0, 48], [72, 20, 70], [0, 0, 56], [0, 20, 44], [84, 0, 60]].map(([ref, x, msg], i) => ({ ref, x: x + 2, msg, op: (1 - i * 0.12).toFixed(2) }));
+    const skList = [['50%', 46, 34, 70, s.roleMember], ['10px', 52, 40, 84, s.secPlatforms], ['10px', 40, 50, 60, 'AI'], ['10px', 44, 30, 48, s.secAccount]].map(([r, a, b, c, tag]) => ({ r, a, b, c, tag }));
+
+    const toasts = [
+      { k: 'ok', c: 'var(--ok)', t: s.saved, d: L ? '3.2 s' : '3,2 s' },
+      { k: 'info', c: 'var(--info)', t: s.detailCopied, d: L ? '3.2 s' : '3,2 s' },
+      { k: 'warn', c: 'var(--warn)', t: s.slowLoad, d: '6 s' },
+      { k: 'error', c: 'var(--danger)', t: fm('errFetchToast', { remote: 'origin' }), d: '∞', close: 1 },
+      { k: 'error', c: 'var(--danger)', t: fm('hookTitle', { hook: 'pre-push' }), d: '∞', close: 1, act: s.viewDetail }
+    ].map(x => ({ kind: x.k, color: x.c, text: x.t, dur: x.d, hasClose: !!x.close, hasAction: !!x.act, action: x.act || '' }));
+    const codes = [['timeout', s.errTimeout], ['transport', s.errTransport], ['internal', s.errInternal], ['unavailable', s.apiDownHelp]].map(([code, text]) => ({ code, text }));
+
+    const b = st.br;
+    const br = { val: b.val, err: b.err, hasErr: !!b.err, noErr: !b.err, invalid: !!b.err, border: b.err ? 'var(--danger)' : 'var(--border)', checking: b.checking, btn: b.checking ? s.busyChecking : s.create, op: b.checking ? 0.75 : 1, hasOk: !!b.ok, ok: b.ok };
+
+    const sbEmpty = [[s.secStashes, s.noStashes, s.noStashesD], [s.secTags, s.noTags], [s.secSubs, s.noSubmodules]].map(([title, line, sub]) => ({ title, line, sub: sub || '', hasSub: !!sub }));
+    const panelEmpty = [
+      { title: s.noRemotes, btn: s.addRemote },
+      { title: s.noPrs },
+      { title: fm('prsNeedAcc', { platform: 'GitLab' }), btn: s.connectAcc },
+      { head: 'GitHub', abbr: 'GH', badge: 'oklch(0.5 0.03 260)', title: s.noAccounts, btn: s.connectAcc },
+      { title: s.noKeys, btn: s.addKey }
+    ].map(e => ({ ...e, hasHead: !!e.head, head: e.head || '', abbr: e.abbr || '', badge: e.badge || '', hasLine: false, line: '', hasBtn: !!e.btn, btn: e.btn || '' }));
+
+    const nt = st.net;
+    const net = { chip: nt !== 'online', ok: nt === 'online', spin: nt === 'reconnecting', cloudOff: nt === 'offline', chipLabel: nt === 'reconnecting' ? s.reconnecting : s.offline, popOpen: st.popOpen && nt !== 'online', title: s.offline, btn: nt === 'reconnecting' ? s.reconnecting : s.retryNow, toast: st.netToast };
+    const members = [['Marta Ruiz', 'marta@example.com', s.roleOwner, 'oklch(0.68 0.2 300)', 'MR'], ['Diego León', 'diego@example.com', s.roleAdmin, 'oklch(0.76 0.16 60)', 'DL', 1], ['Aiko Tanaka', 'aiko@example.com', s.roleMember, 'oklch(0.74 0.18 140)', 'AT']].map(([name, email, role, color, ini, tip]) => ({ name, email, role, color, ini, tip: !!tip }));
+    const orgKeys = [['AN', 'oklch(0.62 0.12 45)', 'ACME · Anthropic', 'sk-ant-••••••••9c1e'], ['OA', 'oklch(0.5 0.02 230)', 'ACME · OpenAI', 'sk-proj-••••••••2b7d']].map(([abbr, color, label, masked]) => ({ abbr, color, label, masked }));
+
+    const syncIcons = [
+      { glyph: '☁', label: s.synced, tip: f.syncedAgo },
+      { glyph: '⟳', label: s.syncing, tip: s.syncing, anim: 'spin 1s linear infinite' },
+      { glyph: '☁', label: L ? 'Pending' : 'Pendiente', tip: f.pending3, badge: 1 },
+      { glyph: '☁', label: s.syncFail, tip: s.syncFail, dot: 1 },
+      { chip: 1, label: s.offline, tip: 'C-05' }
+    ].map(i => ({ isChip: !!i.chip, isIcon: !i.chip, glyph: i.glyph || '', label: i.label, tip: i.tip, anim: i.anim || 'none', hasBadge: !!i.badge, hasDot: !!i.dot }));
+
+    const fl = st.fld;
+    const fld = { val: fl.val, saving: fl.st === 'saving', saved: fl.st === 'saved', fail: fl.st === 'fail' };
+
+    const tOpts = [['system', s.themeSystem, '◐'], ['light', s.themeLight, '☀︎'], ['dark', s.themeDark, '☾']];
+    const themeOpts = tOpts.map(([v, label]) => { const on = st.themeOpt === v; return { label, on, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ themeOpt: v }) }; });
+    const switchRows = tOpts.map(([sv, sl]) => ({ label: sl, opts: tOpts.map(([v, label, glyph]) => { const on = v === sv; return { label, glyph, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ themeOpt: v }) }; }) }));
+
+    const stCols = [s.stRest, s.stHover, s.stFocus, s.stPressed, s.stDisabled];
+    const ring2 = isVs ? '1px solid var(--focus)' : '2px solid var(--focus)';
+    const darker = c => `color-mix(in oklch, ${c} 82%, black)`;
+    const KINDS = [
+      ['kBtnP', { text: s.save, bg: 'var(--accent)', fg: 'var(--accent-ink)', bd: 'transparent', fw: 600, ctl: 1, hov: 'color-mix(in oklch, var(--accent) 88%, var(--text))', prs: darker('var(--accent)') }],
+      ['kBtnS', { text: s.cancel, bg: 'var(--surface)', fg: 'var(--text)', bd: 'var(--border)', fw: 500, ctl: 1, hov: 'var(--surface2)', prs: 'color-mix(in oklch, var(--surface2) 85%, var(--text))' }],
+      ['kBtnD', { text: s.del, bg: 'var(--danger)', fg: 'var(--danger-ink)', bd: 'transparent', fw: 600, ctl: 1, hov: 'color-mix(in oklch, var(--danger) 88%, var(--text))', prs: darker('var(--danger)') }],
+      ['kIcon', { text: '⋯', w: 'var(--btn)', pad: '0', jc: 'center', bg: 'transparent', fg: 'var(--muted)', bd: 'transparent', ctl: 1, hov: 'var(--surface2)', prs: 'color-mix(in oklch, var(--surface2) 80%, var(--text))' }],
+      ['kToggle', { toggle: 1, w: '38px', h: '22px', r: '11px', pad: '0 3px', jc: 'flex-start', bg: 'var(--accent)', bd: 'transparent', ctl: 1, hov: 'color-mix(in oklch, var(--accent) 88%, var(--text))', prs: darker('var(--accent)') }],
+      ['kSeg', { seg: 1, h: '30px', pad: '2px', r: '8px', bg: 'var(--bg)', bd: 'var(--border)', ctl: 1, hov: 'var(--surface2)', prs: 'var(--surface2)' }],
+      ['kCheck', { check: 1, w: '16px', h: '16px', r: '4px', pad: '0', jc: 'center', bg: 'var(--accent)', bd: 'transparent', ctl: 1, hov: 'color-mix(in oklch, var(--accent) 88%, var(--text))', prs: darker('var(--accent)') }],
+      ['kSelect', { text: 'main', caret: 1, w: '140px', bg: 'var(--bg)', fg: 'var(--text)', bd: 'var(--border)', ctl: 1, hov: 'var(--surface2)', prs: 'var(--surface2)', ff: 'var(--mono)' }],
+      ['kInput', { text: 'feature/login', w: '160px', bg: 'var(--bg)', fg: 'var(--text)', bd: 'var(--border)', input: 1, hovBd: 'var(--faint)', ff: 'var(--mono)' }],
+      ['kTab', { text: s.home, h: '34px', r: '9px 9px 0 0', bg: 'transparent', fg: 'var(--muted)', bd: 'transparent', fw: 500, ctl: 1, hovFg: 'var(--text)', prs: 'var(--bg)', prsShadow: 'inset 0 2px 0 var(--accent)' }],
+      ['kRow', { text: 'feature/graph-ui', w: '100%', h: 'var(--sbh)', r: 'var(--r-sm)', bg: 'transparent', fg: 'var(--text)', bd: 'transparent', inset: 1, hov: 'var(--surface2)', prs: 'color-mix(in oklch, var(--surface2) 80%, var(--text))', ff: 'var(--mono)' }],
+      ['kCard', { text: 'ramal-desktop', w: '100%', h: '48px', r: 'var(--r-card)', bg: 'var(--surface)', fg: 'var(--text)', bd: 'var(--border)', fw: 600, inset: 1, hovBd: 'var(--accent)', prs: 'var(--surface2)' }],
+      ['kMenu', { text: 'Checkout', w: '100%', h: 'var(--menu)', r: 'var(--r-sm)', bg: 'transparent', fg: 'var(--text)', bd: 'transparent', inset: 1, hov: 'var(--surface2)', prs: 'color-mix(in oklch, var(--surface2) 80%, var(--text))' }],
+      ['kGraph', { text: 'Fix login redirect loop', node: 1, w: '100%', h: 'var(--row)', r: '0', bg: 'transparent', fg: 'var(--text)', bd: 'transparent', inset: 1, hov: 'var(--surface2)', prs: 'var(--accent-soft)' }]
+    ];
+    const matrix = KINDS.map(([lk, k]) => ({
+      label: s[lk],
+      cells: ['rest', 'hover', 'focus', 'pressed', 'disabled'].map(sv => {
+        const c = { w: k.w || 'auto', h: k.h || 'var(--btn)', pad: k.pad || '0 12px', r: k.r || 'var(--r-ctl)', jc: k.jc || 'flex-start', bg: k.bg, fg: k.fg || 'var(--text)', bd: k.bd, ring: 'none', outline: 'none', oo: '0', op: 1, fw: k.fw || 400, ff: k.ff || 'inherit', text: k.text || '', hasText: !!k.text, hasCaret: !!k.caret, isToggle: !!k.toggle, isCheck: !!k.check, isSeg: !!k.seg, isNode: !!k.node };
+        if (sv === 'hover') { if (k.hov) c.bg = k.hov; if (k.hovBd) c.bd = k.hovBd; if (k.hovFg) c.fg = k.hovFg; }
+        if (sv === 'pressed') { if (k.prs) c.bg = k.prs; if (k.prsShadow) { c.ring = k.prsShadow; c.fg = 'var(--text)'; } if (k.hovBd) c.bd = k.hovBd; }
+        if (sv === 'focus') {
+          if (k.input) c.bd = 'var(--focus)';
+          else if (k.inset) { c.bg = 'var(--surface2)'; if (isVs) { c.outline = '1px solid var(--focus)'; c.oo = '-1px'; } else c.ring = 'inset 0 0 0 2px var(--focus)'; }
+          else { c.outline = ring2; c.oo = '2px'; }
+        }
+        if (sv === 'disabled') c.op = 0.45;
+        return c;
+      })
+    }));
+
+    return {
+      s, f, segs, nav, show, isVs, sk3, sk4, skGraph, skList, toasts, codes,
+      dlgOpen: st.dlgOpen, dlgChev: st.dlgOpen ? '▾' : '▸', toggleDlg: () => this.setState({ dlgOpen: !st.dlgOpen }),
+      copyLabel: st.copied ? s.detailCopied : s.copyDetail, copyDetail: () => { this.setState({ copied: true }); setTimeout(() => this.setState({ copied: false }), 2000); },
+      br, brRef: this.brRef, onBr: this.onBr, blurBr: this.blurBr, keyBr: this.keyBr, submitBr: this.submitBr, resetBr: this.resetBr,
+      sbEmpty, panelEmpty, net, togglePop: () => this.setState({ popOpen: !st.popOpen }), retryNet: this.retryNet, resetNet: this.resetNet, members, orgKeys,
+      syncIcons, fld, onFld: e => this.setState({ fld: { val: e.target.value, st: 'idle' } }), blurFld: this.blurFld,
+      themeOpts, switchRows, langName: st.lang === 'en' ? 'English' : 'Español', stCols, matrix
+    };
+  }
+}
+</script>
+</body>
+</html>

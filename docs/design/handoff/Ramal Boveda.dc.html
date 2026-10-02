@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;--fs:13px;--row:40px;--btn:34px;--r-sm:6px;--r-ctl:9px;--r-card:12px;--r-panel:14px;--r-modal:16px;
+--canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);--danger-ink:oklch(0.99 0 0);
+--shadow:0 12px 40px oklch(0.05 0.01 230 / 0.5),0 2px 6px oklch(0.05 0.01 230 / 0.3);
+--ov-bg:oklch(0.1 0.01 230 / 0.55);--ov-align:center;--ov-pad:28px;--m-w:580px;--m-bg:var(--surface);--m-border:1px solid var(--border);--m-shadow:var(--shadow);--x-show:grid;--vs-show:none;
+font-family:var(--font);font-size:var(--fs);background:var(--canvas);color:var(--text)}
+body[data-theme="light"]{--canvas:oklch(0.935 0.005 230);--bg:oklch(0.965 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.94 0.006 230);--border:oklch(0.89 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);--shadow:0 12px 40px oklch(0.3 0.02 230 / 0.16),0 2px 6px oklch(0.3 0.02 230 / 0.08);--ov-bg:oklch(0.3 0.02 230 / 0.35)}
+body[data-product="web"]{--fs:14px}
+body[data-product="vscode"]{--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--mono:Menlo,Consolas,monospace;--row:28px;--btn:26px;--r-sm:2px;--r-ctl:2px;--r-card:4px;--r-panel:4px;--r-modal:0px;
+--canvas:#141414;--bg:#1f1f1f;--panel:#181818;--surface:#202020;--surface2:#2a2d2e;--border:#2b2b2b;--text:#cccccc;--muted:#9d9d9d;--faint:#8b8b8b;--accent:#0078d4;--accent-ink:#ffffff;--accent-soft:rgba(0,120,212,.18);
+--ok:#73c991;--warn:#cca700;--danger:#f85149;--info:#3794ff;--shadow:0 8px 24px rgba(0,0,0,.5);
+--ov-bg:var(--bg);--ov-align:flex-start;--ov-pad:20px 28px;--m-w:820px;--m-bg:transparent;--m-border:0;--m-shadow:none;--x-show:none;--vs-show:flex}
+body[data-product="vscode"][data-theme="light"]{--canvas:#ececec;--bg:#ffffff;--panel:#f8f8f8;--surface:#f8f8f8;--surface2:#f0f0f0;--border:#e5e5e5;--text:#3b3b3b;--muted:#616161;--faint:#6f6f6f;--accent:#005fb8;--accent-soft:rgba(0,95,184,.12);--ok:#388a34;--warn:#9a6b00;--danger:#c72e0f;--info:#005fb8;--shadow:0 8px 24px rgba(0,0,0,.16)}
+*{box-sizing:border-box}
+a{color:var(--accent)} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes bar{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:36px 44px 80px;display:flex;flex-direction:column;gap:22px;background:var(--canvas);color:var(--text);font-family:var(--font);font-size:var(--fs)">
+
+  <header style="display:flex;flex-direction:column;gap:14px;max-width:1180px">
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Ramal</span><span style="font-family:var(--mono);font-size:12px;color:var(--faint)">#63 · K-01 – K-10 · X-03 · X-04</span></div>
+    <div><h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.02em">{{ c.title }}</h1><p style="margin:6px 0 0;max-width:780px;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ c.sub }}</p></div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end">
+      <sc-for list="{{ segs }}" as="g" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ g.label }}</span>
+          <div style="display:flex;padding:2px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="height:28px;padding:0 12px;border:0;border-radius:var(--r-sm);cursor:pointer;font-size:12px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ nav }}" as="n" hint-placeholder-count="12"><button onClick="{{ n.onClick }}" title="{{ n.title }}" style="height:30px;padding:0 11px;border-radius:var(--r-sm);cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:600;border:1px solid {{ n.border }};background:{{ n.bg }};color:{{ n.color }};opacity:{{ n.op }}">{{ n.label }}</button></sc-for></div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent)">{{ scr.id }}</span><span style="font-size:16px;font-weight:600">{{ scr.title }}</span><span style="color:var(--muted);font-size:12.5px">{{ scr.note }}</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ subs }}" as="x" hint-placeholder-count="6"><button onClick="{{ x.onClick }}" style="height:26px;padding:0 10px;border-radius:13px;cursor:pointer;font-size:12px;font-weight:500;border:1px solid {{ x.border }};background:{{ x.bg }};color:{{ x.color }}">{{ x.label }}</button></sc-for></div>
+    </div>
+  </header>
+
+  <div style="width:1180px;height:720px;position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:var(--bg)">
+    <div style="height:40px;display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--panel);border-bottom:1px solid var(--border)">
+      <span style="width:20px;height:20px;border-radius:6px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:11px">R</span>
+      <span style="font-weight:600">{{ frame.title }}</span><span style="color:var(--faint);font-size:12px">{{ frame.crumb }}</span>
+    </div>
+    <div style="position:absolute;top:40px;left:0;right:0;bottom:0;overflow:auto">
+      <div style="max-width:880px;margin:0 auto;padding:28px 32px 48px;display:flex;flex-direction:column;gap:16px">
+        <div><div style="font-size:22px;font-weight:600;letter-spacing:-0.02em">{{ page.title }}</div><sc-if value="{{ page.hasSub }}"><div style="margin-top:4px;font-size:12px;color:var(--faint)">{{ page.sub }}</div></sc-if></div>
+
+        <sc-if value="{{ page.isAccount }}">
+          <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <div style="flex:1;min-width:220px"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ c.session }}</div><div style="margin-top:4px;font-family:var(--mono);font-weight:600">marta@example.com</div></div>
+            <button onClick="{{ act.signOut }}" style="height:var(--btn);padding:0 14px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;color:var(--danger)">{{ v.signOut }}</button>
+          </div>
+          <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:10px"><span aria-hidden="true" style="width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center">⚿</span><span style="flex:1;font-weight:600;font-size:14px">{{ v.vaultCard }}</span>
+              <sc-if value="{{ vc.hasMenu }}"><button onClick="{{ act.cardMenu }}" aria-label="{{ s.moreActions }}" style="width:30px;height:30px;border-radius:var(--r-sm);border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px">⋯</button></sc-if></div>
+            <div style="color:var(--muted);line-height:1.5">{{ vc.text }}</div>
+            <sc-if value="{{ vc.hasBox }}"><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-radius:var(--r-ctl);background:{{ vc.boxBg }};border:1px solid {{ vc.boxBorder }};line-height:1.45"><span style="flex:1;min-width:240px">{{ vc.box }}</span><button onClick="{{ vc.onBox }}" style="height:28px;padding:0 12px;border-radius:var(--r-sm);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ vc.boxBtn }}</button></div></sc-if>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <sc-for list="{{ vc.btns }}" as="b" hint-placeholder-count="2"><span style="position:relative;display:inline-flex"><button onClick="{{ b.onClick }}" disabled="{{ b.off }}" style="height:var(--btn);padding:0 14px;border-radius:var(--r-ctl);cursor:pointer;font-weight:{{ b.fw }};border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }};opacity:{{ b.op }}">{{ b.label }}</button></span></sc-for>
+              <sc-if value="{{ vc.offline }}"><span style="padding:5px 9px;border-radius:var(--r-sm);background:var(--text);color:var(--bg);font-size:12px">{{ s.needsNet }}</span></sc-if>
+            </div>
+            <sc-if value="{{ vc.menuOpen }}"><div style="align-self:flex-end;margin-top:-6px;min-width:220px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><div onClick="{{ act.rotate }}" style="height:32px;padding:0 10px;border-radius:7px;display:flex;align-items:center;cursor:pointer" style-hover="background:var(--surface2)">{{ v.rotateMenu }}</div><div onClick="{{ act.forgot }}" style="height:32px;padding:0 10px;border-radius:7px;display:flex;align-items:center;cursor:pointer" style-hover="background:var(--surface2)">{{ v.forgot }}</div></div></sc-if>
+            <div style="font-size:12px;color:var(--faint);line-height:1.45">{{ v.x3_9 }}</div>
+          </div>
+          <sc-if value="{{ page.vsK9 }}"><div style="padding:14px 16px;border:1px dashed var(--border);border-radius:var(--r-card);background:var(--panel);line-height:1.55;white-space:pre-line"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">{{ c.vsNative }}</div>{{ c.k9vs }}</div></sc-if>
+        </sc-if>
+
+        <sc-if value="{{ page.isLists }}">
+          <sc-if value="{{ page.locked }}"><div role="note" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 12px 10px 14px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--info) 10%, transparent);border:1px solid color-mix(in oklch, var(--info) 40%, var(--border));line-height:1.45"><span aria-hidden="true" style="color:var(--info)">⚿</span><span style="flex:1;min-width:260px">{{ v.lockedBanner }}</span><button onClick="{{ act.unlock }}" style="height:28px;padding:0 12px;border-radius:var(--r-sm);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ v.unlock }}</button></div></sc-if>
+          <div style="font-weight:600;font-size:15px">{{ c.platforms }}</div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+            <sc-for list="{{ accs }}" as="a" hint-placeholder-count="5">
+              <div style="position:relative;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="width:30px;height:30px;flex-shrink:0;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ a.color }}">{{ a.abbr }}</span>
+                  <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600">@{{ a.user }}</span><sc-if value="{{ a.hasChip }}"><span title="{{ a.chipTip }}" style="height:20px;padding:0 7px;border-radius:var(--r-sm);display:flex;align-items:center;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);white-space:nowrap">{{ a.chip }}</span></sc-if></div><div style="font-size:12px;color:var(--muted);font-family:var(--mono)">{{ a.host }} · {{ a.method }}</div></div>
+                  <button onClick="{{ a.onMenu }}" aria-label="{{ s.moreActions }}" style="width:28px;height:28px;border-radius:var(--r-sm);border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px">⋯</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid var(--border);font-size:12px;flex-wrap:wrap">
+                  <sc-if value="{{ a.isLock }}"><span aria-hidden="true" style="color:var(--muted)">⚿</span></sc-if><sc-if value="{{ a.isDot }}"><span style="width:7px;height:7px;border-radius:50%;background:{{ a.dot }}"></span></sc-if>
+                  <span style="flex:1;min-width:0;color:{{ a.stColor }}">{{ a.status }}</span>
+                  <sc-if value="{{ a.hasAct }}"><button onClick="{{ a.onAct }}" style="border:0;padding:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:600;font-size:12px">{{ a.act }}</button></sc-if>
+                </div>
+                <sc-if value="{{ a.menuOpen }}"><div style="position:absolute;right:12px;top:46px;z-index:3;min-width:240px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><sc-for list="{{ a.menu }}" as="mi"><div onClick="{{ mi.onClick }}" title="{{ mi.tip }}" style="height:32px;padding:0 10px;border-radius:7px;display:flex;align-items:center;cursor:pointer;color:{{ mi.color }};opacity:{{ mi.op }}" style-hover="background:var(--surface2)">{{ mi.label }}</div></sc-for></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-weight:600;font-size:15px;margin-top:8px">{{ c.aiKeys }}</div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+            <sc-for list="{{ keys }}" as="k" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap">
+                <span style="width:30px;height:30px;flex-shrink:0;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ k.color }}">{{ k.abbr }}</span>
+                <div style="flex:1;min-width:200px"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-weight:600">{{ k.label }}</span><span style="height:20px;padding:0 7px;border-radius:var(--r-sm);display:flex;align-items:center;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);white-space:nowrap">{{ k.chip }}</span><sc-if value="{{ k.hasWarn }}"><span style="height:20px;padding:0 7px;border-radius:var(--r-sm);display:flex;align-items:center;font-size:11px;font-weight:500;background:color-mix(in oklch, var(--info) 12%, transparent);color:var(--text)">{{ v.x3_3 }}</span></sc-if></div><div style="font-size:12px;color:var(--muted)">{{ k.sub }}</div></div>
+                <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">{{ k.masked }}</span>
+                <span style="font-size:12px;color:{{ k.stColor }}">{{ k.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ page.isWeb }}">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden">
+            <div style="padding:14px 18px;font-weight:600;font-size:14px">{{ c.syncWhat }}</div>
+            <sc-for list="{{ xrows }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 18px;border-top:1px solid var(--border)">
+                <div style="flex:1 1 300px;min-width:0"><div style="font-weight:500">{{ r.label }}</div><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45">{{ r.desc }}</div><sc-if value="{{ r.hasExtra }}"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:{{ r.extraColor }};line-height:1.45"><span>{{ r.extra }}</span><sc-if value="{{ r.hasBtn }}"><button onClick="{{ r.onBtn }}" style="height:24px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:12px;font-weight:500;color:var(--text)">{{ r.btn }}</button></sc-if></div></sc-if></div>
+                <button onClick="{{ r.onToggle }}" role="switch" aria-checked="{{ r.on }}" style="width:38px;height:22px;flex-shrink:0;border-radius:11px;border:0;padding:0;cursor:pointer;position:relative;background:{{ r.tbg }}"><span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transform:{{ r.tx }};transition:transform .15s"></span></button>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ page.webVault }}">
+            <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);display:flex;flex-direction:column;gap:10px">
+              <div style="font-weight:600;font-size:14px">{{ v.webVault }}</div>
+              <div style="color:var(--muted);line-height:1.5">{{ wv.text }}</div>
+              <sc-if value="{{ wv.on }}"><div style="font-size:12.5px;line-height:1.5">{{ v.webVaultOnD }}</div><div><button onClick="{{ act.resetOpen }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid color-mix(in oklch, var(--danger) 50%, var(--border));background:transparent;color:var(--danger);cursor:pointer;font-weight:500">{{ v.resetBtnMenu }}</button></div></sc-if>
+              <sc-if value="{{ wv.off }}"><div><button style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500">{{ c.downloads }}</button></div></sc-if>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ hasModal }}">
+      <div style="position:absolute;top:40px;left:0;right:0;bottom:0;z-index:5;background:var(--ov-bg);display:flex;align-items:var(--ov-align);justify-content:center;padding:var(--ov-pad);overflow:auto">
+        <div role="dialog" aria-modal="true" style="width:100%;max-width:{{ m.w }};background:var(--m-bg);border:var(--m-border);border-radius:var(--r-modal);box-shadow:var(--m-shadow);display:flex;flex-direction:column">
+          <div style="display:var(--vs-show);padding:0 0 12px"><button onClick="{{ act.close }}" style="height:24px;padding:0 8px;border:0;border-radius:2px;background:transparent;color:var(--accent);cursor:pointer">← {{ v.back }}</button></div>
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:20px 22px 4px">
+            <div style="flex:1;min-width:0"><sc-if value="{{ m.hasStep }}"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-bottom:6px">{{ m.step }}</div></sc-if><div style="font-size:17px;font-weight:600;letter-spacing:-0.01em;text-wrap:pretty">{{ m.title }}</div></div>
+            <sc-if value="{{ m.canClose }}"><button onClick="{{ act.close }}" aria-label="{{ s.closeLabel }}" style="display:var(--x-show);width:30px;height:30px;place-items:center;border-radius:var(--r-sm);border:0;background:transparent;cursor:pointer;color:var(--faint);font-size:17px">×</button></sc-if>
+          </div>
+          <div style="padding:12px 22px 6px;display:flex;flex-direction:column;gap:14px;line-height:1.5">
+            <sc-for list="{{ m.blocks }}" as="b" hint-placeholder-count="3">
+              <sc-if value="{{ b.isP }}"><div style="color:{{ b.color }};text-wrap:pretty;font-size:{{ b.size }}">{{ b.text }}</div></sc-if>
+              <sc-if value="{{ b.isBox }}"><div role="{{ b.role }}" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, {{ b.tone }} 11%, transparent);border:1px solid color-mix(in oklch, {{ b.tone }} 40%, var(--border));font-size:12.5px;line-height:1.5;white-space:pre-line"><span aria-hidden="true" style="color:{{ b.tone }};font-weight:700">{{ b.icon }}</span><span style="flex:1">{{ b.text }}</span><sc-if value="{{ b.hasBtn }}"><button onClick="{{ b.onBtn }}" style="height:26px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap;color:var(--text)">{{ b.btn }}</button></sc-if></div></sc-if>
+              <sc-if value="{{ b.isField }}">
+                <label style="display:flex;flex-direction:column;gap:6px">
+                  <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ b.label }}</span>
+                  <span style="display:flex;align-items:center;height:38px;border-radius:var(--r-ctl);border:1px solid {{ b.border }};background:var(--bg)">
+                    <input type="{{ b.type }}" value="{{ b.value }}" onChange="{{ b.onChange }}" placeholder="{{ b.ph }}" disabled="{{ b.off }}" autocomplete="off" spellcheck="false" aria-invalid="{{ b.hasErr }}" style="flex:1;min-width:0;height:100%;padding:0 12px;border:0;background:transparent;outline:0;font-family:{{ b.font }};letter-spacing:{{ b.ls }}">
+                    <sc-if value="{{ b.canReveal }}"><button onClick="{{ b.onReveal }}" type="button" style="height:28px;margin-right:5px;padding:0 10px;border-radius:var(--r-sm);border:0;background:var(--surface2);cursor:pointer;font-size:11.5px;font-weight:500">{{ b.reveal }}</button></sc-if>
+                  </span>
+                  <sc-if value="{{ b.hasMeter }}"><span style="display:flex;align-items:center;gap:8px"><span style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:4px"><span style="height:4px;border-radius:2px;background:{{ b.m1 }}"></span><span style="height:4px;border-radius:2px;background:{{ b.m2 }}"></span><span style="height:4px;border-radius:2px;background:{{ b.m3 }}"></span></span><span style="width:76px;text-align:right;font-size:12px;font-weight:600;color:{{ b.mColor }}">{{ b.mLabel }}</span></span></sc-if>
+                  <sc-if value="{{ b.hasErr }}"><span role="alert" style="display:flex;gap:6px;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ b.err }}</span></span></sc-if>
+                  <sc-if value="{{ b.hasHelp }}"><span style="font-size:12px;color:var(--faint);line-height:1.4">{{ b.help }}</span></sc-if>
+                </label>
+              </sc-if>
+              <sc-if value="{{ b.isCode }}">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div aria-label="{{ v.codeLabel }}" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 12px;padding:16px;border-radius:9px;background:var(--bg);border:1px solid var(--border);font-family:var(--mono);font-size:15px;letter-spacing:.08em;text-align:center;font-weight:500"><sc-for list="{{ b.groups }}" as="gq" hint-placeholder-count="8"><span>{{ gq }}</span></sc-for></div>
+                  <div style="display:flex;gap:8px"><button onClick="{{ act.copyCode }}" style="height:32px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ b.copyLabel }}</button><button onClick="{{ act.download }}" style="height:32px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">↓ {{ b.dlLabel }}</button></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.isCheck }}"><label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;line-height:1.45"><input type="checkbox" checked="{{ b.checked }}" onChange="{{ b.onToggle }}" style="accent-color:var(--accent);margin-top:3px;width:15px;height:15px"><span>{{ b.label }}</span></label></sc-if>
+              <sc-if value="{{ b.isRadio }}"><div role="radiogroup" style="display:flex;flex-direction:column;gap:8px"><span style="font-weight:500">{{ b.label }}</span><sc-for list="{{ b.opts }}" as="o"><label style="display:flex;gap:10px;align-items:center;cursor:pointer"><input type="radio" checked="{{ o.on }}" onChange="{{ o.onClick }}" style="accent-color:var(--accent)"><span>{{ o.label }}</span></label></sc-for></div></sc-if>
+              <sc-if value="{{ b.isLink }}"><button onClick="{{ b.onClick }}" style="align-self:flex-start;border:0;padding:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500">{{ b.text }}</button></sc-if>
+              <sc-if value="{{ b.isExit }}"><div style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:var(--r-card);border:1px solid var(--border);background:var(--bg)"><span style="width:24px;height:24px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--accent-soft);color:var(--accent)">{{ b.n }}</span><div style="flex:1;display:flex;flex-direction:column;gap:6px"><div style="font-weight:600">{{ b.title }}</div><div style="color:var(--muted);font-size:12.5px;line-height:1.5">{{ b.text }}</div><sc-if value="{{ b.hasBtn }}"><button onClick="{{ b.onBtn }}" style="align-self:flex-start;height:30px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;margin-top:2px">{{ b.btn }}</button></sc-if></div></div></sc-if>
+              <sc-if value="{{ b.isProgress }}"><div style="display:flex;flex-direction:column;gap:10px"><div style="height:4px;border-radius:2px;background:var(--surface2);overflow:hidden"><div style="height:100%;width:40%;background:var(--accent);animation:bar 1.2s linear infinite"></div></div><div style="color:var(--muted)">{{ b.text }}</div></div></sc-if>
+              <sc-if value="{{ b.isDone }}"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0 6px;text-align:center"><span style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:color-mix(in oklch, var(--ok) 15%, transparent);color:var(--ok);font-size:20px">✓</span><div style="color:var(--muted);max-width:420px">{{ b.text }}</div></div></sc-if>
+            </sc-for>
+          </div>
+          <div style="padding:14px 22px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="flex:1;font-size:12px;color:var(--faint);min-width:160px">{{ m.note }}</span>
+            <sc-for list="{{ m.btns }}" as="b" hint-placeholder-count="2"><button onClick="{{ b.onClick }}" disabled="{{ b.off }}" autoFocus="{{ b.focus }}" style="height:var(--btn);padding:0 16px;border-radius:var(--r-ctl);cursor:pointer;font-weight:{{ b.fw }};display:flex;align-items:center;gap:8px;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }};opacity:{{ b.op }}"><sc-if value="{{ b.busy }}"><span style="width:13px;height:13px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span></sc-if>{{ b.label }}</button></sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="position:absolute;right:18px;bottom:18px;z-index:9;display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px 8px 14px;min-height:42px;border-radius:var(--r-card);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-width:420px;animation:toastIn .2s ease-out"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ to.color }}"></span><span style="flex:1;line-height:1.4">{{ to.text }}</span><sc-if value="{{ to.hasAct }}"><button onClick="{{ to.onAct }}" style="height:26px;padding:0 10px;border-radius:var(--r-sm);border:0;background:var(--accent-soft);color:var(--accent);font-weight:600;cursor:pointer">{{ to.act }}</button></sc-if></div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;product&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;desktop&quot;,&quot;vscode&quot;,&quot;web&quot;],&quot;default&quot;:&quot;desktop&quot;,&quot;tsType&quot;:&quot;'desktop'|'vscode'|'web'&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;K-01&quot;,&quot;K-02&quot;,&quot;K-03&quot;,&quot;K-04&quot;,&quot;K-05&quot;,&quot;K-06&quot;,&quot;K-07&quot;,&quot;K-08&quot;,&quot;K-09&quot;,&quot;K-10&quot;,&quot;X-04&quot;],&quot;default&quot;:&quot;K-01&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const CODE = '7KQ2-M9XD-4TPA-HV3N-Q8WE-ZJ6R-B1CF-5YGS';
+const CH = {
+  title: ['Bóveda de secretos', 'Secrets vault'], sub: ['Frase de sincronización, código de recuperación, desbloqueo, estados de las cuentas y reinicio desde la web. Elige pantalla y estado; los flujos se pueden recorrer.', 'Sync passphrase, recovery code, unlock, account states and reset from the web. Pick a screen and state; flows are clickable.'],
+  product: ['Producto', 'Product'], theme: ['Tema', 'Theme'], lang: ['Idioma', 'Language'], dark: ['Oscuro', 'Dark'], light: ['Claro', 'Light'],
+  session: ['Sesión', 'Session'], platforms: ['Plataformas Git', 'Git platforms'], aiKeys: ['Llaves de IA', 'AI keys'], syncWhat: ['Qué se sincroniza', 'What syncs'], downloads: ['Ir a Descargas', 'Go to Downloads'],
+  setTitle: ['Configuración', 'Settings'], acct: ['Cuenta y equipo', 'Account & team'], vsSet: ['Configuración de Ramal', 'Ramal Settings'], cloud: ['Configuración en la nube', 'Cloud settings'], accLinked: ['Cuentas vinculadas', 'Linked accounts'],
+  vsNative: ['Nativo de VS Code: se especifica, no se dibuja', 'Native to VS Code: specified, not drawn'],
+  k9vs: ['Aviso modal nativo (showWarningMessage, modal: true) con el texto de k9Body y dos botones: «Cerrar sesión» y «Cerrar sesión y borrar también las añadidas aquí» (textos signOutKeep y signOutWipe del brief #68). Las demás ventanas sueltan la llave y enseñan otherWindowOut en la barra de estado.', 'Native modal warning (showWarningMessage, modal: true) with the k9Body text and two buttons: "Sign out" and "Sign out and also delete the ones added here" (signOutKeep and signOutWipe from brief #68). Other windows drop the key and show otherWindowOut in the status bar.'],
+  pendingTag: ['PENDIENTE DE DECIDIR (ADR 0012)', 'PENDING DECISION (ADR 0012)'], reauth: ['Para restablecer la bóveda, vuelve a confirmar que eres tú (W-35, brief #69).', 'To reset the vault, confirm it is you again (W-35, brief #69).'], reauthBtn: ['Confirmar identidad', 'Confirm identity'],
+  pendingSoon: ['Si se decide ofrecerlo, el chip y esta confirmación van juntos.', 'If it is offered, the chip and this confirmation go together.']
+};
+const SCREENS = [
+  ['K-01', ['Crear la frase', 'Create passphrase'], ['empty', 'weak', 'ok', 'strong', 'mismatch', 'short', 'offline', 'exists']],
+  ['K-02', ['Código de recuperación', 'Recovery code'], ['unchecked', 'checked', 'creating', 'fail', 'done', 'leave', 'newCode']],
+  ['K-03', ['Desbloquear', 'Unlock'], ['empty', 'unlocking', 'fetching', 'wrong', 'many', 'code', 'codeShort', 'codeWrong', 'daily', 'offline', 'rotated', 'afterCode']],
+  ['K-08', ['Olvidé la frase', 'Forgot passphrase'], ['one']],
+  ['K-04', ['Bloqueada en este equipo', 'Locked on this device'], ['lists', 'useLocked', 'none', 'open', 'locked', 'rotate', 'reset', 'offline']],
+  ['K-05', ['Solo en este equipo', 'This device only'], ['signedOut', 'noVault', 'catOff', 'otherUser', 'upload']],
+  ['K-06', ['Cambiar la frase', 'Change passphrase'], ['no', 'yes', 'invalid', 'saving', 'conflict', 'oldKey', 'offline']],
+  ['K-07', ['Código nuevo', 'New code'], ['no', 'yes', 'wrongPass', 'generating', 'conflict']],
+  ['ROT', ['Rotar la llave', 'Rotate key'], ['confirm', 'wrongPass', 'progress', 'mismatch', 'conflict']],
+  ['K-09', ['Cerrar sesión', 'Sign out'], ['vault', 'noVault', 'checked', 'signingOut', 'offline']],
+  ['K-10', ['Web: bóveda y reinicio', 'Web: vault and reset'], ['none', 'set', 'modal', 'typed', 'resetting', 'reauth', 'limit', 'error']],
+  ['X-04', ['Interruptores de secretos', 'Secret sync toggles'], ['web', 'webNoVault', 'desk', 'deskNoVault', 'deskLocked', 'offModal']]
+];
+const SUBL = {
+  empty: ['Vacío', 'Empty'], weak: ['Débil', 'Weak'], ok: ['Aceptable', 'Acceptable'], strong: ['Fuerte', 'Strong'], mismatch: ['No coinciden', 'Mismatch'], short: ['Corta', 'Too short'], offline: ['Sin conexión', 'Offline'], exists: ['Ya existe (409)', 'Exists (409)'],
+  unchecked: ['Sin marcar', 'Unchecked'], checked: ['Marcado', 'Checked'], creating: ['Creando', 'Creating'], fail: ['Error al subir', 'Upload error'], done: ['Éxito', 'Success'], leave: ['Salir sin terminar', 'Leave unfinished'], newCode: ['Variante código nuevo', 'New code variant'],
+  unlocking: ['Desbloqueando', 'Unlocking'], fetching: ['Descargando', 'Downloading'], wrong: ['Frase incorrecta', 'Wrong passphrase'], many: ['Cinco fallos', 'Five failures'], code: ['Con código', 'With code'], codeShort: ['Código incompleto', 'Incomplete code'], codeWrong: ['Código incorrecto', 'Wrong code'], daily: ['Límite diario (429)', 'Daily limit (429)'], rotated: ['Llave cambiada', 'Key changed'], afterCode: ['Tras usar el código', 'After using the code'],
+  one: ['Único', 'Single'], lists: ['Listas mezcladas', 'Mixed lists'], useLocked: ['Al usarla', 'On use'], none: ['Tarjeta: sin configurar', 'Card: not set up'], open: ['Tarjeta: desbloqueada', 'Card: unlocked'], locked: ['Tarjeta: bloqueada', 'Card: locked'], rotate: ['Tarjeta: rotar recomendado', 'Card: rotation advised'], reset: ['Tarjeta: restablecida', 'Card: reset'],
+  signedOut: ['Sin sesión', 'Signed out'], noVault: ['Sin bóveda', 'No vault'], catOff: ['Categoría apagada', 'Category off'], otherUser: ['Otra cuenta de Ramal', 'Other Ramal account'], upload: ['Subir a mi cuenta', 'Upload to my account'],
+  no: ['Respuesta: no', 'Answer: no'], yes: ['Respuesta: sí', 'Answer: yes'], invalid: ['Validación', 'Validation'], saving: ['Guardando', 'Saving'], conflict: ['Cambió en otro equipo (412)', 'Changed elsewhere (412)'], oldKey: ['Llave antigua (403)', 'Old key (403)'],
+  wrongPass: ['Frase incorrecta', 'Wrong passphrase'], generating: ['Generando', 'Generating'], confirm: ['Confirmar', 'Confirm'], progress: ['Progreso', 'Progress'],
+  vault: ['Con bóveda', 'With vault'], signingOut: ['Cerrando', 'Signing out'], set: ['Configurada', 'Set up'], modal: ['Modal vacío', 'Empty modal'], typed: ['Texto correcto', 'Text matches'], resetting: ['Restableciendo', 'Resetting'], reauth: ['Reautenticación', 'Re-auth'], limit: ['Límite (429)', 'Limit (429)'], error: ['Error', 'Error'],
+  web: ['Web con bóveda', 'Web with vault'], webNoVault: ['Web sin bóveda', 'Web without vault'], desk: ['Desktop con bóveda', 'Desktop with vault'], deskNoVault: ['Desktop sin bóveda', 'Desktop without vault'], deskLocked: ['Desktop bloqueada', 'Desktop locked'], offModal: ['Al apagar', 'Turning off']
+};
+const SEED = {
+  'K-01': { empty: ['', ''], weak: ['ramalramal12', 'ramalramal12'], ok: ['tres perros azules', 'tres perros azules'], strong: ['tres perros azules bailan tango', 'tres perros azules bailan tango'], mismatch: ['tres perros azules', 'tres perros azul'], short: ['gato azul', ''], offline: ['', ''] }
+};
+const strength = p => { if (!p) return 0; if (p.length < 12) return 1; if (!/\s/.test(p) && !/[^a-zA-Z0-9]/.test(p)) return 1; if (p.length < 22) return 2; return 3; };
+
+class Component extends DCLogic {
+  state = { product: 'desktop', theme: 'dark', lang: 'es', scr: 'K-01', sub: 'empty', pass: '', pass2: '', rev: {}, variant: 'acc', checked: false, copied: false, code: '', codeMode: false, fails: 0, menu: null, cardMenu: false, ask: 'no', check9: false, typed: '', toasts: [], ready: false, modalOff: false, sync: { acc: true, ai: false } };
+  componentDidMount() {
+    const p = this.props;
+    this.setState({ product: p.product || 'desktop', theme: p.theme || 'dark', lang: p.lang || 'es' });
+    if (p.screen) this.goScreen(p.screen);
+    const go = () => (window.RAMAL && window.RAMAL.VAULT) ? this.setState({ ready: true }) : setTimeout(go, 30); go();
+    this._k = e => { if (e.key === 'Escape') this.close(); }; window.addEventListener('keydown', this._k);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._k); clearTimeout(this._t); }
+  componentDidUpdate(pp) {
+    const p = this.props, up = {}; ['product', 'theme', 'lang'].forEach(k => { if (pp[k] !== p[k] && p[k]) up[k] = p[k]; }); if (Object.keys(up).length) this.setState(up);
+    if (pp.screen !== p.screen && p.screen) this.goScreen(p.screen);
+    document.body.dataset.theme = this.state.theme; document.body.dataset.product = this.isWebScr() ? 'web' : this.state.product;
+  }
+  isWebScr() { return this.state.scr === 'K-10' || (this.state.scr === 'X-04' && this.state.sub.startsWith('web')) || (this.state.scr === 'X-04' && this.state.sub === 'offModal'); }
+  V(k, vals) { const R = window.RAMAL; const e = (R.VAULT || {})[k] || (R.STATES || {})[k] || (R.D || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (vals) for (const x in vals) s = s.split('{' + x + '}').join(vals[x]); return s; }
+  C(k) { return CH[k][this.state.lang === 'en' ? 1 : 0]; }
+  toast(text, kind = 'ok', act) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind, act }].slice(-3) })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), kind === 'warn' ? 6000 : 3200); }
+  goScreen(id) { const sc = SCREENS.find(x => x[0] === id); if (sc) this.setSub(id, sc[2][0]); }
+  setSub(scr, sub) {
+    clearTimeout(this._t);
+    const p = { scr, sub, menu: null, cardMenu: false, modalOff: false, rev: {}, checked: sub === 'checked' || sub === 'creating' || sub === 'fail', copied: false, fails: sub === 'many' ? 5 : 0, codeMode: ['code', 'codeShort', 'codeWrong'].includes(sub), code: sub === 'codeShort' ? '7KQ2 M9XD 4TPA' : sub === 'codeWrong' ? '7KQ2-M9XD-4TPA-HV3N-Q8WE-ZJ6R-B1CF-5YGT' : sub === 'code' ? '' : '', ask: sub === 'yes' || sub === 'wrongPass' ? 'yes' : 'no', check9: sub === 'checked', typed: sub === 'typed' || sub === 'resetting' ? this.V('resetType').length && (this.state.lang === 'en' ? 'DELETE SECRETS' : 'BORRAR SECRETOS') : '' };
+    const sd = SEED[scr] && SEED[scr][sub]; if (sd) { p.pass = sd[0]; p.pass2 = sd[1]; } else if (scr === 'K-03' || scr === 'K-07' || scr === 'ROT') { p.pass = sub === 'wrong' || sub === 'many' || sub === 'wrongPass' ? 'tres perros verdes' : sub === 'empty' || sub === 'confirm' || sub === 'no' || sub === 'yes' ? '' : 'tres perros azules'; p.pass2 = ''; } else if (scr === 'K-06') { p.pass = sub === 'invalid' ? 'gatoazul' : sub === 'no' || sub === 'yes' ? '' : 'cinco gatos naranjas duermen'; p.pass2 = sub === 'invalid' ? 'gatoazu' : p.pass; }
+    if (scr === 'X-04') p.sync = { acc: true, ai: false };
+    this.setState(p);
+  }
+  close = () => { const s = this.state; if (s.scr === 'K-02' && s.sub !== 'done') { this.setState({ sub: 'leave' }); return; } this.setState({ modalOff: true }); };
+  later(ms, fn) { clearTimeout(this._t); this._t = setTimeout(fn, ms); }
+  download = () => {
+    const L = this.state.lang === 'en'; const txt = [this.V('k2Title'), '', 'marta@example.com', L ? 'October 1, 2026' : '1 de octubre de 2026', '', CODE, '', this.V('k2NoOne')].join('\n');
+    try { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' })); a.download = this.V('fileName'); a.click(); } catch (e) {}
+    this.toast(this.V('dlStarted', { file: this.V('fileName') }), 'info');
+  };
+
+  renderVals() {
+    const st = this.state, R = window.RAMAL;
+    if (!st.ready || !R) return { c: {}, v: {}, s: {}, segs: [], nav: [], subs: [], scr: {}, frame: {}, page: {}, vc: { btns: [] }, accs: [], keys: [], xrows: [], wv: {}, m: { blocks: [], btns: [] }, act: {}, toasts: [] };
+    const L = st.lang === 'en' ? 1 : 0, V = this.V.bind(this), C = this.C.bind(this);
+    const v = {}; for (const k in R.VAULT) v[k] = R.VAULT[k][L];
+    const s = {}; for (const k in R.STATES) s[k] = R.STATES[k][L];
+    const c = {}; for (const k in CH) c[k] = CH[k][L];
+    const isVs = st.product === 'vscode' && !this.isWebScr(), scr = st.scr, sub = st.sub;
+    const DATE = L ? 'March 12, 2026' : '12 de marzo de 2026';
+    const seg = (label, key, opts) => ({ label, opts: opts.map(([val, l]) => { const on = st[key] === val; return { label: l, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ [key]: val }) }; }) });
+    const segs = [seg(c.product, 'product', [['desktop', 'Desktop'], ['vscode', 'VS Code']]), seg(c.theme, 'theme', [['dark', c.dark], ['light', c.light]]), seg(c.lang, 'lang', [['es', 'ES'], ['en', 'EN']])];
+    const nav = SCREENS.map(([id, t]) => { const on = scr === id; return { label: id, title: t[L], bg: on ? 'var(--accent-soft)' : 'var(--surface)', border: on ? 'var(--accent)' : 'var(--border)', color: on ? 'var(--accent)' : 'var(--text)', op: 1, onClick: () => this.goScreen(id) }; });
+    const sc = SCREENS.find(x => x[0] === scr);
+    const subs = sc[2].map(k => { const on = sub === k; return { label: SUBL[k][L], bg: on ? 'var(--accent)' : 'var(--surface)', border: on ? 'var(--accent)' : 'var(--border)', color: on ? 'var(--accent-ink)' : 'var(--text)', onClick: () => this.setSub(scr, k) }; });
+    const offline = sub === 'offline';
+
+    // page
+    const pageType = ['K-04', 'K-05'].includes(scr) && !['none', 'open', 'locked', 'rotate', 'reset', 'offline'].includes(sub) ? 'lists' : (scr === 'K-10' || scr === 'X-04') ? 'web' : 'account';
+    const deskX04 = scr === 'X-04' && sub.startsWith('desk');
+    const page = { isAccount: pageType === 'account', isLists: pageType === 'lists', isWeb: pageType === 'web', locked: pageType === 'lists' && sub !== 'signedOut', webVault: scr === 'K-10', vsK9: isVs && scr === 'K-09',
+      title: pageType === 'web' ? (deskX04 ? c.acct : c.cloud) : pageType === 'lists' ? c.platforms + ' · ' + c.aiKeys : c.acct, hasSub: pageType !== 'lists', sub: deskX04 || pageType === 'account' ? s.syncsWith.replace('{ago}', L ? '2 min ago' : 'hace 2 min') : '' };
+    const frame = { title: pageType === 'web' && !deskX04 ? 'ramal.bahoque.com' : isVs ? 'Visual Studio Code' : 'Ramal', crumb: pageType === 'web' && !deskX04 ? '› ' + c.cloud : isVs ? '› ' + c.vsSet : '› ' + c.setTitle };
+
+    // vault card (K-04 card subs and account page)
+    const cardState = scr === 'K-04' && ['none', 'open', 'locked', 'rotate', 'reset', 'offline'].includes(sub) ? sub : scr === 'K-03' || scr === 'K-08' ? 'locked' : scr === 'K-01' || scr === 'K-02' ? 'none' : 'open';
+    const btn = (label, onClick, kind, off) => ({ label, onClick, off: !!off, op: off ? 0.45 : 1, fw: kind === 'p' ? 600 : 500, bg: kind === 'p' ? 'var(--accent)' : 'var(--surface)', color: kind === 'p' ? 'var(--accent-ink)' : 'var(--text)', border: kind === 'p' ? 'transparent' : 'var(--border)' });
+    const vcBtns = { none: [btn(v.setUpVault, () => this.setSub('K-01', 'empty'), 'p')], open: [btn(v.changePass, () => this.setSub('K-06', 'no')), btn(v.newCode, () => this.setSub('K-07', 'no'))], locked: [btn(v.unlock, () => this.setSub('K-03', 'empty'), 'p'), btn(v.forgot, () => this.setSub('K-08', 'one'))] };
+    const vc = { text: cardState === 'none' || cardState === 'reset' ? v.vaultNone : cardState === 'locked' ? v.vaultLocked : V('vaultOpen', { date: DATE }), hasMenu: ['open', 'rotate', 'offline'].includes(cardState), menuOpen: st.cardMenu, offline: cardState === 'offline',
+      btns: cardState === 'reset' ? [] : cardState === 'locked' ? vcBtns.locked : cardState === 'none' ? vcBtns.none : vcBtns.open.map(b => cardState === 'offline' ? { ...b, off: true, op: 0.45 } : b),
+      hasBox: cardState === 'rotate' || cardState === 'reset', box: cardState === 'rotate' ? v.rotateRec : v.resetFromWeb, boxBtn: cardState === 'rotate' ? v.rotateBtn : v.configure, onBox: () => cardState === 'rotate' ? this.setSub('ROT', 'confirm') : this.setSub('K-01', 'empty'),
+      boxBg: cardState === 'rotate' ? 'color-mix(in oklch, var(--warn) 12%, transparent)' : 'color-mix(in oklch, var(--info) 10%, transparent)', boxBorder: cardState === 'rotate' ? 'color-mix(in oklch, var(--warn) 40%, var(--border))' : 'color-mix(in oklch, var(--info) 40%, var(--border))' };
+
+    // lists (K-04, K-05)
+    const P = R.PLAT, AP = R.AIPROV;
+    const k5 = scr === 'K-05' ? sub : null;
+    const syncItem = k5 === 'signedOut' ? { label: v.signInToSync } : { label: v.syncThisAcc, onClick: () => k5 === 'noVault' ? this.setSub('K-01', 'empty') : this.toast(s.syncing, 'info') };
+    const accDefs = [
+      { id: 1, plat: 'github', user: 'marta-dev', host: 'github.com', method: 'OAuth', kind: k5 === 'signedOut' ? 'local' : 'locked' },
+      { id: 2, plat: 'gitlab', user: 'mruiz', host: 'gitlab.empresa.com', method: 'Token (PAT)', kind: 'local' },
+      { id: 3, plat: 'bitbucket', user: 'marta_r', host: 'bitbucket.org', method: 'API token', kind: k5 ? 'local' : 'noToken' },
+      { id: 4, plat: 'github', user: 'marta-acme', host: 'github.com', method: 'Token (PAT)', kind: k5 ? 'local' : 'mismatch' },
+      { id: 5, plat: 'gitea', user: 'marta', host: 'git.casa.lan', method: 'SSH + Token', kind: 'other' }
+    ];
+    const accs = accDefs.map(a => {
+      const p = P[a.plat], K = a.kind;
+      const st2 = { locked: [v.lockedRow, 'var(--muted)', v.unlock, () => this.setSub('K-03', 'empty')], local: [V('accChecked', { ago: L ? '5 min ago' : 'hace 5 min' }), 'var(--ok)', '', null], noToken: [v.noTokenHere, 'var(--warn)', v.updateCreds, () => this.toast(v.updateCreds, 'info')], mismatch: [v.credsMismatch, 'var(--danger)', v.reconnect, () => this.toast(v.reconnect, 'info')], other: [V('accChecked', { ago: L ? '1 h ago' : 'hace 1 h' }), 'var(--ok)', '', null] }[K];
+      const menuOpen = st.menu === a.id || (k5 && k5 !== 'upload' && ((k5 === 'otherUser' && a.id === 5) || (k5 !== 'otherUser' && a.id === 2)));
+      const menu = [{ label: V('mTest'), op: K === 'locked' ? 0.45 : 1, tip: K === 'locked' ? v.testLocked : '' }, ...(K === 'local' && k5 !== 'catOff' ? [syncItem] : []), ...(K === 'local' && k5 === 'catOff' ? [{ label: v.syncThisAcc, op: 0.45, tip: v.accOffD }] : []), ...(K === 'other' && k5 === 'otherUser' ? [{ label: v.upload, onClick: () => this.setSub('K-05', 'upload') }] : []), { label: V('mRemoveAcc'), color: 'var(--danger)' }].map(x => ({ label: x.label, tip: x.tip || '', op: x.op || 1, color: x.color || 'var(--text)', onClick: x.onClick || (() => this.setState({ menu: null })) }));
+      return { user: a.user, host: a.host, method: a.method, abbr: p.abbr, color: p.color, hasChip: K === 'local' || K === 'other', chip: K === 'other' ? v.otherUserChip : v.localChip, chipTip: v.localTip, isLock: K === 'locked', isDot: K !== 'locked', dot: st2[1], status: st2[0], stColor: K === 'locked' ? 'var(--muted)' : st2[1] === 'var(--ok)' ? 'var(--muted)' : st2[1], hasAct: !!st2[2], act: st2[2], onAct: st2[3], menuOpen, menu, onMenu: () => this.setState({ menu: st.menu === a.id ? null : a.id }) };
+    });
+    const keys = [
+      { prov: 'anthropic', label: 'Personal', chip: v.localChip.replace(v.localChip, k5 === 'signedOut' ? v.localChip : (L ? 'Synced' : 'Sincronizada')), masked: 'sk-ant-…4f2a', locked: k5 !== 'signedOut' },
+      { prov: 'groq', label: L ? 'Quick tests' : 'Pruebas rápidas', chip: v.localChip, masked: 'gsk_…77de' },
+      { prov: 'openai', label: 'ACME', chip: s.orgChip || V('orgChip'), masked: 'sk-proj-…9b1c', org: true }
+    ].map(k => ({ abbr: AP[k.prov].abbr, color: AP[k.prov].color, label: k.label, chip: k.chip, masked: k.masked, hasWarn: !!k.org, sub: k.org ? v.x3_1 : AP[k.prov].label, status: k.locked ? v.lockedRow : '', stColor: 'var(--muted)' }));
+
+    // X-04 rows
+    const vaultOn = !['webNoVault', 'deskNoVault'].includes(sub), deskLocked = sub === 'deskLocked';
+    const xrows = scr === 'X-04' ? [
+      { k: 'acc', label: c.accLinked, desc: st.sync.acc ? v.x3_4 : v.accOffD },
+      { k: 'ai', label: c.aiKeys, desc: st.sync.ai ? v.x3_5 : v.x3_6 }
+    ].map(r => { const on = st.sync[r.k]; let extra = '', ec = 'var(--faint)', b = '', fn = null;
+      if (on) { if (deskLocked) { extra = v.vaultLocked; ec = 'var(--muted)'; b = v.unlock; fn = () => this.setSub('K-03', 'empty'); } else if (vaultOn) { extra = V('vaultSince', { date: DATE }); } else { extra = deskX04 ? v.needsVaultApp : v.needsVault; ec = 'var(--warn)'; if (deskX04) { b = v.configure; fn = () => this.setSub('K-01', r.k === 'ai' ? 'empty' : 'empty'); } } }
+      return { label: r.label, desc: r.desc, on, hasExtra: !!extra, extra, extraColor: ec, hasBtn: !!b, btn: b, onBtn: fn, tbg: on ? 'var(--accent)' : 'var(--border)', tx: on ? 'translateX(16px)' : 'none', onToggle: () => on ? this.setState({ sub: 'offModal', offKey: r.k, modalOff: false }) : this.setState(x => ({ sync: { ...x.sync, [r.k]: true } })) }; }) : [];
+    const wv = { on: sub !== 'none', off: sub === 'none', text: sub === 'none' ? v.webVaultNone : V('webVaultOn', { date: DATE }) };
+
+    // modal
+    const P1 = st.pass, P2 = st.pass2, sg = strength(P1);
+    const field = o => ({ isField: true, type: 'password', value: '', ph: '', off: false, font: 'inherit', ls: 'normal', border: 'var(--border)', hasErr: false, err: '', hasHelp: false, help: '', hasMeter: false, canReveal: false, reveal: '', ...o });
+    const secret = (key, label, val, set, o) => { const r = !!st.rev[key]; return field({ label, value: val, type: r ? 'text' : 'password', canReveal: !!val && !offline, reveal: r ? v.hide : v.show, onReveal: () => this.setState(x => ({ rev: { ...x.rev, [key]: !r } })), onChange: e => set(e.target.value), off: offline, font: r ? 'var(--mono)' : 'inherit', ...o }); };
+    const meter = p => { const g = strength(p); const cols = ['var(--surface2)', 'var(--danger)', 'var(--warn)', 'var(--ok)']; return { hasMeter: !!p, m1: g >= 1 ? cols[g] : cols[0], m2: g >= 2 ? cols[g] : cols[0], m3: g >= 3 ? cols[g] : cols[0], mLabel: g === 3 ? v.strStrong : g === 2 ? v.strOk : v.strWeak, mColor: cols[g] }; };
+    const para = (text, color, size) => ({ isP: true, text, color: color || 'var(--muted)', size: size || 'inherit' });
+    const box = (text, tone, icon, o) => ({ isBox: true, text, tone, icon: icon || '!', role: tone === 'var(--danger)' ? 'alert' : 'note', hasBtn: false, ...(o || {}) });
+    const B = (label, onClick, kind, o) => ({ label, onClick, fw: kind === 'p' || kind === 'd' ? 600 : 500, bg: kind === 'p' ? 'var(--accent)' : kind === 'd' ? 'var(--danger)' : 'var(--surface)', color: kind === 'p' ? 'var(--accent-ink)' : kind === 'd' ? 'var(--danger-ink)' : 'var(--text)', border: kind === 'p' || kind === 'd' ? 'transparent' : 'var(--border)', off: false, op: 1, busy: false, focus: false, ...(o || {}) });
+    const offBox = box(s.needsNet + ' · ' + s.offline, 'var(--warn)', '☁');
+    let m = null;
+    const step = (n) => V('stepOf', { step: n, total: 2 });
+    if (!st.modalOff) {
+      if (scr === 'K-01') {
+        const errs = { short: P1 && P1.length < 12 ? v.errShort : '', guess: P1.length >= 12 && sg === 1 ? v.errGuessable : '', mis: P2 && P1 !== P2 ? v.errMismatch : '' };
+        const okGo = P1.length >= 12 && sg >= 2 && P1 === P2 && !offline;
+        m = { w: '580px', hasStep: true, step: step(1), title: v.k1Title, canClose: true, note: v.notNowNote, blocks: [
+          ...(sub === 'exists' ? [box(v.vaultExists, 'var(--info)', 'i')] : []),
+          para(st.variant === 'ai' ? v.k1BodyAi : v.k1BodyAcc, 'var(--text)'), para(v.k1WhyNot, 'var(--muted)', '12.5px'),
+          ...(offline ? [offBox] : []),
+          secret('p1', v.passLabel, P1, x => this.setState({ pass: x }), { ...meter(P1), hasErr: !!(errs.short || errs.guess), err: errs.short || errs.guess, border: errs.short || errs.guess ? 'var(--danger)' : 'var(--border)', hasHelp: !errs.short && !errs.guess, help: v.passHint }),
+          secret('p2', v.passRepeat, P2, x => this.setState({ pass2: x }), { hasErr: !!errs.mis, err: errs.mis, border: errs.mis ? 'var(--danger)' : 'var(--border)' }),
+          box(v.noRecovery, 'var(--warn)', '!'),
+          { isLink: true, text: st.variant === 'ai' ? (L ? 'View the accounts variant' : 'Ver la variante de cuentas') : (L ? 'View the AI keys variant' : 'Ver la variante de llaves de IA'), onClick: () => this.setState({ variant: st.variant === 'ai' ? 'acc' : 'ai' }) }
+        ], btns: [B(v.notNow, () => { this.setState({ modalOff: true }); this.toast(v.savedLocal, 'info'); }), B(v['continue'], () => { if (sub === 'exists') return; this.setSub('K-02', 'unchecked'); this.setState({ pass: P1, pass2: P2 }); }, 'p', { off: !okGo, op: okGo ? 1 : 0.45 })] };
+        if (sub === 'exists') m.btns = [B(v.notNow, () => this.setState({ modalOff: true })), B(v.unlock, () => this.setSub('K-03', 'empty'), 'p')];
+      }
+      if (scr === 'K-02') {
+        const nc = sub === 'newCode', busy = sub === 'creating';
+        if (sub === 'done') m = { w: '580px', hasStep: false, title: v.doneTitle, canClose: true, note: '', blocks: [{ isDone: true, text: v.doneBody }], btns: [B(v.done, () => { this.setState({ modalOff: true }); this.toast(v.doneTitle); }, 'p')] };
+        else if (sub === 'leave') m = { w: '460px', hasStep: false, title: v.leaveTitle, canClose: false, note: '', blocks: [para(v.leaveBody)], btns: [B(v.leave, () => { this.setState({ modalOff: true }); this.toast(v.savedLocal, 'info'); }), B(v.stayHere, () => this.setState({ sub: 'checked' }), 'p', { focus: true })] };
+        else m = { w: '580px', hasStep: !nc, step: step(2), title: nc ? v.newCodeTitle : v.k2Title, canClose: !busy, note: '', blocks: [
+          ...(nc ? [box(v.oldCodeVoid, 'var(--warn)', '!')] : []), para(v.k2Body, 'var(--text)'),
+          { isCode: true, groups: CODE.split('-'), copyLabel: st.copied ? v.codeCopied : v.copy, dlLabel: v.download },
+          box(v.k2NoOne, 'var(--warn)', '!'),
+          ...(sub === 'fail' ? [box(v.uploadFail, 'var(--danger)', '!', { hasBtn: true, btn: s.retry, onBtn: () => { this.setState({ sub: 'creating' }); this.later(1300, () => this.setState({ sub: 'done' })); } })] : []),
+          { isCheck: true, label: v.k2Check, checked: st.checked, onToggle: e => this.setState({ checked: e.target.checked }) }
+        ], btns: [...(nc ? [] : [B(v.back, () => this.setSub('K-01', 'ok'), null, { off: busy, op: busy ? 0.45 : 1 })]), B(busy ? v.creating : nc ? v.done : v.createVault, () => { if (!st.checked || busy) return; if (nc) { this.setState({ modalOff: true }); this.toast(v.rotated); return; } this.setState({ sub: 'creating' }); this.later(1300, () => this.setState({ sub: 'done' })); }, 'p', { off: !st.checked || busy, op: st.checked ? 1 : 0.45, busy })] };
+      }
+      if (scr === 'K-03') {
+        const cm = st.codeMode, busy = sub === 'unlocking' || sub === 'fetching';
+        if (sub === 'afterCode') m = { w: '460px', hasStep: false, title: v.changePass, canClose: true, note: '', blocks: [para(v.afterCode, 'var(--text)')], btns: [B(v.later, () => this.setState({ modalOff: true })), B(v.changePass, () => this.setSub('K-06', 'no'), 'p')] };
+        else {
+          const codeN = st.code.replace(/[^0-9a-z]/gi, '');
+          const err = sub === 'wrong' || sub === 'many' ? v.errPass : sub === 'codeShort' ? v.errCodeShort : sub === 'codeWrong' ? v.errCode : '';
+          m = { w: '580px', hasStep: false, title: v.k3Title, canClose: !busy, note: '', blocks: [
+            para(sub === 'rotated' ? v.k3Rotated : v.k3Body, 'var(--text)'),
+            ...(offline ? [offBox] : []), ...(sub === 'daily' ? [box(v.errDaily, 'var(--danger)', '!')] : []),
+            cm ? field({ label: v.codeLabel, type: 'text', value: st.code, ph: 'XXXX-XXXX-XXXX-XXXX-…', font: 'var(--mono)', ls: '.06em', off: busy || offline, onChange: e => { const raw = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 32); this.setState({ code: raw.replace(/(.{4})(?=.)/g, '$1-'), sub: 'code' }); }, hasErr: !!err, err, border: err ? 'var(--danger)' : 'var(--border)' })
+               : secret('u', v.passLabel, st.pass, x => this.setState({ pass: x, sub: sub === 'wrong' || sub === 'many' ? sub : 'empty' }), { off: busy || offline, hasErr: !!err, err, border: err ? 'var(--danger)' : 'var(--border)' }),
+            ...(sub === 'many' ? [box(v.errPassMany, 'var(--info)', 'i')] : []),
+            ...(busy ? [{ isProgress: true, text: sub === 'unlocking' ? v.unlocking : v.fetching }] : []),
+            { isLink: true, text: cm ? v.usePass : v.useCode, onClick: () => this.setState({ codeMode: !cm, sub: cm ? 'empty' : 'code' }) },
+            { isLink: true, text: v.forgot, onClick: () => this.setSub('K-08', 'one') },
+            para(v.k3Email, 'var(--faint)', '12px')
+          ], btns: [B(v.notNow, () => this.setState({ modalOff: true })), B(busy ? v.unlocking : v.unlock, () => {
+            if (busy || offline || sub === 'daily') return;
+            if (cm) { if (codeN.length < 32) { this.setState({ sub: 'codeShort' }); return; } if (st.code !== CODE) { this.setState({ sub: 'codeWrong' }); return; } }
+            else if (!st.pass) return;
+            this.setState({ sub: 'unlocking' });
+            this.later(1000, () => { if (!cm && /verde/.test(st.pass)) { const f = st.fails + 1; this.setState({ fails: f, sub: f >= 5 ? 'many' : 'wrong' }); return; } this.setState({ sub: 'fetching' }); this.later(800, () => { this.toast(V('unlocked_other', { count: 6 })); if (cm) this.setState({ sub: 'afterCode' }); else this.setState({ modalOff: true }); }); });
+          }, 'p', { busy, off: offline || sub === 'daily', op: offline || sub === 'daily' ? 0.45 : 1 })] };
+        }
+      }
+      if (scr === 'K-08') m = { w: '580px', hasStep: false, title: v.k8Title, canClose: true, note: '', blocks: [
+        { isExit: true, n: '1', title: v.k8Other, text: v.k8OtherD, hasBtn: false },
+        { isExit: true, n: '2', title: v.k8Code, text: '', hasBtn: true, btn: v.useCode, onBtn: () => { this.setSub('K-03', 'code'); } },
+        { isExit: true, n: '3', title: v.k8Reset, text: v.k8ResetD, hasBtn: true, btn: v.openWeb + ' ↗', onBtn: () => this.toast('https://ramal.bahoque.com', 'info') }
+      ], btns: [B(s.close, () => this.setState({ modalOff: true }))] };
+      if (scr === 'K-04' && sub === 'useLocked' && !st._shown) { /* toast-only state */ }
+      if (scr === 'K-05' && sub === 'upload') m = { w: '460px', hasStep: true, step: c.pendingTag, title: v.upload, canClose: true, note: c.pendingSoon, blocks: [para(v.otherUserAsk, 'var(--text)'), box(v.x3_9, 'var(--info)', 'i')], btns: [B(s.cancel, () => this.setState({ modalOff: true }), null, { focus: true }), B(v.upload, () => { this.setState({ modalOff: true }); this.toast(s.saved); }, 'p')] };
+      if (scr === 'K-06') {
+        const errs = { a: P1 && P1.length < 12 ? v.errShort : P1.length >= 12 && sg === 1 ? v.errGuessable : '', b: P2 && P1 !== P2 ? v.errMismatch : '' };
+        const busy = sub === 'saving', okGo = P1.length >= 12 && sg >= 2 && P1 === P2 && !offline;
+        m = { w: '580px', hasStep: false, title: v.k6Title, canClose: !busy, note: '', blocks: [
+          para(v.k6Others), ...(offline ? [offBox] : []), ...(sub === 'conflict' ? [box(v.errChanged, 'var(--danger)', '!', { hasBtn: true, btn: s.retry, onBtn: () => this.setState({ sub: 'saving' }) })] : []), ...(sub === 'oldKey' ? [box(v.oldKey, 'var(--danger)', '!', { hasBtn: true, btn: v.unlock, onBtn: () => this.setSub('K-03', 'empty') })] : []),
+          secret('n1', v.newPass, P1, x => this.setState({ pass: x }), { ...meter(P1), hasErr: !!errs.a, err: errs.a, border: errs.a ? 'var(--danger)' : 'var(--border)', hasHelp: !errs.a, help: v.passHint }),
+          secret('n2', v.newPassRepeat, P2, x => this.setState({ pass2: x }), { hasErr: !!errs.b, err: errs.b, border: errs.b ? 'var(--danger)' : 'var(--border)' }),
+          { isRadio: true, label: v.k6Ask, opts: [['no', v.askNo], ['yes', v.askYes]].map(([k, l]) => ({ label: l, on: st.ask === k, onClick: () => this.setState({ ask: k }) })) },
+          ...(st.ask === 'yes' ? [box(v.k6RotateInfo, 'var(--info)', 'i')] : [])
+        ], btns: [B(s.cancel, () => this.setState({ modalOff: true })), B(busy ? s.saving : st.ask === 'yes' ? v.changeAndRot : v.changePass, () => { if (!okGo || busy) return; if (st.ask === 'yes') { this.setSub('K-02', 'newCode'); return; } this.setState({ sub: 'saving' }); this.later(1000, () => { this.setState({ modalOff: true }); this.toast(v.passChanged); }); }, 'p', { off: !okGo || busy, op: okGo ? 1 : 0.45, busy })] };
+      }
+      if (scr === 'K-07' || scr === 'ROT') {
+        const rot = scr === 'ROT', busy = sub === 'generating' || sub === 'progress', needPass = rot || st.ask === 'yes';
+        const err = sub === 'wrongPass' ? v.errPass : '';
+        m = { w: '580px', hasStep: false, title: rot ? v.rotateTitle : v.k7Title, canClose: !busy, note: '', blocks: [
+          ...(rot ? [para(v.rotateBody, 'var(--text)')] : [box(v.k7Warn, 'var(--warn)', '!')]),
+          ...(sub === 'conflict' ? [box(v.errChanged, 'var(--danger)', '!', { hasBtn: true, btn: s.retry, onBtn: () => this.setState({ sub: rot ? 'confirm' : 'no' }) })] : []),
+          ...(sub === 'mismatch' ? [box(s.errInternal, 'var(--danger)', '!', { hasBtn: true, btn: s.retry, onBtn: () => this.setState({ sub: 'confirm' }) })] : []),
+          ...(!rot ? [{ isRadio: true, label: v.k7Ask, opts: [['no', v.askNo], ['yes', v.askYes]].map(([k, l]) => ({ label: l, on: st.ask === k, onClick: () => this.setState({ ask: k }) })) }] : []),
+          ...(needPass && sub !== 'progress' ? [secret('r', v.passLabel, st.pass, x => this.setState({ pass: x, sub: rot ? 'confirm' : sub === 'wrongPass' ? 'yes' : sub }), { hasErr: !!err, err, border: err ? 'var(--danger)' : 'var(--border)', hasHelp: !rot && !err, help: v.k7NeedPass, off: busy })] : []),
+          ...(sub === 'progress' ? [{ isProgress: true, text: V('rotating_other', { count: 6 }) }] : [])
+        ], btns: sub === 'progress' ? [] : [B(s.cancel, () => this.setState({ modalOff: true })), B(busy ? (rot ? V('rotating_other', { count: 6 }) : s.busySaving) : rot ? v.rotateBtn : v.k7Btn, () => {
+          if (busy) return; if (needPass && !st.pass) return;
+          if (needPass && /verde/.test(st.pass)) { this.setState({ sub: 'wrongPass' }); return; }
+          if (rot) { this.setSub('K-02', 'newCode'); return; }
+          this.setState({ sub: 'generating' }); this.later(900, () => this.setSub('K-02', 'newCode'));
+        }, 'p', { busy })] };
+      }
+      if (scr === 'K-09' && !isVs) {
+        const noV = sub === 'noVault', busy = sub === 'signingOut';
+        m = { w: '460px', hasStep: false, title: v.k9Title, canClose: !busy, note: '', blocks: [
+          para(noV ? v.k9BodyNoVault : v.k9Body, 'var(--text)'),
+          ...(noV ? [] : [box(V('k9Removed', { accounts: 3, keys: 1 }) + '\n' + V('k9Kept', { accounts: 1, keys: 1 }), 'var(--info)', 'i')]),
+          { isCheck: true, label: v.k9Check, checked: st.check9, onToggle: e => this.setState({ check9: e.target.checked }) },
+          ...(st.check9 ? [para(v.k9CheckWarn, 'var(--warn)', '12.5px')] : []),
+          ...(offline ? [box(v.signOutOffline, 'var(--warn)', '☁')] : [])
+        ], btns: [B(s.cancel, () => this.setState({ modalOff: true }), null, { focus: true }), B(busy ? v.signingOut : v.signOut, () => { if (busy) return; this.setState({ sub: 'signingOut' }); this.later(900, () => { this.setState({ modalOff: true }); this.toast(v.signedOut, 'info'); }); }, 'd', { busy })] };
+      }
+      if (scr === 'K-10' && !['none', 'set'].includes(sub)) {
+        const phrase = L ? 'DELETE SECRETS' : 'BORRAR SECRETOS', match = st.typed === phrase, busy = sub === 'resetting';
+        m = { w: '580px', hasStep: false, title: v.resetTitle, canClose: !busy, note: '', blocks: [
+          box(v.resetTryFirst, 'var(--info)', 'i'),
+          box([v.resetWhat, v.resetNoOne, v.resetKept].join('\n'), 'var(--danger)', '!'),
+          ...(sub === 'reauth' ? [box(c.reauth, 'var(--warn)', '!', { hasBtn: true, btn: c.reauthBtn, onBtn: () => this.setState({ sub: 'typed', typed: phrase }) })] : []),
+          ...(sub === 'limit' ? [box(v.resetLimit, 'var(--danger)', '!')] : []), ...(sub === 'error' ? [box(s.errInternal, 'var(--danger)', '!', { hasBtn: true, btn: s.retry, onBtn: () => this.setState({ sub: 'typed', typed: phrase }) })] : []),
+          field({ label: V('resetType', { phrase }), type: 'text', value: st.typed, ph: phrase, font: 'var(--mono)', off: busy, onChange: e => this.setState({ typed: e.target.value, sub: 'modal' }) })
+        ], btns: [B(s.cancel, () => this.setState({ modalOff: true, sub: 'set' }), null, { focus: true }), B(busy ? v.resetting : v.resetBtn, () => { if (!match || busy) return; this.setState({ sub: 'resetting' }); this.later(1100, () => { this.setState({ sub: 'none', modalOff: true }); this.toast(v.resetDone); }); }, 'd', { off: !match || busy || sub === 'limit', op: match ? 1 : 0.45, busy })] };
+      }
+      if (scr === 'X-04' && sub === 'offModal') {
+        const k = st.offKey || 'acc';
+        m = { w: '460px', hasStep: false, title: k === 'ai' ? v.offKeysTitle : v.offAccTitle, canClose: true, note: '', blocks: [box(v.offBody, 'var(--danger)', '!')], btns: [B(s.cancel, () => this.setState({ sub: 'web' }), null, { focus: true }), B(v.offBtn, () => { this.setState(x => ({ sync: { ...x.sync, [k]: false }, sub: 'web' })); this.toast(s.saved); }, 'd')] };
+      }
+    }
+    if (m && isVs) m.w = '820px';
+    const act = {
+      close: this.close, signOut: () => this.setSub('K-09', 'vault'), unlock: () => this.setSub('K-03', 'empty'), cardMenu: () => this.setState({ cardMenu: !st.cardMenu }),
+      rotate: () => this.setSub('ROT', 'confirm'), forgot: () => this.setSub('K-08', 'one'), resetOpen: () => this.setSub('K-10', 'modal'),
+      copyCode: () => { try { navigator.clipboard.writeText(CODE).catch(() => {}); } catch (e) {} this.setState({ copied: true }); this.toast(v.codeCopied, 'info'); }, download: this.download
+    };
+    const tl = st.toasts.slice();
+    if (scr === 'K-04' && sub === 'useLocked') tl.push({ id: 'ul', text: v.useLocked, kind: 'warn', act: { label: v.unlock, fn: () => this.setSub('K-03', 'empty') } });
+    const toasts = tl.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : x.kind === 'info' ? 'var(--info)' : 'var(--ok)', hasAct: !!x.act, act: x.act ? x.act.label : '', onAct: () => x.act && x.act.fn() }));
+    return { c, v, s, segs, nav, subs, scr: { id: scr, title: sc[1][L], note: isVs ? (L ? 'VS Code: panel inside the Ramal Settings webview' : 'VS Code: panel dentro del webview Configuración de Ramal') : '' }, frame, page, vc, accs, keys, xrows, wv, hasModal: !!m, m: m || { blocks: [], btns: [] }, act, toasts };
+  }
+}
+</script>
+</body>
+</html>

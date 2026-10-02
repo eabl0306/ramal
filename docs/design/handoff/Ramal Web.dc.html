@@ -34,17 +34,19 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
 <div style="min-height:100vh;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px">
 
   <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
-    <div style="position:sticky;top:0;z-index:20;height:64px;display:flex;align-items:center;gap:20px;padding:0 28px;background:color-mix(in oklch, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)">
+    <div style="position:sticky;top:0;z-index:20;height:64px;display:flex;align-items:center;gap:12px;padding:0 {{ pad }}px;background:color-mix(in oklch, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)">
       <div onClick="{{ goLanding }}" style="display:flex;align-items:center;gap:9px;cursor:pointer">
         <div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div>
         <span style="font-weight:600;font-size:16px;letter-spacing:-0.01em">Ramal</span>
       </div>
-      <div style="display:flex;gap:4px;margin-left:12px">
-        <sc-for list="{{ navLinks }}" as="n" hint-placeholder-count="3">
-          <a onClick="{{ n.onClick }}" style="padding:8px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="color:var(--text);background:var(--surface2)">{{ n.label }}</a>
+      <sc-if value="{{ wideNav }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:2px;margin-left:4px">
+        <sc-for list="{{ navLinks }}" as="n" hint-placeholder-count="4">
+          <a onClick="{{ n.onClick }}" style="padding:8px 9px;border-radius:8px;color:var(--muted);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="color:var(--text);background:var(--surface2)">{{ n.label }}</a>
         </sc-for>
-      </div>
+      </div></sc-if>
       <div style="flex:1"></div>
+      <sc-if value="{{ narrowNav }}"><button onClick="{{ toggleSheet }}" aria-expanded="{{ sheet }}" style="height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ sheetLabel }}</button></sc-if>
+      <sc-if value="{{ wideNav }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
         <sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:26px;padding:0 9px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
       </div>
@@ -53,12 +55,24 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
       </div>
       <sc-if value="{{ loggedOut }}">
         <a onClick="{{ goLogin }}" style="padding:8px 12px;color:var(--text);cursor:pointer;font-weight:500;white-space:nowrap">{{ w.login }}</a>
-        <button onClick="{{ goSignup }}" style="height:38px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap">{{ w.signup }}</button>
+        <button onClick="{{ goSignup }}" style="height:38px;padding:0 14px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap">{{ w.signup }}</button>
       </sc-if>
       <sc-if value="{{ loggedIn }}">
         <button onClick="{{ goDash }}" style="height:38px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap">{{ w.openDash }}</button>
       </sc-if>
+      </sc-if>
     </div>
+    <sc-if value="{{ showSheet }}">
+      <div style="position:sticky;top:64px;z-index:19;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow);padding:10px {{ pad }}px 18px;display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ navLinks }}" as="n"><a onClick="{{ n.onClick }}" style="padding:12px 4px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border);cursor:pointer">{{ n.label }}</a></sc-for>
+        <div style="display:flex;gap:8px;align-items:center;padding:10px 0;flex-wrap:wrap">
+          <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)"><sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:30px;padding:0 10px;border:0;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div>
+          <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)"><sc-for list="{{ theme3 }}" as="o"><button onClick="{{ o.onClick }}" style="height:30px;padding:0 10px;border:0;border-radius:6px;cursor:pointer;font-size:12px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div>
+        </div>
+        <sc-if value="{{ loggedOut }}"><button onClick="{{ goLogin }}" style="height:44px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-weight:600;cursor:pointer">{{ w.login }}</button><button onClick="{{ goSignup }}" style="height:44px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ w.signup }}</button></sc-if>
+        <sc-if value="{{ loggedIn }}"><button onClick="{{ goDash }}" style="height:44px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ w.openDash }}</button></sc-if>
+      </div>
+    </sc-if>
 
     <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
       <section style="padding:88px 28px 44px;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px">
@@ -76,9 +90,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
           <div style="height:34px;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:1px solid var(--border)">
             <span style="width:11px;height:11px;border-radius:50%;background:#ff5f57"></span><span style="width:11px;height:11px;border-radius:50%;background:#febc2e"></span><span style="width:11px;height:11px;border-radius:50%;background:#28c840"></span>
           </div>
-          <div style="height:clamp(300px,52vw,640px);overflow:hidden;position:relative">
-            <iframe src="./Ramal.dc.html" title="Ramal" loading="lazy" style="position:absolute;top:0;left:0;width:1560px;height:960px;border:0;transform:scale(0.72);transform-origin:0 0;pointer-events:none"></iframe>
-          </div>
+          <img src="{{ heroImg }}" alt="{{ w.heroAlt }}" width="924" height="540" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:924/540">
         </div>
       </section>
 
@@ -111,9 +123,26 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
             <span style="color:var(--faint)">$</span><span style="flex:1">code --install-extension ramal.ramal</span><span style="color:var(--faint);font-family:'IBM Plex Sans',sans-serif;font-size:12px">{{ w.copy }}</span>
           </div>
         </div>
-        <div style="border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;height:420px;position:relative;background:#1f1f1f">
-          <iframe src="./Ramal VS Code.dc.html" title="Ramal for VS Code" loading="lazy" style="position:absolute;top:0;left:0;width:1300px;height:840px;border:0;transform:scale(0.5);transform-origin:0 0;pointer-events:none"></iframe>
+        <div style="border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden"><img src="{{ vsImg }}" alt="{{ w.vsAlt }}" width="924" height="540" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:924/540"></div>
+      </section>
+
+      <section id="pricing" style="padding:0 {{ pad }}px 110px;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;gap:28px">
+        <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px"><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:10px">{{ pr.kicker }}</div><h2 style="margin:0;font-size:clamp(28px,4vw,40px);letter-spacing:-0.025em;font-weight:600;line-height:1.12;text-wrap:balance">{{ pr.title }}</h2></div>
+          <div role="radiogroup" style="display:flex;padding:3px;border-radius:10px;border:1px solid var(--border);background:var(--surface)"><sc-for list="{{ pr.bill }}" as="o"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="height:32px;padding:0 12px;border:0;border-radius:7px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}<sc-if value="{{ o.hasChip }}"><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:var(--ok);color:var(--surface)">{{ pr.save }}</span></sc-if></button></sc-for></div>
         </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px">
+          <sc-for list="{{ pr.cards }}" as="c">
+            <div style="padding:26px;border-radius:14px;background:var(--surface);border:{{ c.border }};display:flex;flex-direction:column;gap:14px">
+              <div style="font-size:18px;font-weight:600">{{ c.name }}</div>
+              <div><div style="font-size:30px;font-weight:600;font-family:'IBM Plex Mono',monospace;line-height:1.2">{{ c.price }}</div><div style="color:var(--muted);margin-top:4px">{{ c.sub }}</div></div>
+              <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px;flex:1"><sc-for list="{{ c.list }}" as="li"><li style="display:flex;gap:10px;line-height:1.45"><span style="font-weight:700;color:{{ c.tick }}">✓</span><span>{{ li }}</span></li></sc-for></ul>
+              <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ c.btns }}" as="b"><button onClick="{{ b.onClick }}" style="flex:1;height:44px;padding:0 14px;border-radius:10px;cursor:pointer;font-weight:600;white-space:nowrap;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for></div>
+              <sc-if value="{{ c.hasNote }}"><div style="text-align:center;font-size:12px;color:var(--faint)">{{ c.note }}</div></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:10px 18px;flex-wrap:wrap;align-items:baseline"><p style="margin:0;flex:1 1 420px;font-size:12px;color:var(--faint);line-height:1.6;text-wrap:pretty">{{ pr.foot }}</p><a onClick="{{ pr.onCompare }}" style="font-weight:600;white-space:nowrap">{{ pr.compare }} →</a></div>
       </section>
 
       <section id="download" style="padding:0 28px 110px;max-width:1160px;margin:0 auto;display:flex;flex-direction:column;gap:28px">
@@ -124,19 +153,26 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
           </div>
           <span style="color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:13px">{{ w.version }}</span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px">
+        <sc-if value="{{ dlMobile }}"><div role="status" style="display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;background:color-mix(in oklch, var(--info) 10%, transparent);border:1px solid color-mix(in oklch, var(--info) 30%, transparent)"><span style="flex:1 1 240px">{{ w.mobileNote }}</span><button onClick="{{ copyDlLink }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ w.copyLink }}</button></div></sc-if>
+        <sc-if value="{{ dlNone }}"><div style="padding:40px 24px;border-radius:14px;border:1px dashed var(--border);text-align:center;color:var(--muted)">{{ w.dlNone }}</div></sc-if>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;align-items:start">
           <sc-for list="{{ platforms }}" as="p" hint-placeholder-count="4">
             <div style="padding:22px;border-radius:14px;background:var(--surface);border:1px solid {{ p.border }};display:flex;flex-direction:column;gap:14px">
               <div style="display:flex;align-items:center;gap:10px">
                 <span style="font-size:18px;font-weight:600;flex:1">{{ p.name }}</span>
                 <sc-if value="{{ p.isYours }}"><span style="height:22px;padding:0 9px;border-radius:11px;font-size:11px;font-weight:600;display:flex;align-items:center;background:var(--accent-soft);color:var(--accent)">{{ w.yourSystem }}</span></sc-if>
               </div>
-              <span style="color:var(--muted);font-size:13px">{{ p.req }}</span>
-              <button onClick="{{ p.onMain }}" style="height:42px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">↓ {{ p.main }}</button>
+              <span style="color:var(--muted);font-size:13px;line-height:1.5">{{ p.req }}</span>
+              <button onClick="{{ p.onMain }}" style="min-height:42px;padding:6px 10px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px"><span>↓ {{ p.main }}</span><sc-if value="{{ p.hasMainSize }}"><span style="font-size:11px;font-weight:500;font-family:'IBM Plex Mono',monospace;opacity:.8">{{ p.mainSize }}</span></sc-if></button>
+              <sc-if value="{{ p.hasSha }}"><span title="sha256" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">sha256 {{ p.sha }}</span></sc-if>
               <div style="display:flex;flex-direction:column;gap:2px">
-                <sc-for list="{{ p.alts }}" as="a"><a onClick="{{ a.onClick }}" style="display:flex;justify-content:space-between;gap:10px;padding:7px 2px;border-bottom:1px solid var(--border);cursor:pointer;color:var(--text);font-size:13px"><span>{{ a.label }}</span><span style="color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:12px">{{ a.size }}</span></a></sc-for>
+                <sc-for list="{{ p.alts }}" as="a">
+                  <sc-if value="{{ a.isHead }}"><span style="padding:10px 2px 4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)">{{ a.label }}</span></sc-if>
+                  <sc-if value="{{ a.isItem }}"><a onClick="{{ a.onClick }}" title="{{ a.tip }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 2px;border-bottom:1px solid var(--border);cursor:pointer;color:var(--text);font-size:13px"><span style="display:flex;align-items:center;gap:6px;min-width:0"><span>{{ a.label }}</span><sc-if value="{{ a.beta }}"><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:color-mix(in oklch, var(--warn) 18%, transparent);color:var(--warn)">{{ w.beta }}</span></sc-if><sc-if value="{{ a.hasTip }}"><span style="width:14px;height:14px;border-radius:50%;border:1px solid var(--faint);display:grid;place-items:center;font-size:9px;color:var(--faint)">?</span></sc-if></span><span style="color:var(--faint);font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap">{{ a.size }}</span></a></sc-if>
+                </sc-for>
+                <sc-if value="{{ p.hasVsix }}"><details style="padding:7px 2px;font-size:13px"><summary style="cursor:pointer;color:var(--accent);font-weight:500">{{ w.vsixAll }}</summary><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 10px;padding-top:8px"><sc-for list="{{ p.vsix }}" as="v"><a onClick="{{ v.onClick }}" style="font-size:12px;color:var(--text);padding:4px 0">{{ v.label }}</a></sc-for></div></details></sc-if>
               </div>
-              <div onClick="{{ p.onCopy }}" style="padding:9px 11px;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="border-color:var(--accent)">$ {{ p.cmd }}</div>
+              <sc-if value="{{ p.hasCmd }}"><div onClick="{{ p.onCopy }}" style="padding:9px 11px;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" style-hover="border-color:var(--accent)">$ {{ p.cmd }}</div></sc-if>
             </div>
           </sc-for>
         </div>
@@ -171,14 +207,16 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
           <sc-for list="{{ au.fields }}" as="f" hint-placeholder-count="2">
             <label style="display:flex;flex-direction:column;gap:6px">
               <span style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--muted)"><span>{{ f.label }}</span><sc-if value="{{ f.hasLink }}"><a onClick="{{ f.onLink }}" style="cursor:pointer;font-weight:500">{{ f.link }}</a></sc-if></span>
-              <input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" style="height:42px;padding:0 12px;border-radius:10px;border:1px solid {{ f.border }};background:var(--bg);outline:0">
+              <input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" aria-invalid="{{ f.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;border:1px solid {{ f.border }};background:var(--bg);outline:0">
+              <sc-if value="{{ f.hasErr }}"><span role="alert" style="font-size:12px;color:var(--danger)">{{ f.err }}</span></sc-if>
               <sc-if value="{{ f.hasHint }}"><span style="font-size:12px;color:{{ f.hintColor }}">{{ f.hint }}</span></sc-if>
             </label>
           </sc-for>
           <sc-if value="{{ au.isSignup }}">
             <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{ au.terms }}" onChange="{{ au.onTerms }}" style="margin-top:3px;accent-color:var(--accent)"><span>{{ w.terms }}</span></label>
+            <sc-if value="{{ au.hasTermsErr }}"><span role="alert" style="font-size:12px;color:var(--danger);padding-left:22px;margin-top:-10px">{{ au.termsErr }}</span></sc-if>
           </sc-if>
-          <sc-if value="{{ au.hasError }}"><div style="padding:10px 12px;border-radius:9px;font-size:13px;color:var(--danger);background:color-mix(in oklch, var(--danger) 10%, transparent)">{{ au.error }}</div></sc-if>
+          <sc-if value="{{ au.hasError }}"><div role="alert" style="padding:10px 12px;border-radius:9px;font-size:13px;color:var(--danger);background:color-mix(in oklch, var(--danger) 10%, transparent)">{{ au.error }}</div></sc-if>
           <button onClick="{{ au.onSubmit }}" style="height:44px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;font-size:15px">{{ au.submit }}</button>
           <div style="text-align:center;color:var(--muted);font-size:13px">{{ au.switchText }} <a onClick="{{ au.onSwitch }}" style="cursor:pointer;font-weight:600">{{ au.switchLink }}</a></div>
         </div>
@@ -394,7 +432,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;startPage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;login&quot;,&quot;signup&quot;,&quot;dashboard&quot;],&quot;default&quot;:&quot;landing&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;startPage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;login&quot;,&quot;signup&quot;],&quot;default&quot;:&quot;landing&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;os&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;mac&quot;,&quot;win&quot;,&quot;linux&quot;,&quot;mobile&quot;,&quot;unknown&quot;],&quot;default&quot;:&quot;mac&quot;,&quot;tsType&quot;:&quot;'mac'|'win'|'linux'|'mobile'|'unknown'&quot;},&quot;downloads&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;api-caida&quot;,&quot;sin-version&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 const W = {
   features: ['Funciones', 'Features'], download: ['Descargar', 'Download'], vscode: ['VS Code', 'VS Code'], login: ['Iniciar sesión', 'Log in'], signup: ['Crear cuenta', 'Sign up'], openDash: ['Abrir panel', 'Open dashboard'],
   heroTag: ['Conflictos resueltos línea a línea', 'Line-by-line conflict resolution'],
@@ -410,9 +448,9 @@ const W = {
   f6: ['Tu configuración en la nube', 'Your settings in the cloud'], f6t: ['Inicia sesión y tus workspaces, cuentas vinculadas y preferencias te siguen a cada equipo y a VS Code.', 'Sign in and your workspaces, linked accounts and preferences follow you to every machine and to VS Code.'],
   vsKicker: ['EXTENSIÓN', 'EXTENSION'], vsTitle: ['Ramal dentro de VS Code', 'Ramal inside VS Code'],
   vsText: ['El grafo, los cambios pendientes, el resolutor de conflictos y la IA, en el repositorio que tienes abierto. Usa el tema y el idioma de tu editor y la misma cuenta de Ramal.', 'The graph, pending changes, the conflict resolver and AI, for the repository you have open. It uses your editor theme and language and the same Ramal account.'],
-  copy: ['Copiar', 'Copy'], dlKicker: ['DESCARGA', 'DOWNLOAD'], dlTitle: ['Descargar Ramal', 'Download Ramal'], version: ['v2.4.0 · 30 sep 2026', 'v2.4.0 · Sep 30, 2026'], yourSystem: ['Tu sistema', 'Your system'],
+  copy: ['Copiar', 'Copy'], dlKicker: ['DESCARGA', 'DOWNLOAD'], dlTitle: ['Descargar Ramal', 'Download Ramal'], version: ['v{version} · {date}', 'v{version} · {date}'], yourSystem: ['Tu sistema', 'Your system'],
   reqMac: ['macOS 12 o posterior', 'macOS 12 or later'], reqWin: ['Windows 10 y 11', 'Windows 10 and 11'], reqLin: ['Ubuntu 20.04+, Fedora 38+, Debian 11+', 'Ubuntu 20.04+, Fedora 38+, Debian 11+'], reqVs: ['VS Code 1.90 o posterior', 'VS Code 1.90 or later'],
-  install: ['Instalar extensión', 'Install extension'], dlStarted: ['Descarga iniciada: {f} (simulado)', 'Download started: {f} (simulated)'], copied: ['Copiado: {x}', 'Copied: {x}'],
+  install: ['Instalar extensión', 'Install extension'], dlStarted: ['Descarga iniciada: {file}', 'Download started: {file}'], copied: ['Copiado: {x}', 'Copied: {x}'],
   ctaTitle: ['Crea tu cuenta de Ramal', 'Create your Ramal account'], ctaText: ['Con una cuenta tus workspaces, cuentas vinculadas y preferencias se sincronizan entre la app de escritorio y VS Code, y puedes gestionar tu equipo desde la web.', 'With an account your workspaces, linked accounts and preferences sync between the desktop app and VS Code, and you can manage your team from the web.'],
   docs: ['Documentación', 'Docs'], notes: ['Notas de la versión', 'Release notes'], status: ['Estado', 'Status'], privacy: ['Privacidad', 'Privacy'],
   loginTitle: ['Iniciar sesión', 'Log in'], loginSub: ['Accede a tu configuración y a tu equipo.', 'Access your settings and your team.'], signupTitle: ['Crear cuenta', 'Create account'], signupSub: ['Sincroniza Ramal entre tus equipos y trabaja en equipo.', 'Sync Ramal across your machines and work as a team.'],
@@ -420,17 +458,17 @@ const W = {
   pwHint: ['Mínimo 8 caracteres', 'At least 8 characters'], pwOk: ['Contraseña válida', 'Valid password'], terms: ['Acepto los términos del servicio y la política de privacidad.', 'I accept the terms of service and privacy policy.'],
   noAccount: ['¿No tienes cuenta?', 'No account yet?'], haveAccount: ['¿Ya tienes cuenta?', 'Already have an account?'],
   errEmail: ['Escribe un email válido.', 'Enter a valid email.'], errPw: ['La contraseña debe tener al menos 8 caracteres.', 'Password must be at least 8 characters.'], errName: ['Escribe tu nombre.', 'Enter your name.'], errTerms: ['Debes aceptar los términos.', 'You must accept the terms.'],
-  resetSent: ['Te enviamos un enlace para restablecer la contraseña (simulado).', 'We sent you a password reset link (simulated).'], welcome: ['Sesión iniciada como {e}', 'Signed in as {e}'],
+  resetSent: ['Si existe una cuenta con ese email, te enviamos un enlace para restablecer la contraseña.', "If an account exists for that email, we've sent you a password reset link."], welcome: ['Sesión iniciada como {e}', 'Signed in as {e}'],
   dOverview: ['Resumen', 'Overview'], dWorkspaces: ['Workspaces', 'Workspaces'], dRepos: ['Repositorios', 'Repositories'], dAccounts: ['Cuentas vinculadas', 'Linked accounts'], dTeam: ['Equipo', 'Team'], dSync: ['Configuración en la nube', 'Cloud settings'],
   hello: ['Hola, {n}', 'Hi, {n}'], ovSub: ['Esto es lo que se sincroniza con tus dispositivos.', 'This is what syncs to your devices.'], devices: ['Dispositivos sincronizados', 'Synced devices'], syncedAgo: ['Sincronizado {a}', 'Synced {a}'], now: ['ahora', 'just now'],
   wsSub: ['Los workspaces agrupan repositorios. Los compartidos aparecen para todo el equipo.', 'Workspaces group repositories. Shared ones show up for the whole team.'], newWs: ['Nuevo workspace', 'New workspace'],
   shared: ['Compartido con {o}', 'Shared with {o}'], onlyYou: ['Solo tú', 'Only you'], noReposWs: ['Sin repositorios', 'No repositories'],
   reposSub: ['Repositorios vinculados a tu cuenta. Los locales solo existen en el dispositivo donde se añadieron.', 'Repositories linked to your account. Local ones only exist on the device where they were added.'],
-  searchRepos: ['Buscar repositorio, cuenta o workspace…', 'Search repository, account or workspace…'], colRepo: ['Repositorio', 'Repository'], colSource: ['Origen', 'Source'], colWs: ['Workspaces', 'Workspaces'], colSync: ['Actualizado', 'Updated'],
-  localOn: ['Local · {d}', 'Local · {d}'], accSub: ['Cuentas de plataformas Git conectadas a Ramal. Los tokens se guardan cifrados.', 'Git platform accounts connected to Ramal. Tokens are stored encrypted.'], connect: ['Conectar', 'Connect'],
+  searchRepos: ['Buscar repositorio, usuario de la cuenta o workspace…', 'Search repository, account username or workspace…'], colRepo: ['Repositorio', 'Repository'], colSource: ['Origen', 'Source'], colWs: ['Workspaces', 'Workspaces'], colSync: ['Actualizado', 'Updated'],
+  localOn: ['Solo local · {device}', 'Local only · {device}'], accSub: ['Cuentas de plataformas Git conectadas a Ramal. Los tokens se guardan cifrados.', 'Git platform accounts connected to Ramal. Tokens are stored encrypted.'], connect: ['Conectar', 'Connect'],
   usedIn: ['{n} repos', '{n} repos'], ownerYou: ['Tuya', 'Yours'], ownerTeam: ['Equipo', 'Team'],
   teamSub: ['Miembros de {o}, sus roles e invitaciones.', 'Members of {o}, their roles and invitations.'], invite: ['Invitar miembro', 'Invite member'], seats: ['{n} de {m} asientos usados', '{n} of {m} seats used'], addSeats: ['Añadir asientos', 'Add seats'],
-  pending: ['Invitación pendiente', 'Invitation pending'], owner: ['Propietaria', 'Owner'], admin: ['Admin', 'Admin'], member: ['Miembro', 'Member'], role: ['Rol', 'Role'],
+  pending: ['Invitación pendiente', 'Invitation pending'], owner: ['Titular', 'Owner'], admin: ['Admin', 'Admin'], member: ['Miembro', 'Member'], role: ['Rol', 'Role'],
   syncSub: ['Qué se guarda en tu cuenta y se aplica en cada dispositivo al iniciar sesión.', 'What is stored in your account and applied on each device when you sign in.'],
   profile: ['Perfil', 'Profile'], syncWhat: ['Qué se sincroniza', 'What syncs'], sWs: ['Workspaces y repositorios', 'Workspaces and repositories'], sAcc: ['Cuentas vinculadas', 'Linked accounts'], sAccD: ['Tokens cifrados de extremo a extremo', 'End-to-end encrypted tokens'],
   sAiPrefs: ['Preferencias de IA', 'AI preferences'], sAiKeys: ['Llaves de IA', 'AI keys'], sAiKeysD: ['Desactivado: cada dispositivo guarda sus propias llaves', 'Off: each device keeps its own keys'], sGit: ['Preferencias de Git', 'Git preferences'], sLook: ['Apariencia', 'Appearance'], sLookD: ['En VS Code se usa siempre el tema del editor', 'VS Code always uses the editor theme'],
@@ -439,36 +477,39 @@ const W = {
   signOut: ['Cerrar sesión', 'Sign out'], signedOut: ['Sesión cerrada', 'Signed out'], invited: ['Invitación enviada a {e}', 'Invitation sent to {e}'], resend: ['Reenviar invitación', 'Resend invitation'],
   revoke: ['Desconectar…', 'Disconnect…'], test: ['Probar conexión', 'Test connection'], ok: ['Listo: {x}', 'Done: {x}'], wsLabel: ['Workspaces', 'Workspaces'], unlink: ['Quitar de la cuenta…', 'Unlink from account…'],
   signOutDevice: ['Cerrar sesión en este dispositivo', 'Sign out on this device'], platform: ['Plataforma', 'Platform'], host: ['Servidor', 'Host'], user: ['Usuario', 'Username'], token: ['Token de acceso', 'Access token'], teamAcc: ['Compartir con el equipo', 'Share with team'],
+  heroAlt: ['Grafo de commits de Ramal Desktop', 'Ramal Desktop commit graph'], vsAlt: ['Grafo de Ramal dentro de VS Code', 'Ramal graph inside VS Code'], copyLink: ['Copiar enlace', 'Copy link'], menu: ['Menú', 'Menu'], closeMenu: ['Cerrar', 'Close'], tSys: ['Sistema', 'System'], tLight: ['Claro', 'Light'], tDark: ['Oscuro', 'Dark'],
+  mobileNote: ['Ramal es para escritorio y VS Code. Copia el enlace y ábrelo en tu ordenador.', 'Ramal is for desktop and VS Code. Copy the link and open it on your computer.'], allPlatformsMobile: ['Ver todas las plataformas', 'See all platforms'],
   deleteConfirm: ['Esta acción es irreversible. Tus repositorios en disco no se tocan.', 'This cannot be undone. Repositories on disk are not touched.'], newOrg: ['Crear organización…', 'Create organization…'], personal: ['Personal', 'Personal']
 };
 const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
 
 class Component extends DCLogic {
   state = { ready: false };
-  componentDidMount() { const go = () => window.RAMAL ? this.init() : setTimeout(go, 30); go(); this._k = e => { if (e.key === 'Escape') this.setState({ menu: null, modal: null }); }; window.addEventListener('keydown', this._k); }
-  componentWillUnmount() { window.removeEventListener('keydown', this._k); }
+  componentDidMount() { this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs); const go = () => window.RAMAL ? this.init() : setTimeout(go, 30); go(); this._k = e => { if (e.key === 'Escape') this.setState({ menu: null, modal: null }); }; window.addEventListener('keydown', this._k); }
+  componentWillUnmount() { window.removeEventListener('keydown', this._k); window.removeEventListener('resize', this._rs); }
   componentDidUpdate(pp) {
     if (this.state.theme) document.body.dataset.theme = this.state.theme;
     if (pp.theme !== this.props.theme && this.props.theme) this.setState({ theme: this.props.theme });
     if (pp.lang !== this.props.lang && this.props.lang) this.setState({ lang: this.props.lang });
     if (pp.startPage !== this.props.startPage && this.props.startPage) this.go(this.props.startPage);
+    if (pp.os !== this.props.os && this.props.os) this.setState({ os: this.props.os });
   }
   init() {
     const R = window.RAMAL, sp = this.props.startPage || 'landing';
-    const ua = navigator.userAgent; const os = /Win/.test(ua) ? 'win' : /Linux|X11/.test(ua) && !/Android/.test(ua) ? 'linux' : 'mac';
-    this.setState({ ready: true, theme: this.props.theme || 'dark', lang: this.props.lang || 'es', os,
-      page: sp === 'dashboard' ? 'dash' : sp, user: sp === 'dashboard' ? { name: 'Marta Ruiz', email: 'marta@ramal.dev' } : null, dsec: 'overview',
+    const ua = navigator.userAgent; const det = /Android|iPhone|iPad/.test(ua) ? 'mobile' : /Win/.test(ua) ? 'win' : /Linux|X11/.test(ua) ? 'linux' : /Mac/.test(ua) ? 'mac' : 'unknown'; const os = this.props.os || det;
+    this.setState({ vw: window.innerWidth, sheet: false, bill: 'annual', ready: true, theme: this.props.theme || 'dark', lang: this.props.lang || 'es', os,
+      page: sp === 'dashboard' ? 'dash' : sp, user: sp === 'dashboard' ? { name: 'Marta Ruiz', email: 'marta@example.com' } : null, dsec: 'overview',
       form: { email: '', password: '', name: '', org: '' }, terms: false, err: '',
       workspaces: R.WS.map((w, i) => ({ ...w, shared: i !== 2 })), repos: R.REPOS.map(r => ({ ...r })), accounts: R.ACCOUNTS.map((a, i) => ({ ...a, team: i === 1 || i === 2 })), members: R.MEMBERS.map(m => ({ ...m })),
       devices: [{ abbr: 'MAC', name: 'MacBook Pro de Marta', app: 'Ramal Desktop 2.4.0 · macOS 15', mins: 2 }, { abbr: 'VS', name: 'VS Code · ubuntu-dev', app: 'Extensión 1.3.0 · Ubuntu 24.04', mins: 40 }, { abbr: 'WIN', name: 'PC-OFICINA', app: 'Ramal Desktop 2.3.1 · Windows 11', mins: 4320 }],
       sync: { ws: true, acc: true, aiPrefs: true, aiKeys: false, git: true, look: true }, seats: 5, rq: '', menu: null, modal: null, toasts: [] });
   }
-  w(k, v) { const e = W[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  w(k, v) { const e = W[k] || (window.RAMAL && (window.RAMAL.D[k] || (window.RAMAL.STATES || {})[k])); if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
   ago(m) { const en = this.state.lang === 'en'; if (m < 1) return this.w('now'); if (m < 60) return en ? `${m} min ago` : `hace ${m} min`; if (m < 1440) { const h = Math.round(m / 60); return en ? `${h}h ago` : `hace ${h} h`; } const d = Math.round(m / 1440); return en ? `${d}d ago` : `hace ${d} d`; }
   toast(text, kind) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
   copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.toast(this.w('copied', { x })); }
-  dl(file) { this.toast(this.w('dlStarted', { f: file })); }
-  go(page) { this.setState({ page: page === 'dashboard' ? (this.state.user ? 'dash' : 'login') : page, err: '', menu: null }); window.scrollTo(0, 0); }
+  dl(file) { this.toast(this.w('dlStarted', { file })); }
+  go(page) { if (page === 'dashboard') { location.href = './Ramal Web Panel.dc.html'; return; } this.setState({ sheet: false, page: page === 'dashboard' ? (this.state.user ? 'dash' : 'login') : page, err: '', fe: {}, menu: null }); window.scrollTo(0, 0); }
   scrollTo(id) { if (this.state.page !== 'landing') { this.setState({ page: 'landing' }); setTimeout(() => this.scrollTo(id), 60); return; } const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 72, behavior: 'smooth' }); }
   openMenu(e, items) { e.preventDefault(); e.stopPropagation(); const h = items.reduce((a, i) => a + (i.sep ? 9 : 32), 14); this.setState({ menu: { x: Math.max(8, Math.min(e.clientX, window.innerWidth - 240)), y: Math.max(8, Math.min(e.clientY, window.innerHeight - h - 8)), items } }); }
   openForm(cfg) { const values = {}; cfg.fields.forEach(f => { if (f.key) values[f.key] = f.value !== undefined ? f.value : (f.type === 'check' ? false : ''); }); this.setState({ modal: { ...cfg, values }, menu: null }); }
@@ -476,28 +517,36 @@ class Component extends DCLogic {
   confirm(title, text, label, fn) { this.openForm({ title, danger: true, submitLabel: label, fields: [{ type: 'info', text }], onSubmit: fn }); }
   submitAuth = () => {
     const s = this.state, f = s.form, su = s.page === 'signup';
-    let err = '';
-    if (su && !f.name.trim()) err = this.w('errName'); else if (!/^\S+@\S+\.\S+$/.test(f.email)) err = this.w('errEmail'); else if (f.password.length < 8) err = this.w('errPw'); else if (su && !s.terms) err = this.w('errTerms');
-    if (err) { this.setState({ err }); return; }
+    const fe = {};
+    if (su && !f.name.trim()) fe.name = this.w('errName'); if (!/^\S+@\S+\.\S+$/.test(f.email)) fe.email = this.w('errEmail'); if (!su && !f.password) fe.password = this.w('pwRequired'); if (su && f.password.length < 8) fe.password = this.w('errPw'); if (su && !s.terms) fe.terms = this.w('errTerms');
+    if (Object.keys(fe).length) { this.setState({ fe, err: '' }); return; }
+    if (!su && f.password === 'incorrecta') { this.setState({ fe: {}, err: this.a('errCreds') }); return; }
     const user = { name: su ? f.name.trim() : 'Marta Ruiz', email: f.email };
     this.setState({ user, page: 'dash', dsec: 'overview', err: '' }); window.scrollTo(0, 0); this.toast(this.w('welcome', { e: f.email }));
   };
-  oauth(p) { this.setState({ user: { name: 'Marta Ruiz', email: 'marta@ramal.dev' }, page: 'dash', dsec: 'overview', err: '' }); this.toast(this.w('welcome', { e: 'marta@ramal.dev · ' + p })); }
+  a(k) { const e = window.RAMAL.WAUTH['auth.' + k]; return e ? e[this.state.lang === 'en' ? 1 : 0] : k; }
+  oauth(p) { if (this.state.page === 'signup') { location.href = './Ramal Web Auth.dc.html#W-04-completar'; return; } this.setState({ user: { name: 'Marta Ruiz', email: 'marta@example.com' }, page: 'dash', dsec: 'overview', err: '' }); this.toast(this.w('welcome', { e: 'marta@example.com · ' + p })); }
   signOut() { this.setState({ user: null, page: 'landing', menu: null }); this.toast(this.w('signedOut')); }
-  newWs() { this.openForm({ title: this.w('newWs'), submitLabel: this.w('create'), fields: [{ type: 'text', key: 'name', label: this.w('name'), placeholder: 'Frontend' }, { type: 'check', key: 'shared', label: this.w('shared', { o: 'ACME Studio' }), value: true }], onSubmit: v => { const n = (v.name || '').trim(); if (!n) return false; const L = window.RAMAL.LANE; this.setState(s => ({ workspaces: [...s.workspaces, { id: 'w' + Date.now(), name: n, color: L[s.workspaces.length % L.length], shared: v.shared }] })); } }); }
+  newWs() { this.openForm({ title: this.w('newWs'), submitLabel: this.w('create'), fields: [{ type: 'text', key: 'name', label: this.w('name'), placeholder: 'Frontend' }, { type: 'check', key: 'shared', label: this.w('shared', { o: 'ACME Studio' }), value: true }], onSubmit: v => { const n = (v.name || '').trim(); if (!n) return false; const L = window.RAMAL.LANE; this.setState(s => ({ workspaces: [...s.workspaces, { id: 'w' + Date.now(), name: n, color: L[s.workspaces.length % L.length], shared: v.shared }] })); this.toast(this.w('wsCreated', { name: n })); } }); }
   addAcc(p) { const P = window.RAMAL.PLAT; this.openForm({ title: this.w('connect') + ' · ' + P[p || 'github'].label, submitLabel: this.w('connect'), fields: [{ type: 'select', key: 'platform', label: this.w('platform'), value: p || 'github', options: Object.keys(P).map(k => ({ value: k, label: P[k].label })) }, { type: 'text', key: 'host', label: this.w('host'), placeholder: 'github.com' }, { type: 'text', key: 'user', label: this.w('user') }, { type: 'text', key: 'token', label: this.w('token'), placeholder: '••••••••' }, { type: 'check', key: 'team', label: this.w('teamAcc') }], onSubmit: v => { const u = (v.user || '').trim(); if (!u) return false; this.setState(s => ({ accounts: [...s.accounts, { id: 'a' + Date.now(), platform: v.platform, user: u, name: '—', host: v.host || { github: 'github.com', gitlab: 'gitlab.com', bitbucket: 'bitbucket.org', gitea: 'gitea.com', azure: 'dev.azure.com' }[v.platform], method: 'Token (PAT)', team: v.team }] })); } }); }
-  invite() { this.openForm({ title: this.w('invite'), submitLabel: this.w('invite'), fields: [{ type: 'text', key: 'email', label: this.w('email'), placeholder: 'nombre@empresa.com' }, { type: 'select', key: 'role', label: this.w('role'), value: 'member', options: [{ value: 'member', label: this.w('member') }, { value: 'admin', label: this.w('admin') }] }], onSubmit: v => { const e = (v.email || '').trim(); if (!e.includes('@')) return false; this.setState(s => ({ members: [...s.members, { name: e, email: e, role: v.role, ini: e[0].toUpperCase(), lane: s.members.length % 5, pending: true }], seats: Math.max(s.seats, s.members.length + 1) })); this.toast(this.w('invited', { e })); } }); }
+  invite() { this.openForm({ title: this.w('invite'), submitLabel: this.w('invite'), fields: [{ type: 'text', key: 'email', label: this.w('email'), placeholder: 'nombre@example.com' }, { type: 'select', key: 'role', label: this.w('role'), value: 'member', options: [{ value: 'member', label: this.w('member') }, { value: 'admin', label: this.w('admin') }] }], onSubmit: v => { const e = (v.email || '').trim(); if (!e.includes('@')) return false; this.setState(s => ({ members: [...s.members, { name: e, email: e, role: v.role, ini: e[0].toUpperCase(), lane: s.members.length % 5, pending: true }], seats: Math.max(s.seats, s.members.length + 1) })); this.toast(this.w('invited', { e })); } }); }
 
   renderVals() {
     const s = this.state;
     if (!s.ready || !window.RAMAL) return { isPublic: true, isLanding: true, w: {} };
     const R = window.RAMAL, P = R.PLAT, LANE = R.LANE, wf = this.w.bind(this), L = s.lang === 'en' ? 1 : 0;
     const w = {}; for (const k in W) w[k] = W[k][L];
+    w.version = this.w('version', { version: '2.4.0', date: L ? 'Sep 30, 2026' : '30 sep 2026' });
     const osName = { mac: 'macOS', win: 'Windows', linux: 'Linux' }[s.os];
     w.dlFor = wf('dlFor', { p: osName });
     const accById = Object.fromEntries(s.accounts.map(a => [a.id, a])), wsById = Object.fromEntries(s.workspaces.map(x => [x.id, x]));
     const isDash = s.page === 'dash' && !!s.user;
-    const base = { w, isPublic: !isDash, isDash, isLanding: !isDash && s.page === 'landing', isAuth: !isDash && (s.page === 'login' || s.page === 'signup'), loggedIn: !!s.user, loggedOut: !s.user,
+    const WV = window.RAMAL.WEB70, X = k => { const e = WV[k]; return e ? e[L] : k; }, vw = s.vw || 1280;
+    w.beta = X('download.dlBeta'); w.vsixAll = X('download.dlVsixAll'); w.dlNone = X('download.dlNone'); w.f6t = X('pricing.f6t');
+    const base = { pad: vw < 600 ? 16 : 28, wideNav: vw >= 900, narrowNav: vw < 900, sheet: !!s.sheet, showSheet: vw < 900 && !!s.sheet, sheetLabel: s.sheet ? w.closeMenu : w.menu, toggleSheet: () => this.setState({ sheet: !s.sheet }),
+      theme3: [['system', w.tSys], ['light', w.tLight], ['dark', w.tDark]].map(([k, l]) => ({ label: l, bg: (s.theme3 || s.theme) === k ? 'var(--accent)' : 'transparent', color: (s.theme3 || s.theme) === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ theme3: k, theme: k === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : k }) })),
+      heroImg: s.theme === 'light' ? './img/landing-desktop-light.png' : './img/landing-desktop-dark.png', vsImg: s.theme === 'light' ? './img/landing-vscode-light.png' : './img/landing-vscode-dark.png',
+      w, isPublic: !isDash, isDash, isLanding: !isDash && s.page === 'landing', isAuth: !isDash && (s.page === 'login' || s.page === 'signup'), loggedIn: !!s.user, loggedOut: !s.user,
       goLanding: () => this.go('landing'), goLogin: () => this.go('login'), goSignup: () => this.go('signup'), goDash: () => this.go('dashboard'), goDownload: () => this.scrollTo('download'), goVscode: () => this.scrollTo('vscode'),
       langOpts: [['es', 'ES'], ['en', 'EN']].map(([k, l]) => ({ label: l, bg: s.lang === k ? 'var(--accent)' : 'transparent', color: s.lang === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ lang: k }) })),
       themeOpts: [['light', '☀︎'], ['dark', '☾']].map(([k, l]) => ({ label: l, title: k, bg: s.theme === k ? 'var(--accent)' : 'transparent', color: s.theme === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ theme: k }) })),
@@ -508,30 +557,42 @@ class Component extends DCLogic {
     if (s.modal) { const m = s.modal, mv = m.values; base.modal = { title: m.title, submit: m.submitLabel, btnBg: m.danger ? 'var(--danger)' : 'var(--accent)', btnColor: m.danger ? 'white' : 'var(--accent-ink)', fields: m.fields.map(f => { const v = f.key ? mv[f.key] : undefined; return { isInfo: f.type === 'info', isText: f.type === 'text', isSelect: f.type === 'select', isCheck: f.type === 'check', label: f.label || '', text: f.text || '', value: v == null ? '' : v, placeholder: f.placeholder || '', checked: !!v, options: f.options || [], onChange: e => this.setVal(f.key, e.target.value), onToggle: e => this.setVal(f.key, e.target.checked) }; }) }; }
 
     if (!isDash) {
-      base.navLinks = [[w.features, () => this.scrollTo('features-anchor')], [w.download, () => this.scrollTo('download')], [w.vscode, () => this.scrollTo('vscode')]].map(([label, onClick]) => ({ label, onClick }));
+      base.navLinks = [[w.features, () => this.scrollTo('features-anchor')], [w.vscode, () => this.scrollTo('vscode')], [X('pricing.prNav'), () => this.scrollTo('pricing')], [w.download, () => this.scrollTo('download')]].map(([label, onClick]) => ({ label, onClick }));
       if (base.isLanding) {
-        base.dlPrimary = () => this.dl({ mac: 'Ramal-2.4.0-arm64.dmg', win: 'Ramal-Setup-2.4.0-x64.exe', linux: 'ramal_2.4.0_amd64.deb' }[s.os]);
-        base.features = [1, 2, 3, 4, 5, 6].map(i => ({ n: '0' + i, title: w['f' + i], text: w['f' + i + 't'] }));
+        const mob = s.os === 'mobile', unk = s.os === 'unknown' || mob, dlst = this.props.downloads || 'normal', apiDown = dlst === 'api-caida', none = dlst === 'sin-version';
+        base.dlPrimary = mob ? () => this.scrollTo('download') : () => this.dl({ mac: 'Ramal-2.4.0-arm64.dmg', win: 'Ramal-Setup-2.4.0-x64.exe', linux: 'ramal_2.4.0_amd64.deb', unknown: 'Ramal' }[s.os]);
+        if (mob) w.dlFor = w.allPlatformsMobile;
+        base.features = [1, 2, 3, 4, 5, 6].map(i => ({ n: '0' + i, title: w['f' + i], text: i === 6 ? w.f6t : w['f' + i + 't'] }));
         base.dlVsMarket = () => this.dl('ramal.ramal @ VS Code Marketplace'); base.dlVsOpen = () => this.dl('ramal.ramal @ Open VSX'); base.copyVsCmd = () => this.copy('code --install-extension ramal.ramal');
-        const plat = (id, name, req, main, mainFile, alts, cmd) => ({ name, req, main, isYours: s.os === id, border: s.os === id ? 'var(--accent)' : 'var(--border)', onMain: () => this.dl(mainFile), alts: alts.map(([label, size, file]) => ({ label, size, onClick: () => this.dl(file || label) })), cmd, onCopy: () => this.copy(cmd) });
-        base.platforms = [
-          plat('mac', 'macOS', w.reqMac, 'Apple Silicon (.dmg)', 'Ramal-2.4.0-arm64.dmg', [['Intel (.dmg)', '118 MB', 'Ramal-2.4.0-x64.dmg'], ['Universal (.zip)', '231 MB', 'Ramal-2.4.0-universal.zip']], 'brew install --cask ramal'),
-          plat('win', 'Windows', w.reqWin, 'x64 (.exe)', 'Ramal-Setup-2.4.0-x64.exe', [['ARM64 (.exe)', '104 MB', 'Ramal-Setup-2.4.0-arm64.exe'], ['x64 (.msi)', '109 MB', 'Ramal-2.4.0-x64.msi'], ['Portable (.zip)', '121 MB', 'Ramal-2.4.0-win-portable.zip']], 'winget install Ramal.Ramal'),
-          plat('linux', 'Linux', w.reqLin, 'Debian / Ubuntu (.deb)', 'ramal_2.4.0_amd64.deb', [['Fedora / RHEL (.rpm)', '97 MB', 'ramal-2.4.0.x86_64.rpm'], ['AppImage', '112 MB', 'Ramal-2.4.0.AppImage'], ['Flathub', '—', 'io.ramal.Ramal (Flathub)'], ['ARM64 (.deb)', '94 MB', 'ramal_2.4.0_arm64.deb']], 'flatpak install flathub io.ramal.Ramal'),
-          plat('vscode', 'VS Code', w.reqVs, w.install, 'ramal.ramal @ VS Code Marketplace', [['Open VSX (VSCodium, Cursor)', '6 MB', 'ramal.ramal @ Open VSX'], ['.vsix', '6 MB', 'ramal-1.3.0.vsix']], 'code --install-extension ramal.ramal')
+        base.dlMobile = mob; base.dlNone = none; base.copyDlLink = () => this.copy('https://ramal.bahoque.com/#download');
+        const sz = v => apiDown ? '' : v;
+        const item = (label, size, file, o = {}) => ({ isItem: true, isHead: false, label, size: sz(size), beta: !!o.beta, hasTip: !!o.tip, tip: o.tip || '', onClick: () => this.dl(file) });
+        const head = label => ({ isHead: true, isItem: false, label });
+        const plat = (id, name, req, main, mainFile, mainSize, sha, alts, cmd, vsix) => ({ name, req, main, hasMainSize: !apiDown && !!mainSize, mainSize, hasSha: !apiDown && !!sha, sha, isYours: !unk && s.os === id, border: !unk && s.os === id ? 'var(--accent)' : 'var(--border)', onMain: () => this.dl(mainFile), alts, hasCmd: !!cmd, cmd, onCopy: () => this.copy(cmd), hasVsix: !!vsix, vsix: (vsix || []).map(l => ({ label: l, onClick: () => this.dl('ramal-1.3.0@' + l + '.vsix') })) });
+        const L2 = L;
+        base.platforms = none ? [] : [
+          plat('mac', 'macOS', w.reqMac, 'Apple Silicon (.dmg)', 'Ramal-2.4.0-arm64.dmg', '112 MB', '9f2c…41ab', [item('Intel (.dmg)', '118 MB', 'Ramal-2.4.0-x64.dmg'), item('Universal (.dmg)', '226 MB', 'Ramal-2.4.0-universal.dmg')], L2 ? 'brew install ramal/tap/ramal  # to be confirmed' : 'brew install ramal/tap/ramal  # por confirmar'),
+          plat('win', 'Windows', w.reqWin, 'x64 (.exe)', 'Ramal-Setup-2.4.0-x64.exe', '108 MB', '3e7a…0c9d', [item('ARM64 (.exe)', '104 MB', 'Ramal-Setup-2.4.0-arm64.exe', { beta: true }), item('x64 (.msi)', '109 MB', 'Ramal-2.4.0-x64.msi', { tip: X('download.dlMsiTip') })], 'winget install Ramal.Ramal'),
+          plat('linux', 'Linux', L2 ? "Ubuntu 22.04+, Debian 12+. The .deb and .rpm don't update themselves." : 'Ubuntu 22.04+, Debian 12+. Los .deb y .rpm no se actualizan solos.', 'Debian / Ubuntu (.deb)', 'ramal_2.4.0_amd64.deb', '96 MB', 'b41d…77e2', [item('Fedora / RHEL (.rpm)', '97 MB', 'ramal-2.4.0.x86_64.rpm'), item(X('download.dlAppImage'), '112 MB', 'Ramal-2.4.0.AppImage'), head(X('download.dlArmBeta')), item('.deb', '94 MB', 'ramal_2.4.0_arm64.deb'), item('.rpm', '95 MB', 'ramal-2.4.0.aarch64.rpm'), item('AppImage', '110 MB', 'Ramal-2.4.0-arm64.AppImage')], ''),
+          plat('vscode', 'VS Code', L2 ? 'VS Code 1.138 or later. Not available on vscode.dev.' : 'VS Code 1.138 o posterior. No disponible en vscode.dev.', w.install, 'ramal.ramal @ VS Code Marketplace', '', '', [item('Open VSX (VSCodium, Cursor)', '6 MB', 'ramal.ramal @ Open VSX')], 'code --install-extension ramal.ramal', ['Windows x64', 'Windows ARM64', 'macOS Intel', 'macOS Apple Silicon', 'Linux x64', 'Linux ARM64', 'Alpine x64', 'Alpine ARM64'])
         ];
-        base.footLinks = [w.docs, w.notes, w.status, w.privacy].map(label => ({ label, onClick: () => this.toast(wf('ok', { x: label })) }));
+        const ann = s.bill !== 'monthly', XP = k => X('pricing.' + k), toPages = h => () => { location.href = './Ramal Web Paginas.dc.html#' + h; };
+        base.pr = { kicker: XP('prKicker'), title: XP('prTitle'), save: XP('prSave'), foot: XP('prFootnote'), compare: XP('prCompare'), onCompare: toPages('W-17'),
+          bill: [['annual', XP('prAnnual'), true], ['monthly', XP('prMonthly'), false]].map(([k, l, c]) => ({ label: l, hasChip: c, on: (s.bill || 'annual') === k, bg: (s.bill || 'annual') === k ? 'var(--accent)' : 'transparent', color: (s.bill || 'annual') === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ bill: k }) })),
+          cards: [{ name: XP('prFree'), price: XP('prFreePrice'), sub: XP('prFreeSub'), list: [1, 2, 3, 4, 5].map(i => XP('prF' + i)), tick: 'var(--ok)', border: '1px solid var(--border)', hasNote: false, note: '', btns: [{ label: XP('prDownload'), onClick: () => this.scrollTo('download'), bg: 'var(--bg)', color: 'var(--text)', border: 'var(--border)' }, { label: XP('prSignup'), onClick: () => this.go('signup'), bg: 'var(--bg)', color: 'var(--text)', border: 'var(--border)' }] },
+            { name: XP('prPro'), price: ann ? XP('prProAnnual') : XP('prProMonthly'), sub: ann ? XP('prProAnnualS') : XP('prProMonthlyS'), list: [1, 2, 3, 4, 5].map(i => XP('prP' + i)), tick: 'var(--accent)', border: '2px solid var(--accent)', hasNote: true, note: XP('prTrialSub'), btns: [{ label: XP('prTrial'), onClick: s.user ? () => { location.href = './Ramal Web Panel.dc.html'; } : () => this.go('signup'), bg: 'var(--accent)', color: 'var(--accent-ink)', border: 'var(--accent)' }] }] };
+        base.footLinks = [[X('dashboard.ftDocs'), 'W-29-docs'], [X('dashboard.ftNotes'), 'W-29-releases'], [X('dashboard.ftStatus'), ''], [X('legal.ftPricing'), 'W-17'], [X('legal.ftTerms'), 'W-27-terminos'], [w.privacy, 'W-27-privacidad'], [X('legal.ftRefunds'), 'W-27-reembolsos']].map(([label, h]) => ({ label, onClick: h ? toPages(h) : () => this.toast('/status') }));
       }
       if (base.isAuth) {
-        const su = s.page === 'signup', f = s.form, setF = k => e => this.setState({ form: { ...s.form, [k]: e.target.value }, err: '' });
-        const fld = (k, label, type, ph, extra) => ({ label, type, value: f[k], placeholder: ph, onChange: setF(k), border: 'var(--border)', hasLink: false, hasHint: false, ...extra });
+        const su = s.page === 'signup', f = s.form, fe = s.fe || {}, setF = k => e => this.setState({ form: { ...s.form, [k]: e.target.value }, err: '', fe: { ...fe, [k]: '' } });
+        const fld = (k, label, type, ph, extra) => { const o = { label, type, value: f[k], placeholder: ph, onChange: setF(k), hasLink: false, hasHint: false, ...extra }; if (fe[k]) { o.hasErr = true; o.err = fe[k]; o.hasHint = false; } o.border = fe[k] ? 'var(--danger)' : 'var(--border)'; return o; };
         const pwOk = f.password.length >= 8;
         base.au = { isSignup: su, title: su ? w.signupTitle : w.loginTitle, sub: su ? w.signupSub : w.loginSub, submit: su ? w.signup : w.login,
           oauth: [['github', 'GitHub'], ['gitlab', 'GitLab'], ['google', 'Google']].map(([k, l]) => ({ label: wf('withP', { p: l }), abbr: k === 'google' ? 'G' : P[k].abbr, color: k === 'google' ? 'oklch(0.6 0.15 255)' : P[k].color, onClick: () => this.oauth(l) })),
-          fields: [...(su ? [fld('name', w.name, 'text', 'Marta Ruiz')] : []), fld('email', w.email, 'email', 'tu@empresa.com'),
-            fld('password', w.password, 'password', '••••••••', su ? { hasHint: true, hint: pwOk ? w.pwOk : w.pwHint, hintColor: pwOk ? 'var(--ok)' : 'var(--faint)' } : { hasLink: true, link: w.forgot, onLink: e => { e.preventDefault(); this.toast(w.resetSent); } }),
-            ...(su ? [fld('org', w.orgName, 'text', 'ACME Studio')] : [])],
-          terms: s.terms, onTerms: e => this.setState({ terms: e.target.checked, err: '' }), hasError: !!s.err, error: s.err, onSubmit: this.submitAuth,
+          fields: [...(su ? [fld('name', w.name, 'text', 'Marta Ruiz')] : []), fld('email', w.email, 'email', 'tu@example.com'),
+            fld('password', w.password, 'password', '••••••••', su ? { hasHint: true, hint: pwOk ? w.pwOk : w.pwHint, hintColor: pwOk ? 'var(--ok)' : 'var(--faint)' } : { hasLink: true, link: w.forgot, onLink: e => { e.preventDefault(); location.href = './Ramal Web Auth.dc.html#W-01'; } }),
+            ...(su ? [fld('org', w.orgName, 'text', 'ACME Studio', { hasHint: true, hint: this.a('orgHint'), hintColor: 'var(--faint)' })] : [])],
+          terms: s.terms, onTerms: e => this.setState({ terms: e.target.checked, err: '', fe: { ...fe, terms: '' } }), hasTermsErr: !!fe.terms, termsErr: fe.terms || '', hasError: !!s.err, error: s.err, onSubmit: this.submitAuth,
           switchText: su ? w.haveAccount : w.noAccount, switchLink: su ? w.login : w.signup, onSwitch: () => this.go(su ? 'login' : 'signup') };
       }
       return base;
@@ -545,47 +606,47 @@ class Component extends DCLogic {
     base.onUserMenu = e => this.openMenu(e, [{ label: u.email, action: () => {} }, { sep: 1 }, { label: w.dSync, action: () => this.setState({ dsec: 'sync' }) }, { label: w.download, action: () => this.scrollTo('download') }, { sep: 1 }, { label: w.signOut, danger: 1, action: () => this.signOut() }]);
     base.dNav = [['overview', w.dOverview, ''], ['workspaces', w.dWorkspaces, s.workspaces.length], ['repos', w.dRepos, s.repos.length], ['accounts', w.dAccounts, s.accounts.length], ['team', w.dTeam, s.members.length], ['sync', w.dSync, '']].map(([k, l, c]) => ({ label: l, count: String(c), bg: sec === k ? 'var(--accent-soft)' : 'transparent', color: sec === k ? 'var(--accent)' : 'var(--text)', onClick: () => this.setState({ dsec: k }) }));
     Object.assign(base, { isOverview: sec === 'overview', isWorkspaces: sec === 'workspaces', isRepos: sec === 'repos', isAccounts: sec === 'accounts', isTeam: sec === 'team', cards: [] });
-    const repoSrc = r => { const a = accById[r.acc], p = a ? P[a.platform] : null; return { abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)', source: p ? p.label : wf('localOn', { d: 'MacBook Pro' }), srcUser: p ? '@' + a.user : '' }; };
+    const repoSrc = r => { const a = accById[r.acc], rm = a ? { plat: a.platform } : r.remote, p = rm ? P[rm.plat] : null; return { abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)', source: p ? p.label : wf('localOn', { device: 'MacBook Pro' }), srcUser: a ? '@' + a.user : '', slug: a ? `${a.user}/${r.name}` : r.remote ? r.remote.slug : wf('localOn', { device: 'MacBook Pro' }) }; };
     let dh = { title: '', sub: '', hasAction: false };
     if (sec === 'overview') {
       dh = { title: wf('hello', { n: u.name.split(' ')[0] }), sub: w.ovSub, hasAction: false };
       base.ov = { tiles: [[s.workspaces.length, w.dWorkspaces, 'workspaces'], [s.repos.length, w.dRepos, 'repos'], [s.accounts.length, w.dAccounts, 'accounts'], [s.members.length, w.dTeam, 'team']].map(([value, label, k]) => ({ value: String(value), label, onClick: () => this.setState({ dsec: k }) })),
-        devices: s.devices.map((d, i) => ({ ...d, sync: wf('syncedAgo', { a: this.ago(d.mins) }), dot: d.mins < 60 ? 'var(--ok)' : 'var(--warn)', onMenu: e => this.openMenu(e, [{ label: w.signOutDevice, danger: 1, action: () => this.setState(x => ({ devices: x.devices.filter((_, j) => j !== i) })) }]) })) };
+        devices: s.devices.map((d, i) => ({ ...d, sync: wf('syncedAgo', { a: this.ago(d.mins) }), dot: d.mins < 60 ? 'var(--ok)' : 'var(--warn)', onMenu: e => this.openMenu(e, [{ label: w.signOutDevice, danger: 1, action: () => this.confirm(wf('c_sessTitle', { device: d.name }), wf('c_sessInfo'), wf('c_signOut'), () => this.setState(x => ({ devices: x.devices.filter((_, j) => j !== i) }))) }]) })) };
     }
     if (sec === 'workspaces') {
       dh = { title: w.dWorkspaces, sub: w.wsSub, hasAction: true, action: '+ ' + w.newWs, onAction: () => this.newWs() };
       base.wsCards = s.workspaces.map(x => { const rs = s.repos.filter(r => r.wss.includes(x.id)); return { name: x.name, color: x.color, empty: !rs.length, repos: rs.map(r => { const src = repoSrc(r); return { name: r.alias || r.name, abbr: src.abbr, color: src.badgeBg }; }),
         tbg: x.shared ? 'var(--accent)' : 'var(--border)', tx: x.shared ? 'translateX(14px)' : 'none', shareLabel: x.shared ? wf('shared', { o: 'ACME Studio' }) : w.onlyYou,
         onShare: () => this.setState(y => ({ workspaces: y.workspaces.map(z => z.id === x.id ? { ...z, shared: !z.shared } : z) })),
-        onMenu: e => this.openMenu(e, [{ label: w.rename, action: () => this.openForm({ title: w.rename.replace('…', ''), submitLabel: w.save, fields: [{ type: 'text', key: 'name', label: w.name, value: x.name }], onSubmit: v => this.setState(y => ({ workspaces: y.workspaces.map(z => z.id === x.id ? { ...z, name: v.name || z.name } : z) })) }) }, { sep: 1 }, { label: w.del, danger: 1, action: () => this.confirm(w.del + ' · ' + x.name, w.noReposWs, w.del, () => this.setState(y => ({ workspaces: y.workspaces.filter(z => z.id !== x.id), repos: y.repos.map(r => ({ ...r, wss: r.wss.filter(id => id !== x.id) })) }))) }]) }; });
+        onMenu: e => this.openMenu(e, [{ label: w.rename, action: () => this.openForm({ title: w.rename.replace('…', ''), submitLabel: w.save, fields: [{ type: 'text', key: 'name', label: w.name, value: x.name }], onSubmit: v => { this.setState(y => ({ workspaces: y.workspaces.map(z => z.id === x.id ? { ...z, name: v.name || z.name } : z) })); this.toast(wf('renamed')); } }) }, { sep: 1 }, { label: w.del, danger: 1, action: () => this.confirm(wf('deleteWsTitle', { n: x.name }), wf('c_wsInfo', { org: 'ACME Studio' }), w.del, () => this.setState(y => ({ workspaces: y.workspaces.filter(z => z.id !== x.id), repos: y.repos.map(r => ({ ...r, wss: r.wss.filter(id => id !== x.id) })) }))) }]) }; });
     }
     if (sec === 'repos') {
       dh = { title: w.dRepos, sub: w.reposSub, hasAction: false };
       const q = s.rq.trim().toLowerCase();
       base.rq = s.rq; base.onRq = e => this.setState({ rq: e.target.value });
-      base.repoRows = s.repos.filter(r => { if (!q) return true; const src = repoSrc(r).source; const wsn = r.wss.map(id => (wsById[id] || {}).name).join(' '); return (r.name + ' ' + r.alias + ' ' + src + ' ' + wsn).toLowerCase().includes(q); }).map(r => { const wl = r.wss.map(id => wsById[id]).filter(Boolean);
-        return { name: r.alias || r.name, sub: r.alias ? r.name : r.path, ...repoSrc(r), wss: wl.map(x => ({ name: x.name, color: x.color })), noWs: !wl.length, sync: this.ago(r.mins),
-          onMenu: e => this.openMenu(e, [...s.workspaces.map(x => ({ label: (r.wss.includes(x.id) ? '✓  ' : '     ') + x.name, action: () => this.setState(y => ({ repos: y.repos.map(z => z.id !== r.id ? z : { ...z, wss: z.wss.includes(x.id) ? z.wss.filter(i => i !== x.id) : [...z.wss, x.id] }) })) })), { sep: 1 }, { label: w.unlink, danger: 1, action: () => this.confirm(w.unlink.replace('…', ''), r.alias || r.name, w.remove, () => this.setState(y => ({ repos: y.repos.filter(z => z.id !== r.id) }))) }]) }; });
+      base.repoRows = s.repos.filter(r => { if (!q) return true; const src = repoSrc(r); const wsn = r.wss.map(id => (wsById[id] || {}).name).join(' '); return (r.name + ' ' + r.alias + ' ' + src.source + ' ' + src.srcUser + ' ' + src.slug + ' ' + wsn).toLowerCase().includes(q); }).map(r => { const wl = r.wss.map(id => wsById[id]).filter(Boolean);
+        return { name: r.alias || r.name, sub: repoSrc(r).slug, ...repoSrc(r), wss: wl.map(x => ({ name: x.name, color: x.color })), noWs: !wl.length, sync: this.ago(r.mins),
+          onMenu: e => this.openMenu(e, [...s.workspaces.map(x => ({ label: (r.wss.includes(x.id) ? '✓  ' : '     ') + x.name, action: () => this.setState(y => ({ repos: y.repos.map(z => z.id !== r.id ? z : { ...z, wss: z.wss.includes(x.id) ? z.wss.filter(i => i !== x.id) : [...z.wss, x.id] }) })) })), { sep: 1 }, { label: w.unlink, danger: 1, action: () => this.confirm(wf('c_repoAccTitle', { name: r.alias || r.name }), wf('c_repoAccInfo'), w.remove, () => this.setState(y => ({ repos: y.repos.filter(z => z.id !== r.id) }))) }]) }; });
     }
     if (sec === 'accounts') {
       dh = { title: w.dAccounts, sub: w.accSub, hasAction: true, action: '+ ' + w.connect, onAction: () => this.addAcc('github') };
       base.accGroups = Object.keys(P).map(k => { const list = s.accounts.filter(a => a.platform === k); return { label: P[k].label, abbr: P[k].abbr, color: P[k].color, count: list.length, onAdd: () => this.addAcc(k),
         accounts: list.map((a, i) => ({ user: a.user, name: a.name, host: a.host, method: a.method, ini: a.user.slice(0, 2).toUpperCase(), avBg: LANE[(i + k.length) % LANE.length], usedIn: wf('usedIn', { n: s.repos.filter(r => r.acc === a.id).length }), owner: a.team ? w.ownerTeam : w.ownerYou, ownerColor: a.team ? 'var(--info)' : 'var(--accent)', ownerBg: tint(a.team ? 'var(--info)' : 'var(--accent)', 14),
-          onMenu: e => this.openMenu(e, [{ label: w.test, action: () => this.toast(wf('ok', { x: w.test + ' @' + a.user })) }, { label: (a.team ? '✓  ' : '     ') + w.teamAcc, action: () => this.setState(y => ({ accounts: y.accounts.map(z => z.id === a.id ? { ...z, team: !z.team } : z) })) }, { sep: 1 }, { label: w.revoke, danger: 1, action: () => this.confirm(w.revoke.replace('…', '') + ' @' + a.user, a.host, w.remove, () => this.setState(y => ({ accounts: y.accounts.filter(z => z.id !== a.id) }))) }]) })) }; });
+          onMenu: e => this.openMenu(e, [{ label: w.test, action: () => this.toast(wf('ok', { x: w.test + ' @' + a.user })) }, { label: (a.team ? '✓  ' : '     ') + w.teamAcc, action: () => this.setState(y => ({ accounts: y.accounts.map(z => z.id === a.id ? { ...z, team: !z.team } : z) })) }, { sep: 1 }, { label: w.revoke, danger: 1, action: () => this.confirm(wf('c_accTitle', { user: a.user, platform: P[a.platform].label }), wf('c_accInfo', { platform: P[a.platform].label }), wf('c_disconnect'), () => this.setState(y => ({ accounts: y.accounts.filter(z => z.id !== a.id) }))) }]) })) }; });
     }
     if (sec === 'team') {
       dh = { title: w.dTeam, sub: wf('teamSub', { o: 'ACME Studio' }), hasAction: true, action: '+ ' + w.invite, onAction: () => this.invite() };
-      const n = s.members.length;
-      base.tm = { seats: wf('seats', { n, m: s.seats }), pct: Math.min(100, Math.round(n / s.seats * 100)) + '%', onSeats: () => { this.setState(x => ({ seats: x.seats + 1 })); this.toast(wf('ok', { x: w.addSeats })); },
+      const n = s.members.length, nMem = s.members.filter(m => !m.pending).length, nPend = n - nMem;
+      base.tm = { seats: wf('teamLine', { members: wf(nMem === 1 ? 'members_one' : 'members_other', { count: nMem }), pending: wf(nPend === 1 ? 'pendingInv_one' : 'pendingInv_other', { count: nPend }), seats: wf('seatsUsed', { used: n, seats: s.seats }) }), pct: Math.min(100, Math.round(n / s.seats * 100)) + '%', onSeats: () => this.openForm({ title: w.addSeats, submitLabel: w.save, fields: [{ type: 'text', key: 'n', label: w.addSeats, value: '1' }], onSubmit: v => { const k = parseInt(v.n, 10); if (!(k > 0)) return false; this.setState(x => ({ seats: x.seats + k })); this.toast(wf('seatsUsed', { used: n, seats: s.seats + k })); } }),
         members: s.members.map(m => ({ ini: m.ini, name: m.name, sub: m.pending ? w.pending : m.email, avBg: LANE[m.lane], opacity: m.pending ? 0.5 : 1, role: m.role, locked: m.role === 'owner',
-          roles: (m.role === 'owner' ? ['owner'] : ['admin', 'member']).map(r => ({ value: r, label: w[r] })), onRole: e => this.setState(x => ({ members: x.members.map(y => y.email === m.email ? { ...y, role: e.target.value } : y) })),
-          onMenu: e => this.openMenu(e, m.role === 'owner' ? [{ label: m.email, action: () => this.copy(m.email) }] : [...(m.pending ? [{ label: w.resend, action: () => this.toast(wf('invited', { e: m.email })) }] : []), { label: m.email, action: () => this.copy(m.email) }, { sep: 1 }, { label: w.remove, danger: 1, action: () => this.confirm(w.remove + ' · ' + m.name, m.email, w.remove, () => this.setState(x => ({ members: x.members.filter(y => y.email !== m.email) }))) }]) })) };
+          roles: (m.role === 'owner' ? ['owner'] : ['admin', 'member']).map(r => ({ value: r, label: w[r] })), onRole: e => { const v = e.target.value; this.setState(x => ({ members: x.members.map(y => y.email === m.email ? { ...y, role: v } : y) })); this.toast(wf('roleChanged', { name: m.name, role: w[v] })); },
+          onMenu: e => this.openMenu(e, m.role === 'owner' ? [{ label: m.email, action: () => this.copy(m.email) }] : [...(m.pending ? [{ label: w.resend, action: () => this.toast(wf('invited', { e: m.email })) }] : []), { label: m.email, action: () => this.copy(m.email) }, { sep: 1 }, { label: m.pending ? wf('c_invBtn') : w.remove, danger: 1, action: () => m.pending ? this.confirm(wf('c_invTitle', { email: m.email }), wf('c_invInfo'), wf('c_invBtn'), () => this.setState(x => ({ members: x.members.filter(y => y.email !== m.email) }))) : this.confirm(wf('c_memberTitle', { name: m.name, org: 'ACME Studio' }), wf('c_memberInfo', { email: m.email }), w.remove, () => this.setState(x => ({ members: x.members.filter(y => y.email !== m.email) }))) }]) })) };
     }
     if (sec === 'sync') {
-      dh = { title: w.dSync, sub: w.syncSub, hasAction: true, action: w.save, onAction: () => this.toast(w.saved) };
+      dh = { title: w.dSync, sub: w.syncSub, hasAction: false };
       const R0 = { isInput: false, isButton: false, isToggle: false, hasDesc: false, desc: '' };
-      const tog = (label, desc, k) => ({ ...R0, label, desc: desc || '', hasDesc: !!desc, isToggle: true, tbg: s.sync[k] ? 'var(--accent)' : 'var(--border)', tx: s.sync[k] ? 'translateX(16px)' : 'none', onToggle: () => this.setState(x => ({ sync: { ...x.sync, [k]: !x.sync[k] } })) });
-      const inp = (label, k) => ({ ...R0, label, isInput: true, value: u[k], onChange: e => this.setState({ user: { ...u, [k]: e.target.value } }) });
+      const tog = (label, desc, k) => ({ ...R0, label, desc: desc || '', hasDesc: !!desc, isToggle: true, tbg: s.sync[k] ? 'var(--accent)' : 'var(--border)', tx: s.sync[k] ? 'translateX(16px)' : 'none', onToggle: () => { this.setState(x => ({ sync: { ...x.sync, [k]: !x.sync[k] } })); this.toast(wf('saved')); } });
+      const inp = (label, k) => ({ ...R0, label, isInput: true, value: u[k], onChange: e => this.setState({ user: { ...u, [k]: e.target.value } }), onBlur: () => this.toast(wf('saved')) });
       const btn = (label, desc, b, fn, danger) => ({ ...R0, label, desc, hasDesc: true, isButton: true, btnLabel: b, onBtn: fn, btnColor: danger ? 'var(--danger)' : 'var(--text)', btnBorder: danger ? 'var(--danger)' : 'var(--border)' });
       base.cards = [
         { title: w.profile, hasSub: false, sub: '', rows: [inp(w.name, 'name'), inp(w.email, 'email')] },

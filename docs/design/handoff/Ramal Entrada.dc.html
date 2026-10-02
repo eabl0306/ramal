@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;
+--canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);--danger-ink:oklch(0.99 0 0);
+--shadow:0 12px 40px oklch(0.05 0.01 230 / 0.5),0 2px 6px oklch(0.05 0.01 230 / 0.3);--scrim:oklch(0.1 0.01 230 / 0.5);
+background:var(--canvas);color:var(--text)}
+body[data-theme="light"]{--canvas:oklch(0.935 0.005 230);--bg:oklch(0.965 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.94 0.006 230);--border:oklch(0.89 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);--shadow:0 12px 40px oklch(0.3 0.02 230 / 0.16),0 2px 6px oklch(0.3 0.02 230 / 0.08);--scrim:oklch(0.3 0.02 230 / 0.35)}
+*{box-sizing:border-box}
+a{color:var(--accent)} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:32px 40px 72px;display:flex;flex-direction:column;gap:18px;background:var(--canvas);color:var(--text)">
+
+  <header style="display:flex;flex-direction:column;gap:12px;max-width:1280px">
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Ramal Desktop</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">#64 · D-01 – D-11</span></div>
+    <div><h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.02em">{{ ch.title }}</h1><p style="margin:6px 0 0;max-width:820px;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ ch.sub }}</p></div>
+    <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
+      <sc-for list="{{ segs }}" as="g" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ g.label }}</span>
+          <div style="display:flex;padding:2px;border-radius:9px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="height:28px;padding:0 11px;border:0;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="28"><button onClick="{{ n.onClick }}" title="{{ n.title }}" style="height:28px;padding:0 9px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;border:1px solid {{ n.border }};background:{{ n.bg }};color:{{ n.color }}">{{ n.label }}</button></sc-for>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--accent)">{{ cur.id }}</span><span style="font-weight:600;font-size:15px">{{ cur.title }}</span>
+      <sc-for list="{{ vars }}" as="x" hint-placeholder-count="4"><button onClick="{{ x.onClick }}" style="height:26px;padding:0 10px;border-radius:13px;cursor:pointer;font-size:12px;font-weight:500;border:1px solid {{ x.border }};background:{{ x.bg }};color:{{ x.color }}">{{ x.label }}</button></sc-for>
+      <sc-if value="{{ cur.hasNote }}"><span style="font-size:12px;color:var(--faint)">{{ cur.note }}</span></sc-if>
+    </div>
+  </header>
+
+  <div style="width:1280px;height:780px;position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;box-shadow:var(--shadow)">
+    <div style="height:46px;flex-shrink:0;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
+      <sc-if value="{{ win.mac }}"><div style="display:flex;align-items:center;gap:8px;padding-right:12px"><span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span></div></sc-if>
+      <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Ramal</span></div>
+      <sc-if value="{{ win.tabs }}">
+        <div style="display:flex;align-items:center;padding:0 16px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:{{ win.homeBg }};color:{{ win.homeColor }};box-shadow:{{ win.homeShadow }}">{{ t.e_home }}</div>
+        <sc-if value="{{ win.hasRepoTab }}"><div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:var(--bg);box-shadow:inset 0 2px 0 var(--accent)"><span style="width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;background:{{ win.tabBadge }};color:white">{{ win.tabAbbr }}</span>{{ win.repoTab }}<span style="color:var(--faint);font-size:15px">×</span></div></sc-if>
+        <sc-if value="{{ win.hasSetTab }}"><div style="display:flex;align-items:center;gap:8px;padding:0 14px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:var(--bg);box-shadow:inset 0 2px 0 var(--accent)">⚙︎ {{ t.e_settings }}</div></sc-if>
+      </sc-if>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <sc-if value="{{ win.tabs }}">
+          <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border);background:var(--bg)"><span style="height:24px;padding:0 9px;border-radius:6px;font-size:11px;font-weight:600;display:grid;place-items:center;background:{{ win.esBg }};color:{{ win.esColor }}">ES</span><span style="height:24px;padding:0 9px;border-radius:6px;font-size:11px;font-weight:600;display:grid;place-items:center;background:{{ win.enBg }};color:{{ win.enColor }}">EN</span></div>
+          <span style="width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--muted);display:grid;place-items:center;font-size:15px">⚙︎</span>
+          <sc-if value="{{ win.signedIn }}"><div title="marta@example.com" style="width:30px;height:30px;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px">MR</div></sc-if>
+          <sc-if value="{{ win.signedOut }}"><button onClick="{{ act.signIn }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="background:var(--surface2)">{{ t.e_signIn }}</button></sc-if>
+        </sc-if>
+        <sc-if value="{{ win.ctrls }}"><div style="display:flex;align-items:center;gap:2px;margin-left:6px;color:var(--muted)"><span style="width:36px;text-align:center">—</span><span style="width:36px;text-align:center">▢</span><span style="width:36px;text-align:center">×</span></div></sc-if>
+      </div>
+    </div>
+
+    <div style="flex:1;min-height:0;display:flex;position:relative">
+      <sc-if value="{{ pg.home }}">
+        <div style="width:232px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:2px">
+          <div style="display:flex;align-items:center;padding:9px 12px;border-radius:9px;font-weight:500;background:{{ hm.navBg }};color:{{ hm.navColor }}"><span style="flex:1">{{ t.e_repos }}</span><span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ hm.count }}</span></div>
+          <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:22px 12px 8px">Workspaces</div>
+          <sc-for list="{{ hm.ws }}" as="w" hint-placeholder-count="0"><div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-weight:500;background:{{ w.bg }};color:{{ w.color }}"><span style="width:8px;height:8px;border-radius:3px;background:{{ w.dot }}"></span><span style="flex:1">{{ w.name }}</span><span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ w.count }}</span></div></sc-for>
+          <sc-if value="{{ hm.wsEmpty }}"><div style="padding:0 12px 6px;font-size:12px;color:var(--faint);line-height:1.45">{{ t.e_wsEmpty }}</div></sc-if>
+          <div style="padding:9px 12px;color:var(--accent);font-weight:500">+ {{ t.e_newWs }}</div>
+        </div>
+        <div style="flex:1;min-width:0;overflow:auto">
+          <div style="max-width:1120px;margin:0 auto;padding:30px 32px 48px;display:flex;flex-direction:column;gap:18px">
+            <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:240px"><div style="display:flex;align-items:center;gap:10px"><sc-if value="{{ hm.isWs }}"><span style="width:12px;height:12px;border-radius:4px;background:oklch(0.72 0.15 190)"></span></sc-if><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ hm.title }}</h1></div><p style="margin:6px 0 0;color:var(--muted)">{{ hm.sub }}</p></div>
+              <div style="display:flex;gap:8px"><sc-for list="{{ hm.btns }}" as="b" hint-placeholder-count="3"><button onClick="{{ b.onClick }}" style="height:36px;padding:0 16px;border-radius:9px;cursor:pointer;font-weight:{{ b.fw }};border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for></div>
+            </div>
+            <sc-if value="{{ hm.hasNotice }}"><div style="display:flex;align-items:center;gap:12px;padding:10px 12px 10px 14px;border-radius:10px;background:color-mix(in oklch, var(--info) 10%, transparent);border:1px solid color-mix(in oklch, var(--info) 40%, var(--border))"><span aria-hidden="true" style="color:var(--info)">☁</span><span style="flex:1">{{ hm.notice }}</span></div></sc-if>
+            <sc-if value="{{ hm.hasFilters }}">
+              <div style="position:relative;display:flex;align-items:center;gap:8px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:14px">
+                <div style="flex:1;display:flex;align-items:center;gap:10px;padding:0 12px;height:38px;border-radius:9px;background:var(--bg);border:1px solid var(--border)"><span style="color:var(--faint);font-size:16px">⌕</span><span style="color:{{ hm.qColor }}">{{ hm.q }}</span></div>
+                <button onClick="{{ act.typeMenu }}" style="height:38px;padding:0 10px 0 12px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12.5px;border:1px solid {{ hm.typeBorder }};background:{{ hm.typeBg }}"><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15"><span style="font-size:10px;color:var(--faint)">{{ t.e_type }}</span><span style="font-weight:600">{{ hm.typeVal }}</span></span><span style="color:var(--faint);font-size:9px">▾</span></button>
+                <sc-for list="{{ hm.fakeFilters }}" as="f" hint-placeholder-count="4"><span style="height:38px;padding:0 10px 0 12px;border-radius:9px;display:flex;align-items:center;gap:6px;font-size:12.5px;border:1px solid var(--border);background:var(--bg)"><span style="display:flex;flex-direction:column;line-height:1.15"><span style="font-size:10px;color:var(--faint)">{{ f.l }}</span><span style="font-weight:600">{{ f.v }}</span></span><span style="color:var(--faint);font-size:9px">▾</span></span></sc-for>
+                <sc-if value="{{ hm.typeOpen }}"><div style="position:absolute;top:52px;left:calc(100% - 640px);z-index:4;min-width:236px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><sc-for list="{{ hm.typeOpts }}" as="o"><div onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:7px;cursor:pointer" style-hover="background:var(--surface2)"><span style="width:14px;color:var(--accent)">{{ o.check }}</span>{{ o.label }}</div></sc-for></div></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hm.isEmpty }}">
+              <div style="padding:44px 32px;border:1.5px dashed var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+                <div style="font-size:20px;font-weight:600;letter-spacing:-0.01em">{{ t.e_emptyTitle }}</div>
+                <div style="color:var(--muted);max-width:440px;line-height:1.5">{{ t.e_emptyText }}</div>
+                <div style="width:100%;max-width:760px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">
+                  <sc-for list="{{ hm.tiles }}" as="ti" hint-placeholder-count="3"><button onClick="{{ ti.onClick }}" style="padding:20px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left" style-hover="border-color:var(--accent)"><span aria-hidden="true" style="width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:16px">{{ ti.glyph }}</span><span style="font-weight:600;font-size:14px">{{ ti.title }}</span><span style="font-size:12.5px;color:var(--muted);line-height:1.4">{{ ti.sub }}</span></button></sc-for>
+                </div>
+                <button onClick="{{ act.findRepos }}" style="margin-top:8px;border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500">{{ t.e_findLink }}</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hm.isNoMatch }}"><div style="padding:44px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:10px">{{ t.e_noMatch }}<button style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-weight:500">{{ t.e_clearFilters }}</button></div></sc-if>
+            <sc-if value="{{ hm.isLoading }}"><sc-for list="{{ hm.skel }}" as="k" hint-placeholder-count="4"><div aria-busy="true" style="height:70px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:grid;grid-template-columns:34px 1.5fr 1.2fr 1fr 224px;gap:14px;align-items:center;padding:0 16px;opacity:{{ k.op }}"><span style="width:34px;height:34px;border-radius:10px;background:var(--surface2)"></span><span style="height:11px;width:60%;border-radius:6px;background:var(--surface2)"></span><span style="height:10px;width:70%;border-radius:6px;background:var(--surface2)"></span><span style="height:10px;width:50%;border-radius:6px;background:var(--surface2)"></span><span style="height:10px;width:60%;justify-self:end;border-radius:6px;background:var(--surface2)"></span></div></sc-for></sc-if>
+            <sc-if value="{{ hm.isList }}">
+              <div style="display:grid;grid-template-columns:repeat({{ hm.cols }},minmax(0,1fr));gap:8px">
+              <sc-for list="{{ hm.cards }}" as="r" hint-placeholder-count="5">
+                <div style="position:relative;display:grid;grid-template-columns:34px minmax(0,1.5fr) minmax(0,1.2fr) minmax(0,1fr) 230px;gap:14px;align-items:center;padding:14px 12px 14px 16px;background:var(--surface);border:1px solid {{ r.border }};border-radius:12px">
+                  <div style="width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:11px;font-weight:700;background:{{ r.badgeBg }};color:{{ r.badgeColor }};opacity:{{ r.dim }}">{{ r.abbr }}</div>
+                  <div style="min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ r.pathColor }};text-decoration:{{ r.pathDeco }}">{{ r.path }}</span></div>
+                  <div style="min-width:0;display:flex;flex-direction:column;gap:3px"><span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ r.srcColor }}">{{ r.src }}</span><span style="font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.srcSub }}</span></div>
+                  <div style="min-width:0;display:flex;flex-direction:column;gap:4px">
+                    <sc-if value="{{ r.hasPill }}"><span style="align-self:flex-start;height:22px;padding:0 8px;border-radius:6px;display:flex;align-items:center;font-size:11.5px;font-weight:500;white-space:nowrap;color:{{ r.pillColor }};background:{{ r.pillBg }};border:1px solid {{ r.pillBorder }}">{{ r.pill }}</span></sc-if>
+                    <sc-if value="{{ r.hasBranch }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">⎇ {{ r.branch }}</span><span style="font-size:12px;color:var(--faint)">{{ r.stats }}</span></sc-if>
+                    <sc-if value="{{ r.hasProg }}"><div style="height:4px;border-radius:2px;background:var(--surface2);overflow:hidden"><div style="height:100%;width:{{ r.pct }}%;background:var(--accent)"></div></div><span style="font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace">{{ r.progText }}</span></sc-if>
+                    <sc-if value="{{ r.hasErr }}"><span style="font-size:12px;color:var(--danger);line-height:1.35">{{ r.err }}</span></sc-if>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px">
+                    <sc-if value="{{ r.hasAct }}"><button onClick="{{ r.onAct }}" style="height:28px;padding:0 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;border:1px solid {{ r.actBorder }};background:{{ r.actBg }};color:{{ r.actColor }}">{{ r.act }}</button></sc-if>
+                    <sc-if value="{{ r.hasTime }}"><span style="font-size:12px;color:var(--faint);white-space:nowrap">{{ r.time }}</span></sc-if>
+                    <button onClick="{{ r.onMenu }}" aria-label="{{ t.moreActions }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px">⋯</button>
+                  </div>
+                  <sc-if value="{{ r.menuOpen }}"><div style="position:absolute;right:12px;top:52px;z-index:4;min-width:236px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><sc-for list="{{ r.menu }}" as="mi"><sc-if value="{{ mi.sep }}"><div style="height:1px;background:var(--border);margin:4px 6px"></div></sc-if><sc-if value="{{ mi.item }}"><div onClick="{{ mi.onClick }}" style="display:flex;align-items:center;height:32px;padding:0 10px;border-radius:7px;cursor:pointer;color:{{ mi.color }}" style-hover="background:var(--surface2)"><span style="flex:1">{{ mi.label }}</span><span style="color:var(--faint);font-size:11px">{{ mi.hint }}</span></div></sc-if></sc-for></div></sc-if>
+                </div>
+              </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ pg.repo }}">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+          <div style="height:62px;flex-shrink:0;display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid var(--border)">
+            <div style="display:flex;flex-direction:column;gap:3px;width:236px"><span style="font-weight:600;font-size:14px">{{ rp.name }} <span style="color:var(--faint);font-size:10px">▾</span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">⎇ {{ rp.branch }} <span style="color:var(--faint);font-family:'IBM Plex Sans',sans-serif">{{ rp.branchNote }}</span></span></div>
+            <div style="flex:1;display:flex;justify-content:center;align-items:center;gap:2px">
+              <sc-for list="{{ rp.tools }}" as="tl" hint-placeholder-count="10"><sc-if value="{{ tl.sep }}"><div style="width:1px;height:28px;background:var(--border);margin:0 8px"></div></sc-if><sc-if value="{{ tl.item }}"><button onClick="{{ tl.onClick }}" title="{{ tl.tip }}" aria-disabled="{{ tl.off }}" style="all:unset;cursor:{{ tl.cursor }};display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 10px;border-radius:9px;min-width:44px;opacity:{{ tl.op }}"><span style="font-size:16px;line-height:20px">{{ tl.glyph }}</span><span style="font-size:11px;color:var(--muted)">{{ tl.label }}</span></button></sc-if></sc-for>
+            </div>
+            <div style="width:200px;height:34px;padding:0 12px;border-radius:9px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;color:var(--faint);opacity:{{ rp.searchOp }}">⌕</div>
+          </div>
+          <sc-if value="{{ rp.hasBanner }}"><div role="status" style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:9px 14px;background:color-mix(in oklch, var(--warn) 12%, var(--bg));border-bottom:1px solid color-mix(in oklch, var(--warn) 35%, var(--border))"><span aria-hidden="true" style="color:var(--warn)">⚠</span><span style="flex:1">{{ t.e_roBanner }}</span><button onClick="{{ act.trust }}" style="height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.e_trustBtn }}</button></div></sc-if>
+          <div style="flex:1;min-height:0;display:flex">
+            <div style="width:236px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:12px 8px;opacity:{{ rp.sideOp }}">
+              <sc-for list="{{ rp.side }}" as="sd" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:6px;padding:8px 8px 6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)"><span style="width:10px;font-size:9px">▾</span><span style="flex:1">{{ sd.title }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ sd.count }}</span></div>
+                <sc-for list="{{ sd.items }}" as="it"><div style="display:flex;align-items:center;gap:8px;height:30px;padding:0 8px;border-radius:7px;background:{{ it.bg }}"><span style="width:14px;text-align:center;font-size:12px;color:{{ it.ic }}">{{ it.icon }}</span><span style="flex:1;font-weight:{{ it.fw }}">{{ it.label }}</span><span style="font-size:11px;color:var(--faint)">{{ it.right }}</span></div></sc-for>
+                <sc-if value="{{ sd.hasEmpty }}"><div style="padding:2px 8px 8px 24px;font-size:12px;color:var(--faint)">{{ sd.empty }}</div></sc-if>
+              </sc-for>
+            </div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+              <sc-if value="{{ rp.hasWip }}"><div style="height:40px;display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid var(--border);background:var(--accent-soft)"><span style="width:16px;height:16px;border-radius:50%;border:2px dashed var(--accent)"></span><span style="font-style:italic;font-weight:500;color:var(--muted)">{{ rp.wipText }}</span></div></sc-if>
+              <sc-if value="{{ rp.hasRows }}"><sc-for list="{{ rp.rows }}" as="rw" hint-placeholder-count="8"><div style="height:40px;display:grid;grid-template-columns:150px 40px minmax(0,1fr) 130px 70px;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid color-mix(in oklch, var(--border) 50%, transparent)"><span style="font-size:11px;color:var(--accent);font-family:'IBM Plex Mono',monospace">{{ rw.ref }}</span><span style="width:12px;height:12px;border-radius:50%;background:{{ rw.color }};margin-left:{{ rw.x }}px"></span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ rw.msg }}</span><span style="font-size:12px;color:var(--muted)">{{ rw.author }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--faint)">{{ rw.sha }}</span></div></sc-for></sc-if>
+              <sc-if value="{{ rp.hasEmpty }}"><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px;text-align:center"><span aria-hidden="true" style="font-size:24px;color:var(--faint)">{{ rp.emptyGlyph }}</span><div style="font-size:16px;font-weight:600">{{ rp.emptyTitle }}</div><div style="color:var(--muted);max-width:460px;line-height:1.5">{{ rp.emptyText }}</div><sc-if value="{{ rp.hasEmptyBtns }}"><div style="display:flex;gap:8px;margin-top:6px"><button onClick="{{ act.locate }}" style="height:34px;padding:0 16px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ t.e_locate }}</button><button onClick="{{ act.removeList }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.e_removeList }}</button></div></sc-if></div></sc-if>
+            </div>
+            <div style="width:320px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;opacity:{{ rp.panelOp }}">
+              <div style="padding:16px;border-bottom:1px solid var(--border)"><div style="font-weight:600;font-size:14px">{{ rp.stgTitle }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:2px">{{ rp.branch }}</div></div>
+              <div style="flex:1;padding:8px 12px;overflow:auto">
+                <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:8px 4px 6px">{{ t.e_unstaged }} ({{ rp.nFiles }})</div>
+                <sc-for list="{{ rp.files }}" as="f" hint-placeholder-count="0"><div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 4px"><span style="width:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--ok)">U</span><span style="flex:1">{{ f }}</span><span style="width:24px;height:24px;border-radius:6px;border:1px solid var(--border);display:grid;place-items:center;color:var(--muted)">+</span></div></sc-for>
+                <sc-if value="{{ rp.noFiles }}"><div style="padding:4px;font-size:12px;color:var(--faint)">{{ t.noChanges }}</div></sc-if>
+              </div>
+              <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px">
+                <div style="height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;color:var(--faint)">{{ t.e_summary }}</div>
+                <label title="{{ t.e_whyUndo }}" style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint);opacity:{{ rp.amendOp }}"><input type="checkbox" disabled="{{ rp.amendOff }}">{{ t.e_amend }}</label>
+                <button style="height:38px;border-radius:9px;border:0;font-weight:600;background:var(--surface2);color:var(--faint)">{{ rp.commitBtn }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ pg.settings }}">
+        <div style="width:232px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:2px">
+          <div style="font-size:15px;font-weight:600;padding:2px 12px 10px">{{ t.e_settings }}</div>
+          <sc-for list="{{ st.nav }}" as="n" hint-placeholder-count="5"><div onClick="{{ n.onClick }}" style="padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}" style-hover="background:var(--surface2)">{{ n.label }}</div></sc-for>
+        </div>
+        <div style="flex:1;min-width:0;overflow:auto"><div style="max-width:900px;margin:0 auto;padding:32px 36px;display:flex;flex-direction:column;gap:16px">
+          <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ st.title }}</h1>
+          <sc-for list="{{ st.cards }}" as="cd" hint-placeholder-count="1">
+            <sc-if value="{{ cd.isInvite }}"><div style="padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap"><span aria-hidden="true" style="width:38px;height:38px;flex-shrink:0;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:17px">☁</span><div style="flex:1;min-width:260px;display:flex;flex-direction:column;gap:6px"><div style="font-weight:600;font-size:14px">{{ cd.title }}</div><div style="color:var(--muted);line-height:1.5">{{ cd.text }}</div><div style="display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap"><button onClick="{{ act.signIn }}" style="height:34px;padding:0 16px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer">{{ t.e_signIn }}</button><span style="font-size:12px;color:var(--faint)">{{ t.e_noteGit }}</span></div></div></div></sc-if>
+            <sc-if value="{{ cd.isAcc }}"><div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:12px"><span style="width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ cd.color }}">{{ cd.abbr }}</span><div style="flex:1"><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600">@{{ cd.user }}</span><span style="height:20px;padding:0 7px;border-radius:6px;display:flex;align-items:center;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border)">{{ cd.chip }}</span></div><div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace">{{ cd.host }}</div></div></div></sc-if>
+            <sc-if value="{{ cd.isHead }}"><div style="font-weight:600;font-size:15px;margin-top:6px">{{ cd.title }}</div></sc-if>
+          </sc-for>
+        </div></div>
+      </sc-if>
+
+      <sc-if value="{{ hasPanel }}">
+        <div style="position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:28px;overflow:auto;background:{{ pn.scrim }}">
+          <div role="dialog" aria-modal="true" style="width:100%;max-width:{{ pn.w }};max-height:100%;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column">
+            <sc-if value="{{ pn.hasTitle }}"><div style="display:flex;align-items:flex-start;gap:12px;padding:20px 22px 4px"><div style="flex:1;font-size:17px;font-weight:600;letter-spacing:-0.01em">{{ pn.title }}</div><sc-if value="{{ pn.canClose }}"><button onClick="{{ act.close }}" aria-label="{{ t.closeLabel }}" style="width:30px;height:30px;border-radius:7px;border:0;background:transparent;cursor:pointer;color:var(--faint);font-size:17px">×</button></sc-if></div></sc-if>
+            <div style="padding:{{ pn.pad }};display:flex;flex-direction:column;gap:14px;line-height:1.5">
+              <sc-for list="{{ pn.blocks }}" as="b" hint-placeholder-count="4">
+                <sc-if value="{{ b.isStepper }}"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><sc-for list="{{ b.steps }}" as="sp"><div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="height:4px;border-radius:2px;background:{{ sp.bar }}"></span><span style="font-size:11px;font-weight:600;color:{{ sp.color }}">{{ sp.label }}</span></div></sc-for></div></sc-if>
+                <sc-if value="{{ b.isLogo }}"><div style="width:48px;height:48px;border-radius:14px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:22px">R</div></sc-if>
+                <sc-if value="{{ b.isIcon }}"><div style="width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:{{ b.bg }};color:{{ b.color }}">{{ b.glyph }}</div></sc-if>
+                <sc-if value="{{ b.isTitle }}"><div style="font-size:21px;font-weight:600;letter-spacing:-0.015em;text-wrap:pretty">{{ b.text }}</div></sc-if>
+                <sc-if value="{{ b.isP }}"><div style="color:{{ b.color }};font-size:{{ b.size }};font-family:{{ b.font }};text-wrap:pretty;white-space:pre-line">{{ b.text }}</div></sc-if>
+                <sc-if value="{{ b.isLines }}"><div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ b.lines }}" as="ln"><div style="display:flex;gap:10px;align-items:flex-start;color:var(--muted)"><span style="color:{{ ln.c }};width:14px;flex-shrink:0">{{ ln.g }}</span><span>{{ ln.t }}</span></div></sc-for></div></sc-if>
+                <sc-if value="{{ b.isBox }}"><div role="{{ b.role }}" style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;padding:10px 12px;border-radius:9px;background:color-mix(in oklch, {{ b.tone }} 11%, transparent);border:1px solid color-mix(in oklch, {{ b.tone }} 40%, var(--border));font-size:12.5px;line-height:1.5"><span aria-hidden="true" style="color:{{ b.tone }};font-weight:700">{{ b.icon }}</span><span style="flex:1;min-width:200px;white-space:pre-line">{{ b.text }}</span><sc-for list="{{ b.btns }}" as="bb"><button onClick="{{ bb.onClick }}" style="height:26px;padding:0 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500;white-space:nowrap">{{ bb.label }}</button></sc-for></div></sc-if>
+                <sc-if value="{{ b.isField }}">
+                  <div style="position:relative;display:flex;flex-direction:column;gap:6px">
+                    <span style="font-size:12px;font-weight:600;color:var(--muted);font-family:{{ b.labelFont }}">{{ b.label }}</span>
+                    <div style="display:flex;gap:8px">
+                      <input value="{{ b.value }}" onChange="{{ b.onChange }}" onBlur="{{ b.onBlur }}" placeholder="{{ b.ph }}" readOnly="{{ b.ro }}" aria-invalid="{{ b.hasErr }}" style="flex:1;min-width:0;height:36px;padding:0 12px;border-radius:9px;outline:0;border:1px solid {{ b.border }};background:{{ b.inBg }};font-family:{{ b.font }};color:{{ b.inColor }}">
+                      <sc-if value="{{ b.hasBtn }}"><button onClick="{{ b.onBtn }}" style="height:36px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap">{{ b.btn }}</button></sc-if>
+                    </div>
+                    <sc-if value="{{ b.hasSugg }}"><div style="position:absolute;top:66px;left:0;right:0;z-index:3;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)"><sc-if value="{{ b.searching }}"><div style="display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;color:var(--muted);font-size:12px"><span style="width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span>{{ b.searchText }}</div></sc-if><sc-for list="{{ b.sugg }}" as="sg"><div onClick="{{ sg.onClick }}" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer" style-hover="background:var(--surface2)"><span style="width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ sg.color }}">{{ sg.ini }}</span><div style="flex:1;min-width:0"><div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px">{{ sg.name }} <span style="color:var(--faint)">{{ sg.lock }}</span></div><div style="font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sg.desc }}</div></div></div></sc-for></div></sc-if>
+                    <sc-if value="{{ b.hasErr }}"><span role="alert" style="display:flex;gap:6px;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ b.err }}</span></span></sc-if>
+                    <sc-if value="{{ b.hasHelp }}"><span style="font-size:12px;line-height:1.4;color:{{ b.helpColor }};font-family:{{ b.helpFont }}">{{ b.help }}</span></sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.isSelect }}"><label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ b.label }}</span><select value="{{ b.value }}" onChange="{{ b.onChange }}" style="height:36px;padding:0 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ b.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select><sc-if value="{{ b.hasHelp }}"><span style="font-size:12px;color:{{ b.helpColor }};line-height:1.4">{{ b.help }}</span></sc-if></label></sc-if>
+                <sc-if value="{{ b.isSeg }}"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ b.label }}</span><div style="display:flex;padding:3px;border-radius:9px;background:var(--bg);border:1px solid var(--border)"><sc-for list="{{ b.opts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.tip }}" style="flex:1;height:30px;border:0;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;background:{{ o.bg }};color:{{ o.color }};opacity:{{ o.op }}">{{ o.label }}</button></sc-for></div><sc-if value="{{ b.hasHelp }}"><span style="font-size:12px;color:{{ b.helpColor }};font-family:{{ b.helpFont }};line-height:1.4">{{ b.help }}</span></sc-if></div></sc-if>
+                <sc-if value="{{ b.isCheck }}"><label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer"><input type="checkbox" checked="{{ b.checked }}" onChange="{{ b.onToggle }}" style="accent-color:var(--accent);margin-top:3px"><span style="display:flex;flex-direction:column;gap:2px"><span>{{ b.label }}</span><sc-if value="{{ b.hasDesc }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--faint)">{{ b.desc }}</span></sc-if></span></label></sc-if>
+                <sc-if value="{{ b.isBtnRow }}"><div style="display:grid;grid-template-columns:repeat({{ b.cols }},minmax(0,1fr));gap:10px"><sc-for list="{{ b.btns }}" as="bb"><button onClick="{{ bb.onClick }}" disabled="{{ bb.off }}" style="height:{{ bb.h }};padding:0 14px;border-radius:9px;cursor:pointer;font-weight:{{ bb.fw }};display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid {{ bb.border }};background:{{ bb.bg }};color:{{ bb.color }};opacity:{{ bb.op }}"><sc-if value="{{ bb.busy }}"><span style="width:13px;height:13px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span></sc-if>{{ bb.label }}</button></sc-for></div></sc-if>
+                <sc-if value="{{ b.isChips }}"><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ b.chips }}" as="cp"><span style="height:28px;padding:0 6px 0 10px;border-radius:8px;display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--bg);border:1px solid {{ cp.border }}">{{ cp.label }}<button onClick="{{ cp.onRemove }}" aria-label="{{ t.e_remove }}" style="width:20px;height:20px;border:0;border-radius:5px;background:transparent;cursor:pointer;color:var(--faint)">×</button></span></sc-for></div></sc-if>
+                <sc-if value="{{ b.isList }}"><div style="border:1px solid var(--border);border-radius:10px;overflow:hidden"><sc-if value="{{ b.hasHead }}"><div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px"><span style="flex:1;color:var(--muted)">{{ b.head }}</span><button onClick="{{ b.onHead }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500;font-size:12px">{{ b.headBtn }}</button></div></sc-if><sc-for list="{{ b.items }}" as="li"><label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--border);cursor:pointer"><sc-if value="{{ li.hasCheck }}"><input type="checkbox" checked="{{ li.checked }}" onChange="{{ li.onToggle }}" style="accent-color:var(--accent)"></sc-if><span style="width:22px;height:22px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:8px;font-weight:700;background:{{ li.bg }};color:{{ li.fg }}">{{ li.abbr }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-weight:500">{{ li.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ li.path }}</span></span><span style="font-size:12px;color:{{ li.stColor }}">{{ li.status }}</span></label></sc-for></div></sc-if>
+                <sc-if value="{{ b.isTiles }}"><div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px"><sc-for list="{{ b.tiles }}" as="ti"><button onClick="{{ ti.onClick }}" style="padding:14px 6px;border-radius:10px;border:1px solid {{ ti.border }};background:var(--bg);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px" style-hover="border-color:var(--accent)"><span style="width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:10px;font-weight:700;color:white;background:{{ ti.color }}">{{ ti.abbr }}</span><span style="font-size:11.5px;font-weight:500;text-align:center;line-height:1.25">{{ ti.label }}</span></button></sc-for></div></sc-if>
+                <sc-if value="{{ b.isRows }}"><div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden"><sc-for list="{{ b.rows }}" as="ro"><div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border)"><span style="width:16px;color:{{ ro.ic }}">{{ ro.icon }}</span><span style="flex:1;font-family:{{ ro.font }};font-size:12.5px">{{ ro.title }}</span><span style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ ro.sub }}</span></div></sc-for></div></sc-if>
+                <sc-if value="{{ b.isCode }}"><div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--border)"><pre style="flex:1;margin:0;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.7;white-space:pre-wrap">{{ b.text }}</pre><button onClick="{{ b.onCopy }}" style="height:28px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500">{{ b.copy }}</button></div></sc-if>
+                <sc-if value="{{ b.isBig }}"><div style="display:flex;align-items:center;justify-content:center;gap:14px;padding:18px;border-radius:12px;background:var(--bg);border:1px solid var(--border)"><span style="font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;letter-spacing:.08em">{{ b.code }}</span><button onClick="{{ b.onCopy }}" style="height:28px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500">{{ b.copy }}</button></div></sc-if>
+                <sc-if value="{{ b.isSpin }}"><div style="display:flex;align-items:center;gap:10px;color:var(--muted)"><span style="width:16px;height:16px;flex-shrink:0;border-radius:50%;border:2px solid var(--accent);border-right-color:transparent;animation:spin .8s linear infinite"></span><span>{{ b.text }}</span></div></sc-if>
+                <sc-if value="{{ b.isPhases }}"><div style="display:flex;flex-direction:column;gap:10px"><sc-for list="{{ b.phases }}" as="ph"><div style="display:flex;align-items:center;gap:10px;color:{{ ph.color }};font-weight:{{ ph.fw }}"><span style="width:16px;text-align:center">{{ ph.icon }}</span><span>{{ ph.label }}</span></div></sc-for><sc-if value="{{ b.hasBar }}"><div style="height:6px;border-radius:3px;background:var(--surface2);overflow:hidden;margin-top:4px"><div style="height:100%;width:{{ b.pct }}%;background:var(--accent);transition:width .2s"></div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">{{ b.detail }}</div></sc-if></div></sc-if>
+                <sc-if value="{{ b.isDone }}"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 0 4px;text-align:center"><span style="width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:color-mix(in oklch, var(--ok) 15%, transparent);color:var(--ok);font-size:20px">✓</span><div style="font-weight:600">{{ b.text }}</div><sc-if value="{{ b.hasSub }}"><div style="color:var(--muted);font-size:12.5px">{{ b.sub }}</div></sc-if></div></sc-if>
+                <sc-if value="{{ b.isLink }}"><button onClick="{{ b.onClick }}" style="align-self:{{ b.align }};border:0;padding:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500">{{ b.text }}</button></sc-if>
+              </sc-for>
+            </div>
+            <sc-if value="{{ pn.hasFoot }}"><div style="padding:12px 22px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><sc-for list="{{ pn.btns }}" as="b" hint-placeholder-count="2"><button onClick="{{ b.onClick }}" disabled="{{ b.off }}" autoFocus="{{ b.focus }}" style="margin-right:{{ b.mr }};height:36px;padding:0 16px;border-radius:9px;cursor:pointer;font-weight:{{ b.fw }};display:flex;align-items:center;gap:8px;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }};opacity:{{ b.op }}"><sc-if value="{{ b.busy }}"><span style="width:13px;height:13px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:spin .8s linear infinite"></span></sc-if>{{ b.label }}</button></sc-for></div></sc-if>
+            <sc-if value="{{ pn.hasGit }}"><div style="padding:12px 22px;border-top:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:{{ pn.gitColor }}">{{ pn.git }}</div></sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="position:absolute;right:18px;bottom:18px;z-index:9;display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0"><div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:11px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-width:420px;animation:toastIn .2s ease-out"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ to.color }}"></span><span>{{ to.text }}</span></div></sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;os&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;macos&quot;,&quot;windows&quot;,&quot;linux&quot;],&quot;default&quot;:&quot;macos&quot;,&quot;tsType&quot;:&quot;'macos'|'windows'|'linux'&quot;},&quot;session&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;signedOut&quot;,&quot;signedIn&quot;],&quot;default&quot;:&quot;signedOut&quot;,&quot;tsType&quot;:&quot;'signedIn'|'signedOut'&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;d01-cuenta&quot;,&quot;d01-identidad&quot;,&quot;d01-repos&quot;,&quot;d01-plataformas&quot;,&quot;d01-ia&quot;,&quot;d02-ausente&quot;,&quot;d02-antiguo&quot;,&quot;d03-navegador&quot;,&quot;d03-codigo&quot;,&quot;d03-error&quot;,&quot;d04-sin-sesion&quot;,&quot;d05-vacio&quot;,&quot;d05-solo-nube&quot;,&quot;d06-lista&quot;,&quot;d06-abrir-todos&quot;,&quot;d07-tarjeta&quot;,&quot;d07-vista&quot;,&quot;d08-formulario&quot;,&quot;d08-progreso&quot;,&quot;d08-error&quot;,&quot;d09-no-repo&quot;,&quot;d09-confianza&quot;,&quot;d09-solo-lectura&quot;,&quot;d09-iniciar&quot;,&quot;d10-vacio&quot;,&quot;d11-formulario&quot;,&quot;d11-progreso&quot;,&quot;d11-error&quot;],&quot;default&quot;:&quot;d01-cuenta&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const SCR = [
+  ['d01-cuenta', 'D-01', ['Primer arranque · Cuenta', 'First run · Account'], [['base', 'Sin sesión', 'Signed out'], ['signedIn', 'Sesión iniciada', 'Signed in'], ['checking', 'Comprobando Git', 'Checking Git']]],
+  ['d01-identidad', 'D-01', ['Primer arranque · Identidad', 'First run · Identity'], [['prefill', 'Detectado', 'Detected'], ['empty', 'Vacío', 'Empty']]],
+  ['d01-repos', 'D-01', ['Primer arranque · Repositorios', 'First run · Repositories'], [['base', 'Carpetas', 'Folders'], ['results', 'Resultados', 'Results'], ['none', 'Sin resultados', 'No results'], ['perm', 'Sin permiso', 'No permission']]],
+  ['d01-plataformas', 'D-01', ['Primer arranque · Plataformas', 'First run · Platforms'], []],
+  ['d01-ia', 'D-01', ['Primer arranque · IA', 'First run · AI'], []],
+  ['d02-ausente', 'D-02', ['Git ausente', 'Git missing'], [['base', 'Ausente', 'Missing'], ['still', 'Sigue sin aparecer', 'Still missing'], ['found', 'Encontrado', 'Found']]],
+  ['d02-antiguo', 'D-02', ['Git antiguo', 'Old Git'], []],
+  ['d03-navegador', 'D-03', ['Iniciar sesión · navegador', 'Sign in · browser'], []],
+  ['d03-codigo', 'D-03', ['Iniciar sesión · código', 'Sign in · code'], [['base', 'Código', 'Code'], ['noReceiver', 'Sin receptor local', 'No local receiver'], ['success', 'Éxito', 'Success']]],
+  ['d03-error', 'D-03', ['Iniciar sesión · errores', 'Sign in · errors'], [['cancelled', 'Cancelado', 'Cancelled'], ['expired', 'Caducado', 'Expired'], ['offline', 'Sin conexión', 'Offline'], ['generic', 'Genérico', 'Generic']]],
+  ['d04-sin-sesion', 'D-04', ['App sin sesión', 'Signed-out app'], [['profile', 'Perfil', 'Profile'], ['account', 'Cuenta', 'Account'], ['team', 'Equipo', 'Team'], ['platforms', 'Plataformas', 'Platforms'], ['ai', 'IA', 'AI'], ['ws', 'Workspace', 'Workspace']]],
+  ['d05-vacio', 'D-05', ['Sin repositorios', 'No repositories'], [['empty', 'Vacío', 'Empty'], ['filters', 'Con filtros', 'With filters'], ['loading', 'Cargando', 'Loading'], ['narrow', '1024 px', '1024 px']]],
+  ['d05-solo-nube', 'D-05', ['Solo en la nube', 'Cloud only'], []],
+  ['d06-lista', 'D-06', ['No clonados en este equipo', 'Not cloned here'], [['base', 'Lista', 'List'], ['type', 'Filtro Tipo', 'Type filter'], ['menu', 'Menú', 'Menu'], ['cloning', 'Clonando', 'Cloning'], ['error', 'Error', 'Error'], ['grid', 'Rejilla del workspace', 'Workspace grid']]],
+  ['d06-abrir-todos', 'D-06', ['Abrir todos con faltantes', 'Open all with missing'], []],
+  ['d07-tarjeta', 'D-07', ['Ruta desaparecida · tarjeta', 'Missing path · card'], [['base', 'Tarjeta', 'Card'], ['menu', 'Menú', 'Menu'], ['other', 'Otro repositorio', 'Other repository']]],
+  ['d07-vista', 'D-07', ['Ruta desaparecida · vista', 'Missing path · view'], []],
+  ['d08-formulario', 'D-08', ['Clonar · formulario', 'Clone · form'], [['base', 'Formulario', 'Form'], ['sugg', 'Autocompletar', 'Autocomplete'], ['host', 'Otro host', 'Other host'], ['bad', 'URL no válida', 'Invalid URL']]],
+  ['d08-progreso', 'D-08', ['Clonar · progreso', 'Clone · progress'], []],
+  ['d08-error', 'D-08', ['Clonar · errores', 'Clone · errors'], [['auth', 'Credenciales', 'Credentials'], ['missing', 'No existe', 'Not found'], ['busy', 'Destino ocupado', 'Folder busy'], ['already', 'Ya lo tienes', 'Already here'], ['net', 'Red', 'Network'], ['ssh', 'Host SSH', 'SSH host'], ['lfs', 'Git LFS', 'Git LFS']]],
+  ['d09-no-repo', 'D-09', ['Abrir · no es un repo', 'Open · not a repo'], [['base', 'No es repo', 'Not a repo'], ['root', 'Subcarpeta', 'Subfolder']]],
+  ['d09-confianza', 'D-09', ['Abrir · confianza', 'Open · trust'], []],
+  ['d09-solo-lectura', 'D-09', ['Solo lectura', 'Read-only'], []],
+  ['d09-iniciar', 'D-09', ['Iniciar', 'Initialize'], [['base', 'Carpeta vacía', 'Empty folder'], ['files', 'Con archivos', 'With files'], ['already', 'Ya es repo', 'Already a repo']]],
+  ['d10-vacio', 'D-10', ['Repositorio vacío', 'Empty repository'], [['nofiles', 'Sin archivos', 'No files'], ['files', 'Con archivos', 'With files']]],
+  ['d11-formulario', 'D-11', ['Publicar · formulario', 'Publish · form'], [['github', 'GitHub', 'GitHub'], ['gitlab', 'GitLab', 'GitLab'], ['azure', 'Azure DevOps', 'Azure DevOps']]],
+  ['d11-progreso', 'D-11', ['Publicar · progreso', 'Publish · progress'], [['run', 'En curso', 'Running'], ['done', 'Éxito', 'Success']]],
+  ['d11-error', 'D-11', ['Publicar · errores', 'Publish · errors'], [['taken', 'Nombre ocupado', 'Name taken'], ['scope', 'Sin permiso', 'Missing scope'], ['org', 'Organización', 'Organization'], ['sso', 'SSO', 'SSO'], ['net', 'Red', 'Network'], ['partial', 'Parcial', 'Partial']]]
+];
+const CH = { title: ['Entrada y ciclo de vida del repositorio', 'Repository entry and lifecycle'], sub: ['Primer arranque, Git ausente, inicio de sesión, app sin sesión, lista vacía, repos que faltan y los flujos de abrir, iniciar, clonar y publicar. Elige pantalla y variante; los pasos se recorren con clics.', 'First run, missing Git, sign-in, signed-out app, empty list, missing repos and the open, initialize, clone and publish flows. Pick a screen and variant; steps are clickable.'],
+  theme: ['Tema', 'Theme'], lang: ['Idioma', 'Language'], os: ['Sistema', 'System'], session: ['Sesión', 'Session'], dark: ['Oscuro', 'Dark'], light: ['Claro', 'Light'], on: ['Con sesión', 'Signed in'], off: ['Sin sesión', 'Signed out'] };
+const ACCS = [{ id: 'a1', plat: 'github', user: 'marta-dev', host: 'github.com', ssh: true }, { id: 'a3', plat: 'gitlab', user: 'mruiz', host: 'gitlab.empresa.com', ssh: false }];
+const SUGG = [['acme/web-app', 'Panel web de ACME en Next.js', 'AC', 'oklch(0.76 0.16 60)', true], ['acme/api-gateway', 'Gateway con rate limiting', 'AC', 'oklch(0.76 0.16 60)', true], ['marta-dev/dotfiles', 'Mis dotfiles', 'MR', 'oklch(0.68 0.2 300)', false]];
+const FOUND = [['gitflow-desktop', '~/code/gitflow-desktop', 'github'], ['mobile-app', '~/code/mobile-app', 'github'], ['api-gateway', '~/work/api-gateway', 'gitlab'], ['notas', '~/Documents/notas', null], ['infra-terraform', '~/work/infra-terraform', 'gitlab']];
+
+class Component extends DCLogic {
+  state = { ready: false, theme: 'dark', lang: 'es', os: 'macos', session: 'signedOut', screen: 'd01-cuenta', v: 'base', toasts: [], gitName: 'Marta Ruiz', gitEmail: 'marta@example.com', emailErr: '', folders: ['~/code', '~/work'], searching: false, found: 0, picked: {}, plats: {}, keyAdded: false, checks: 0, gitState: 'idle', remain: 600, url: 'acme/web-app', acc: 'a1', proto: 'https', subs: true, ws: '', pct: 0, phase: 0, menu: null, typeMenu: false, typeVal: 'all', initBranch: 'main', pub: { owner: 'marta-dev', name: 'nuevo-proyecto', vis: 'private', readme: true }, pubStep: 0, copied: false, cloneState: null };
+  componentDidMount() {
+    const p = this.props; const up = {}; ['theme', 'lang', 'os', 'session'].forEach(k => { if (p[k]) up[k] = p[k]; }); if (p.screen) Object.assign(up, this.screenState(p.screen)); this.setState(up);
+    const go = () => window.RAMAL && window.RAMAL.D.e_welcome ? this.setState({ ready: true }) : setTimeout(go, 30); go();
+    this._k = e => { if (e.key === 'Escape') this.closePanel(); }; window.addEventListener('keydown', this._k);
+  }
+  componentWillUnmount() { clearInterval(this._iv); clearTimeout(this._t); window.removeEventListener('keydown', this._k); }
+  componentDidUpdate(pp) { const p = this.props, up = {}; ['theme', 'lang', 'os', 'session'].forEach(k => { if (pp[k] !== p[k] && p[k]) up[k] = p[k]; }); if (pp.screen !== p.screen && p.screen) Object.assign(up, this.screenState(p.screen)); if (Object.keys(up).length) this.setState(up); document.body.dataset.theme = this.state.theme; }
+  T(k, v) { const e = window.RAMAL.D[k] || (window.RAMAL.STATES || {})[k] || (window.RAMAL.VAULT || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  P(base, n) { return this.T(base + (n === 1 ? '_one' : '_other'), { count: n }); }
+  toast(text, kind = 'ok') { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }].slice(-3) })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
+  screenState(id) { const sc = SCR.find(x => x[0] === id); const v = sc && sc[3][0] ? sc[3][0][0] : 'base'; return this.variantState(id, v); }
+  variantState(id, v) {
+    clearInterval(this._iv); clearTimeout(this._t);
+    const st = { screen: id, v, menu: null, typeMenu: false, copied: false, panelOff: false, cloneState: null };
+    if (id === 'd01-identidad') { st.gitName = v === 'empty' ? '' : 'Marta Ruiz'; st.gitEmail = v === 'empty' ? '' : 'marta@example.com'; st.emailErr = ''; }
+    if (id === 'd01-repos') { st.searching = false; st.found = v === 'results' ? FOUND.length : 0; st.folders = v === 'perm' ? ['~/code', '/Volumes/Backup'] : v === 'none' ? ['~/Downloads'] : ['~/code', '~/work']; st.picked = Object.fromEntries(FOUND.map((_, i) => [i, true])); }
+    if (id === 'd02-ausente') st.gitState = v === 'still' ? 'still' : v === 'found' ? 'found' : 'idle';
+    if (id === 'd03-codigo') { st.remain = 600; this._iv = setInterval(() => this.setState(s => ({ remain: Math.max(0, s.remain - 1) })), 1000); }
+    if (id === 'd08-formulario') { st.url = v === 'bad' ? 'htps:/acme' : v === 'host' ? 'https://bitbucket.org/acme/billing' : v === 'sugg' ? 'acme/' : 'acme/web-app'; st.acc = v === 'host' ? 'none' : 'a1'; st.proto = 'https'; }
+    if (id === 'd08-progreso') { st.pct = 8; st.phase = 2; setTimeout(() => this.runClone(), 0); }
+    if (id === 'd06-lista' && v === 'cloning') { st.cloneState = { pct: 42 }; }
+    if (id === 'd11-progreso') { st.pubStep = v === 'done' ? 3 : 0; if (v !== 'done') setTimeout(() => this.runPublish(), 0); }
+    if (id === 'd09-iniciar') st.initBranch = 'main';
+    return st;
+  }
+  go(id, v) { this.setState(v ? this.variantState(id, v) : this.screenState(id)); }
+  closePanel = () => this.setState({ panelOff: true });
+  runClone() { clearInterval(this._iv); this._iv = setInterval(() => { const s = this.state; let pct = s.pct + 6 + Math.random() * 6, ph = pct < 12 ? 1 : pct < 22 ? 2 : pct < 72 ? 3 : pct < 88 ? 4 : pct < 98 ? 5 : 6; if (pct >= 100) { clearInterval(this._iv); this.toast(this.T('e_cloned', { repo: 'web-app' })); this.setState({ screen: 'd06-lista', v: 'base', panelOff: false, pct: 100 }); return; } this.setState({ pct, phase: ph }); }, 260); }
+  runPublish() { clearInterval(this._iv); let n = 0; this._iv = setInterval(() => { n++; this.setState({ pubStep: n }); if (n >= 3) { clearInterval(this._iv); this.setState({ v: 'done' }); this.toast(this.T('e_published', { url: 'github.com/marta-dev/nuevo-proyecto' })); } }, 900); }
+  searchRepos() { this.setState({ searching: true, found: 0 }); clearInterval(this._iv); this._iv = setInterval(() => { const n = this.state.found + 1; if (n >= FOUND.length) { clearInterval(this._iv); this.setState({ found: FOUND.length, searching: false, v: 'results' }); } else this.setState({ found: n }); }, 380); }
+
+  renderVals() {
+    const s = this.state, R = window.RAMAL;
+    if (!s.ready || !R) return { ch: {}, t: {}, segs: [], nav: [], vars: [], cur: {}, win: {}, pg: {}, hm: { btns: [], tiles: [], cards: [], ws: [], skel: [], fakeFilters: [], typeOpts: [] }, rp: { tools: [], side: [], rows: [], files: [] }, st: { nav: [], cards: [] }, pn: { blocks: [], btns: [] }, act: {}, toasts: [] };
+    const L = s.lang === 'en' ? 1 : 0, T = this.T.bind(this), P = R.PLAT;
+    const t = {}; for (const k in (R.STATES || {})) t[k] = R.STATES[k][L]; for (const k in R.D) t[k] = R.D[k][L];
+    const ch = {}; for (const k in CH) ch[k] = CH[k][L];
+    const signed = s.session === 'signedIn', id = s.screen, v = s.v;
+    const seg = (label, key, opts) => ({ label, opts: opts.map(([val, l]) => { const on = s[key] === val; return { label: l, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ [key]: val }) }; }) });
+    const segs = [seg(ch.theme, 'theme', [['dark', ch.dark], ['light', ch.light]]), seg(ch.lang, 'lang', [['es', 'ES'], ['en', 'EN']]), seg(ch.os, 'os', [['macos', 'macOS'], ['windows', 'Windows'], ['linux', 'Linux']]), seg(ch.session, 'session', [['signedOut', ch.off], ['signedIn', ch.on]])];
+    const nav = SCR.map(([sid, code, ttl]) => { const on = id === sid; return { label: sid, title: code + ' · ' + ttl[L], bg: on ? 'var(--accent-soft)' : 'var(--surface)', border: on ? 'var(--accent)' : 'var(--border)', color: on ? 'var(--accent)' : 'var(--text)', onClick: () => this.go(sid) }; });
+    const sc = SCR.find(x => x[0] === id);
+    const vars = sc[3].map(([k, es, en]) => { const on = v === k; return { label: L ? en : es, bg: on ? 'var(--accent)' : 'var(--surface)', border: on ? 'var(--accent)' : 'var(--border)', color: on ? 'var(--accent-ink)' : 'var(--text)', onClick: () => this.go(id, k) }; });
+    const nativeScr = id.startsWith('d09') && id !== 'd09-solo-lectura';
+    const cur = { id: sc[1], title: sc[2][L], hasNote: nativeScr, note: t.e_nativeNote };
+
+    // page type
+    const onboard = id.startsWith('d01') || id.startsWith('d02');
+    const pageType = onboard ? 'blank' : id === 'd04-sin-sesion' && v !== 'ws' ? 'settings' : ['d07-vista', 'd09-solo-lectura', 'd10-vacio'].includes(id) || id.startsWith('d11') ? 'repo' : 'home';
+    const showSignedIn = id === 'd04-sin-sesion' ? false : signed;
+    const win = { mac: s.os === 'macos', ctrls: s.os !== 'macos', tabs: !onboard, signedIn: showSignedIn, signedOut: !showSignedIn, hasRepoTab: pageType === 'repo', hasSetTab: pageType === 'settings', homeBg: pageType === 'home' ? 'var(--bg)' : 'transparent', homeColor: pageType === 'home' ? 'var(--text)' : 'var(--muted)', homeShadow: pageType === 'home' ? 'inset 0 2px 0 var(--accent)' : 'none',
+      repoTab: id === 'd07-vista' ? 'design-tokens' : id === 'd09-solo-lectura' ? 'vendor-sdk' : 'nuevo-proyecto', tabAbbr: id === 'd07-vista' ? 'GH' : '⌂', tabBadge: id === 'd07-vista' ? P.github.color : 'var(--faint)',
+      esBg: L ? 'transparent' : 'var(--accent)', esColor: L ? 'var(--muted)' : 'var(--accent-ink)', enBg: L ? 'var(--accent)' : 'transparent', enColor: L ? 'var(--accent-ink)' : 'var(--muted)' };
+    const pg = { home: pageType === 'home', repo: pageType === 'repo', settings: pageType === 'settings' };
+    const btnS = (label, onClick, kind, o) => ({ label, onClick, fw: kind === 'p' || kind === 'd' ? 600 : 500, bg: kind === 'p' ? 'var(--accent)' : kind === 'd' ? 'var(--danger)' : 'var(--surface)', color: kind === 'p' ? 'var(--accent-ink)' : kind === 'd' ? 'var(--danger-ink)' : 'var(--text)', border: kind === 'p' || kind === 'd' ? 'transparent' : 'var(--border)', off: false, op: 1, busy: false, focus: false, mr: '0', h: '36px', ...(o || {}) });
+
+    // home page
+    const hm = { btns: [btnS(t.e_open, () => this.go('d09-no-repo')), btnS(t.e_tInit, () => this.go('d09-iniciar')), btnS(t.e_clone, () => this.go('d08-formulario'), 'p')], ws: [], wsEmpty: true, tiles: [], cards: [], skel: [], fakeFilters: [], typeOpts: [], cols: 1, navBg: 'var(--accent-soft)', navColor: 'var(--accent)', title: t.e_repos, sub: t.e_reposSub, isWs: false };
+    if (pageType === 'home') {
+      const card = o => ({ border: 'var(--border)', dim: 1, pathColor: 'var(--faint)', pathDeco: 'none', srcColor: 'var(--text)', srcSub: '', hasPill: false, hasBranch: false, hasProg: false, hasErr: false, hasAct: false, hasTime: true, time: '', menuOpen: false, menu: [], onMenu: () => {}, ...o });
+      const local = [card({ abbr: 'GH', badgeBg: P.github.color, badgeColor: 'white', name: 'Cliente Git', path: '~/code/gitflow-desktop', src: 'GitHub · @marta-dev', srcSub: 'github.com · Personal', hasBranch: true, branch: 'feature/graph-ui', stats: '↑2  ↓0', time: L ? '5 min ago' : 'hace 5 min' }), card({ abbr: 'GL', badgeBg: P.gitlab.color, badgeColor: 'white', name: 'api-gateway', path: '~/work/api-gateway', src: 'GitLab · @mruiz', srcSub: 'gitlab.empresa.com · Empresa', hasBranch: true, branch: 'develop', stats: '↑0  ↓3', time: L ? '2h ago' : 'hace 2 h' })];
+      const MI = (label, fn, o) => ({ sep: false, item: true, label, hint: '', color: 'var(--text)', onClick: e => { e.stopPropagation(); this.setState({ menu: null }); fn && fn(); }, ...(o || {}) });
+      const cloud = (k, name, plat, slug, accLabel) => { const cl = s.cloneState && k === 0; const err = v === 'error' && k === 0; return card({ abbr: P[plat].abbr, badgeBg: P[plat].color, badgeColor: 'white', dim: 0.7, name, path: slug, src: accLabel || T('e_noAccHost', { host: slug.split('/')[0] }), srcColor: accLabel ? 'var(--text)' : 'var(--warn)', srcSub: accLabel ? slug.split('/')[0] : '',
+        hasPill: !cl && !err, pill: t.e_notCloned, pillColor: 'var(--muted)', pillBg: 'var(--bg)', pillBorder: 'var(--border)', hasProg: !!cl, pct: cl ? Math.round(s.cloneState.pct) : 0, progText: cl ? T('e_detail', { pct: Math.round(s.cloneState.pct), size: '84 MB', speed: '6,2 MB' }) : '', hasErr: err, err: err ? T('e_net', { host: 'github.com' }) : '',
+        hasAct: true, act: cl ? t.e_cancel : err ? t.e_retry : t.e_clone, actBorder: cl || err ? 'var(--border)' : 'var(--accent)', actBg: cl || err ? 'var(--surface)' : 'var(--accent-soft)', actColor: cl ? 'var(--text)' : 'var(--accent)', onAct: () => cl ? (this.setState({ cloneState: null }), this.toast(t.e_cloneCancelled, 'warn')) : this.go('d08-formulario'), hasTime: false,
+        menuOpen: s.menu === 'c' + k || (v === 'menu' && k === 0 && s.menu !== 'x'), onMenu: () => this.setState({ menu: s.menu === 'c' + k ? 'x' : 'c' + k }),
+        menu: [MI(t.e_cloneMenu, () => this.go('d08-formulario')), MI(t.e_copyUrl, () => this.toast(T('copied', { x: 'https://' + slug }), 'info')), MI(t.e_wsMenu, null, { hint: '›' }), { sep: true, item: false }, MI(t.e_removeAcc, () => this.setState({ confirm: { title: T('e_removeTitle', { repo: name }), body: t.e_removeBody } }), { color: 'var(--danger)' })] }); };
+      const clouds = [cloud(0, 'web-app', 'github', 'github.com/acme/web-app', 'GitHub · @marta-dev'), cloud(1, 'billing-service', 'bitbucket', 'bitbucket.org/marta_r/billing-service', null), cloud(2, 'infra-terraform', 'gitlab', 'gitlab.empresa.com/infra/terraform', 'GitLab · @mruiz')];
+      const missing = card({ abbr: 'GH', badgeBg: P.github.color, badgeColor: 'white', name: 'design-tokens', path: '~/work/design-tokens', pathColor: 'var(--faint)', pathDeco: 'line-through', src: 'GitHub · @marta-acme', srcSub: 'github.com · ACME Corp', border: 'color-mix(in oklch, var(--warn) 45%, var(--border))', hasPill: true, pill: t.e_folderMissing, pillColor: 'var(--warn)', pillBg: 'color-mix(in oklch, var(--warn) 12%, transparent)', pillBorder: 'transparent', hasAct: true, act: t.e_locate, actBorder: 'var(--border)', actBg: 'var(--surface)', actColor: 'var(--text)', onAct: () => this.toast(t.e_pathUpdated), hasTime: false,
+        menuOpen: v === 'menu' && s.menu !== 'x', onMenu: () => this.setState({ menu: s.menu === 'x' ? null : 'x' }), menu: [MI(t.e_locate, () => this.toast(t.e_pathUpdated)), MI(t.e_copyPrev, () => this.toast(T('copied', { x: '~/work/design-tokens' }), 'info')), { sep: true, item: false }, MI(t.e_removeList, () => this.setState({ confirm: { title: T('e_rmListTitle', { name: 'design-tokens' }), body: t.e_rmListBody } }), { color: 'var(--danger)' })] });
+      if (id === 'd05-vacio') { hm.isEmpty = v !== 'filters' && v !== 'loading'; hm.isNoMatch = v === 'filters'; hm.isLoading = v === 'loading'; hm.hasFilters = v === 'filters'; hm.count = v === 'filters' ? '4' : v === 'loading' ? '' : '0'; hm.wsEmpty = v !== 'filters';
+        hm.tiles = [['⌂', t.e_tOpen, t.e_tOpenD, () => this.go('d09-no-repo')], ['⇣', t.e_tClone, t.e_tCloneD, () => this.go('d08-formulario')], ['+', t.e_tInit, t.e_tInitD, () => this.go('d09-iniciar')]].map(([glyph, title, sub, onClick]) => ({ glyph, title, sub, onClick }));
+        hm.skel = [1, 0.8, 0.6, 0.4].map(op => ({ op })); hm.q = 'kubernetes'; hm.qColor = 'var(--text)'; }
+      if (id === 'd05-solo-nube') { hm.isList = true; hm.cards = clouds; hm.hasNotice = true; hm.notice = this.P('e_cloudNotice', 3); hm.count = '3'; hm.ws = [{ name: 'Producto', dot: 'oklch(0.72 0.15 190)', count: '2', bg: 'transparent', color: 'var(--text)' }]; hm.wsEmpty = false; }
+      if (id === 'd06-lista' || id === 'd06-abrir-todos') {
+        hm.isList = true; hm.hasFilters = true; hm.count = '5'; hm.wsEmpty = false; hm.q = t.e_searchPh; hm.qColor = 'var(--faint)';
+        hm.ws = [{ name: 'Producto', dot: 'oklch(0.72 0.15 190)', count: '4', bg: id === 'd06-abrir-todos' || v === 'grid' ? 'var(--accent-soft)' : 'transparent', color: id === 'd06-abrir-todos' || v === 'grid' ? 'var(--accent)' : 'var(--text)' }];
+        const tv = { all: t.e_all, local: t.e_local, remote: t.e_remote, notCloned: t.e_fNotCloned };
+        hm.typeVal = tv[s.typeVal]; hm.typeOpen = v === 'type' && !s.typeMenuClosed; hm.typeBorder = s.typeVal !== 'all' ? 'var(--accent)' : 'var(--border)'; hm.typeBg = s.typeVal !== 'all' ? 'var(--accent-soft)' : 'var(--bg)';
+        hm.typeOpts = ['all', 'local', 'remote', 'notCloned'].map(k => ({ label: tv[k], check: s.typeVal === k ? '✓' : '', onClick: () => this.setState({ typeVal: k, typeMenuClosed: true }) }));
+        hm.fakeFilters = [[t.platform || 'Plataforma', t.allPlat || (L ? 'All' : 'Todas')], [t.e_account, L ? 'Any' : 'Cualquiera'], ['Workspace', L ? 'Any' : 'Cualquiera'], [L ? 'Group' : 'Agrupar', L ? 'None' : 'Nada']].map(([l, val]) => ({ l, v: val }));
+        hm.cards = s.typeVal === 'notCloned' ? clouds : [...local, ...clouds];
+        if (id === 'd06-abrir-todos' || v === 'grid') { hm.navBg = 'transparent'; hm.navColor = 'var(--text)'; hm.title = 'Producto'; hm.isWs = true; hm.sub = L ? '4 repositories · 3 open PRs' : '4 repositorios · 3 PRs abiertos'; hm.hasFilters = false; hm.btns = [btnS('⟳ ' + (L ? 'Fetch all' : 'Fetch de todos'), () => {}), btnS(t.e_openAll, () => this.go('d06-abrir-todos'), 'p')]; hm.cards = [local[0], clouds[0], local[1], clouds[2]]; hm.cols = v === 'grid' ? 2 : 1; }
+      }
+      if (id === 'd07-tarjeta') { hm.isList = true; hm.hasFilters = false; hm.count = '3'; hm.cards = [local[0], missing, local[1]]; hm.wsEmpty = true; }
+      if (['d03-navegador', 'd03-codigo', 'd03-error', 'd08-formulario', 'd08-progreso', 'd08-error', 'd09-no-repo', 'd09-confianza', 'd09-iniciar', 'd04-sin-sesion'].includes(id)) { hm.isList = true; hm.count = '2'; hm.cards = local; hm.hasFilters = true; hm.q = t.e_searchPh; hm.qColor = 'var(--faint)'; hm.typeVal = t.e_all; hm.fakeFilters = []; hm.typeBorder = 'var(--border)'; hm.typeBg = 'var(--bg)'; }
+      if (id === 'd04-sin-sesion') { hm.isList = true; hm.isWs = true; hm.title = 'Producto'; hm.sub = L ? '2 repositories' : '2 repositorios'; hm.hasFilters = false; hm.ws = [{ name: 'Producto', dot: 'oklch(0.72 0.15 190)', count: '2', bg: 'var(--accent-soft)', color: 'var(--accent)' }]; hm.wsEmpty = false; hm.navBg = 'transparent'; hm.navColor = 'var(--text)'; }
+    }
+
+    // repo page
+    const rp = { tools: [], side: [], rows: [], files: [], sideOp: 1, panelOp: 1, searchOp: 1, amendOp: 1, amendOff: false };
+    if (pageType === 'repo') {
+      const empty = id === 'd10-vacio' || id.startsWith('d11'), ro = id === 'd09-solo-lectura', miss = id === 'd07-vista', withFiles = empty && (v === 'files' || id.startsWith('d11'));
+      const tool = (glyph, label, tip, onClick) => ({ sep: false, item: true, glyph, label, tip: tip || '', off: !!tip, op: tip ? 0.38 : 1, cursor: tip ? 'not-allowed' : 'pointer', onClick: tip ? () => {} : (onClick || (() => {})) });
+      const roTip = ro ? t.e_roBanner : miss ? T('e_missingView', { repo: 'design-tokens', path: '~/work/design-tokens' }) : '';
+      rp.tools = [tool('↶', t.e_undo, empty ? t.e_whyUndo : roTip), tool('↷', t.e_redo, empty ? t.e_whyUndo : roTip), { sep: true }, tool('⟳', t.e_fetch, empty ? t.e_whyRemote : miss ? roTip : ''), tool('↓', t.e_pull, empty ? t.e_whyRemote : roTip), empty ? tool('↑', t.e_publish, '', () => this.go('d11-formulario', 'github')) : tool('↑', t.e_push, roTip), { sep: true }, tool('⎇', t.e_branch, empty ? t.e_whyBranch : roTip), tool('⊟', t.e_stash, empty ? t.e_whyBranch : roTip), tool('⊞', t.e_pop, empty ? t.e_whyBranch : roTip), { sep: true }, tool('⇄', t.e_pr, empty ? t.e_whyRemote : roTip)];
+      rp.name = miss ? 'design-tokens' : ro ? 'vendor-sdk' : 'nuevo-proyecto'; rp.branch = miss ? 'main' : ro ? 'main' : 'main'; rp.branchNote = empty ? '· ' + t.e_noCommitsShort : '';
+      const it = (icon, label, o) => ({ icon, label, ic: 'var(--accent)', fw: 400, right: '', bg: 'transparent', ...(o || {}) });
+      rp.side = empty ? [{ title: 'Local', count: '1', items: [it('✓', 'main', { fw: 600, right: t.e_unborn })], hasEmpty: false }, { title: L ? 'Remotes' : 'Remotos', count: '0', items: [], hasEmpty: true, empty: t.e_whyRemote }, { title: 'Tags', count: '0', items: [], hasEmpty: true, empty: t.noTags }]
+        : [{ title: 'Local', count: '2', items: [it('✓', 'main', { fw: 600 }), it('⎇', 'feature/tokens', { ic: 'oklch(0.68 0.2 300)' })], hasEmpty: false }, { title: L ? 'Remotes' : 'Remotos', count: '1', items: [it('⇅', 'origin', { ic: 'var(--faint)', fw: 600 })], hasEmpty: false }];
+      rp.sideOp = miss ? 0.4 : 1; rp.panelOp = miss ? 0.4 : 1; rp.searchOp = miss || empty ? 0.4 : 1;
+      rp.hasWip = withFiles; rp.wipText = L ? '// WIP · 3 files' : '// WIP · 3 archivos';
+      rp.hasRows = ro; rp.rows = ['Add iOS bindings', 'Bump SDK to 4.2', 'Fix crash on cold start', 'Initial import'].map((msg, i) => ({ ref: i === 0 ? 'main' : '', msg, author: 'Samuel Ortiz', sha: ['3a9e2c1', 'b81d0fe', '07c4a92', 'e5d6f13'][i], color: 'oklch(0.72 0.15 190)', x: 0 }));
+      rp.hasEmpty = empty || miss; rp.emptyGlyph = miss ? '⚠' : '◌'; rp.emptyTitle = miss ? t.e_folderMissing : t.e_noCommits; rp.emptyText = miss ? T('e_missingView', { repo: 'design-tokens', path: '~/work/design-tokens' }) : T('e_bornWith', { branch: 'main' }); rp.hasEmptyBtns = miss;
+      rp.hasBanner = ro;
+      rp.files = withFiles ? ['README.md', 'package.json', 'src/index.ts'] : ro ? ['vendor/sdk.h'] : []; rp.nFiles = String(rp.files.length); rp.noFiles = !rp.files.length;
+      rp.stgTitle = L ? `${rp.files.length} changes` : `${rp.files.length} cambios`; rp.commitBtn = empty ? T('e_firstCommit', { branch: 'main' }) : (L ? 'Commit' : 'Commit'); rp.amendOff = empty || ro; rp.amendOp = empty || ro ? 0.45 : 1;
+    }
+
+    // settings page (D-04)
+    const stp = { nav: [], cards: [], title: '' };
+    if (pageType === 'settings') {
+      const navK = [['profile', t.e_t_profile], ['account', t.e_t_account], ['team', t.e_t_team], ['platforms', t.e_t_platforms], ['ai', t.e_t_ai]];
+      stp.nav = navK.map(([k, l]) => ({ label: l, bg: v === k ? 'var(--accent-soft)' : 'transparent', color: v === k ? 'var(--accent)' : 'var(--text)', onClick: () => this.go(id, k) }));
+      stp.title = (navK.find(x => x[0] === v) || navK[0])[1];
+      const inv = (title, text) => ({ isInvite: true, title, text });
+      if (v === 'profile') stp.cards = [inv(t.e_t_profile, t.e_inv_profile)];
+      if (v === 'account') stp.cards = [inv(t.e_t_account, t.e_inv_account)];
+      if (v === 'team') stp.cards = [inv(t.e_t_team, t.e_inv_team)];
+      if (v === 'platforms') stp.cards = [{ isAcc: true, abbr: 'GH', color: P.github.color, user: 'marta-dev', host: 'github.com · OAuth', chip: T('localChip') }, { isAcc: true, abbr: 'GL', color: P.gitlab.color, user: 'mruiz', host: 'gitlab.empresa.com · Token (PAT)', chip: T('localChip') }];
+      if (v === 'ai') stp.cards = [{ isHead: true, title: t.e_t_myKeys }, { isAcc: true, abbr: 'AN', color: R.AIPROV.anthropic.color, user: 'Personal', host: 'sk-ant-…4f2a · Anthropic', chip: T('localChip') }, { isHead: true, title: t.e_t_orgKeys }, inv(t.e_t_orgKeys, t.e_inv_orgai)];
+    }
+
+    // panel
+    const P_ = (text, o) => ({ isP: true, text, color: 'var(--muted)', size: 'inherit', font: 'inherit', ...(o || {}) });
+    const BOX = (text, tone, icon, btns) => ({ isBox: true, text, tone, icon: icon || '!', role: tone === 'var(--danger)' ? 'alert' : 'note', btns: (btns || []).map(([label, onClick]) => ({ label, onClick })) });
+    const FIELD = o => ({ isField: true, label: '', labelFont: 'inherit', value: '', onChange: () => {}, onBlur: () => {}, ph: '', ro: false, border: 'var(--border)', inBg: 'var(--bg)', inColor: 'var(--text)', font: 'inherit', hasBtn: false, hasSugg: false, hasErr: false, hasHelp: false, helpColor: 'var(--faint)', helpFont: 'inherit', ...o });
+    const SEG = (label, val, opts, set, help, helpFont) => ({ isSeg: true, label, hasHelp: !!help, help: help || '', helpColor: 'var(--faint)', helpFont: helpFont || 'inherit', opts: opts.map(([k, l, off, tip]) => ({ label: l, tip: tip || '', op: off ? 0.45 : 1, bg: val === k ? 'var(--accent)' : 'transparent', color: val === k ? 'var(--accent-ink)' : 'var(--text)', onClick: () => !off && set(k) })) });
+    const SEL = (label, value, options, onChange, help, helpColor) => ({ isSelect: true, label, value, options: options.map(([value, label]) => ({ value, label })), onChange, hasHelp: !!help, help: help || '', helpColor: helpColor || 'var(--faint)' });
+    const CHECK = (label, checked, onToggle, desc) => ({ isCheck: true, label, checked, onToggle, hasDesc: !!desc, desc: desc || '' });
+    const ROWS = rows => ({ isRows: true, rows: rows.map(([icon, title, sub, ic, font]) => ({ icon, title, sub: sub || '', ic: ic || 'var(--ok)', font: font || 'inherit' })) });
+    let pn = null;
+    const modal = (w, title, blocks, btns, o) => ({ w, title, hasTitle: true, canClose: true, blocks, btns, hasFoot: !!btns.length, pad: '12px 22px 6px', scrim: 'var(--scrim)', hasGit: false, ...(o || {}) });
+    const gitLine = s.os === 'windows' ? '✓ Git 2.56.0 · C:\\Program Files\\Ramal\\resources\\mingit\\cmd\\git.exe' : s.os === 'linux' ? '✓ Git 2.56.0 · /usr/bin/git' : '✓ Git 2.56.0 · /usr/bin/git';
+    if (!s.panelOff) {
+      if (id.startsWith('d01')) {
+        const order = ['d01-cuenta', 'd01-identidad', 'd01-repos', 'd01-plataformas', 'd01-ia'], idx = order.indexOf(id);
+        const stepper = { isStepper: true, steps: [t.e_s1, t.e_s2, t.e_s3, t.e_s4, t.e_s5].map((l, i) => ({ label: l, bar: i <= idx ? 'var(--accent)' : 'var(--surface2)', color: i === idx ? 'var(--text)' : i < idx ? 'var(--muted)' : 'var(--faint)' })) };
+        const next = () => idx < 4 ? this.go(order[idx + 1]) : (this.toast(L ? 'Welcome to Ramal' : 'Bienvenida a Ramal'), this.go('d05-vacio'));
+        const foot = [btnS(t.e_back, () => idx > 0 && this.go(order[idx - 1]), null, { off: idx === 0, op: idx === 0 ? 0.4 : 1, mr: 'auto' }), ...(idx > 0 ? [btnS(t.e_skip, next)] : []), btnS(idx === 4 ? t.e_start : t.e_continue, next, 'p')];
+        let blocks = [];
+        if (id === 'd01-cuenta') {
+          const si = v === 'signedIn' || signed;
+          blocks = [{ isLogo: true }, { isTitle: true, text: t.e_welcome }, P_(t.e_welcomeSub),
+            ...(si ? [BOX(T('e_success', { email: 'marta@example.com' }) + '\n' + t.e_cloudApplied, 'var(--ok)', '✓')] : [{ isBtnRow: true, cols: 2, btns: [btnS(t.e_signIn, () => this.setState({ screen: 'd03-navegador', v: 'base', panelOff: false }), 'p', { h: '42px' }), btnS(t.e_noAcc, () => this.go('d01-identidad'), null, { h: '42px' })] }]),
+            { isLines: true, lines: [t.e_acc1, t.e_acc2, t.e_acc3].map(x => ({ g: '·', c: 'var(--accent)', t: x })) }];
+          if (v === 'checking') blocks = [{ isLogo: true }, { isSpin: true, text: t.e_checking + ' Git' }];
+          pn = modal('560px', '', [stepper, ...blocks], si ? foot : [], { hasTitle: false, pad: '26px 30px 14px', scrim: 'var(--bg)', hasGit: true, git: v === 'checking' ? '… git --version' : gitLine, gitColor: 'var(--faint)' });
+        } else {
+          if (id === 'd01-identidad') {
+            const emErr = s.emailErr; const missingId = !s.gitName.trim() || !s.gitEmail.trim();
+            blocks = [{ isTitle: true, text: t.e_idTitle },
+              FIELD({ label: 'user.name', labelFont: "'IBM Plex Mono',monospace", value: s.gitName, onChange: e => this.setState({ gitName: e.target.value }), ph: 'Marta Ruiz', hasHelp: !!s.gitName && v !== 'empty', help: signed ? t.e_hintAcc : t.e_hintGit }),
+              FIELD({ label: 'user.email', labelFont: "'IBM Plex Mono',monospace", value: s.gitEmail, onChange: e => this.setState({ gitEmail: e.target.value, emailErr: '' }), onBlur: () => this.setState({ emailErr: s.gitEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.gitEmail) ? t.errEmail : '' }), ph: 'nombre@example.com', hasErr: !!emErr, err: emErr, border: emErr ? 'var(--danger)' : 'var(--border)', hasHelp: !emErr && !!s.gitEmail && v !== 'empty', help: signed ? t.e_hintAcc : t.e_hintGit }),
+              P_(t.e_idNote, { size: '12.5px', color: 'var(--faint)' }), ...(missingId ? [BOX(t.e_idWarn, 'var(--warn)', '!')] : [])];
+          }
+          if (id === 'd01-repos') {
+            const res = v === 'results' || (s.found > 0 && !s.searching && v !== 'none');
+            blocks = [{ isTitle: true, text: t.e_reposTitle }, { isChips: true, chips: s.folders.map(f => ({ label: f, border: v === 'perm' && f.startsWith('/Volumes') ? 'var(--danger)' : 'var(--border)', onRemove: () => this.setState(x => ({ folders: x.folders.filter(y => y !== f) })) })) },
+              ...(v === 'perm' ? [BOX(T('e_noPerm', { path: '/Volumes/Backup' }), 'var(--danger)', '!')] : []),
+              { isBtnRow: true, cols: 2, btns: [btnS(t.e_chooseFolder, () => this.setState(x => ({ folders: x.folders.includes('~/Projects') ? x.folders : [...x.folders, '~/Projects'] }))), btnS(s.searching ? T('e_searching_other', { count: s.found }).split('…')[0] + '…' : t.e_search, () => v === 'none' ? this.setState({ v: 'none' }) : this.searchRepos(), 'p', { busy: s.searching })] },
+              ...(s.searching ? [{ isSpin: true, text: this.P('e_searching', s.found) }] : []),
+              ...(v === 'none' ? [P_(t.e_noneFound, { color: 'var(--faint)' })] : []),
+              ...(res || s.searching ? [{ isList: true, hasHead: !s.searching, head: this.P('e_searching', FOUND.length).replace(/^[^…]*…\s*/, ''), headBtn: t.e_selectAll, onHead: () => this.setState({ picked: Object.fromEntries(FOUND.map((_, i) => [i, true])) }), items: FOUND.slice(0, s.searching ? s.found : FOUND.length).map(([name, path, pl], i) => ({ hasCheck: true, checked: !!s.picked[i], onToggle: () => this.setState(x => ({ picked: { ...x.picked, [i]: !x.picked[i] } })), abbr: pl ? P[pl].abbr : '⌂', bg: pl ? P[pl].color : 'var(--surface2)', fg: pl ? 'white' : 'var(--muted)', name, path, status: '', stColor: 'var(--faint)' })) }] : [])];
+            const n = Object.values(s.picked).filter(Boolean).length;
+            if (res) foot.splice(foot.length - 1, 1, btnS(this.P('e_addN', n), next, 'p', { off: !n, op: n ? 1 : 0.45 }));
+          }
+          if (id === 'd01-plataformas') {
+            const conn = Object.keys(s.plats).filter(k => s.plats[k]);
+            blocks = [{ isTitle: true, text: t.e_platTitle }, P_(t.e_platNote), { isTiles: true, tiles: Object.keys(P).map(k => ({ abbr: P[k].abbr, color: P[k].color, label: P[k].label, border: s.plats[k] ? 'var(--ok)' : 'var(--border)', onClick: () => this.setState(x => ({ plats: { ...x.plats, [k]: true } })) })) },
+              ...(conn.length ? [ROWS(conn.map(k => ['✓', '@' + ({ github: 'marta-dev', gitlab: 'mruiz', bitbucket: 'marta_r', gitea: 'marta', azure: 'mruiz-corp' }[k]), { github: 'github.com', gitlab: 'gitlab.com', bitbucket: 'bitbucket.org', gitea: 'git.casa.lan', azure: 'dev.azure.com/banca' }[k]]))] : [])];
+          }
+          if (id === 'd01-ia') blocks = [{ isTitle: true, text: t.e_aiTitle }, P_(t.e_aiNote), ...(s.keyAdded ? [ROWS([['✓', 'Anthropic · Personal', 'sk-ant-…4f2a']])] : [{ isBtnRow: true, cols: 2, btns: [btnS('+ ' + t.e_addKey, () => this.setState({ keyAdded: true }))] }])];
+          pn = modal('560px', '', [stepper, ...blocks], foot, { hasTitle: false, pad: '26px 30px 14px', scrim: 'var(--bg)', hasGit: true, git: gitLine, gitColor: 'var(--faint)' });
+        }
+      }
+      if (id.startsWith('d02')) {
+        const old = id === 'd02-antiguo', win_ = s.os === 'windows', st_ = s.gitState;
+        const cmd = s.os === 'macos' ? 'xcode-select --install' : s.os === 'linux' ? 'sudo apt install git\nsudo dnf install git' : 'winget install Git.Git';
+        const blocks = st_ === 'found' ? [{ isDone: true, text: t.e_gitOk, hasSub: true, sub: gitLine.slice(2) }] : [{ isIcon: true, glyph: '⚠', bg: 'color-mix(in oklch, var(--warn) 14%, transparent)', color: 'var(--warn)' }, { isTitle: true, text: old ? t.e_gitOldTitle : t.e_gitTitle }, P_(old ? T('e_gitOldText', { version: '2.30.1', path: s.os === 'windows' ? 'C:\\Git\\cmd\\git.exe' : '/usr/local/bin/git' }) : win_ ? t.e_gitWin : t.e_gitText, { color: 'var(--text)' }),
+          { isCode: true, text: cmd, copy: s.copied ? t.e_copied : t.e_copy, onCopy: () => this.setState({ copied: true }) }, { isLink: true, text: t.e_officialDl + ' ↗', align: 'flex-start', onClick: () => this.toast('https://git-scm.com/downloads', 'info') },
+          ...(st_ === 'still' ? [BOX(t.e_stillMissing, 'var(--danger)', '!')] : []), { isLink: true, text: t.e_whyGit, align: 'flex-start', onClick: () => {} }];
+        const checking = st_ === 'checking';
+        pn = modal('560px', '', blocks, st_ === 'found' ? [] : [btnS(t.e_chooseGit, () => this.toast(t.e_checking, 'info'), null, { mr: 'auto' }), ...(win_ && !old ? [btnS(t.e_reinstall, () => {})] : []), btnS(checking ? t.e_checking : t.e_checkAgain, () => { this.setState({ gitState: 'checking' }); this._t = setTimeout(() => { const c = s.checks + 1; if (c >= 2) { this.setState({ gitState: 'found', checks: 0 }); this._t = setTimeout(() => this.go('d01-cuenta'), 1100); } else this.setState({ gitState: 'still', checks: c }); }, 1000); }, 'p', { busy: checking })], { hasTitle: false, pad: '26px 30px 14px', scrim: 'var(--bg)' });
+      }
+      if (id.startsWith('d03')) {
+        let blocks = [], btns = [];
+        if (id === 'd03-navegador') { blocks = [{ isSpin: true, text: t.e_siWait }]; btns = [btnS(t.e_useCode, () => this.go('d03-codigo'), null, { mr: 'auto' }), btnS(t.e_copyLink, () => this.toast(T('copied', { x: 'ramal.bahoque.com/authorize' }), 'info')), btnS(t.e_cancel, () => this.setState({ panelOff: true })), btnS(t.e_openAgain, () => this.toast('ramal.bahoque.com', 'info'), 'p')]; }
+        if (id === 'd03-codigo') {
+          if (v === 'success') { blocks = [{ isDone: true, text: T('e_success', { email: 'marta@example.com' }), hasSub: true, sub: t.e_applying }]; }
+          else { const m = Math.floor(s.remain / 60), sec = String(s.remain % 60).padStart(2, '0');
+            blocks = [...(v === 'noReceiver' ? [BOX(t.e_noReceiver, 'var(--info)', 'i')] : []), P_(t.e_codeText, { color: 'var(--text)' }), { isBig: true, code: 'K7QD-2M9X', copy: s.copied ? t.e_copied : t.e_copy, onCopy: () => this.setState({ copied: true }) }, P_(T('e_expires', { remaining: `${m}:${sec}` }), { color: 'var(--faint)', size: '12px', font: "'IBM Plex Mono',monospace" }), { isSpin: true, text: t.e_waiting }];
+            btns = [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(L ? 'Approve on the web' : 'Aprobar en la web', () => { this.setState({ v: 'success' }); this._t = setTimeout(() => { this.setState({ panelOff: true, session: 'signedIn' }); this.toast(T('e_success', { email: 'marta@example.com' })); }, 1600); }, 'p')]; }
+        }
+        if (id === 'd03-error') {
+          const E = { cancelled: [t.e_cancelled, t.e_tryAgain, 'var(--warn)'], expired: [t.e_expired, t.e_newCode, 'var(--warn)'], offline: [t.e_offline, t.e_retry, 'var(--warn)'], generic: [t.e_genericErr + '\n' + t.errInternal, t.e_retry, 'var(--danger)'] }[v];
+          blocks = [BOX(E[0], E[2], '!', v === 'generic' ? [[t.e_copyDetail, () => this.toast(t.detailCopied, 'info')]] : [])];
+          btns = [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(E[1], () => this.go(v === 'expired' ? 'd03-codigo' : 'd03-navegador'), 'p')];
+        }
+        pn = modal('460px', t.e_siTitle, blocks, btns, { canClose: v !== 'success' });
+      }
+      if (id === 'd04-sin-sesion' && v === 'ws') pn = modal('460px', t.e_editWs, [FIELD({ label: t.e_name, value: 'Producto' }), BOX(t.e_inv_ws + ' ' + t.e_noteGit, 'var(--info)', '☁', [[t.e_signIn, () => this.go('d03-navegador')]])], [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.save || 'Guardar', () => this.setState({ panelOff: true }), 'p')]);
+      if (id === 'd06-abrir-todos') pn = modal('580px', T('e_missingTitle', { count: 2, total: 4 }), [{ isList: true, hasHead: false, items: [['web-app', 'github.com/acme/web-app', 'github'], ['infra-terraform', 'gitlab.empresa.com/infra/terraform', 'gitlab']].map(([name, path, pl]) => ({ hasCheck: true, checked: true, onToggle: () => {}, abbr: P[pl].abbr, bg: P[pl].color, fg: 'white', name, path, status: '', stColor: '' })) }, FIELD({ label: t.e_dest, value: '~/code', ro: true, font: "'IBM Plex Mono',monospace", inColor: 'var(--muted)', hasBtn: true, btn: t.e_choose, onBtn: () => {} })],
+        [btnS(t.e_openOnly, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.e_cloneOpenAll, () => this.go('d08-progreso'), 'p')]);
+      if (id === 'd07-tarjeta' && v === 'other') pn = modal('460px', t.e_locate.replace('…', ''), [P_(T('e_otherRepo', { remote: 'github.com/acme/web-app' }), { color: 'var(--text)' })], [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.e_chooseOther, () => { this.setState({ panelOff: true }); this.toast(t.e_pathUpdated); }, 'p')]);
+      if (id === 'd08-formulario' || id === 'd08-error') {
+        const u = s.url.trim(), m = u.match(/^(?:https?:\/\/([^/]+)\/|git@([^:]+):)?([\w.-]+)\/([\w.-]+?)(?:\.git)?$/);
+        const acc = ACCS.find(a => a.id === s.acc), host = m ? (m[1] || m[2] || (acc ? acc.host : 'github.com')) : null;
+        const bad = u && !m && !/\/$/.test(u), otherHost = m && (m[1] || m[2]) && (!acc || acc.host !== host);
+        const sugg = id === 'd08-formulario' && (v === 'sugg' || /\/$/.test(u)) && acc;
+        const blocks = [SEL(t.e_account, s.acc, [...ACCS.map(a => [a.id, `${P[a.plat].label} · @${a.user} (${a.host})`]), ['none', t.e_sysCreds]], e => this.setState({ acc: e.target.value })),
+          FIELD({ label: t.e_url, value: s.url, onChange: e => { const val = e.target.value; const mm = val.match(/^(?:https?:\/\/([^/]+)\/|git@([^:]+):)/); const up = { url: val }; if (mm) { const h = mm[1] || mm[2]; const a2 = ACCS.find(a => a.host === h); up.acc = a2 ? a2.id : 'none'; } this.setState(up); }, font: "'IBM Plex Mono',monospace", ph: 'owner/repo', hasErr: !!bad, err: t.e_badUrl, border: bad ? 'var(--danger)' : 'var(--border)', hasHelp: !!m && !bad, help: m ? `${host} · ${m[3]}/${m[4]}` : '', helpFont: "'IBM Plex Mono',monospace",
+            hasSugg: !!sugg, searching: false, sugg: sugg ? SUGG.map(([name, desc, ini, color, priv]) => ({ name, desc, ini, color, lock: priv ? '🔒︎' : '', onClick: () => this.setState({ url: name, v: 'base' }) })) : [] }),
+          ...(otherHost || s.acc === 'none' ? [BOX(T('e_noHostAcc', { host: host || 'bitbucket.org' }), 'var(--info)', 'i', [[t.e_connectAcc, () => {}]])] : []),
+          SEG(t.e_protocol, s.proto, [['https', 'HTTPS'], ['ssh', 'SSH', acc && !acc.ssh, t.e_sshOff]], k => this.setState({ proto: k }), acc && !acc.ssh ? t.e_sshOff : (m ? (s.proto === 'ssh' ? `git@${host}:${m[3]}/${m[4]}.git` : `https://${host}/${m[3]}/${m[4]}.git`) : ''), acc && !acc.ssh ? 'inherit' : "'IBM Plex Mono',monospace"),
+          FIELD({ label: t.e_dest, value: '~/code', ro: true, font: "'IBM Plex Mono',monospace", inColor: 'var(--muted)', hasBtn: true, btn: t.e_choose, onBtn: () => {}, hasHelp: true, help: T('e_willClone', { path: '~/code/' + (m ? m[4] : 'repo') }), helpFont: "'IBM Plex Mono',monospace" }),
+          SEL(t.e_ws, s.ws, [['', t.e_noWs], ['w1', 'Producto'], ['w2', 'Backend']], e => this.setState({ ws: e.target.value })),
+          CHECK(t.e_subs, s.subs, () => this.setState({ subs: !s.subs }), '--recurse-submodules')];
+        if (id === 'd08-error') {
+          const E = { auth: [T('e_auth', { platform: 'GitHub', user: 'marta-dev' }), [[t.e_updCreds, () => {}], [t.e_otherAcc, () => this.go('d08-formulario')]], 'var(--danger)'], missing: [T('e_notExist', { repo: 'acme/web-app' }), [], 'var(--danger)'], busy: [T('e_busy', { path: '~/code/web-app' }), [[t.e_choose, () => {}]], 'var(--danger)'], already: [T('e_already', { path: '~/code/web-app' }), [[t.e_openIt, () => this.setState({ panelOff: true })]], 'var(--info)'], net: [T('e_net', { host: 'github.com' }), [[t.e_retry, () => this.go('d08-progreso')]], 'var(--danger)'], ssh: [T('e_sshUnknown', { host: 'git.casa.lan' }), [[t.e_reviewHost, () => {}]], 'var(--warn)'], lfs: [t.e_lfs, [], 'var(--warn)'] }[v];
+          blocks.unshift(BOX(E[0], E[2], E[2] === 'var(--info)' ? 'i' : '!', [...E[1], [t.e_copyDetail, () => this.toast(t.detailCopied, 'info')]]));
+        }
+        const okGo = !!m && !bad;
+        pn = modal('580px', t.e_cloneTitle, blocks, [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.e_clone, () => okGo && this.go('d08-progreso'), 'p', { off: !okGo, op: okGo ? 1 : 0.45 })]);
+      }
+      if (id === 'd08-progreso') {
+        const ph = s.phase; const lbl = [t.e_ph1, t.e_ph2, t.e_ph3, t.e_ph4, t.e_ph5, T('e_ph6', { current: ph >= 6 ? 1 : 0, total: 2 })];
+        pn = modal('580px', T('e_cloning', { repo: 'acme/web-app' }), [P_('github.com · acme/web-app → ~/code/web-app', { font: "'IBM Plex Mono',monospace", size: '12px', color: 'var(--faint)' }), { isPhases: true, phases: lbl.map((label, i) => ({ label, icon: i + 1 < ph ? '✓' : i + 1 === ph ? '●' : '○', color: i + 1 === ph ? 'var(--text)' : i + 1 < ph ? 'var(--ok)' : 'var(--faint)', fw: i + 1 === ph ? 600 : 400 })), hasBar: true, pct: Math.round(s.pct), detail: T('e_detail', { pct: Math.round(s.pct), size: (s.pct * 2.1).toFixed(0) + ' MB', speed: '6,2 MB' }) }],
+          [btnS(t.e_cancel, () => { clearInterval(this._iv); this.setState({ panelOff: true }); this.toast(t.e_cloneCancelled, 'warn'); }, null, { mr: 'auto' }), btnS(t.e_background, () => { clearInterval(this._iv); this.setState({ screen: 'd06-lista', v: 'cloning', panelOff: false, cloneState: { pct: s.pct }, menu: null }); }, 'p')], { canClose: false });
+      }
+      if (id === 'd09-no-repo') {
+        if (v === 'root') { if (!s._rootToast) setTimeout(() => { this.setState({ _rootToast: true }); this.toast(T('e_rootOpened', { path: '~/code/gitflow-desktop' }), 'info'); }, 0); }
+        else pn = modal('460px', T('e_notRepo', { path: '' }).trim(), [P_('~/Downloads/fotos-2026', { font: "'IBM Plex Mono',monospace", color: 'var(--text)' })], [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.e_chooseOther, () => {}), btnS(t.e_initHere, () => this.go('d09-iniciar', 'files'), 'p')]);
+      }
+      if (id === 'd09-confianza') pn = modal('580px', t.e_trustTitle, [P_(t.e_trustText, { color: 'var(--text)' }), P_('~/Downloads/vendor-sdk', { font: "'IBM Plex Mono',monospace", size: '12px', color: 'var(--faint)' }), ROWS([['!', 'core.fsmonitor = ./tools/watch.sh', '', 'var(--warn)', "'IBM Plex Mono',monospace"], ['!', '.git/hooks/pre-commit', '', 'var(--warn)', "'IBM Plex Mono',monospace"], ['!', '.git/hooks/post-checkout', '', 'var(--warn)', "'IBM Plex Mono',monospace"]])],
+        [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto', focus: true }), btnS(t.e_openRO, () => this.go('d09-solo-lectura')), btnS(t.e_trustOpen, () => { this.setState({ panelOff: true }); this.toast(L ? 'vendor-sdk opened' : 'vendor-sdk abierto'); }, 'p')]);
+      if (id === 'd09-iniciar') {
+        const bad = s.initBranch && /(\s|\.\.|[~^:?*\[\\]|\/$|\.lock$)/.test(s.initBranch);
+        if (v === 'already') pn = modal('460px', t.e_initTitle, [P_(t.e_alreadyRepo, { color: 'var(--text)' }), P_('~/code/gitflow-desktop', { font: "'IBM Plex Mono',monospace", size: '12px', color: 'var(--faint)' })], [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.e_openIt, () => this.setState({ panelOff: true }), 'p')]);
+        else pn = modal('460px', t.e_initTitle, [FIELD({ label: t.e_folder, value: v === 'files' ? '~/Downloads/fotos-2026' : '~/code/nuevo-proyecto', ro: true, font: "'IBM Plex Mono',monospace", inColor: 'var(--muted)', hasBtn: true, btn: t.e_change, onBtn: () => {} }),
+          FIELD({ label: t.e_initBranch, value: s.initBranch, onChange: e => this.setState({ initBranch: e.target.value }), font: "'IBM Plex Mono',monospace", hasErr: !!bad || !s.initBranch.trim(), err: bad ? t.badBranch : t.reqName, border: bad || !s.initBranch.trim() ? 'var(--danger)' : 'var(--border)' }),
+          ...(v === 'files' ? [BOX(t.e_withFiles, 'var(--info)', 'i')] : []), CHECK(t.e_publishAfter, !!s.pubAfter, () => this.setState({ pubAfter: !s.pubAfter }))],
+          [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.e_create, () => { if (bad || !s.initBranch.trim()) return; if (s.pubAfter) this.go('d11-formulario', 'github'); else this.go('d10-vacio', v === 'files' ? 'files' : 'nofiles'); }, 'p')]);
+      }
+      if (id === 'd11-formulario' || id === 'd11-error') {
+        const plat = id === 'd11-error' ? 'github' : v, pl = P[plat], az = plat === 'azure';
+        const owners = { github: ['marta-dev', 'acme'], gitlab: ['mruiz', 'empresa/infra'], azure: ['Banca · Core', 'Banca · Web'] }[plat];
+        const taken = v === 'taken';
+        const blocks = [SEL(t.e_account, plat, [[plat, `${pl.label} · @${{ github: 'marta-dev', gitlab: 'mruiz', azure: 'mruiz-corp' }[plat]}`]], () => {}),
+          SEL(az ? t.e_project : t.e_owner, owners[0], owners.map(o => [o, o]), () => {}),
+          FIELD({ label: t.e_name, value: 'nuevo-proyecto', font: "'IBM Plex Mono',monospace", hasErr: taken, err: T('e_nameTaken', { owner: owners[0], name: 'nuevo-proyecto' }), border: taken ? 'var(--danger)' : 'var(--border)', hasHelp: !taken, help: '✓ ' + t.e_free, helpColor: 'var(--ok)' }),
+          SEG(t.e_visibility, s.pub.vis, [['private', t.e_private], ['public', t.e_public], ...(plat === 'gitlab' || az ? [] : []), ...(plat === 'gitlab' ? [['internal', t.e_internal]] : [])], k => this.setState(x => ({ pub: { ...x.pub, vis: k } }))),
+          FIELD({ label: t.e_desc, value: '', ph: '' }),
+          SEL('.gitignore', 'Node', [['', t.e_none], ['Node', 'Node'], ['Python', 'Python']], () => {}, t.e_exists, 'var(--faint)'),
+          SEL(t.e_license, '', [['', t.e_none], ['MIT', 'MIT'], ['Apache-2.0', 'Apache 2.0']], () => {}),
+          CHECK('README', s.pub.readme, () => this.setState(x => ({ pub: { ...x.pub, readme: !x.pub.readme } }))), P_(t.e_initialCommit, { size: '12px', color: 'var(--faint)' }),
+          FIELD({ label: t.e_remoteName, value: 'origin', font: "'IBM Plex Mono',monospace" }), SEG(t.e_protocol, 'https', [['https', 'HTTPS'], ['ssh', 'SSH']], () => {})];
+        if (id === 'd11-error') { const E = { taken: null, scope: [T('e_noScope', { scope: 'repo' }), [[t.e_updCreds, () => {}]], 'var(--danger)'], org: [T('e_orgDeny', { org: 'acme' }), [], 'var(--danger)'], sso: [T('e_sso', { org: 'acme' }), [[t.e_authorizeSso, () => {}]], 'var(--warn)'], net: [T('e_net', { host: 'api.github.com' }), [[t.e_retry, () => this.go('d11-progreso')]], 'var(--danger)'], partial: [t.e_partial, [[t.e_retryPush, () => this.go('d11-progreso')]], 'var(--warn)'] }[v]; if (E) blocks.unshift(BOX(E[0], E[2], '!', [...E[1], [t.e_copyDetail, () => this.toast(t.detailCopied, 'info')]])); }
+        pn = modal('580px', t.e_pubTitle, blocks, [btnS(t.e_cancel, () => this.setState({ panelOff: true }), null, { mr: 'auto' }), btnS(t.e_publish, () => !taken && this.go('d11-progreso'), 'p', { off: taken, op: taken ? 0.45 : 1 })]);
+      }
+      if (id === 'd11-progreso') {
+        const n = s.pubStep, done = v === 'done';
+        const steps = [T('e_stepCreate', { repo: 'nuevo-proyecto', platform: 'GitHub' }), T('e_stepRemote', { remote: 'origin' }), T('e_stepPush', { branch: 'main' })];
+        pn = modal('580px', t.e_pubTitle, [{ isPhases: true, phases: steps.map((label, i) => ({ label, icon: i < n ? '✓' : i === n ? '●' : '○', color: i < n ? 'var(--ok)' : i === n ? 'var(--text)' : 'var(--faint)', fw: i === n ? 600 : 400 })), hasBar: n === 2, pct: 64, detail: T('e_detail', { pct: 64, size: '1,2 MB', speed: '850 KB' }) }, ...(done ? [{ isDone: true, text: T('e_published', { url: 'github.com/marta-dev/nuevo-proyecto' }), hasSub: false }] : [])],
+          done ? [btnS(t.e_copyLink, () => this.toast(T('copied', { x: 'https://github.com/marta-dev/nuevo-proyecto' }), 'info'), null, { mr: 'auto' }), btnS(T('e_openOn', { platform: 'GitHub' }), () => this.toast('github.com/marta-dev/nuevo-proyecto', 'info'), 'p')] : [], { canClose: done });
+      }
+      if (s.confirm) pn = modal('460px', s.confirm.title, [BOX(s.confirm.body, 'var(--danger)', '!')], [btnS(t.e_cancel, () => this.setState({ confirm: null }), null, { mr: 'auto', focus: true }), btnS(t.e_remove, () => { this.setState({ confirm: null }); this.toast(T('removedT', { n: '' }).trim() || 'OK'); }, 'd')]);
+    }
+    const act = { close: () => this.setState({ panelOff: true, confirm: null }), signIn: () => this.go('d03-navegador'), findRepos: () => this.go('d01-repos'), typeMenu: () => this.setState({ v: 'type', typeMenuClosed: !(s.v === 'type' && s.typeMenuClosed) ? true : false }), trust: () => this.go('d09-confianza'), locate: () => this.toast(t.e_pathUpdated), removeList: () => this.setState({ confirm: { title: T('e_rmListTitle', { name: 'design-tokens' }), body: t.e_rmListBody }, panelOff: false }) };
+    if (id === 'd05-vacio' && v === 'narrow') { hm.cols = 1; }
+    const toasts = s.toasts.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : x.kind === 'info' ? 'var(--info)' : 'var(--ok)' }));
+    return { ch, t, segs, nav, vars, cur, win, pg, hm, rp, st: stp, hasPanel: !!pn, pn: pn || { blocks: [], btns: [] }, act, toasts };
+  }
+}
+</script>
+</body>
+</html>

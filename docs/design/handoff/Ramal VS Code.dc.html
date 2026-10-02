@@ -10,632 +10,812 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@vscode/codicons@0.0.36/dist/codicon.css" rel="stylesheet">
 <script src="./ramal-data.js"></script>
 <style>
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:13px;
 --bg:#1f1f1f;--side:#181818;--bar:#181818;--border:#2b2b2b;--fg:#cccccc;--fg2:#9d9d9d;--fg3:#7a7a7a;--accent:#0078d4;--accent-fg:#ffffff;
---hover:#2a2d2e;--sel:#04395e;--sel2:#37373d;--input:#313131;--input-b:#3c3c3c;--widget:#222222;--menu:#1f1f1f;--menu-b:#454545;
---mod:#e2c08d;--add:#73c991;--del:#c74e39;--conf:#e4676b;--add-bg:rgba(46,160,67,.16);--del-bg:rgba(248,81,73,.16);--warn:#cca700;--info:#3794ff;
---hatch:repeating-linear-gradient(135deg,transparent 0 6px,#2b2b2b 6px 7px);--shadow:0 8px 24px rgba(0,0,0,.45);
-background:var(--bg);color:var(--fg)}
+--hover:#2a2d2e;--sel:#04395e;--sel2:#37373d;--input:#313131;--input-b:#3c3c3c;
+--mod:#e2c08d;--add:#73c991;--del:#c74e39;--conf:#e4676b;--warn:#cca700;--info:#3794ff;--err:#f85149;--proto:#111111;
+background:var(--proto);color:var(--fg)}
 body[data-vs="light"]{--bg:#ffffff;--side:#f8f8f8;--bar:#f8f8f8;--border:#e5e5e5;--fg:#3b3b3b;--fg2:#616161;--fg3:#8b8b8b;--accent:#005fb8;--accent-fg:#ffffff;
---hover:#f2f2f2;--sel:#e4e6f1;--sel2:#e8e8e8;--input:#ffffff;--input-b:#cecece;--widget:#f8f8f8;--menu:#ffffff;--menu-b:#cecece;
---mod:#895503;--add:#587c0c;--del:#ad0707;--conf:#ad0707;--add-bg:rgba(88,164,12,.14);--del-bg:rgba(220,40,40,.1);--warn:#bf8803;--info:#1a85ff;
---hatch:repeating-linear-gradient(135deg,transparent 0 6px,#ececec 6px 7px);--shadow:0 8px 24px rgba(0,0,0,.16)}
+--hover:#f2f2f2;--sel:#e4e6f1;--sel2:#e8e8e8;--input:#ffffff;--input-b:#cecece;
+--mod:#895503;--add:#587c0c;--del:#ad0707;--conf:#ad0707;--warn:#bf8803;--info:#1a85ff;--err:#e51400;--proto:#e9e9e9}
 *{box-sizing:border-box}
-a{color:var(--info)} a:hover{color:var(--accent)}
+a{color:var(--info);cursor:pointer} a:hover{color:var(--accent)}
 input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+button:disabled{cursor:default}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:rgba(121,121,121,.4)}::-webkit-scrollbar-track{background:transparent}
 </style>
 </helmet>
-<div style="height:100vh;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:13px">
+<div style="height:100vh;display:flex;flex-direction:column;overflow:hidden;background:var(--proto);color:var(--fg)">
 
-  <div style="height:35px;flex-shrink:0;display:grid;grid-template-columns:1fr minmax(0,420px) 1fr;align-items:center;padding:0 10px;background:var(--bar);border-bottom:1px solid var(--border)">
-    <div style="display:flex;gap:8px;align-items:center">
-      <span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span>
-    </div>
-    <div onClick="{{ openPalette }}" style="height:24px;border-radius:6px;border:1px solid var(--input-b);background:var(--input);display:flex;align-items:center;justify-content:center;gap:6px;color:var(--fg2);font-size:12px;cursor:pointer" style-hover="border-color:var(--fg3)">⌕ gitflow-desktop</div>
-    <div></div>
+  <div style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:8px 12px;flex-wrap:wrap;border-bottom:1px solid var(--border)">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--fg2);margin-right:4px">state</span>
+    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="14">
+      <button onClick="{{ c.onClick }}" style="height:22px;padding:0 8px;border-radius:11px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer">{{ c.id }}</button>
+    </sc-for>
   </div>
 
-  <div style="flex:1;min-height:0;display:flex">
-    <div style="width:48px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;background:var(--bar);border-right:1px solid var(--border)">
-      <sc-for list="{{ activity }}" as="a" hint-placeholder-count="5">
-        <div onClick="{{ a.onClick }}" title="{{ a.title }}" style="width:48px;height:48px;display:grid;place-items:center;cursor:pointer;font-size:{{ a.size }};font-weight:700;color:{{ a.color }};box-shadow:{{ a.shadow }}">{{ a.glyph }}</div>
-      </sc-for>
-      <div style="flex:1"></div>
-      <div onClick="{{ openSettings }}" title="{{ t.tabSettings }}" style="width:48px;height:48px;display:grid;place-items:center;cursor:pointer;font-size:18px;color:var(--fg3)" style-hover="color:var(--fg)">⚙︎</div>
-    </div>
+  <div style="flex:1;min-height:0;display:flex;gap:12px;padding:12px">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--bg)">
+      <div style="flex:1;min-height:0;display:flex">
 
-    <div style="width:clamp(230px,24vw,300px);flex-shrink:0;display:flex;flex-direction:column;min-height:0;background:var(--side);border-right:1px solid var(--border)">
-      <div style="height:35px;flex-shrink:0;display:flex;align-items:center;gap:2px;padding:0 8px 0 20px;font-size:11px;letter-spacing:.04em;color:var(--fg2)">
-        <span style="flex:1">RAMAL</span>
-        <sc-for list="{{ viewActions }}" as="va">
-          <button onClick="{{ va.onClick }}" title="{{ va.title }}" style="width:22px;height:22px;border:0;border-radius:5px;background:transparent;cursor:pointer;color:var(--fg);font-size:13px;display:grid;place-items:center;padding:0" style-hover="background:var(--hover)">{{ va.glyph }}</button>
-        </sc-for>
-      </div>
-      <div style="flex:1;overflow:auto;min-height:0">
-        <sc-for list="{{ panes }}" as="pn" hint-placeholder-count="6">
-          <div style="border-top:1px solid var(--border)">
-            <div onClick="{{ pn.onToggle }}" style="height:22px;display:flex;align-items:center;gap:4px;padding:0 8px 0 4px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">
-              <span style="width:16px;text-align:center;font-size:9px;color:var(--fg2)">{{ pn.chev }}</span><span style="flex:1">{{ pn.title }}</span>
-              <sc-if value="{{ pn.hasCount }}"><span style="min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--sel2);font-size:11px;font-weight:600;display:grid;place-items:center">{{ pn.count }}</span></sc-if>
-            </div>
-            <sc-if value="{{ pn.open }}">
-              <sc-if value="{{ pn.isChanges }}">
-                <div style="padding:4px 12px 8px 20px;display:flex;flex-direction:column;gap:6px">
+        <div style="width:clamp(230px,24vw,300px);flex-shrink:0;display:flex;flex-direction:column;min-height:0;background:var(--side);border-right:1px solid var(--border)">
+          <div style="height:22px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 8px;border-bottom:1px dashed var(--fg3);font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--fg3)">
+            <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ x.native }} · ramal.changes · {{ V.view.changes }}</span><span>refresh · git-commit · gear</span>
+          </div>
+          <div style="flex:1;min-height:0;overflow:auto">
+            <sc-if value="{{ engineRestarting }}"><div role="status" style="display:flex;align-items:center;gap:6px;padding:4px 12px;font-size:12px;background:color-mix(in oklch, var(--info) 14%, transparent);border-bottom:1px solid var(--border)"><i class="codicon codicon-sync codicon-modifier-spin" style="font-size:13px"></i><span>{{ V.engine.bannerReconnect }}</span></div></sc-if>
+            <sc-if value="{{ engineStopped }}">
+              <div style="padding:20px 16px;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+                <i class="codicon codicon-error" style="font-size:20px;color:var(--err)"></i>
+                <div style="font-size:12.5px;line-height:1.5;text-wrap:pretty">{{ V.engine.engineStopped }}</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap"><button onClick="{{ onRetryEngine }}" style="height:26px;padding:0 12px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px">{{ V.engine.retry }}</button><button onClick="{{ onShowLog }}" style="height:26px;padding:0 12px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px">{{ V.engine.showLog }}</button></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ showWebviews }}" hint-placeholder-val="{{ true }}">
+              <div style="pointer-events:{{ events }};opacity:{{ dim }}">
+                <sc-if value="{{ hasOp }}"><div style="display:flex;align-items:flex-start;gap:6px;padding:6px 12px;font-size:12px;line-height:1.4;background:color-mix(in oklch, var(--warn) 14%, transparent);border-bottom:1px solid var(--border)"><i class="codicon codicon-git-merge" style="font-size:13px;margin-top:1px;color:var(--warn)"></i><span style="flex:1;min-width:0">{{ op.short }}</span></div></sc-if>
+                <sc-if value="{{ isDetached }}"><div style="display:flex;flex-direction:column;gap:4px;padding:6px 12px;font-size:12px;line-height:1.4;background:color-mix(in oklch, var(--warn) 14%, transparent);border-bottom:1px solid var(--border)"><span>{{ detachedText }}</span><a onClick="{{ onBranchHere }}" style="align-self:flex-start">{{ V.graph.branchHere }}</a></div></sc-if>
+                <div style="padding:8px 12px 8px 20px;display:flex;flex-direction:column;gap:6px">
                   <div style="position:relative">
-                    <textarea value="{{ scm.msg }}" onChange="{{ scm.onMsg }}" placeholder="{{ scm.ph }}" rows="2" style="width:100%;padding:5px 28px 5px 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;resize:vertical;line-height:1.4;font-size:13px"></textarea>
-                    <button onClick="{{ scm.onAI }}" title="{{ scm.aiTitle }}" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border:0;border-radius:4px;background:transparent;cursor:pointer;color:var(--info);font-size:13px;padding:0" style-hover="background:var(--hover)">{{ scm.aiGlyph }}</button>
+                    <textarea ref="{{ msgRef }}" value="{{ scm.msg }}" onChange="{{ scm.onMsg }}" placeholder="{{ scm.ph }}" rows="3" style="width:100%;padding:5px 28px 5px 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;resize:vertical;line-height:1.4;font-size:13px;display:block"></textarea>
+                    <button onClick="{{ scm.onAI }}" title="{{ scm.aiTitle }}" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border:0;border-radius:4px;background:transparent;cursor:pointer;color:var(--fg);padding:0;display:grid;place-items:center" style-hover="background:var(--hover)"><i class="codicon codicon-{{ scm.aiIcon }}" style="font-size:14px"></i></button>
                   </div>
+                  <div style="display:flex;justify-content:flex-end;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:{{ scm.countColor }}">{{ scm.count }}</div>
+                  <sc-if value="{{ scm.hasErr }}"><div role="alert" style="font-size:12px;line-height:1.45;color:var(--err)">{{ scm.errText }} <a onClick="{{ scm.onErrAction }}">{{ scm.errAction }}</a></div></sc-if>
                   <div style="display:flex;height:26px">
-                    <button onClick="{{ scm.onCommit }}" style="flex:1;border:0;border-radius:2px 0 0 2px;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:13px;opacity:{{ scm.btnOpacity }}">✓ {{ scm.btnLabel }}</button>
-                    <button onClick="{{ scm.onCommitMenu }}" style="width:24px;border:0;border-left:1px solid rgba(255,255,255,.3);border-radius:0 2px 2px 0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:10px;padding:0">▾</button>
+                    <button onClick="{{ scm.onCommit }}" disabled="{{ scm.disabled }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:2px 0 0 2px;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:13px;opacity:{{ scm.btnOpacity }}"><i class="codicon codicon-check" style="font-size:14px"></i>{{ scm.btnLabel }}</button>
+                    <button onClick="{{ scm.onCommitMenu }}" style="width:24px;border:0;border-left:1px solid rgba(255,255,255,.3);border-radius:0 2px 2px 0;background:var(--accent);color:var(--accent-fg);cursor:pointer;padding:0;display:grid;place-items:center"><i class="codicon codicon-chevron-down" style="font-size:12px"></i></button>
                   </div>
                 </div>
                 <sc-for list="{{ scm.groups }}" as="gr">
-                  <div onContextMenu="{{ gr.onMenu }}" style="height:22px;display:flex;align-items:center;gap:4px;padding:0 8px 0 12px;font-size:12px;font-weight:600;color:var(--fg)">
-                    <span style="width:14px;font-size:9px;color:var(--fg2)">▾</span><span style="flex:1">{{ gr.title }}</span>
-                    <sc-if value="{{ gr.hasAll }}"><button onClick="{{ gr.onAll }}" title="{{ gr.allTitle }}" style="width:20px;height:20px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;font-size:14px" style-hover="background:var(--hover)">{{ gr.allGlyph }}</button></sc-if>
+                  <div style="height:22px;display:flex;align-items:center;gap:4px;padding:0 8px 0 12px;font-size:12px;font-weight:600">
+                    <i class="codicon codicon-chevron-down" style="font-size:12px;color:var(--fg2)"></i><span style="flex:1">{{ gr.title }}</span>
+                    <sc-if value="{{ gr.hasAll }}"><button onClick="{{ gr.onAll }}" title="{{ gr.allTitle }}" style="width:20px;height:20px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;display:grid;place-items:center" style-hover="background:var(--hover)"><i class="codicon codicon-{{ gr.allIcon }}" style="font-size:14px"></i></button></sc-if>
                     <span style="min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--sel2);font-size:11px;display:grid;place-items:center">{{ gr.count }}</span>
                   </div>
                   <sc-for list="{{ gr.files }}" as="f">
                     <div onClick="{{ f.onOpen }}" onContextMenu="{{ f.onMenu }}" style="height:22px;display:flex;align-items:center;gap:6px;padding:0 8px 0 30px;cursor:pointer;background:{{ f.bg }}" style-hover="background:var(--hover)">
                       <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ f.nameColor }}">{{ f.base }} <span style="color:var(--fg3);font-size:12px">{{ f.dir }}</span></span>
-                      <sc-if value="{{ f.hasAct }}"><button onClick="{{ f.onAct }}" title="{{ f.actTitle }}" style="width:20px;height:20px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;font-size:14px;color:var(--fg)" style-hover="background:var(--sel2)">{{ f.act }}</button></sc-if>
+                      <sc-if value="{{ f.hasAct }}"><button onClick="{{ f.onAct }}" title="{{ f.actTitle }}" style="width:20px;height:20px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;display:grid;place-items:center" style-hover="background:var(--sel2)"><i class="codicon codicon-{{ f.actIcon }}" style="font-size:14px"></i></button></sc-if>
                       <span style="width:12px;text-align:center;font-size:12px;font-weight:600;color:{{ f.stColor }}">{{ f.st }}</span>
                     </div>
                   </sc-for>
                 </sc-for>
-              </sc-if>
-              <sc-if value="{{ pn.isList }}">
-                <sc-for list="{{ pn.items }}" as="it">
-                  <div onClick="{{ it.onClick }}" onDoubleClick="{{ it.onDbl }}" onContextMenu="{{ it.onMenu }}" style="height:22px;display:flex;align-items:center;gap:6px;padding:0 10px 0 {{ it.pad }};cursor:pointer;background:{{ it.bg }}" style-hover="background:var(--hover)">
-                    <span style="width:14px;text-align:center;font-size:12px;color:{{ it.iconColor }}">{{ it.icon }}</span>
-                    <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:{{ it.weight }}">{{ it.label }}</span>
-                    <span style="font-size:11px;color:{{ it.rightColor }};white-space:nowrap">{{ it.right }}</span>
-                  </div>
-                </sc-for>
-              </sc-if>
+              </div>
             </sc-if>
           </div>
-        </sc-for>
-      </div>
-    </div>
-
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)">
-      <div style="height:35px;flex-shrink:0;display:flex;background:var(--bar);border-bottom:1px solid var(--border);overflow-x:auto">
-        <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="2">
-          <div onClick="{{ tb.onClick }}" style="display:flex;align-items:center;gap:6px;padding:0 6px 0 12px;cursor:pointer;flex-shrink:0;border-right:1px solid var(--border);background:{{ tb.bg }};color:{{ tb.color }};box-shadow:{{ tb.shadow }}">
-            <span style="font-size:12px;color:{{ tb.iconColor }}">{{ tb.icon }}</span>
-            <span style="white-space:nowrap;font-style:{{ tb.fontStyle }}">{{ tb.label }}</span>
-            <span onClick="{{ tb.onClose }}" style="width:20px;height:20px;border-radius:4px;display:grid;place-items:center;font-size:14px;color:var(--fg2);visibility:{{ tb.closeVis }}" style-hover="background:var(--hover)">×</span>
+          <div style="flex-shrink:0;border-top:1px dashed var(--fg3);padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;line-height:1.7;color:var(--fg3)">
+            <div>{{ x.native }} · {{ x.trees }}</div>
+            <sc-for list="{{ trees }}" as="tv"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tv }}</div></sc-for>
           </div>
-        </sc-for>
-      </div>
+        </div>
 
-      <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ true }}">
-        <div style="height:34px;flex-shrink:0;display:flex;align-items:center;gap:2px;padding:0 10px;border-bottom:1px solid var(--border);overflow:hidden">
-          <span style="font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12px;margin-right:8px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis">⎇ {{ curBranch }}</span>
-          <sc-for list="{{ tools }}" as="tl" hint-placeholder-count="7">
-            <button onClick="{{ tl.onClick }}" title="{{ tl.label }}" style="height:24px;min-width:26px;padding:0 6px;border:0;border-radius:4px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;font-size:13px;flex-shrink:0" style-hover="background:var(--hover)">{{ tl.glyph }}<span style="font-size:11px;color:var(--fg2)">{{ tl.badge }}</span></button>
-          </sc-for>
-          <div style="flex:1"></div>
-          <input value="{{ cq }}" onChange="{{ onCq }}" placeholder="{{ t.searchCommits }}" style="flex:0 1 180px;min-width:90px;height:24px;padding:0 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;font-size:12px">
-        </div>
-        <div style="flex:1;min-height:0;display:flex">
-          <div style="flex:1;min-width:0;overflow:auto">
-            <div style="position:relative;min-width:560px">
-              <sc-for list="{{ rows }}" as="row" hint-placeholder-count="16">
-                <div onClick="{{ row.onClick }}" onContextMenu="{{ row.onMenu }}" style="display:grid;grid-template-columns:130px 120px minmax(150px,1fr) 100px 84px 60px;align-items:center;height:28px;padding-right:10px;cursor:pointer;font-size:12.5px;background:{{ row.bg }};opacity:{{ row.opacity }}" style-hover="background:var(--hover)">
-                  <div style="display:flex;gap:3px;padding-left:10px;overflow:hidden;min-width:0">
-                    <sc-for list="{{ row.refs }}" as="rf"><span onContextMenu="{{ rf.onMenu }}" style="display:inline-flex;align-items:center;gap:3px;height:18px;padding:0 5px;border-radius:3px;font-size:11px;white-space:nowrap;min-width:0;max-width:110px;overflow:hidden;text-overflow:ellipsis;background:{{ rf.bg }};border:1px solid {{ rf.color }}">{{ rf.icon }} {{ rf.label }}</span></sc-for>
-                    <sc-if value="{{ row.hasMore }}"><span style="height:18px;padding:0 4px;border-radius:3px;font-size:11px;display:inline-flex;align-items:center;color:var(--fg2);background:var(--sel2)">{{ row.more }}</span></sc-if>
-                  </div>
-                  <div></div>
-                  <div style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:{{ row.weight }};font-style:{{ row.fontStyle }};color:{{ row.color }}">{{ row.msg }}</div>
-                  <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--fg2);font-size:12px">{{ row.author }}</div>
-                  <span style="font-family:'IBM Plex Mono',Menlo,monospace;font-size:11px;color:var(--fg3);white-space:nowrap">{{ row.date }}</span>
-                  <span style="font-family:'IBM Plex Mono',Menlo,monospace;font-size:11px;color:var(--fg3)">{{ row.sha }}</span>
-                </div>
-              </sc-for>
-              {{ graphSvg }}
-            </div>
-          </div>
-          <sc-if value="{{ hasDetail }}">
-            <div style="width:clamp(220px,22vw,300px);flex-shrink:0;overflow:auto;border-left:1px solid var(--border);background:var(--side);padding:12px 14px;display:flex;flex-direction:column;gap:12px">
-              <div style="display:flex;align-items:center;gap:6px">
-                <span style="font-family:'IBM Plex Mono',Menlo,monospace;font-size:12px;padding:1px 6px;border-radius:3px;background:var(--sel2)">{{ dt.sha }}</span>
-                <a onClick="{{ dt.onCopy }}" style="cursor:pointer;font-size:12px">{{ t.copy }}</a>
-                <div style="flex:1"></div>
-                <button onClick="{{ dt.onClose }}" style="width:22px;height:22px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;font-size:14px" style-hover="background:var(--hover)">×</button>
-              </div>
-              <div style="font-size:14px;font-weight:600;line-height:1.4;text-wrap:pretty">{{ dt.msg }}</div>
-              <sc-if value="{{ dt.hasAI }}"><div style="padding:8px 10px;border-radius:4px;border-left:2px solid var(--info);background:var(--hover);font-size:12px;line-height:1.5"><span style="color:var(--info);font-weight:600">✦ AI · </span>{{ dt.aiText }}</div></sc-if>
-              <div style="display:flex;align-items:center;gap:8px;font-size:12px">
-                <span style="width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;color:#1b1b1b;background:{{ dt.avColor }}">{{ dt.ini }}</span>
-                <span>{{ dt.author }}</span><span style="color:var(--fg3);font-family:'IBM Plex Mono',Menlo,monospace;font-size:11px">{{ dt.date }}</span>
-              </div>
-              <div style="font-size:12px;color:var(--fg2)">{{ t.parents }}: <span style="font-family:'IBM Plex Mono',Menlo,monospace;color:var(--fg)">{{ dt.parents }}</span></div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button onClick="{{ dt.onCherry }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px" style-hover="background:var(--hover)">{{ t.cherryBtn }}</button>
-                <button onClick="{{ dt.onRevert }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px" style-hover="background:var(--hover)">{{ t.revertBtn }}</button>
-                <button onClick="{{ dt.onBranch }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px" style-hover="background:var(--hover)">{{ t.branchBtn }}</button>
-              </div>
-              <div>
-                <div style="display:flex;font-size:11px;font-weight:700;text-transform:uppercase;padding:4px 0;color:var(--fg2)"><span style="flex:1">{{ dt.filesLabel }}</span><span style="font-family:'IBM Plex Mono',Menlo,monospace;font-weight:400"><span style="color:var(--add)">+{{ dt.add }}</span> <span style="color:var(--del)">−{{ dt.del }}</span></span></div>
-                <sc-for list="{{ dt.files }}" as="f">
-                  <div onClick="{{ f.onOpen }}" style="height:22px;display:flex;align-items:center;gap:6px;padding:0 4px;cursor:pointer" style-hover="background:var(--hover)">
-                    <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.base }} <span style="color:var(--fg3);font-size:12px">{{ f.dir }}</span></span>
-                    <span style="font-size:12px;font-weight:600;color:{{ f.stColor }}">{{ f.st }}</span>
-                  </div>
-                </sc-for>
-              </div>
-            </div>
-          </sc-if>
-        </div>
-      </sc-if>
-
-      <sc-if value="{{ isDiff }}" hint-placeholder-val="{{ false }}">
-        <div style="height:24px;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12px;color:var(--fg2);border-bottom:1px solid var(--border)">
-          <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ df.crumb }}</span>
-          <span style="font-family:'IBM Plex Mono',Menlo,monospace"><span style="color:var(--add)">+{{ df.add }}</span> <span style="color:var(--del)">−{{ df.del }}</span></span>
-          <sc-if value="{{ df.canStage }}"><a onClick="{{ df.onStage }}" style="cursor:pointer">{{ df.stageLabel }}</a></sc-if>
-        </div>
-        <div style="flex:1;overflow:auto;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:19px;padding-top:4px">
-          <sc-for list="{{ df.rows }}" as="d" hint-placeholder-count="14">
-            <div style="display:grid;grid-template-columns:44px minmax(0,1fr) 44px minmax(0,1fr)">
-              <span style="text-align:right;padding-right:12px;color:var(--fg3);background:{{ d.lbg }}">{{ d.ln }}</span>
-              <span style="white-space:pre;overflow:hidden;border-right:1px solid var(--border);background:{{ d.lbg }}">{{ d.lt }}</span>
-              <span style="text-align:right;padding-right:12px;color:var(--fg3);background:{{ d.rbg }}">{{ d.rn }}</span>
-              <span style="white-space:pre;overflow:hidden;background:{{ d.rbg }}">{{ d.rt }}</span>
-            </div>
-          </sc-for>
-        </div>
-      </sc-if>
-
-      <sc-if value="{{ isMerge }}" hint-placeholder-val="{{ false }}">
-        <div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--border);font-size:12px">
-          <span style="color:var(--warn)">⚠</span>
-          <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-family:'IBM Plex Mono',Menlo,monospace">{{ cf.path }}</span> <span style="color:var(--fg2)">· {{ cf.sub }}</span></span>
-          <button onClick="{{ cf.takeA }}" style="height:22px;padding:0 8px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px;white-space:nowrap">{{ t.takeAllA }}</button>
-          <button onClick="{{ cf.takeB }}" style="height:22px;padding:0 8px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px;white-space:nowrap">{{ t.takeAllB }}</button>
-          <button onClick="{{ cf.onComplete }}" style="height:22px;padding:0 10px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px;white-space:nowrap;opacity:{{ cf.completeOpacity }}">{{ t.completeMerge }}</button>
-        </div>
-        <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.1fr) minmax(0,1fr)">
-          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0;border-bottom:1px solid var(--border)">
-            <sc-for list="{{ cf.panes }}" as="pn" hint-placeholder-count="2">
-              <div style="display:flex;flex-direction:column;min-height:0;min-width:0;border-right:1px solid var(--border)">
-                <div style="height:24px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;font-size:12px;background:var(--side);border-bottom:1px solid var(--border);min-width:0">
-                  <span style="width:16px;height:16px;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:700;color:#1b1b1b;background:{{ pn.color }}">{{ pn.letter }}</span>
-                  <span style="font-weight:600;white-space:nowrap">{{ pn.label }}</span><span style="color:var(--fg2);font-family:'IBM Plex Mono',Menlo,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pn.name }}</span>
-                </div>
-                <div style="flex:1;overflow:auto;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:20px;padding:4px 0 10px">
-                  <sc-for list="{{ pn.lines }}" as="l">
-                    <sc-if value="{{ l.isCtx }}"><div style="display:grid;grid-template-columns:38px 24px minmax(0,1fr)"><span style="text-align:right;padding-right:8px;color:var(--fg3);font-size:11px">{{ l.n }}</span><span></span><span style="white-space:pre-wrap;word-break:break-word;padding-right:10px;color:var(--fg2)">{{ l.text }}</span></div></sc-if>
-                    <sc-if value="{{ l.isHead }}"><div style="display:flex;align-items:center;gap:8px;margin-top:3px;padding:1px 8px 1px 12px;font-family:-apple-system,'Segoe UI',sans-serif;font-size:11px;font-weight:600;color:{{ l.color }};background:{{ l.headBg }}"><span style="flex:1">{{ l.title }}</span><a onClick="{{ l.onPick }}" style="cursor:pointer;color:{{ l.color }}">{{ l.btn }}</a></div></sc-if>
-                    <sc-if value="{{ l.isHunk }}"><div style="display:grid;grid-template-columns:38px 24px minmax(0,1fr);align-items:start;background:{{ l.bg }};box-shadow:inset 3px 0 0 {{ l.color }}"><span style="text-align:right;padding-right:8px;color:var(--fg3);font-size:11px">{{ l.n }}</span><button onClick="{{ l.onToggle }}" title="{{ l.tip }}" style="width:18px;height:18px;margin-top:1px;padding:0;border-radius:3px;cursor:pointer;font-size:13px;font-weight:700;line-height:1;display:grid;place-items:center;border:1px solid {{ l.color }};background:{{ l.btnBg }};color:{{ l.btnColor }}">{{ l.mark }}</button><span style="white-space:pre-wrap;word-break:break-word;padding-right:10px;opacity:{{ l.opacity }}">{{ l.text }}</span></div></sc-if>
-                  </sc-for>
-                </div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+          <div style="height:30px;flex-shrink:0;display:flex;align-items:stretch;border-bottom:1px dashed var(--fg3);background:var(--bar);overflow-x:auto">
+            <span style="display:flex;align-items:center;padding:0 8px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--fg3);white-space:nowrap">{{ x.native }} · {{ x.tabs }}</span>
+            <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="2">
+              <div onClick="{{ tb.onClick }}" style="display:flex;align-items:center;gap:6px;padding:0 6px 0 10px;cursor:pointer;flex-shrink:0;border-left:1px solid var(--border);background:{{ tb.bg }};color:{{ tb.color }}">
+                <i class="codicon codicon-{{ tb.icon }}" style="font-size:14px;color:{{ tb.iconColor }}"></i>
+                <span style="white-space:nowrap;font-size:12.5px">{{ tb.label }}</span>
+                <span onClick="{{ tb.onClose }}" style="width:18px;height:18px;border-radius:4px;display:grid;place-items:center;color:var(--fg2);visibility:{{ tb.closeVis }}" style-hover="background:var(--hover)"><i class="codicon codicon-close" style="font-size:13px"></i></span>
               </div>
             </sc-for>
           </div>
-          <div style="display:flex;flex-direction:column;min-height:0;min-width:0">
-            <div style="height:24px;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 10px;font-size:12px;background:var(--side);border-bottom:1px solid var(--border)">
-              <span style="font-weight:600">{{ t.output }}</span><span style="flex:1;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cf.outSub }}</span><span style="font-weight:600;color:{{ cf.statusColor }}">{{ cf.status }}</span>
-            </div>
-            <div style="flex:1;overflow:auto;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:20px;padding:4px 0 10px">
-              <sc-for list="{{ cf.out }}" as="l">
-                <sc-if value="{{ l.isLine }}"><div style="display:grid;grid-template-columns:38px 24px minmax(0,1fr);align-items:start;background:{{ l.bg }};box-shadow:inset 3px 0 0 {{ l.bar }}"><span style="text-align:right;padding-right:8px;color:var(--fg3);font-size:11px">{{ l.n }}</span><button onClick="{{ l.onRemove }}" title="{{ t.lgRemove }}" style="width:18px;height:18px;margin-top:1px;padding:0;border-radius:3px;cursor:pointer;font-size:13px;font-weight:700;line-height:1;display:grid;place-items:center;border:1px solid var(--input-b);background:var(--input);color:var(--del);visibility:{{ l.vis }}">−</button><span style="white-space:pre-wrap;word-break:break-word;padding-right:10px">{{ l.text }}</span></div></sc-if>
-                <sc-if value="{{ l.isGap }}"><div style="margin:3px 10px 3px 38px;padding:6px 10px;border-radius:3px;border:1px dashed var(--warn);color:var(--warn);font-family:-apple-system,'Segoe UI',sans-serif;font-size:12px">{{ l.text }}</div></sc-if>
-              </sc-for>
-            </div>
-          </div>
-        </div>
-      </sc-if>
 
-      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
-        <div style="flex:1;overflow:auto">
-          <div style="max-width:820px;margin:0 auto;padding:20px 28px 48px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-              <div style="width:28px;height:28px;border-radius:7px;background:oklch(0.74 0.12 190);color:oklch(0.2 0.03 190);display:grid;place-items:center;font-weight:700">R</div>
-              <div style="font-size:20px;font-weight:600">{{ t.tabSettings }}</div>
-            </div>
-            <div style="font-size:12px;color:var(--fg2);margin-bottom:18px">{{ t.followsVs }}</div>
-            <sc-for list="{{ setSections }}" as="ss" hint-placeholder-count="4">
-              <div style="margin-bottom:22px">
-                <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px">
-                  <span style="flex:1">{{ ss.title }}</span>
-                  <sc-if value="{{ ss.hasAction }}"><button onClick="{{ ss.onAction }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px;font-weight:400">{{ ss.action }}</button></sc-if>
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+            <sc-if value="{{ engineRestarting }}"><div role="status" style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 12px;font-size:12px;background:color-mix(in oklch, var(--info) 14%, transparent);border-bottom:1px solid var(--border)"><i class="codicon codicon-sync codicon-modifier-spin" style="font-size:13px"></i><span>{{ V.engine.bannerReconnect }}</span></div></sc-if>
+            <sc-if value="{{ engineStopped }}">
+              <div style="flex:1;display:grid;place-items:center;padding:24px">
+                <div style="max-width:420px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+                  <i class="codicon codicon-error" style="font-size:32px;color:var(--err)"></i>
+                  <div style="font-size:13px;line-height:1.5;text-wrap:pretty">{{ V.engine.engineStopped }}</div>
+                  <div style="display:flex;gap:8px"><button onClick="{{ onRetryEngine }}" style="height:26px;padding:0 14px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px">{{ V.engine.retry }}</button><button onClick="{{ onShowLog }}" style="height:26px;padding:0 14px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px">{{ V.engine.showLog }}</button></div>
                 </div>
-                <sc-for list="{{ ss.items }}" as="it">
-                  <sc-if value="{{ it.isEntity }}">
-                    <div onContextMenu="{{ it.onMenu }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:3px" style-hover="background:var(--hover)">
-                      <span style="width:26px;height:26px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ it.color }}">{{ it.abbr }}</span>
-                      <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:600">{{ it.title }}</span> <span style="color:var(--fg2)">{{ it.meta }}</span></div><div style="font-size:12px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:{{ it.subFont }}">{{ it.sub }}</div></div>
-                      <sc-if value="{{ it.hasBadge }}"><span style="font-size:11px;padding:1px 6px;border-radius:3px;background:var(--sel2)">{{ it.badge }}</span></sc-if>
-                      <button onClick="{{ it.onMenu }}" style="width:22px;height:22px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;font-size:14px;color:var(--fg2)" style-hover="background:var(--sel2)">⋯</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ showWebviews }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:1;min-height:0;display:flex;flex-direction:column;pointer-events:{{ events }};opacity:{{ dim }}">
+
+              <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ true }}">
+                <div style="height:34px;flex-shrink:0;display:flex;align-items:center;gap:2px;padding:0 10px;border-bottom:1px solid var(--border);overflow:hidden">
+                  <sc-if value="{{ multi }}"><button onClick="{{ onPickRepo }}" title="{{ V.command.selectRepository }}" style="height:24px;display:flex;align-items:center;gap:5px;padding:0 6px;margin-right:8px;border:0;border-radius:4px;background:transparent;cursor:pointer;font-size:12.5px;white-space:nowrap" style-hover="background:var(--hover)"><i class="codicon codicon-repo" style="font-size:14px"></i>{{ repo }}<i class="codicon codicon-chevron-down" style="font-size:12px"></i></button></sc-if>
+                  <sc-if value="{{ single }}"><span style="display:flex;align-items:center;gap:5px;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12px;margin-right:8px;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis"><i class="codicon codicon-{{ branchIcon }}" style="font-size:14px"></i>{{ branchLabel }}</span></sc-if>
+                  <sc-for list="{{ tools }}" as="tl" hint-placeholder-count="7">
+                    <button onClick="{{ tl.onClick }}" title="{{ tl.label }}" style="height:24px;min-width:26px;padding:0 5px;border:0;border-radius:4px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;flex-shrink:0" style-hover="background:var(--hover)"><i class="codicon codicon-{{ tl.icon }}" style="font-size:16px"></i><span style="font-size:11px;color:var(--fg2)">{{ tl.badge }}</span></button>
+                  </sc-for>
+                  <div style="flex:1"></div>
+                  <input value="{{ cq }}" onChange="{{ onCq }}" placeholder="{{ t.searchCommits }}" style="flex:0 1 180px;min-width:90px;height:24px;padding:0 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;font-size:12px">
+                </div>
+                <sc-if value="{{ isDetached }}"><div style="flex-shrink:0;display:flex;align-items:center;gap:10px;padding:5px 12px;font-size:12px;background:color-mix(in oklch, var(--warn) 14%, transparent);border-bottom:1px solid var(--border)"><i class="codicon codicon-warning" style="font-size:14px;color:var(--warn)"></i><span style="flex:1;min-width:0">{{ detachedText }}</span><button onClick="{{ onBranchHere }}" style="height:22px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px;white-space:nowrap">{{ V.graph.branchHere }}</button></div></sc-if>
+                <sc-if value="{{ isEmptyRepo }}">
+                  <div style="flex:1;display:grid;place-items:center;padding:24px">
+                    <div style="max-width:380px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+                      <i class="codicon codicon-git-commit" style="font-size:32px;color:var(--fg3)"></i>
+                      <div style="font-size:13px;line-height:1.5;color:var(--fg2);text-wrap:pretty">{{ emptyText }}</div>
+                      <button onClick="{{ onGoChanges }}" style="height:26px;padding:0 14px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px">{{ V.graph.goChanges }}</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1;min-height:0;display:flex">
+                  <div style="flex:1;min-width:0;overflow:auto">
+                    <div style="position:relative;min-width:560px">
+                      <sc-for list="{{ rows }}" as="row" hint-placeholder-count="16">
+                        <div onClick="{{ row.onClick }}" onContextMenu="{{ row.onMenu }}" style="display:grid;grid-template-columns:130px 120px minmax(150px,1fr) 100px 84px 60px;align-items:center;height:28px;padding-right:10px;cursor:pointer;font-size:12.5px;background:{{ row.bg }};opacity:{{ row.opacity }}" style-hover="background:var(--hover)">
+                          <div style="display:flex;gap:3px;padding-left:10px;overflow:hidden;min-width:0">
+                            <sc-for list="{{ row.refs }}" as="rf"><span onContextMenu="{{ rf.onMenu }}" style="display:inline-flex;align-items:center;gap:3px;height:18px;padding:0 5px;border-radius:3px;font-size:11px;white-space:nowrap;min-width:0;max-width:110px;overflow:hidden;background:{{ rf.bg }};border:1px solid {{ rf.color }}"><sc-if value="{{ rf.hasIcon }}"><i class="codicon codicon-{{ rf.icon }}" style="font-size:11px"></i></sc-if><span style="overflow:hidden;text-overflow:ellipsis">{{ rf.label }}</span></span></sc-for>
+                            <sc-if value="{{ row.hasMore }}"><span style="height:18px;padding:0 4px;border-radius:3px;font-size:11px;display:inline-flex;align-items:center;color:var(--fg2);background:var(--sel2)">{{ row.more }}</span></sc-if>
+                          </div>
+                          <div></div>
+                          <div style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:{{ row.weight }};font-style:{{ row.fontStyle }};color:{{ row.color }}">{{ row.msg }}</div>
+                          <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--fg2);font-size:12px">{{ row.author }}</div>
+                          <span style="font-family:'IBM Plex Mono',Menlo,monospace;font-size:11px;color:var(--fg3);white-space:nowrap">{{ row.date }}</span>
+                          <span style="font-family:'IBM Plex Mono',Menlo,monospace;font-size:11px;color:var(--fg3)">{{ row.sha }}</span>
+                        </div>
+                      </sc-for>
+                      {{ graphSvg }}
+                      <sc-if value="{{ showSkeleton }}">
+                        <sc-for list="{{ skeleton }}" as="sk"><div aria-busy="true" style="display:grid;grid-template-columns:130px 120px minmax(150px,1fr) 100px 84px 60px;align-items:center;height:28px;padding-right:10px"><span></span><span style="width:10px;height:10px;margin-left:10px;border-radius:50%;background:var(--sel2)"></span><span style="height:8px;width:{{ sk }};border-radius:3px;background:var(--sel2)"></span><span style="height:8px;width:60px;border-radius:3px;background:var(--sel2)"></span><span></span><span></span></div></sc-for>
+                      </sc-if>
+                      <sc-if value="{{ showLoadMore }}"><div style="height:36px;display:flex;align-items:center;padding-left:250px"><button onClick="{{ onLoadMore }}" style="height:24px;padding:0 12px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px">{{ V.graph.loadMore }}</button></div></sc-if>
+                      <sc-if value="{{ showEnd }}"><div style="height:32px;display:flex;align-items:center;padding-left:250px;font-size:12px;color:var(--fg3)">{{ endText }}</div></sc-if>
+                    </div>
+                  </div>
+                  <sc-if value="{{ hasDetail }}">
+                    <div style="width:clamp(220px,22vw,300px);flex-shrink:0;overflow:auto;border-left:1px solid var(--border);background:var(--side);padding:12px 14px;display:flex;flex-direction:column;gap:12px">
+                      <div style="display:flex;align-items:center;gap:6px">
+                        <span style="font-family:'IBM Plex Mono',Menlo,monospace;font-size:12px;padding:1px 6px;border-radius:3px;background:var(--sel2)">{{ dt.sha }}</span>
+                        <a onClick="{{ dt.onCopy }}" style="font-size:12px">{{ t.copy }}</a>
+                        <div style="flex:1"></div>
+                        <button onClick="{{ dt.onClose }}" style="width:22px;height:22px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;display:grid;place-items:center" style-hover="background:var(--hover)"><i class="codicon codicon-close" style="font-size:14px"></i></button>
+                      </div>
+                      <div style="font-size:14px;font-weight:600;line-height:1.4;text-wrap:pretty">{{ dt.msg }}</div>
+                      <sc-if value="{{ dt.aiIdle }}"><button onClick="{{ dt.onSum }}" style="align-self:flex-start;height:24px;display:flex;align-items:center;gap:5px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px"><i class="codicon codicon-sparkle" style="font-size:13px"></i>{{ t.summarize }}</button></sc-if>
+                      <sc-if value="{{ dt.aiBusy }}"><div aria-busy="true" style="padding:8px 10px;border-radius:4px;border-left:2px solid var(--info);background:var(--hover);display:flex;flex-direction:column;gap:6px"><span style="height:8px;width:92%;border-radius:3px;background:var(--sel2)"></span><span style="height:8px;width:80%;border-radius:3px;background:var(--sel2)"></span><span style="height:8px;width:50%;border-radius:3px;background:var(--sel2)"></span></div></sc-if>
+                      <sc-if value="{{ dt.aiDone }}"><div style="padding:8px 10px;border-radius:4px;border-left:2px solid var(--info);background:var(--hover);font-size:12px;line-height:1.5"><div>{{ dt.aiText }}</div><div style="margin-top:4px;font-size:11px;color:var(--fg2)">{{ dt.aiBy }}</div></div></sc-if>
+                      <sc-if value="{{ dt.aiOff }}"><div style="font-size:12px;color:var(--fg2)">{{ dt.aiOffText }} <a onClick="{{ dt.onAiSettings }}">{{ t.tabSettings }}</a></div></sc-if>
+                      <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                        <span style="width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;color:#1b1b1b;background:{{ dt.avColor }}">{{ dt.ini }}</span>
+                        <span>{{ dt.author }}</span><span style="color:var(--fg3);font-family:'IBM Plex Mono',Menlo,monospace;font-size:11px">{{ dt.date }}</span>
+                      </div>
+                      <div style="font-size:12px;color:var(--fg2)">{{ t.parents }}: <span style="font-family:'IBM Plex Mono',Menlo,monospace;color:var(--fg)">{{ dt.parents }}</span></div>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button onClick="{{ dt.onCherry }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px" style-hover="background:var(--hover)">{{ t.cherryBtn }}</button>
+                        <button onClick="{{ dt.onRevert }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px" style-hover="background:var(--hover)">{{ t.revertBtn }}</button>
+                        <button onClick="{{ dt.onBranch }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px" style-hover="background:var(--hover)">{{ t.branchBtn }}</button>
+                      </div>
+                      <div>
+                        <div style="display:flex;font-size:11px;font-weight:700;text-transform:uppercase;padding:4px 0;color:var(--fg2)"><span style="flex:1">{{ dt.filesLabel }}</span><span style="font-family:'IBM Plex Mono',Menlo,monospace;font-weight:400"><span style="color:var(--add)">+{{ dt.add }}</span> <span style="color:var(--del)">−{{ dt.del }}</span></span></div>
+                        <sc-for list="{{ dt.files }}" as="f">
+                          <div onClick="{{ f.onOpen }}" style="height:22px;display:flex;align-items:center;gap:6px;padding:0 4px;cursor:pointer" style-hover="background:var(--hover)">
+                            <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.base }} <span style="color:var(--fg3);font-size:12px">{{ f.dir }}</span></span>
+                            <span style="font-size:12px;font-weight:600;color:{{ f.stColor }}">{{ f.st }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
                     </div>
                   </sc-if>
-                  <sc-if value="{{ it.isSetting }}">
-                    <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                      <div style="font-size:13px"><span style="color:var(--fg2)">{{ it.cat }}</span><span style="font-weight:600">{{ it.title }}</span></div>
-                      <sc-if value="{{ it.isCheck }}"><label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2)"><input type="checkbox" checked="{{ it.checked }}" onChange="{{ it.onToggle }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ it.desc }}</span></label></sc-if>
-                      <sc-if value="{{ it.isSelect }}">
-                        <div style="color:var(--fg2);margin-top:4px">{{ it.desc }}</div>
-                        <select value="{{ it.value }}" onChange="{{ it.onChange }}" style="margin-top:8px;height:26px;min-width:240px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ it.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+                </div>
+                </sc-if>
+              </sc-if>
+
+              <sc-if value="{{ isMerge }}" hint-placeholder-val="{{ false }}">
+                <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--border);font-size:12px;background:color-mix(in oklch, var(--warn) 12%, transparent);flex-wrap:wrap">
+                  <i class="codicon codicon-{{ op.icon }}" style="font-size:15px;color:var(--warn)"></i>
+                  <span style="flex:1;min-width:200px">{{ op.text }}</span>
+                  <button onClick="{{ op.onContinue }}" title="{{ op.continueTip }}" disabled="{{ op.continueDisabled }}" style="height:22px;padding:0 10px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px;white-space:nowrap;opacity:{{ op.continueOpacity }}">{{ V.operation.continue }}</button>
+                  <sc-if value="{{ op.canSkip }}"><button onClick="{{ op.onSkip }}" style="height:22px;padding:0 10px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px;white-space:nowrap">{{ V.operation.skip }}</button></sc-if>
+                  <button onClick="{{ op.onAbort }}" style="height:22px;padding:0 10px;border-radius:2px;border:1px solid var(--err);background:transparent;color:var(--err);cursor:pointer;font-size:12px;white-space:nowrap">{{ op.abortLabel }}</button>
+                </div>
+                <div style="flex-shrink:0;display:flex;align-items:center;gap:8px;padding:5px 12px;border-bottom:1px solid var(--border);font-size:12px">
+                  <span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'IBM Plex Mono',Menlo,monospace">{{ cf.path }}</span>
+                  <button onClick="{{ cf.takeA }}" style="height:22px;padding:0 8px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px;white-space:nowrap">{{ t.takeAllA }}</button>
+                  <button onClick="{{ cf.takeB }}" style="height:22px;padding:0 8px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px;white-space:nowrap">{{ t.takeAllB }}</button>
+                  <button onClick="{{ cf.onEdit }}" style="height:22px;display:flex;align-items:center;gap:5px;padding:0 8px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px;white-space:nowrap"><i class="codicon codicon-edit" style="font-size:13px"></i>{{ V.operation.editInEditor }}</button>
+                </div>
+                <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.1fr) minmax(0,1fr)">
+                  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:0;border-bottom:1px solid var(--border)">
+                    <sc-for list="{{ cf.panes }}" as="pn" hint-placeholder-count="2">
+                      <div style="display:flex;flex-direction:column;min-height:0;min-width:0;border-right:1px solid var(--border)">
+                        <div style="height:24px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 10px;font-size:12px;background:var(--side);border-bottom:1px solid var(--border);min-width:0">
+                          <span style="width:16px;height:16px;border-radius:3px;display:grid;place-items:center;font-size:10px;font-weight:700;color:#1b1b1b;background:{{ pn.color }}">{{ pn.letter }}</span>
+                          <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pn.label }}</span>
+                        </div>
+                        <div style="flex:1;overflow:auto;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:20px;padding:4px 0 10px">
+                          <sc-for list="{{ pn.lines }}" as="l">
+                            <sc-if value="{{ l.isCtx }}"><div style="display:grid;grid-template-columns:38px 24px minmax(0,1fr)"><span style="text-align:right;padding-right:8px;color:var(--fg3);font-size:11px">{{ l.n }}</span><span></span><span style="white-space:pre-wrap;word-break:break-word;padding-right:10px;color:var(--fg2)">{{ l.text }}</span></div></sc-if>
+                            <sc-if value="{{ l.isHead }}"><div style="display:flex;align-items:center;gap:8px;margin-top:3px;padding:1px 8px 1px 12px;font-family:-apple-system,'Segoe UI',sans-serif;font-size:11px;font-weight:600;color:{{ l.color }};background:{{ l.headBg }}"><span style="flex:1">{{ l.title }}</span><a onClick="{{ l.onPick }}" style="color:{{ l.color }}">{{ l.btn }}</a></div></sc-if>
+                            <sc-if value="{{ l.isHunk }}"><div style="display:grid;grid-template-columns:38px 24px minmax(0,1fr);align-items:start;background:{{ l.bg }};box-shadow:inset 3px 0 0 {{ l.color }}"><span style="text-align:right;padding-right:8px;color:var(--fg3);font-size:11px">{{ l.n }}</span><button onClick="{{ l.onToggle }}" title="{{ l.tip }}" style="width:18px;height:18px;margin-top:1px;padding:0;border-radius:3px;cursor:pointer;font-size:13px;font-weight:700;line-height:1;display:grid;place-items:center;border:1px solid {{ l.color }};background:{{ l.btnBg }};color:{{ l.btnColor }}">{{ l.mark }}</button><span style="white-space:pre-wrap;word-break:break-word;padding-right:10px;opacity:{{ l.opacity }}">{{ l.text }}</span></div></sc-if>
+                          </sc-for>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;flex-direction:column;min-height:0;min-width:0">
+                    <div style="height:24px;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 10px;font-size:12px;background:var(--side);border-bottom:1px solid var(--border)">
+                      <span style="font-weight:600">{{ t.output }}</span><span style="flex:1;color:var(--fg2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cf.outSub }}</span><span style="font-weight:600;color:{{ cf.statusColor }}">{{ cf.status }}</span>
+                    </div>
+                    <sc-if value="{{ cf.hasDup }}"><div role="alert" style="padding:4px 10px;font-size:12px;background:color-mix(in oklch, var(--warn) 12%, transparent);border-bottom:1px solid var(--border)">{{ t.dupWarn }}</div></sc-if>
+                    <div style="flex:1;overflow:auto;font-family:'IBM Plex Mono',Menlo,Consolas,monospace;font-size:12.5px;line-height:20px;padding:4px 0 10px">
+                      <sc-for list="{{ cf.out }}" as="l">
+                        <sc-if value="{{ l.isLine }}"><div style="display:grid;grid-template-columns:38px 24px minmax(0,1fr);align-items:start;background:{{ l.bg }};box-shadow:inset 3px 0 0 {{ l.bar }}"><span style="text-align:right;padding-right:8px;color:var(--fg3);font-size:11px">{{ l.n }}</span><button onClick="{{ l.onRemove }}" title="{{ t.lgRemove }}" style="width:18px;height:18px;margin-top:1px;padding:0;border-radius:3px;cursor:pointer;font-size:13px;font-weight:700;line-height:1;display:grid;place-items:center;border:1px solid var(--input-b);background:var(--input);color:var(--del);visibility:{{ l.vis }}">−</button><span style="white-space:pre-wrap;word-break:break-word;padding-right:10px">{{ l.text }}</span></div></sc-if>
+                        <sc-if value="{{ l.isGap }}"><div style="margin:3px 10px 3px 38px;padding:4px 4px 4px 10px;border-radius:3px;border:1px dashed var(--warn);font-family:-apple-system,'Segoe UI',sans-serif;font-size:12px;display:flex;align-items:center;gap:8px"><span style="flex:1;color:var(--warn)">{{ l.text }}</span><button onClick="{{ l.onEmpty }}" style="height:20px;padding:0 8px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:11px">{{ t.leaveEmpty }}</button></div></sc-if>
+                        <sc-if value="{{ l.isEmpty }}"><div style="margin:2px 10px 2px 38px;display:flex;align-items:center;gap:8px;font-family:-apple-system,'Segoe UI',sans-serif;font-size:11px;color:var(--fg3)"><span style="flex:1;height:1px;background:var(--border)"></span>{{ t.emptyBlock }}<a onClick="{{ l.onEmpty }}">{{ t.undo }}</a><span style="flex:1;height:1px;background:var(--border)"></span></div></sc-if>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isPR }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;overflow:auto">
+                  <div style="max-width:640px;margin:0 auto;padding:20px 28px 40px;display:flex;flex-direction:column;gap:14px">
+                    <div style="font-size:18px;font-weight:600">{{ t.prTitleM }}</div>
+                    <sc-if value="{{ pr.noAccount }}">
+                      <div role="alert" style="padding:12px 14px;border-radius:3px;border:1px solid var(--err);background:color-mix(in oklch, var(--err) 10%, transparent);display:flex;flex-direction:column;gap:8px;font-size:12.5px;line-height:1.5">
+                        <div style="font-weight:600">{{ pr.noAccMsg }}</div>
+                        <div style="color:var(--fg2)">{{ V.account.prNoAccount }}</div>
+                        <button onClick="{{ pr.onAddAccount }}" style="align-self:flex-start;height:26px;padding:0 12px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px">{{ V.account.addAccount }}</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ pr.hasForm }}">
+                      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+                        <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--fg2)">{{ t.fromB }}</span><input value="{{ pr.from }}" readonly="true" style="height:26px;padding:0 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--side);outline:0;font-family:'IBM Plex Mono',Menlo,monospace;font-size:12px"></label>
+                        <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--fg2)">{{ t.toB }}</span><select value="{{ pr.to }}" onChange="{{ pr.onTo }}" style="height:26px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);font-family:'IBM Plex Mono',Menlo,monospace;font-size:12px"><sc-for list="{{ pr.toOpts }}" as="o"><option value="{{ o }}">{{ o }}</option></sc-for></select></label>
+                      </div>
+                      <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--fg2)">{{ t.asAccount }}</span><select value="{{ pr.acc }}" onChange="{{ pr.onAcc }}" style="height:26px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ pr.accOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+                      <button onClick="{{ pr.onAI }}" style="height:26px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:2px;border:1px dashed var(--info);background:transparent;color:var(--info);cursor:pointer;font-size:12px">{{ pr.aiLabel }}</button>
+                      <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--fg2)">{{ t.prTitle }}</span><input value="{{ pr.title }}" onChange="{{ pr.onTitle }}" style="height:26px;padding:0 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0"></label>
+                      <sc-if value="{{ pr.hasErr }}"><div role="alert" style="font-size:12px;color:var(--err)">{{ pr.err }}</div></sc-if>
+                      <label style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;color:var(--fg2)">{{ t.prDesc }}</span><textarea value="{{ pr.desc }}" onChange="{{ pr.onDesc }}" rows="8" style="padding:6px 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;resize:vertical;line-height:1.45"></textarea></label>
+                      <label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12.5px"><input type="checkbox" checked="{{ pr.draft }}" onChange="{{ pr.onDraft }}" style="accent-color:var(--accent);margin:0">{{ t.draft }}</label>
+                      <div style="display:flex;justify-content:flex-end;gap:8px"><button onClick="{{ pr.onCreate }}" style="height:26px;padding:0 14px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px">{{ t.prTitleM }}</button></div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;overflow:auto">
+                  <div style="max-width:820px;margin:0 auto;padding:20px 28px 48px">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                      <div style="width:28px;height:28px;border-radius:7px;background:oklch(0.74 0.12 190);color:oklch(0.2 0.03 190);display:grid;place-items:center;font-weight:700">R</div>
+                      <div style="font-size:20px;font-weight:600">{{ t.tabSettings }}</div>
+                    </div>
+                    <div style="font-size:12px;color:var(--fg2);margin-bottom:4px;text-wrap:pretty">{{ V.settings.cfgHeader }}</div>
+                    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg2);margin-bottom:18px"><i class="codicon codicon-{{ syncIcon }}" style="font-size:13px"></i>{{ syncLine }}</div>
+
+                    <div style="margin-bottom:22px">
+                      <div style="font-size:15px;font-weight:600;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px">{{ t.sAccount }}</div>
+                      <sc-if value="{{ signedIn }}">
+                        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px">
+                          <span style="width:26px;height:26px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:oklch(0.68 0.2 300)">MR</span>
+                          <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:600">Marta Ruiz</span> <span style="color:var(--fg2)">· marta@example.com</span></div><div style="font-size:12px;color:var(--fg3)">ACME Studio · Ramal Pro</div></div>
+                        </div>
+                        <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                          <div><span style="color:var(--fg2)">Ramal › {{ t.sAccount }}: </span><span style="font-weight:600">{{ V.settings.cfgCloud }}</span></div>
+                          <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2);line-height:1.45"><input type="checkbox" checked="{{ cfg.cloud }}" onChange="{{ onCloud }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ V.settings.cfgCloudD }}</span></label>
+                        </div>
+                        <div style="display:flex;gap:8px;padding:8px 10px;flex-wrap:wrap">
+                          <button onClick="{{ onDashboard }}" style="height:26px;padding:0 12px;border-radius:2px;border:0;cursor:pointer;font-size:12px;background:var(--accent);color:var(--accent-fg)">{{ t.openDashboard }}</button>
+                          <button onClick="{{ onSignOut }}" style="height:26px;padding:0 12px;border-radius:2px;border:0;cursor:pointer;font-size:12px;background:var(--sel2)">{{ V.command.signOut }}</button>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ signedOut }}">
+                        <div style="padding:12px 10px;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+                          <div style="font-size:12.5px;line-height:1.5;color:var(--fg2);max-width:560px;text-wrap:pretty">{{ V.auth.cardSignedOut }}</div>
+                          <button onClick="{{ onSignIn }}" disabled="{{ signingIn }}" style="height:26px;padding:0 12px;border-radius:2px;border:0;cursor:pointer;font-size:12px;background:var(--accent);color:var(--accent-fg);opacity:{{ signInOpacity }}">{{ V.command.signIn }}</button>
+                        </div>
                       </sc-if>
                     </div>
-                  </sc-if>
-                  <sc-if value="{{ it.isButtons }}">
-                    <div style="display:flex;gap:8px;padding:8px 10px;flex-wrap:wrap">
-                      <sc-for list="{{ it.buttons }}" as="b"><button onClick="{{ b.onClick }}" style="height:26px;padding:0 12px;border-radius:2px;border:0;cursor:pointer;font-size:12px;background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for>
+
+                    <div style="margin-bottom:22px">
+                      <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px"><span style="flex:1">{{ t.sPlatforms }}</span><button onClick="{{ onAddAccount }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px;font-weight:400">{{ V.account.addAccount }}</button></div>
+                      <sc-for list="{{ accRows }}" as="it">
+                        <div onContextMenu="{{ it.onMenu }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:3px" style-hover="background:var(--hover)">
+                          <span style="width:26px;height:26px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ it.color }}">{{ it.abbr }}</span>
+                          <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:600">{{ it.title }}</span> <span style="color:var(--fg2)">{{ it.meta }}</span></div><div style="font-size:12px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'IBM Plex Mono',Menlo,monospace">{{ it.sub }}</div></div>
+                          <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:{{ it.stColor }};white-space:nowrap"><span style="width:7px;height:7px;border-radius:50%;background:{{ it.stColor }}"></span>{{ it.status }}</span>
+                          <sc-if value="{{ it.hasBadge }}"><span style="font-size:11px;padding:1px 6px;border-radius:3px;background:var(--sel2)">{{ it.badge }}</span></sc-if>
+                          <button onClick="{{ it.onMenu }}" style="width:22px;height:22px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;display:grid;place-items:center;color:var(--fg2)" style-hover="background:var(--sel2)"><i class="codicon codicon-ellipsis" style="font-size:14px"></i></button>
+                        </div>
+                      </sc-for>
                     </div>
-                  </sc-if>
-                </sc-for>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-      </sc-if>
-    </div>
-  </div>
 
-  <div style="height:22px;flex-shrink:0;display:flex;align-items:stretch;font-size:12px;background:var(--bar);border-top:1px solid var(--border);color:var(--fg2)">
-    <div style="display:flex;align-items:center;padding:0 10px;background:var(--accent);color:var(--accent-fg)">&gt;&lt;</div>
-    <sc-for list="{{ statusL }}" as="sb" hint-placeholder-count="3">
-      <div onClick="{{ sb.onClick }}" style="display:flex;align-items:center;padding:0 8px;cursor:pointer;white-space:nowrap;color:{{ sb.color }}" style-hover="background:var(--hover)">{{ sb.label }}</div>
-    </sc-for>
-    <div style="flex:1"></div>
-    <sc-for list="{{ statusR }}" as="sb" hint-placeholder-count="2">
-      <div onClick="{{ sb.onClick }}" style="display:flex;align-items:center;padding:0 8px;cursor:pointer;white-space:nowrap;color:{{ sb.color }}" style-hover="background:var(--hover)">{{ sb.label }}</div>
-    </sc-for>
-  </div>
+                    <div style="margin-bottom:22px">
+                      <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px"><span style="flex:1">{{ t.sAI }}</span><button onClick="{{ onAddKey }}" style="height:24px;padding:0 10px;border-radius:2px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer;font-size:12px;font-weight:400">{{ x.addKey }}</button></div>
+                      <sc-for list="{{ keyRows }}" as="it">
+                        <div onContextMenu="{{ it.onMenu }}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:3px" style-hover="background:var(--hover)">
+                          <span style="width:26px;height:26px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ it.color }}">{{ it.abbr }}</span>
+                          <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:600">{{ it.title }}</span> <span style="color:var(--fg2)">{{ it.meta }}</span></div><div style="font-size:12px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'IBM Plex Mono',Menlo,monospace">{{ it.sub }}</div></div>
+                          <sc-if value="{{ it.hasBadge }}"><span style="font-size:11px;padding:1px 6px;border-radius:3px;background:var(--sel2);white-space:nowrap">{{ it.badge }}</span></sc-if>
+                          <sc-if value="{{ it.hasMenu }}"><button onClick="{{ it.onMenu }}" style="width:22px;height:22px;border:0;border-radius:4px;background:transparent;cursor:pointer;padding:0;display:grid;place-items:center;color:var(--fg2)" style-hover="background:var(--sel2)"><i class="codicon codicon-ellipsis" style="font-size:14px"></i></button></sc-if>
+                        </div>
+                      </sc-for>
+                      <div style="padding:8px 10px 4px;font-size:12px;color:var(--fg2);line-height:1.5;text-wrap:pretty">{{ V.settings.aiHint }}</div>
+                      <sc-for list="{{ fnRows }}" as="f">
+                        <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                          <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onToggle }}" style="margin:0;accent-color:var(--accent)"><span><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ f.title }}</span></span></label>
+                          <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;padding-left:21px">
+                            <label style="display:flex;flex-direction:column;gap:3px;flex:1 1 200px;min-width:0"><span style="font-size:11px;color:var(--fg2)">{{ x.key }}</span><select value="{{ f.keyVal }}" onChange="{{ f.onKey }}" style="height:26px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ f.keyOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+                            <label style="display:flex;flex-direction:column;gap:3px;flex:1 1 220px;min-width:0"><span style="font-size:11px;color:var(--fg2)">{{ t.model }}</span><select value="{{ f.modelVal }}" onChange="{{ f.onModel }}" disabled="{{ f.modelDisabled }}" style="height:26px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);opacity:{{ f.modelOpacity }}"><sc-for list="{{ f.modelOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
+                          </div>
+                        </div>
+                      </sc-for>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.language }}</span></div>
+                        <select value="{{ cfg.aiLang }}" onChange="{{ onAiLang }}" style="margin-top:8px;height:26px;min-width:240px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ langOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+                      </div>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.conventional }}</span></div>
+                        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2)"><input type="checkbox" checked="{{ cfg.conventional }}" onChange="{{ onConventional }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ t.conventionalD }}</span></label>
+                      </div>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ V.settings.excludeLabel }}</span></div>
+                        <div style="color:var(--fg2);margin-top:4px">{{ V.settings.excludeD }}</div>
+                        <input value="{{ cfg.exclude }}" onChange="{{ onExclude }}" style="margin-top:8px;width:100%;max-width:480px;height:26px;padding:0 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;font-family:'IBM Plex Mono',Menlo,monospace;font-size:12px">
+                      </div>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.instructions }}</span></div>
+                        <textarea value="{{ cfg.instr }}" onChange="{{ onInstr }}" rows="3" style="margin-top:8px;width:100%;max-width:560px;padding:6px 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;resize:vertical;line-height:1.4;display:block"></textarea>
+                      </div>
+                    </div>
 
-  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:40"></div>
-    <div style="position:fixed;top:44px;left:50%;transform:translateX(-50%);z-index:41;width:min(600px,calc(100vw - 32px));background:var(--widget);border:1px solid var(--menu-b);border-radius:6px;box-shadow:var(--shadow);max-height:80vh;display:flex;flex-direction:column">
-      <div style="padding:8px 10px 4px;font-size:12px;font-weight:600;color:var(--fg2)">{{ modal.title }}</div>
-      <div style="padding:4px 10px 8px;display:flex;flex-direction:column;gap:8px;overflow:auto">
-        <sc-for list="{{ modal.fields }}" as="f">
-          <sc-if value="{{ f.isInfo }}"><div style="font-size:12px;color:var(--fg2);font-family:{{ f.font }};white-space:pre-wrap">{{ f.text }}</div></sc-if>
-          <sc-if value="{{ f.isAction }}"><button onClick="{{ f.onClick }}" style="height:26px;border-radius:2px;border:1px dashed var(--info);background:transparent;color:var(--info);cursor:pointer;font-size:12px">{{ f.label }}</button></sc-if>
-          <sc-if value="{{ f.isText }}"><label style="display:flex;flex-direction:column;gap:3px"><span style="font-size:11px;color:var(--fg2)">{{ f.label }}</span><input value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" style="height:26px;padding:0 8px;border-radius:2px;border:1px solid var(--accent);background:var(--input);outline:0;font-family:{{ f.font }}"></label></sc-if>
-          <sc-if value="{{ f.isArea }}"><label style="display:flex;flex-direction:column;gap:3px"><span style="font-size:11px;color:var(--fg2)">{{ f.label }}</span><textarea value="{{ f.value }}" onChange="{{ f.onChange }}" rows="4" style="padding:6px 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;resize:vertical;line-height:1.4"></textarea></label></sc-if>
-          <sc-if value="{{ f.isSelect }}"><label style="display:flex;flex-direction:column;gap:3px"><span style="font-size:11px;color:var(--fg2)">{{ f.label }}</span><select value="{{ f.value }}" onChange="{{ f.onChange }}" style="height:26px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ f.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label></sc-if>
-          <sc-if value="{{ f.isCheck }}"><label style="display:flex;gap:6px;align-items:center;cursor:pointer;font-size:12px"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onToggle }}" style="accent-color:var(--accent)">{{ f.label }}</label></sc-if>
-        </sc-for>
-      </div>
-      <div style="display:flex;justify-content:flex-end;gap:6px;padding:8px 10px;border-top:1px solid var(--border)">
-        <button onClick="{{ closeModal }}" style="height:26px;padding:0 12px;border-radius:2px;border:0;background:var(--sel2);cursor:pointer;font-size:12px">{{ t.cancel }}</button>
-        <button onClick="{{ submitModal }}" style="height:26px;padding:0 14px;border-radius:2px;border:0;cursor:pointer;font-size:12px;background:{{ modal.btnBg }};color:#fff">{{ modal.submit }}</button>
-      </div>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ hasPalette }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closePalette }}" style="position:fixed;inset:0;z-index:40"></div>
-    <div style="position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:41;width:min(600px,calc(100vw - 32px));background:var(--widget);border:1px solid var(--menu-b);border-radius:6px;box-shadow:var(--shadow);padding:6px">
-      <input value="{{ pal.q }}" onChange="{{ pal.onQ }}" placeholder="{{ t.cmdPh }}" autofocus="true" style="width:100%;height:26px;padding:0 8px;border-radius:2px;border:1px solid var(--accent);background:var(--input);outline:0">
-      <div style="margin-top:4px;max-height:320px;overflow:auto">
-        <sc-for list="{{ pal.items }}" as="c">
-          <div onClick="{{ c.onClick }}" style="height:24px;display:flex;align-items:center;padding:0 8px;border-radius:3px;cursor:pointer;gap:8px" style-hover="background:var(--sel)">
-            <span style="flex:1"><span style="color:var(--fg2)">Ramal: </span>{{ c.label }}</span><span style="font-size:11px;color:var(--fg3)">{{ c.key }}</span>
-          </div>
-        </sc-for>
-      </div>
-    </div>
-  </sc-if>
-
-  <sc-if value="{{ hasMenu }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ closeMenu }}" onContextMenu="{{ closeMenu }}" style="position:fixed;inset:0;z-index:50"></div>
-    <div style="position:fixed;left:{{ menu.x }}px;top:{{ menu.y }}px;z-index:51;min-width:220px;padding:4px;border-radius:5px;background:var(--menu);border:1px solid var(--menu-b);box-shadow:var(--shadow)">
-      <sc-for list="{{ menu.items }}" as="it">
-        <sc-if value="{{ it.isSep }}"><div style="height:1px;background:var(--menu-b);margin:4px 0"></div></sc-if>
-        <sc-if value="{{ it.notSep }}">
-          <div onClick="{{ it.onClick }}" onMouseEnter="{{ it.onEnter }}" style="position:relative;display:flex;align-items:center;gap:20px;height:24px;padding:0 10px 0 22px;border-radius:3px;cursor:pointer;color:{{ it.color }};background:{{ it.bg }}" style-hover="background:var(--accent);color:var(--accent-fg)">
-            <span style="flex:1;white-space:nowrap">{{ it.label }}</span><span style="font-size:11px;opacity:.7">{{ it.hint }}</span>
-            <sc-if value="{{ it.showSub }}">
-              <div style="position:absolute;left:100%;top:-5px;margin-left:2px;min-width:200px;padding:4px;border-radius:5px;background:var(--menu);border:1px solid var(--menu-b);box-shadow:var(--shadow);color:var(--fg)">
-                <sc-for list="{{ it.children }}" as="ch"><div onClick="{{ ch.onClick }}" style="height:24px;display:flex;align-items:center;padding:0 10px 0 22px;border-radius:3px;cursor:pointer;white-space:nowrap;color:{{ ch.color }}" style-hover="background:var(--accent);color:var(--accent-fg)">{{ ch.label }}</div></sc-for>
-              </div>
+                    <div style="margin-bottom:22px">
+                      <div style="font-size:15px;font-weight:600;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px">{{ t.sGit }}</div>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.autoFetch }}</span></div>
+                        <select value="{{ cfg.autoFetch }}" onChange="{{ onAutoFetch }}" style="margin-top:8px;height:26px;min-width:240px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ fetchOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+                      </div>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.pullDefault }}</span></div>
+                        <select value="{{ cfg.pull }}" onChange="{{ onPullMode }}" style="margin-top:8px;height:26px;min-width:240px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ pullOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
+                      </div>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.signCommits }}</span></div>
+                        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2)"><input type="checkbox" checked="{{ cfg.sign }}" onChange="{{ onSign }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ t.signCommitsD }}</span></label>
+                      </div>
+                      <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
+                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.prune }}</span></div>
+                        <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2)"><input type="checkbox" checked="{{ cfg.prune }}" onChange="{{ onPrune }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ x.pruneD }}</span></label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
             </sc-if>
           </div>
-        </sc-if>
-      </sc-for>
-    </div>
-  </sc-if>
-
-  <div style="position:fixed;right:12px;bottom:32px;z-index:60;display:flex;flex-direction:column;gap:6px">
-    <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0">
-      <div style="width:min(420px,calc(100vw - 24px));padding:10px 12px;border-radius:4px;background:var(--widget);border:1px solid var(--menu-b);box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-start">
-        <span style="font-size:14px;line-height:18px;color:{{ to.color }}">{{ to.icon }}</span>
-        <div style="flex:1;min-width:0"><div style="line-height:18px">{{ to.text }}</div><div style="font-size:11px;color:var(--fg3);margin-top:4px">{{ t.sourceRamal }}</div></div>
+        </div>
       </div>
-    </sc-for>
+
+      <div style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 8px;border-top:1px dashed var(--fg3);background:var(--bar);font-family:'IBM Plex Mono',monospace;font-size:11px;overflow-x:auto">
+        <span style="color:var(--fg3);white-space:nowrap;margin-right:4px">{{ x.native }} · {{ x.statusbar }}</span>
+        <sc-for list="{{ statusL }}" as="sb"><span title="{{ sb.tip }}" style="white-space:nowrap;padding:1px 6px;border-radius:3px;border:1px solid {{ sb.border }};color:{{ sb.color }};opacity:{{ sb.opacity }}">{{ sb.text }}</span></sc-for>
+        <div style="flex:1"></div>
+        <sc-for list="{{ statusR }}" as="sb"><span title="{{ sb.tip }}" style="white-space:nowrap;padding:1px 6px;border-radius:3px;border:1px solid {{ sb.border }};color:{{ sb.color }};opacity:{{ sb.opacity }}">{{ sb.text }}</span></sc-for>
+      </div>
+    </div>
+
+    <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;min-height:0;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--fg2)"><span style="flex:1">{{ x.logTitle }}</span><a onClick="{{ onClearLog }}" style="font-weight:400">{{ x.clear }}</a></div>
+      <sc-if value="{{ logEmpty }}"><div style="font-size:12px;line-height:1.5;color:var(--fg3);text-wrap:pretty">{{ x.logEmpty }}</div></sc-if>
+      <div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ log }}" as="e" hint-placeholder-count="0">
+          <div style="border:1px dashed var(--fg3);border-radius:6px;padding:8px 10px;background:var(--bg);display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;gap:6px;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--fg2)"><span style="color:{{ e.kindColor }};font-weight:600">{{ e.kind }}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ e.api }}</span><button onClick="{{ e.onClose }}" style="width:18px;height:18px;border:0;border-radius:3px;background:transparent;cursor:pointer;padding:0;display:grid;place-items:center;color:var(--fg2)" style-hover="background:var(--hover)"><i class="codicon codicon-close" style="font-size:12px"></i></button></div>
+            <sc-if value="{{ e.hasTitle }}"><div style="font-weight:600;font-size:12.5px;line-height:1.4;text-wrap:pretty">{{ e.title }}</div></sc-if>
+            <sc-if value="{{ e.hasDetail }}"><div style="font-size:12px;line-height:1.45;color:var(--fg2);white-space:pre-wrap">{{ e.detail }}</div></sc-if>
+            <sc-if value="{{ e.hasInput }}">
+              <input value="{{ e.value }}" onChange="{{ e.onInput }}" placeholder="{{ e.ph }}" type="{{ e.inputType }}" style="height:24px;padding:0 6px;border-radius:2px;border:1px solid {{ e.inputBorder }};background:var(--input);outline:0;font-size:12px">
+              <sc-if value="{{ e.hasError }}"><div style="font-size:11.5px;color:var(--err)">{{ e.error }}</div></sc-if>
+            </sc-if>
+            <sc-if value="{{ e.hasItems }}">
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ e.items }}" as="it">
+                  <sc-if value="{{ it.isSep }}"><div style="height:1px;background:var(--border);margin:3px 0"></div></sc-if>
+                  <sc-if value="{{ it.notSep }}"><div onClick="{{ it.onClick }}" style="display:flex;align-items:center;gap:8px;padding:3px 6px 3px {{ it.pad }};border-radius:3px;cursor:pointer;font-size:12px;color:{{ it.color }}" style-hover="background:var(--hover)"><span style="flex:1;min-width:0">{{ it.label }}</span><span style="font-size:11px;color:var(--fg3);white-space:nowrap">{{ it.hint }}</span></div></sc-if>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ e.hasButtons }}"><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ e.buttons }}" as="b"><button onClick="{{ b.onClick }}" style="height:22px;padding:0 10px;border-radius:2px;border:0;cursor:pointer;font-size:12px;background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for></div></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
   </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;vsTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;,&quot;section&quot;:&quot;VS Code&quot;},&quot;vsLanguage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;es&quot;,&quot;fr&quot;],&quot;default&quot;:&quot;en&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;VS Code&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;vsTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;,&quot;section&quot;:&quot;VS Code&quot;},&quot;vsLanguage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;en&quot;,&quot;es&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'en'|'es'&quot;,&quot;section&quot;:&quot;VS Code&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;V-01-sin-sesion&quot;,&quot;V-05-reiniciando&quot;,&quot;V-05-detenido&quot;,&quot;V-06&quot;,&quot;V-07-rebase&quot;,&quot;V-07-cherry-pick&quot;,&quot;V-08&quot;,&quot;V-09-vacio&quot;,&quot;V-09-separado&quot;,&quot;V-15&quot;,&quot;V-16-ia&quot;,&quot;V-22-sin-sesion&quot;,&quot;V-22-nube-apagada&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Estado&quot;}}">
 const STC = { M: 'var(--mod)', A: 'var(--add)', D: 'var(--del)', U: 'var(--add)', C: 'var(--conf)' };
 const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
 const splitPath = p => { const a = p.split('/'); const base = a.pop(); return { base, dir: a.join('/') }; };
 const rsha = () => Math.random().toString(16).slice(2, 9).padEnd(7, '0');
-const nowStr = () => { const d = new Date(); return `09-30 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
-const MONO = "'IBM Plex Mono',Menlo,Consolas,monospace";
+const fill = (s, v) => { if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; };
+const STATES = ['normal', 'V-01-sin-sesion', 'V-05-reiniciando', 'V-05-detenido', 'V-06', 'V-07-rebase', 'V-07-cherry-pick', 'V-08', 'V-09-vacio', 'V-09-separado', 'V-15', 'V-16-ia', 'V-22-sin-sesion', 'V-22-nube-apagada'];
+const MODELS = { anthropic: [['claude-haiku-4-5', 'fast'], ['claude-sonnet-4-5', 'balanced'], ['claude-opus-4-1', '']], openai: [['gpt-5-mini', 'fast'], ['gpt-5', 'balanced']], groq: [['llama-3.1-8b-instant', 'fast'], ['llama-3.3-70b-versatile', 'balanced']] };
+const AI_ERRS = ['badKey', 'network', 'quota', 'modelGone', 'orgLimit'];
+const X = {
+  native: ['Nativo', 'Native'], trees: ['vistas de árbol (TreeView)', 'tree views (TreeView)'], tabs: ['pestañas del editor', 'editor tabs'], statusbar: ['barra de estado', 'status bar'],
+  logTitle: ['Llamadas nativas', 'Native calls'], clear: ['Limpiar', 'Clear'],
+  logEmpty: ['Menús, modales, notificaciones, QuickInput y mensajes de la barra de estado son de VS Code y no se dibujan. Lo que dispara cada acción aparece aquí con su texto; los botones y las filas simulan la respuesta.', 'Menus, modals, notifications, QuickInput and status bar messages belong to VS Code and are not drawn. What each action triggers shows up here with its text; buttons and rows simulate the response.'],
+  onlyGitOff: ['solo con git.enabled = false (V-21)', 'only with git.enabled = false (V-21)'], key: ['Llave', 'Key'], addKey: ['Añadir llave…', 'Add Key…'],
+  pruneD: ['Borra las ramas remotas que ya no existen al hacer fetch.', 'Removes remote branches that no longer exist when fetching.'],
+  chkOk: ['Comprobada hace {ago}', 'Checked {ago} ago'], chkExp: ['Caduca en {days} días', 'Expires in {days} days'], chkBad: ['Token rechazado', 'Token rejected'],
+  mergeOp: ['Merge de {source} en {target}', 'Merge {source} into {target}'], cancel: ['Cancelar', 'Cancel'], enter: ['Aceptar (Enter)', 'OK (Enter)'],
+  rebaseDone: ['Rebase terminado', 'Rebase finished'], prCreated: ['Pull request #{num} creado', 'Pull request #{num} created']
+};
 
 class Component extends DCLogic {
   state = { ready: false };
-  componentDidMount() {
-    const go = () => window.RAMAL ? this.init() : setTimeout(go, 30); go();
-    this._k = e => { if (e.key === 'Escape') this.setState({ menu: null, modal: null, palette: null }); if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'p') { e.preventDefault(); this.setState({ palette: { q: '' } }); } };
-    window.addEventListener('keydown', this._k);
+  msgRef = React.createRef();
+  componentDidMount() { const go = () => window.RAMAL && window.RAMAL.VS ? this.setup(this.curState()) : setTimeout(go, 30); go(); }
+  componentDidUpdate(pp) {
+    document.body.dataset.vs = this.props.vsTheme === 'light' ? 'light' : 'dark';
+    if (pp.state !== this.props.state && this.state.ready) this.setState({ stOverride: null }, () => this.setup(this.curState()));
   }
-  componentWillUnmount() { window.removeEventListener('keydown', this._k); }
-  componentDidUpdate() { document.body.dataset.vs = this.props.vsTheme === 'light' ? 'light' : 'dark'; }
-  init() {
+  curState() { const s = this.state.stOverride || this.props.state || 'normal'; return STATES.includes(s) ? s : 'normal'; }
+  get L() { return this.props.vsLanguage === 'es' ? 0 : 1; }
+  tr(k, v) { const R = window.RAMAL, e = R.D[k] || (R.STATES || {})[k]; return e ? fill(e[this.L], v) : k; }
+  v(k, vars) { const VS = window.RAMAL.VS; let key = 'vscode.' + k; if (vars && vars.count != null && VS[key + '_one']) key += vars.count === 1 ? '_one' : '_other'; const e = VS[key]; return e ? fill(e[this.L], vars) : k; }
+  x(k, v) { return fill(X[k][this.L], v); }
+
+  setup(st) {
     const R = window.RAMAL;
     document.body.dataset.vs = this.props.vsTheme === 'light' ? 'light' : 'dark';
-    this.setState({ ready: true, commits: R.mkCommits(), ahead: 2, current: 'feature/graph-ui', unstaged: R.UNSTAGED.slice(), staged: R.STAGED.slice(), msg: '',
-      conflict: { src: 'hotfix/login', file: 0, choices: this.initChoices() }, tabs: ['graph', 'merge'], active: 'graph', diff: null, sel: null,
-      stashes: R.STASHES.slice(), repoPrs: R.REPO_PRS.slice(), accounts: R.ACCOUNTS.filter(a => ['a1', 'a2', 'a3'].includes(a.id)).map(a => ({ ...a })), aiKeys: R.AIKEYS.map(k => ({ ...k })),
-      cfg: { sync: true, aiCommit: true, aiPR: true, aiSummary: true, aiKey: '', aiLang: 'vscode', conventional: true, autoFetch: '15', pull: 'rebase', sign: true, prune: true },
-      closed: {}, cq: '', menu: null, modal: null, palette: null, toasts: [], aiBusy: false });
+    const b = { ready: true, st, commits: R.mkCommits(), ahead: 2, current: 'feature/graph-ui', unstaged: R.UNSTAGED.slice(), staged: R.STAGED.slice(), msg: '',
+      conflict: null, aiSum: {}, tabs: ['graph'], active: 'graph', sel: null, aiBusy: false, aiErr: null, signedIn: true, signingIn: false, engine: 'ready',
+      multi: false, repo: 'gitflow-desktop', big: false, loads: 0, loading: false, empty: false, detached: false, prNoAcc: false, orgAck: false, sbMsg: null, cq: '', log: [],
+      stashes: R.STASHES.slice(), accounts: R.ACCOUNTS.filter(a => ['a1', 'a2', 'a3'].includes(a.id)).map(a => ({ ...a })), aiKeys: R.AIKEYS.map(k => ({ ...k })),
+      cfg: { cloud: true, aiCommit: true, aiPR: true, aiSummary: true, keyCommit: 'k1', keyPR: 'k1', keySummary: 'k1', modelCommit: 'claude-haiku-4-5', modelPR: '', modelSummary: '', aiLang: 'vscode', conventional: true, exclude: 'fixtures/**, *.sqlite', instr: '', autoFetch: '15', pull: 'rebase', sign: false, prune: true },
+      pr: { to: 'main', title: '', desc: '', draft: false, acc: 'a1', err: '' } };
+    const cf = op => ({ op, src: op === 'merge' ? 'hotfix/login' : 'feature/auth', file: 0, choices: this.initChoices(), idx: 3, total: 7, subject: 'Validar tokens OAuth', sha: op === 'rebase' ? '3f9a1c0' : '9c2e4b1', upstream: 'origin/develop' });
+    if (st === 'V-01-sin-sesion' || st === 'V-22-sin-sesion') Object.assign(b, { signedIn: false, tabs: ['graph', 'settings'], active: 'settings' });
+    if (st === 'V-05-reiniciando') b.engine = 'restarting';
+    if (st === 'V-05-detenido') b.engine = 'stopped';
+    if (st === 'V-06') Object.assign(b, { multi: true, repo: 'web-app' });
+    if (st === 'V-07-rebase') Object.assign(b, { conflict: cf('rebase'), tabs: ['graph', 'merge'], active: 'merge' });
+    if (st === 'V-07-cherry-pick') Object.assign(b, { conflict: cf('cherryPick'), tabs: ['graph', 'merge'], active: 'merge' });
+    if (st === 'V-08') b.big = true;
+    if (st === 'V-09-vacio') Object.assign(b, { empty: true, commits: [], current: 'main', ahead: 0, staged: [] });
+    if (st === 'V-09-separado') Object.assign(b, { detached: true, current: null, commits: b.commits.map(c => ({ ...c, refs: c.refs.map(r => ({ ...r, head: false })) })) });
+    if (st === 'V-15') Object.assign(b, { prNoAcc: true, tabs: ['graph', 'pr'], active: 'pr' });
+    if (st === 'V-16-ia') b.aiErr = 'badKey';
+    if (st === 'V-22-nube-apagada') { b.cfg.cloud = false; Object.assign(b, { tabs: ['graph', 'settings'], active: 'settings' }); }
+    b.pr.title = (b.commits[0] || {}).msg || '';
+    this.setState(b, () => {
+      if (st === 'V-05-detenido') this.nat({ kind: 'error', api: 'showErrorMessage', title: this.v('engine.engineStopped'), buttons: [[this.v('engine.retry'), () => this.setState({ engine: 'ready' }), 1], [this.v('engine.showLog'), () => this.showLog()]] });
+    });
   }
-  get lang() { return this.props.vsLanguage === 'es' ? 'es' : 'en'; }
-  tr(k, v) { const e = window.RAMAL.D[k]; if (!e) return k; let s = e[this.lang === 'es' ? 0 : 1]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
-  toast(text, kind) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3600); }
-  copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.toast(this.tr('copied', { x })); }
-  head() { return this.state.commits.find(c => c.refs.some(r => r.head)) || this.state.commits[0]; }
-  openTab(id) { this.setState(s => ({ tabs: s.tabs.includes(id) ? s.tabs : [...s.tabs, id], active: id, menu: null, palette: null })); }
-  closeTab(id, e) { if (e) e.stopPropagation(); this.setState(s => { const tabs = s.tabs.filter(x => x !== id); return { tabs, active: s.active === id ? (tabs[tabs.length - 1] || 'graph') : s.active }; }); }
-  openDiff(f, staged) { this.setState({ diff: { ...f, staged } }); this.openTab('diff'); }
 
-  openMenu(e, items) {
-    e.preventDefault(); e.stopPropagation();
-    const build = typeof items === 'function' ? items : null; if (build) items = build();
-    const h = items.reduce((a, i) => a + (i.sep ? 9 : 24), 10);
-    const x = Math.max(8, Math.min(e.clientX, window.innerWidth - (items.some(i => i.children) ? 440 : 240)));
-    const y = Math.max(8, Math.min(e.clientY, window.innerHeight - h - 8));
-    this.setState({ menu: { x, y, items, build, sub: -1 } });
-  }
-  closeMenu = e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ menu: null }); };
-  openForm(cfg) { const values = {}; cfg.fields.forEach(f => { if (f.key) values[f.key] = f.value !== undefined ? f.value : (f.type === 'check' ? false : ''); }); this.setState({ modal: { ...cfg, values }, menu: null, palette: null }); }
-  setVal(k, v) { this.setState(s => ({ modal: { ...s.modal, values: { ...s.modal.values, [k]: v } } })); }
-  submitModal = () => { const m = this.state.modal; if (m && m.onSubmit(m.values) !== false) this.setState({ modal: null }); };
-  confirm(title, info, label, fn) { this.openForm({ title, danger: true, submitLabel: label, fields: [{ type: 'info', text: info }], onSubmit: fn }); }
+  nat(e) { const id = Math.random(); this.setState(s => ({ log: [{ id, ...e }, ...s.log].slice(0, 12) })); return id; }
+  drop(id) { this.setState(s => ({ log: s.log.filter(x => x.id !== id) })); }
+  patchLog(id, p) { this.setState(s => ({ log: s.log.map(x => x.id === id ? { ...x, ...p } : x) })); }
+  sb(text) { const id = Math.random(); this.setState({ sbMsg: { id, text: '$(check) ' + text } }); this.nat({ kind: 'status', api: 'setStatusBarMessage(…, 4000)', title: '$(check) ' + text }); setTimeout(() => this.setState(s => s.sbMsg && s.sbMsg.id === id ? { sbMsg: null } : null), 4000); }
+  menu(e, ctx, items) { if (e) { e.preventDefault(); e.stopPropagation(); } this.nat({ kind: 'menu', api: ctx, items }); }
+  modal(message, detail, buttons) { this.nat({ kind: 'modal', api: 'showWarningMessage({ modal: true })', title: message, detail, buttons: [...buttons, [this.x('cancel'), null]] }); }
+  pick(title, items, step) { this.nat({ kind: 'quickPick', api: 'showQuickPick' + (step ? ' · ' + step : ''), title, items }); }
+  input(title, ph, onOk, opts) { this.nat({ kind: 'inputBox', api: 'showInputBox' + (opts && opts.step ? ' · ' + opts.step : ''), title, ph, input: true, value: (opts && opts.value) || '', password: opts && opts.password, validate: opts && opts.validate, onOk }); }
+  copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.sb(this.tr('copied', { x })); }
+  showLog() { this.nat({ kind: 'command', api: 'OutputChannel.show()', title: 'Ramal Engine' }); }
+  head() { return this.state.commits.find(c => c.refs.some(r => r.head)) || this.state.commits[0]; }
+  openTab(id) { this.setState(s => ({ tabs: s.tabs.includes(id) ? s.tabs : [...s.tabs, id], active: id })); }
+  closeTab(id, e) { if (e) e.stopPropagation(); this.setState(s => { const tabs = s.tabs.filter(x => x !== id); return { tabs, active: s.active === id ? (tabs[tabs.length - 1] || 'graph') : s.active }; }); }
+  diffTab(f, staged, sha) { const file = f.path.split('/').pop(); this.nat({ kind: 'editor', api: 'vscode.diff(left, right, title)', title: sha ? this.v('diff.diffCommit', { file, sha }) : staged ? this.v('diff.diffStaged', { file }) : this.v('diff.diffWorking', { file }), detail: sha ? '' : 'editor/title: add · remove · discard' }); }
 
   stage(p) { this.setState(s => { const f = s.unstaged.find(x => x.path === p); return f ? { unstaged: s.unstaged.filter(x => x.path !== p), staged: [...s.staged, f] } : null; }); }
   unstage(p) { this.setState(s => { const f = s.staged.find(x => x.path === p); return f ? { staged: s.staged.filter(x => x.path !== p), unstaged: [...s.unstaged, f] } : null; }); }
   addCommit(msg, extra) {
-    this.setState(s => { const head = s.commits.find(c => c.refs.some(r => r.head)); const refs = head.refs.filter(r => r.head).map(r => ({ ...r }));
+    const sha = rsha();
+    this.setState(s => {
+      if (!s.commits.length) return { empty: false, commits: [{ id: 'n' + Date.now(), lane: 0, parents: [], msg, au: 'MR', date: '2026-10-01 12:00', sha, refs: [{ name: s.current, type: 'local', head: true }] }] };
+      const head = s.commits.find(c => c.refs.some(r => r.head)) || s.commits[0]; const refs = head.refs.filter(r => r.head).map(r => ({ ...r }));
       const commits = s.commits.map(c => c === head ? { ...c, refs: c.refs.filter(r => !r.head) } : c);
-      return { commits: [{ id: 'n' + Date.now(), lane: head.lane, parents: extra ? [head.id, extra] : [head.id], msg, au: 'MR', date: '2026-' + nowStr(), sha: rsha(), refs }, ...commits], ahead: s.ahead + 1 }; });
+      return { commits: [{ id: 'n' + Date.now(), lane: head.lane, parents: extra ? [head.id, extra] : [head.id], msg, au: 'MR', date: '2026-10-01 12:00', sha, refs }, ...commits], ahead: s.ahead + 1 };
+    });
+    return sha;
   }
   commit(push) {
-    const s = this.state, tr = this.tr.bind(this);
-    if (!s.msg.trim() || !s.staged.length) { this.toast(tr('noStagedT'), 'warn'); return; }
-    this.addCommit(s.msg.trim().split('\n')[0]); this.setState({ staged: [], msg: '' });
-    setTimeout(() => { this.toast(tr('committedT', { s: this.head().sha })); if (push) this.push(); }, 0);
+    const s = this.state; if (!s.msg.trim() || !s.staged.length) return;
+    const sha = this.addCommit(s.msg.trim().split('\n')[0]); this.setState({ staged: [], msg: '' });
+    this.sb(this.v('status.committed', { sha })); if (push) setTimeout(() => this.push(), 0);
   }
-  push() { const tr = this.tr.bind(this), nm = 'origin/' + this.state.current; this.setState(s => { const h = s.commits.find(c => c.refs.some(r => r.head)); return { ahead: 0, commits: s.commits.map(c => { let refs = c.refs.filter(r => r.name !== nm); if (c.id === h.id) refs = [...refs, { name: nm, type: 'remote' }]; return { ...c, refs }; }) }; }); this.toast(tr('pushedT', { b: nm })); }
-  checkout(name) { this.setState(s => ({ current: name, ahead: name === 'feature/graph-ui' ? s.ahead : 0, commits: s.commits.map(c => ({ ...c, refs: c.refs.map(r => ({ ...r, head: r.type === 'local' && r.name === name })) })) })); this.toast(this.tr('checkoutT', { b: name })); }
-  aiKey() { const s = this.state; return s.aiKeys.find(k => k.id === s.cfg.aiKey) || s.aiKeys.find(k => k.def) || s.aiKeys[0]; }
+  push() { const nm = 'origin/' + this.state.current; this.setState(s => { const h = s.commits.find(c => c.refs.some(r => r.head)); if (!h) return null; return { ahead: 0, commits: s.commits.map(c => { let refs = c.refs.filter(r => r.name !== nm); if (c.id === h.id) refs = [...refs, { name: nm, type: 'remote' }]; return { ...c, refs }; }) }; }); this.sb(this.tr('pushedT', { b: nm })); }
+  doCheckout(name) { this.setState(s => ({ current: name, detached: false, ahead: name === 'feature/graph-ui' ? s.ahead : 0, commits: s.commits.map(c => ({ ...c, refs: c.refs.map(r => ({ ...r, head: r.type === 'local' && r.name === name })) })) })); this.sb(this.tr('checkoutT', { b: name })); }
+  checkout(name) {
+    const s = this.state;
+    if (name === 'develop' && s.unstaged.length) {
+      this.modal(this.v('dirty.dirtyCheckout', { branch: name, count: s.unstaged.length }), s.unstaged.slice(0, 4).map(f => f.path).join('\n'), [[this.v('dirty.stashAndGo'), () => {
+        this.setState(x => ({ stashes: [{ msg: 'WIP en ' + x.current, files: [...x.unstaged] }, ...x.stashes], unstaged: [] })); this.doCheckout(name);
+        this.nat({ kind: 'info', api: 'showInformationMessage', title: this.v('dirty.stashedNow'), buttons: [[this.v('dirty.applyNow'), () => this.pop(0)]] });
+      }]]); return;
+    }
+    this.doCheckout(name);
+  }
+  pop(i = 0, drop = true) { const st = this.state.stashes[i]; if (!st) return; const files = st.files || window.RAMAL.UNSTAGED.slice(0, 2); this.setState(s => ({ unstaged: [...s.unstaged, ...files.filter(f => !s.unstaged.some(x => x.path === f.path))], stashes: drop ? s.stashes.filter((_, j) => j !== i) : s.stashes })); this.sb(this.tr('poppedT')); }
+  validRef(n) { if (!n.trim()) return this.v('quickInput.branchBad', { reason: this.L ? 'empty' : 'vacío' }); if (/\s/.test(n)) return this.v('quickInput.branchBad', { reason: this.L ? 'no spaces' : 'sin espacios' }); if (/\.\.|~|\^|:|\\|\/$|\.lock$/.test(n)) return this.v('quickInput.branchBad', { reason: this.L ? 'contains a character Git does not allow' : 'tiene un carácter que Git no admite' }); return ''; }
+  newBranch(c) {
+    const base = c || this.head(); if (!base) return;
+    this.input(this.v('quickInput.branchFrom', { sha: base.sha }), 'feature/…', n => {
+      this.pick(n, [[this.v('quickInput.createCo'), () => this.makeBranch(base, n, true)], [this.v('quickInput.createOnly'), () => this.makeBranch(base, n, false)]], '2/2');
+    }, { step: '1/2', validate: n => this.validRef(n) });
+  }
+  makeBranch(base, n, co) { this.setState(s => ({ commits: s.commits.map(x => x.id === base.id ? { ...x, refs: [...x.refs, { name: n, type: 'local' }] } : x) })); this.sb(this.tr('branchT', { b: n })); if (co) setTimeout(() => this.doCheckout(n), 0); }
+  newTag(c) {
+    const base = c || this.head(); if (!base) return;
+    this.input(this.v('tag.tagName'), 'v2.5.0', n => this.input(this.v('tag.tagMsg'), '', () => this.pick(n, [[this.v('tag.tagPushQ'), () => this.makeTag(base, n)], [this.v('tag.tagLocal'), () => this.makeTag(base, n)]], '3/3'), { step: '2/3' }),
+      { step: '1/3', validate: n => { const e = this.validRef(n); if (e) return e; return this.state.commits.some(x => x.refs.some(r => r.type === 'tag' && r.name === n)) ? this.v('tag.tagExists') : ''; } });
+  }
+  makeTag(base, n) { this.setState(s => ({ commits: s.commits.map(x => x.id === base.id ? { ...x, refs: [...x.refs, { name: n, type: 'tag' }] } : x) })); this.sb(this.v('tag.tagCreated', { tag: n })); }
+  stash() {
+    const s = this.state; if (!s.unstaged.length && !s.staged.length) return;
+    const go = () => this.input(this.v('quickInput.stashMsg'), 'WIP en ' + (s.current || 'HEAD'), m => { this.setState(x => ({ stashes: [{ msg: m || 'WIP en ' + x.current, files: [...x.unstaged, ...x.staged] }, ...x.stashes], unstaged: [], staged: [] })); this.sb(this.tr('stashedT')); }, { step: '2/2' });
+    this.pick(this.v('command.stash'), [[this.v('quickInput.stashAll'), go], [this.v('quickInput.stashUntr'), go], [this.v('quickInput.stashStaged'), go]], '1/2');
+  }
+  merge(src) {
+    const cur = this.state.current;
+    const run = () => { if (src === 'hotfix/login') { this.setState({ conflict: { op: 'merge', src, file: 0, choices: this.initChoices() } }); this.openTab('merge'); } else { const t = this.state.commits.find(c => c.refs.some(r => r.name === src)); this.addCommit(`Merge branch '${src}' into ${cur}`, t && t.id); this.sb(this.tr('mergedT', { a: src, b: cur })); } };
+    this.pick(this.v('quickInput.strategy', { source: src, target: cur }), [[this.tr('sFF'), run], [this.tr('sNoFF'), () => this.input(this.v('quickInput.mergeMsg'), '', run, { value: `Merge branch '${src}' into ${cur}`, step: '3/3' })], [this.tr('sSquash'), () => this.input(this.v('quickInput.mergeMsg'), '', run, { value: `Squash ${src}`, step: '3/3' })]], '2/3');
+  }
+  aiKeyFor(fn) { const s = this.state, id = s.cfg['key' + fn]; return s.aiKeys.find(k => k.id === id) || s.aiKeys.find(k => k.def) || s.aiKeys[0]; }
   aiCommit = () => {
-    const tr = this.tr.bind(this), s = this.state;
-    if (!s.cfg.aiCommit) { this.toast(tr('aiDisabled'), 'warn'); return; }
-    const k = this.aiKey(); if (!k) { this.toast(tr('aiNoKey'), 'warn'); return; }
-    if (!s.staged.length) { this.toast(tr('aiNothing'), 'warn'); return; }
-    this.setState({ aiBusy: true });
-    setTimeout(() => { const en = (s.cfg.aiLang === 'vscode' ? this.lang : s.cfg.aiLang) !== 'es'; const cc = s.cfg.conventional;
-      const m = (cc ? 'feat(graph): ' : '') + (en ? 'add zoom and tooltip to commit graph' : 'añadir zoom y tooltip al grafo de commits');
-      this.setState({ aiBusy: false, msg: m + '\n\n' + this.state.staged.map(f => '- ' + (en ? 'Update ' : 'Actualiza ') + f.path.split('/').pop()).join('\n') });
-      this.toast(tr('aiDoneT', { p: window.RAMAL.AIPROV[k.prov].label, m: k.model })); }, 800);
+    const s = this.state, AP = window.RAMAL.AIPROV;
+    if (s.st === 'V-16-ia') { const i = AI_ERRS.indexOf(s.aiErr); this.setState({ aiErr: AI_ERRS[(i + 1) % AI_ERRS.length] }); return; }
+    if (!s.cfg.aiCommit || !s.staged.length) return;
+    const k = this.aiKeyFor('Commit'); if (!k) { this.setState({ aiErr: 'noKey' }); return; }
+    if (k.scope === 'org' && !s.orgAck) { this.modal(this.v('errors.orgProxyTitle'), this.v('errors.orgProxyDetail', { org: 'ACME Studio' }), [[this.v('errors.generate'), () => { this.setState({ orgAck: true }); setTimeout(this.aiCommit, 0); }], [this.v('errors.useMyKey'), () => this.setState(x => ({ cfg: { ...x.cfg, keyCommit: 'k1' } }))]]); return; }
+    this.setState({ aiBusy: true, aiErr: null });
+    setTimeout(() => { const en = (s.cfg.aiLang === 'vscode' ? this.L : s.cfg.aiLang === 'en') ? true : false; const m = (s.cfg.conventional ? 'feat(graph): ' : '') + (en ? 'add zoom and tooltip to commit graph' : 'añadir zoom y tooltip al grafo de commits');
+      this.setState({ aiBusy: false, msg: m + '\n\n' + this.state.staged.map(f => '- ' + (en ? 'Update ' : 'Actualiza ') + f.path.split('/').pop()).join('\n') }); }, 800);
   };
-  openMerge(src) {
-    const tr = this.tr.bind(this);
-    this.openForm({ title: tr('mMerge', { a: src, b: this.state.current }).replace('…', ''), submitLabel: tr('mergeTitle'), fields: [{ type: 'select', key: 'st', label: tr('strategy'), value: 'noff', options: [{ value: 'ff', label: tr('sFF') }, { value: 'noff', label: tr('sNoFF') }, { value: 'squash', label: tr('sSquash') }] }], onSubmit: () => {
-      if (!this.state.conflict) { this.setState({ conflict: { src, file: 0, choices: this.initChoices() } }); this.openTab('merge'); this.toast(tr('conflictsT'), 'warn'); }
-      else { const t = this.state.commits.find(c => c.refs.some(r => r.name === src)); this.addCommit(`Merge branch '${src}' into ${this.state.current}`, t && t.id); this.toast(tr('mergedT', { a: src, b: this.state.current })); }
-    } });
+  aiPR() { const s = this.state; if (!s.cfg.aiPR) return; this.setState({ aiBusy: true }); setTimeout(() => { const en = s.cfg.aiLang === 'vscode' ? !!this.L : s.cfg.aiLang === 'en'; this.setState(x => ({ aiBusy: false, pr: { ...x.pr, err: '', title: (s.cfg.conventional ? 'feat(graph): ' : '') + (en ? 'zoom, tooltip and reusable lanes' : 'zoom, tooltip y carriles reutilizables'), desc: en ? '## Summary\nImproves the commit graph.\n\n## Changes\n- Mouse-wheel zoom\n- Commit tooltip\n- Lanes reuse free slots' : '## Resumen\nMejora el grafo de commits.\n\n## Cambios\n- Zoom con la rueda\n- Tooltip de commit\n- Los carriles reutilizan huecos' } })); }, 800); }
+  addAccount() {
+    const plats = ['GitHub', 'GitLab.com', this.L ? 'Self-hosted GitLab' : 'GitLab propio', this.L ? 'Gitea or Forgejo' : 'Gitea o Forgejo', 'GitHub Enterprise Server', 'Bitbucket Cloud', 'Azure DevOps'];
+    const tokenStep = (p, step) => this.input(this.v('account.tokenPrompt'), '', () => this.pick(this.v('account.tokenResult', { user: 'marta-dev', scopes: 'repo, read:org' }), [[this.v('account.labelOpt'), () => this.sb(this.v('account.accConnected', { user: 'marta-dev' }))]], step), { step, password: true });
+    this.pick(this.v('account.pickPlatform'), plats.map(p => [p, () => {
+      const oauth = { GitHub: 'GitHub', 'GitLab.com': 'GitLab', 'Bitbucket Cloud': 'Bitbucket' }[p];
+      if (oauth) this.pick(p, [[this.v('account.oauthRec', { platform: oauth }), () => oauth === 'GitHub' ? this.nat({ kind: 'modal', api: 'showInformationMessage({ modal: true })', title: this.v('account.ghCodeTitle'), detail: 'B3F7-91KQ', buttons: [[this.v('account.copyOpenGh'), () => this.nat({ kind: 'progress', api: 'withProgress(Notification, cancellable)', title: this.v('account.waitPlatform', { platform: 'GitHub' }), buttons: [[this.x('cancel'), null]] })]] }) : this.nat({ kind: 'progress', api: 'withProgress(Notification, cancellable)', title: this.v('account.waitPlatform', { platform: oauth }), buttons: [[this.x('cancel'), null]] })], [oauth === 'GitHub' ? this.v('account.tokenFine') : oauth === 'GitLab' ? this.v('account.tokenPersonal') : this.v('account.apiToken'), () => tokenStep(p, '3/4')]], '2/4');
+      else if (p === 'Azure DevOps') this.input(this.v('account.azureOrg'), 'acme', () => tokenStep(p, '3/4'), { step: '2/4' });
+      else this.input(this.v('account.hostPrompt'), 'gitlab.acme.dev', () => tokenStep(p, '3/4'), { step: '2/4' });
+    }]), '1/4');
   }
-  newBranch(c) { const tr = this.tr.bind(this), base = c || this.head(); this.openForm({ title: tr('branchTitle'), submitLabel: tr('create'), fields: [{ type: 'info', text: `${base.sha}  ${base.msg}`, mono: true }, { type: 'text', key: 'name', label: tr('branchName'), placeholder: 'feature/…', mono: true }, { type: 'check', key: 'co', label: tr('checkoutAfter'), value: true }], onSubmit: v => { const n = (v.name || '').trim().replace(/\s+/g, '-'); if (!n) return false; this.setState(s => ({ commits: s.commits.map(x => x.id === base.id ? { ...x, refs: [...x.refs, { name: n, type: 'local' }] } : x) })); this.toast(tr('branchT', { b: n })); if (v.co) setTimeout(() => this.checkout(n), 0); } }); }
-  cherry(c) { this.addCommit(c.msg); this.toast(this.tr('cherryT', { s: c.sha })); }
-  revert(c) { this.addCommit(`Revert "${c.msg}"`); this.toast(this.tr('revertT', { s: c.sha })); }
-  stash() { const tr = this.tr.bind(this); if (!this.state.unstaged.length && !this.state.staged.length) { this.toast(tr('noChanges'), 'warn'); return; } this.openForm({ title: tr('stashTitle'), submitLabel: tr('stash'), fields: [{ type: 'text', key: 'msg', label: tr('stashMsg'), placeholder: 'WIP on ' + this.state.current }], onSubmit: v => { this.setState(s => ({ stashes: [{ msg: v.msg || 'WIP on ' + s.current, files: [...s.unstaged, ...s.staged] }, ...s.stashes], unstaged: [], staged: [] })); this.toast(tr('stashedT')); } }); }
-  pop(i = 0, drop = true) { const st = this.state.stashes[i]; if (!st) { this.toast(this.tr('nothingStashT'), 'warn'); return; } const files = st.files || window.RAMAL.UNSTAGED.slice(0, 2); this.setState(s => ({ unstaged: [...s.unstaged, ...files.filter(f => !s.unstaged.some(x => x.path === f.path))], stashes: drop ? s.stashes.filter((_, j) => j !== i) : s.stashes })); this.toast(this.tr('poppedT')); }
-  openPR(from) {
-    const tr = this.tr.bind(this), f0 = from || this.state.current;
-    this.openForm({ title: tr('prTitleM'), submitLabel: tr('create'), fields: [
-      { type: 'action', label: tr('aiPR'), run: () => this.aiPR() },
-      { type: 'select', key: 'acc', label: tr('asAccount'), value: 'a1', options: this.state.accounts.filter(a => a.platform === 'github').map(a => ({ value: a.id, label: `GitHub · @${a.user}` })) },
-      { type: 'text', key: 'to', label: tr('toB'), value: f0 === 'develop' ? 'main' : 'develop', mono: true },
-      { type: 'text', key: 'title', label: tr('prTitle'), value: (this.head() || {}).msg || '' },
-      { type: 'area', key: 'desc', label: tr('prDesc') },
-      { type: 'check', key: 'draft', label: tr('draft') }
-    ], onSubmit: v => { if (!(v.title || '').trim()) return false; const num = 143 + this.state.repoPrs.length - 2; this.setState(s => ({ repoPrs: [{ num, title: v.title, from: f0, to: v.to, state: v.draft ? 'draft' : 'open' }, ...s.repoPrs] })); this.toast(tr('prT', { n: num, p: 'GitHub' })); } });
+  addKey() {
+    const AP = window.RAMAL.AIPROV;
+    this.pick(this.x('addKey').replace('…', ''), Object.keys(AP).map(id => [AP[id].label, () => {
+      const modelStep = () => this.pick(this.tr('model'), (MODELS[id] || [[AP[id].model || 'model', 'fast']]).map(([m, tier]) => [m + (tier === 'fast' ? ' · ' + this.v('errors.recFast') : tier === 'balanced' ? ' · ' + this.v('errors.recBalanced') : ''), () => this.input(this.v('account.labelOpt'), '', () => this.sb(this.tr('keyAddedT', { p: AP[id].label })), { step: '5/5' })]), '4/5');
+      const keyStep = () => id === 'ollama' ? modelStep() : this.input(this.tr('apiKey'), AP[id].ph, modelStep, { step: '3/5', password: true });
+      if (AP[id].url) this.input(this.tr('a_baseUrl'), '', keyStep, { step: '2/5', value: AP[id].url }); else keyStep();
+    }]), '1/5');
   }
-  aiPR() {
-    const tr = this.tr.bind(this), s = this.state; if (!s.cfg.aiPR) { this.toast(tr('aiDisabled'), 'warn'); return; } const k = this.aiKey(); if (!k) { this.toast(tr('aiNoKey'), 'warn'); return; }
-    this.setState({ aiBusy: true });
-    setTimeout(() => { const en = (s.cfg.aiLang === 'vscode' ? this.lang : s.cfg.aiLang) !== 'es';
-      const title = (s.cfg.conventional ? 'feat(graph): ' : '') + (en ? 'zoom, tooltip and reusable lanes' : 'zoom, tooltip y carriles reutilizables');
-      const desc = en ? '## Summary\nImproves the commit graph.\n\n## Changes\n- Mouse-wheel zoom\n- Commit tooltip\n- Lanes reuse free slots' : '## Resumen\nMejora el grafo de commits.\n\n## Cambios\n- Zoom con la rueda\n- Tooltip de commit\n- Los carriles reutilizan huecos';
-      this.setState(x => ({ aiBusy: false, modal: x.modal ? { ...x.modal, values: { ...x.modal.values, title, desc } } : x.modal })); this.toast(tr('aiDoneT', { p: window.RAMAL.AIPROV[k.prov].label, m: k.model })); }, 800);
+  signIn() {
+    this.setState({ signingIn: true });
+    const id = this.nat({ kind: 'progress', api: 'withProgress(Notification, cancellable)', title: this.v('auth.progressBrowser'), buttons: [[this.x('cancel'), () => this.setState({ signingIn: false })]] });
+    setTimeout(() => { if (!this.state.signingIn) return; this.drop(id); this.setState({ signedIn: true, signingIn: false }); this.sb(this.v('auth.signedInMsg', { name: 'Marta Ruiz' })); }, 1600);
   }
-  initChoices() { const o = {}; window.RAMAL.CF.forEach((file, i) => { o[i] = file.segs.filter(sg => sg.h).map(sg => ({ ours: sg.h[0].map(() => false), theirs: sg.h[1].map(() => false) })); }); return o; }
-  updHunks(fn) { this.setState(s => { const cf = s.conflict; return { conflict: { ...cf, choices: { ...cf.choices, [cf.file]: fn(cf.choices[cf.file].map(h => ({ ours: h.ours.slice(), theirs: h.theirs.slice() }))) } } }; }); }
-  pick(hi, side) { this.updHunks(hs => { const a = hs[hi][side]; const all = a.every(Boolean); hs[hi][side] = a.map(() => !all); return hs; }); }
-  pickLine(hi, side, li) { this.updHunks(hs => { hs[hi][side][li] = !hs[hi][side][li]; return hs; }); }
-  takeAll(side) { const o = side === 'ours' ? 'theirs' : 'ours'; this.updHunks(hs => hs.map(h => ({ [side]: h[side].map(() => true), [o]: h[o].map(() => false) }))); }
-  cfResolved(i) { return this.state.conflict.choices[i].every(h => h.ours.some(Boolean) || h.theirs.some(Boolean)); }
-  completeMerge = () => {
-    const tr = this.tr.bind(this), cf = this.state.conflict;
-    if (!window.RAMAL.CF.every((_, i) => this.cfResolved(i))) { this.toast(tr('stillConflicts'), 'warn'); return; }
-    const t = this.state.commits.find(c => c.refs.some(r => r.name === cf.src)); this.addCommit(`Merge branch '${cf.src}' into ${this.state.current}`, t && t.id);
-    this.setState(s => ({ conflict: null, tabs: s.tabs.filter(x => x !== 'merge'), active: 'graph' })); this.toast(tr('mergeDoneT'));
+  signOut() { this.modal(this.v('auth.signOutTitle'), this.v('auth.signOutDetail'), [[this.v('auth.signOutKeep'), () => this.setState({ signedIn: false })], [this.v('auth.signOutWipe'), () => this.setState({ signedIn: false })]]); }
+
+  initChoices() { const o = {}; window.RAMAL.CF.forEach((file, i) => { o[i] = file.segs.filter(sg => sg.h).map(sg => ({ ours: sg.h[0].map(() => false), theirs: sg.h[1].map(() => false), empty: false })); }); return o; }
+  updHunks(fn) { this.setState(s => { const cf = s.conflict; return { conflict: { ...cf, choices: { ...cf.choices, [cf.file]: fn(cf.choices[cf.file].map(h => ({ ours: h.ours.slice(), theirs: h.theirs.slice(), empty: !!h.empty }))) } } }; }); }
+  pickBlock(hi, side) { this.updHunks(hs => { const a = hs[hi][side]; const all = a.every(Boolean); hs[hi][side] = a.map(() => !all); hs[hi].empty = false; return hs; }); }
+  pickLine(hi, side, li) { this.updHunks(hs => { hs[hi][side][li] = !hs[hi][side][li]; hs[hi].empty = false; return hs; }); }
+  leaveEmpty(hi) { this.updHunks(hs => { const e = !hs[hi].empty; hs[hi] = { ours: hs[hi].ours.map(() => false), theirs: hs[hi].theirs.map(() => false), empty: e }; return hs; }); }
+  takeAll(side) { const o = side === 'ours' ? 'theirs' : 'ours'; this.updHunks(hs => hs.map(h => ({ [side]: h[side].map(() => true), [o]: h[o].map(() => false), empty: false }))); }
+  cfResolved(i) { return this.state.conflict.choices[i].every(h => h.empty || h.ours.some(Boolean) || h.theirs.some(Boolean)); }
+  allResolved() { return window.RAMAL.CF.every((_, i) => this.cfResolved(i)); }
+  opName(op) { return this.v('operation.name.' + op); }
+  continueOp(skip) {
+    const cf = this.state.conflict; if (!cf) return; if (!skip && !this.allResolved()) return;
+    if (cf.op === 'rebase' && cf.idx < cf.total - 3) { this.setState({ conflict: { ...cf, idx: cf.idx + 1, subject: 'Refrescar tokens caducados', sha: rsha(), choices: this.initChoices() } }); return; }
+    if (!skip && cf.op !== 'rebase') { const t = this.state.commits.find(c => c.refs.some(r => r.name === cf.src)); this.addCommit(cf.op === 'merge' ? `Merge branch '${cf.src}' into ${this.state.current}` : this.state.commits[3].msg, cf.op === 'merge' && t ? t.id : null); }
+    this.setState(s => ({ conflict: null, tabs: s.tabs.filter(x => x !== 'merge'), active: 'graph' }));
+    this.sb(cf.op === 'rebase' ? this.x('rebaseDone') : this.tr('mergeDoneT'));
+  }
+  abortOp() { const cf = this.state.conflict, n = this.opName(cf.op); this.modal(this.v('confirm.abortOperation.message', { operation: n }), this.v('confirm.abortOperation.detail'), [[this.v('confirm.abortOperation.button'), () => this.setState(s => ({ conflict: null, tabs: s.tabs.filter(x => x !== 'merge'), active: 'graph' }))]]); }
+  summarize(c) { const k = this.aiKeyFor('Summary'); if (!this.state.cfg.aiSummary || !k) return; this.setState(s => ({ aiSum: { ...s.aiSum, [c.id]: { st: 'busy' } } })); setTimeout(() => this.setState(s => ({ aiSum: { ...s.aiSum, [c.id]: { st: 'done', prov: k.prov, model: s.cfg.modelSummary || k.model } } })), 900); }
+  loadMore = () => {
+    this.setState({ loading: true });
+    setTimeout(() => this.setState(s => { const n = s.loads, start = n * 8; const extra = Array.from({ length: 8 }, (_, i) => { const k = start + i; const id = k === 0 ? 'c0' : 'o' + k; const last = n === 1 && i === 7; return { id, lane: 0, parents: last ? [] : ['o' + (k + 1)], msg: (this.L ? 'Older commit ' : 'Commit antiguo ') + (k + 1), au: ['MR', 'DL', 'AT', 'SO'][k % 4], date: '2026-09-' + String(17 - Math.floor(k / 2)).padStart(2, '0') + ' 10:00', sha: rsha(), refs: [] }; });
+      return { loading: false, loads: n + 1, commits: [...s.commits, ...extra] }; }), 900);
   };
 
-  commitMenu(c) { const tr = this.tr.bind(this), cur = this.state.current; const br = c.refs.find(r => r.type === 'local');
-    return [{ label: tr('mCheckout') + (br ? ' ' + br.name : ' ' + c.sha), action: () => br ? this.checkout(br.name) : this.toast(tr('checkoutT', { b: c.sha + ' (detached HEAD)' }), 'warn') }, { label: tr('mBranchHere'), action: () => this.newBranch(c) }, { sep: 1 },
-      { label: tr('mCherry', { b: cur }).replace('…', ''), action: () => this.cherry(c) }, { label: tr('mRevert'), action: () => this.revert(c) },
-      { label: tr('mReset', { b: cur }), children: ['soft', 'mixed', 'hard'].map(m => ({ label: '--' + m, danger: m === 'hard', action: () => this.toast(tr('resetT', { m: '--' + m, s: c.sha })) })) },
-      ...(br && br.name !== cur ? [{ sep: 1 }, { label: tr('mMerge', { a: br.name, b: cur }), action: () => this.openMerge(br.name) }] : []),
-      { sep: 1 }, { label: tr('mCopySha'), action: () => this.copy(c.sha) }, { label: tr('openDesktop'), action: () => this.toast(tr('doneT', { x: tr('openDesktop') })) }]; }
-  branchMenu(name, remote) { const tr = this.tr.bind(this), cur = this.state.current, isCur = !remote && name === cur;
-    return [...(isCur ? [] : [{ label: tr('mCheckout') + ' ' + name, action: () => this.checkout(remote ? name.split('/').slice(1).join('/') : name) }, { sep: 1 }, { label: tr('mMerge', { a: name, b: cur }), action: () => this.openMerge(name) }, { label: tr('mRebaseOnto', { a: cur, b: name }).replace('…', ''), action: () => this.toast(tr('rebaseT', { a: cur, b: name })) }]),
-      { sep: 1 }, ...(remote ? [] : [{ label: tr('mPush'), action: () => this.push() }, { label: tr('mPull'), action: () => this.toast(tr('pulledT', { b: name })) }]), { label: tr('mCreatePR'), action: () => this.openPR(remote ? name.split('/').slice(1).join('/') : name) },
-      ...(isCur ? [] : [{ sep: 1 }, { label: tr('mDelete'), danger: 1, action: () => this.confirm(tr('deleteBranchTitle', { b: name }), tr('deleteBranchInfo'), tr('del'), () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => r.name !== name) })) })); this.toast(tr('deletedT', { b: name })); }) }])]; }
-  fileMenu(f, staged) { const tr = this.tr.bind(this);
-    return [{ label: tr('mViewDiff'), action: () => this.openDiff(f, staged) }, { label: staged ? tr('mUnstage') : tr('mStage'), action: () => staged ? this.unstage(f.path) : this.stage(f.path) }, { label: tr('mDiscard'), danger: 1, action: () => this.confirm(tr('discardTitle'), f.path + '\n' + tr('discardInfo'), tr('del'), () => this.setState(s => ({ unstaged: s.unstaged.filter(x => x.path !== f.path), staged: s.staged.filter(x => x.path !== f.path) }))) }, { sep: 1 }, { label: tr('mHistory'), action: () => this.toast(tr('doneT', { x: tr('mHistory') })) }, { label: tr('mCopyPath'), action: () => this.copy(f.path) }]; }
-  addAccount() { const tr = this.tr.bind(this), P = window.RAMAL.PLAT; this.openForm({ title: tr('accTitleM'), submitLabel: tr('create'), fields: [{ type: 'select', key: 'platform', label: tr('platform'), value: 'github', options: Object.keys(P).map(k => ({ value: k, label: P[k].label })) }, { type: 'text', key: 'host', label: tr('host'), placeholder: 'github.com', mono: true }, { type: 'text', key: 'user', label: tr('user') }, { type: 'text', key: 'token', label: tr('token'), mono: true }], onSubmit: v => { const u = (v.user || '').trim(); if (!u) return false; this.setState(s => ({ accounts: [...s.accounts, { id: 'a' + Date.now(), platform: v.platform, user: u, host: v.host || { github: 'github.com', gitlab: 'gitlab.com', bitbucket: 'bitbucket.org' }[v.platform] || '—', method: 'Token (PAT)', name: '—' }] })); this.toast(tr('accAddedT', { u })); } }); }
-  addKey() { const tr = this.tr.bind(this), AP = window.RAMAL.AIPROV; this.openForm({ title: tr('addKey'), submitLabel: tr('create'), fields: [{ type: 'select', key: 'prov', label: tr('provider'), value: 'anthropic', options: Object.keys(AP).map(k => ({ value: k, label: AP[k].label })) }, { type: 'text', key: 'label', label: tr('label'), placeholder: tr('keyLabelPh') }, { type: 'text', key: 'key', label: tr('apiKey'), mono: true }, { type: 'text', key: 'model', label: tr('model'), mono: true, placeholder: 'claude-sonnet-4-5' }], onSubmit: v => { const raw = (v.key || '').trim(); if (!raw && v.prov !== 'ollama') return false; const p = AP[v.prov]; this.setState(s => ({ aiKeys: [...s.aiKeys, { id: 'k' + Date.now(), prov: v.prov, label: v.label || p.label, scope: 'personal', masked: raw ? raw.slice(0, 6) + '••••••••' + raw.slice(-4) : '—', model: v.model || p.model, def: !s.aiKeys.length }] })); this.toast(tr('keyAddedT', { p: p.label })); } }); }
+  commitMenu(c) {
+    const cur = this.state.current || c.sha, br = c.refs.find(r => r.type === 'local');
+    const it = (label, fn, o) => ({ label, run: fn, ...o });
+    return [it(this.tr('mCheckout'), () => br ? this.checkout(br.name) : this.setState({ detached: true, current: null })), it(this.tr('mBranchHere'), () => this.newBranch(c)), it(this.tr('mTagHere'), () => this.newTag(c)), { sep: 1 },
+      it(this.tr('mCherry', { b: cur }), () => { this.addCommit(c.msg); this.sb(this.tr('cherryT', { s: c.sha })); }), it(this.tr('mRevert'), () => { this.addCommit(`Revert "${c.msg}"`); this.sb(this.tr('revertT', { s: c.sha })); }),
+      it(this.tr('mReset', { b: cur }), null, { hint: '›' }), it(this.tr('rSoft'), () => this.sb(this.tr('resetT', { m: '--soft', s: c.sha })), { sub: 1 }), it(this.tr('rMixed'), () => this.sb(this.tr('resetT', { m: '--mixed', s: c.sha })), { sub: 1 }),
+      it(this.tr('rHard'), () => this.modal(this.v('confirm.resetHard.message', { sha: c.sha }), this.v('confirm.resetHard.detail'), [[this.v('confirm.resetHard.button'), () => this.sb(this.tr('resetT', { m: '--hard', s: c.sha }))]]), { sub: 1, danger: 1 }),
+      { sep: 1 }, it(this.tr('mCopySha'), () => this.copy(c.sha)), it(this.tr('mCopyMsg'), () => this.copy(c.msg)), it(this.v('command.openInDesktop'), () => this.nat({ kind: 'warning', api: 'showWarningMessage', title: this.v('desktop.noDesktop'), detail: 'env.openExternal("ramal://open?repo=…") → false', buttons: [[this.v('desktop.getDesktop'), null]] }))];
+  }
+  branchMenu(name, type) {
+    const cur = this.state.current, isCur = type === 'local' && name === cur, it = (label, fn, o) => ({ label, run: fn, ...o });
+    if (type === 'tag') return [it(this.v('menu.tagCheckout'), () => this.setState({ detached: true, current: null })), it(this.tr('mPushTag'), () => this.sb(this.tr('pushedT', { b: name }))), it(this.v('menu.copyName'), () => this.copy(name)), { sep: 1 },
+      it(this.tr('mDeleteTag') + '…', () => this.modal(this.v('confirm.deleteTag.message', { tag: name }), this.v('confirm.deleteTag.detail'), [[this.v('confirm.deleteTag.button'), () => this.delRef(name, 'tag')], [this.v('confirm.deleteTag.button2'), () => this.delRef(name, 'tag')]]), { danger: 1 })];
+    if (type === 'remote') { const [rm, ...rb] = name.split('/'), b = rb.join('/');
+      return [it(this.tr('mCheckout'), () => this.checkout(b)), it(this.v('menu.mergeCurrent'), () => this.merge(name)), it(this.tr('mCreatePR'), () => this.openTab('pr')), it(this.v('menu.copyName'), () => this.copy(name)), { sep: 1 },
+        it(this.tr('mDeleteRemote'), () => this.modal(this.v('confirm.deleteRemoteBranch.message', { remote: rm, branch: b }), this.v('confirm.deleteRemoteBranch.detail'), [[this.v('confirm.deleteRemoteBranch.button', { remote: rm }), () => this.delRef(name, 'remote')]]), { danger: 1 })]; }
+    const common = [it(this.tr('mPush'), () => isCur ? this.push() : this.sb(this.tr('pushedT', { b: 'origin/' + name }))), it(this.tr('mPull'), () => this.sb(this.tr('pulledT', { b: name }))), it(this.tr('mUpstream'), () => this.pick(this.v('quickInput.pickRemote', { branch: name }), [['origin', () => this.sb(this.tr('saved'))]])), it(this.tr('mCreatePR'), () => this.openTab('pr')), { sep: 1 }, it(this.v('menu.copyName'), () => this.copy(name)), it(this.v('menu.renameBranch'), () => this.input(this.v('menu.renameBranch').replace('…', ''), '', () => {}, { value: name, validate: n => this.validRef(n) }))];
+    if (isCur) return common;
+    return [it(this.tr('mCheckout'), () => this.checkout(name)), it(this.v('menu.mergeCurrent'), () => this.merge(name)), it(this.v('menu.rebaseOnThis'), () => this.sb(this.tr('rebaseT', { a: cur, b: name }))), { sep: 1 }, ...common,
+      it(this.tr('mDelete'), () => this.modal(this.v('confirm.deleteBranch.message', { branch: name }), this.v('confirm.deleteBranch.detail'), [[this.v('confirm.deleteBranch.button'), () => this.delRef(name, 'local')], [this.v('confirm.deleteBranch.button2'), () => this.delRef(name, 'local')]]), { danger: 1 })];
+  }
+  delRef(name, type) { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => !(r.type === type && r.name === name)) })) })); this.sb(this.tr('deletedT', { b: name })); }
+  fileMenu(f, staged) {
+    const it = (label, fn, o) => ({ label, run: fn, ...o });
+    return [it(this.tr('mViewDiff'), () => this.diffTab(f, staged)), it(this.v('menu.openFile'), () => this.nat({ kind: 'editor', api: 'window.showTextDocument', title: f.path })), it(staged ? this.tr('mUnstage') : this.tr('mStage'), () => staged ? this.unstage(f.path) : this.stage(f.path)), { sep: 1 },
+      it(this.v('menu.fileHistory'), () => this.nat({ kind: 'command', api: 'ramal.fileHistory', title: this.v('history.historyTab', { file: f.path.split('/').pop() }), detail: this.v('history.followsRenames') })), it(this.tr('mCopyPath'), () => this.copy(f.path)), { sep: 1 },
+      it(this.tr('mDiscard'), () => this.modal(this.v('confirm.discard.message', { file: f.path }), this.v('confirm.discard.detail'), [[this.v('confirm.discard.button'), () => this.setState(s => ({ unstaged: s.unstaged.filter(x => x.path !== f.path), staged: s.staged.filter(x => x.path !== f.path) }))]]), { danger: 1 })];
+  }
 
   renderVals() {
     const s = this.state;
-    if (!s.ready || !window.RAMAL) return { t: {}, isGraph: true };
-    const R = window.RAMAL, LANE = R.LANE, P = R.PLAT, AP = R.AIPROV, tr = this.tr.bind(this), L = this.lang === 'es' ? 0 : 1;
-    const t = {}; for (const k in R.D) t[k] = R.D[k][L];
-    const head = this.head();
-    const base = { t, openPalette: () => this.setState({ palette: { q: '' } }), openSettings: () => this.openTab('settings'),
-      closeModal: () => this.setState({ modal: null }), submitModal: this.submitModal, closeMenu: this.closeMenu, closePalette: () => this.setState({ palette: null }),
-      hasModal: !!s.modal, hasMenu: !!s.menu, hasPalette: !!s.palette, curBranch: s.current,
-      toasts: s.toasts.map(x => ({ text: x.text, icon: x.kind === 'warn' ? '⚠' : 'ⓘ', color: x.kind === 'warn' ? 'var(--warn)' : 'var(--info)' })) };
-    base.activity = [['▤', 'Explorer'], ['⌕', 'Search'], ['⎇', 'Source Control'], ['R', 'Ramal', 1], ['⊞', 'Extensions']].map(([g, title, on]) => ({ glyph: g, title, size: g === 'R' ? '15px' : '19px', color: on ? 'var(--fg)' : 'var(--fg3)', shadow: on ? 'inset 2px 0 0 var(--accent)' : 'none', onClick: () => on ? this.openTab('graph') : null }));
-    base.viewActions = [{ glyph: '⟳', title: 'Fetch', onClick: () => this.toast(tr('fetchedT')) }, { glyph: '⑂', title: t.tabGraph, onClick: () => this.openTab('graph') }, { glyph: '⚙︎', title: t.tabSettings, onClick: () => this.openTab('settings') }];
+    if (!s.ready || !window.RAMAL || !window.RAMAL.VS) return { t: {}, V: { view: {}, engine: {}, graph: {}, command: {}, operation: {}, account: {}, settings: {}, auth: {} }, x: {}, isGraph: true, showWebviews: true, hasRows: true };
+    const R = window.RAMAL, LANE = R.LANE, P = R.PLAT, AP = R.AIPROV, L = this.L, tr = this.tr.bind(this), v = this.v.bind(this), xx = this.x.bind(this);
+    const t = {}; for (const k in (R.STATES || {})) t[k] = R.STATES[k][L]; for (const k in R.D) t[k] = R.D[k][L];
+    const V = {}; for (const k in R.VS) { const parts = k.replace(/^vscode\./, '').split('.'); let o = V; parts.slice(0, -1).forEach(p => { o = o[p] = o[p] || {}; }); o[parts[parts.length - 1]] = R.VS[k][L]; }
+    const x = {}; for (const k in X) x[k] = X[k][L];
+    const LC = l => LANE[l % LANE.length], head = this.head(), st = s.st;
+    const base = { t, V, x, signedIn: s.signedIn, signedOut: !s.signedIn, signingIn: s.signingIn, signInOpacity: s.signingIn ? 0.6 : 1, multi: s.multi, single: !s.multi, repo: s.repo, msgRef: this.msgRef, cq: s.cq, onCq: e => this.setState({ cq: e.target.value }) };
+    base.chips = STATES.map(id => ({ id, bg: id === st ? 'var(--accent)' : 'transparent', color: id === st ? 'var(--accent-fg)' : 'var(--fg2)', border: id === st ? 'var(--accent)' : 'var(--border)', onClick: () => this.setState({ stOverride: id }, () => this.setup(id)) }));
+    Object.assign(base, { engineRestarting: s.engine === 'restarting', engineStopped: s.engine === 'stopped', showWebviews: s.engine !== 'stopped', events: s.engine === 'restarting' ? 'none' : 'auto', dim: s.engine === 'restarting' ? 0.55 : 1,
+      onRetryEngine: () => this.setState({ engine: 'ready' }), onShowLog: () => this.showLog() });
+    base.trees = ['ramal.branches · ' + V.view.branches, 'ramal.remotes · ' + V.view.remotes, 'ramal.pullRequests · ' + V.view.pullRequests + (s.prNoAcc ? ' · viewsWelcome' : ''), 'ramal.stashes · ' + V.view.stashes, 'ramal.tags · ' + V.view.tags].map(l => s.multi ? l + ' — ' + s.repo : l);
 
-    const all = []; s.commits.forEach(c => c.refs.forEach(r => all.push({ ...r, c })));
-    const item = o => ({ pad: '22px', weight: 400, iconColor: 'var(--fg2)', right: '', rightColor: 'var(--fg3)', bg: 'transparent', onDbl: () => {}, onClick: () => {}, onMenu: e => e.preventDefault(), ...o });
-    const sel = s.sel;
-    const nCh = s.unstaged.length + s.staged.length + (s.conflict ? R.CF.length : 0);
-    const cfFiles = s.conflict ? R.CF.map((f, i) => ({ ...splitPath(f.path), st: this.cfResolved(i) ? 'M' : 'C', stColor: this.cfResolved(i) ? 'var(--mod)' : 'var(--conf)', nameColor: 'var(--conf)', hasAct: false, bg: s.active === 'merge' && s.conflict.file === i ? 'var(--sel2)' : 'transparent', onOpen: () => { this.setState(x => ({ conflict: { ...x.conflict, file: i } })); this.openTab('merge'); }, onMenu: e => e.preventDefault() })) : [];
-    const fv = (f, staged) => ({ ...splitPath(f.path), st: f.st === 'A' && !staged ? 'U' : f.st, stColor: STC[f.st === 'A' && !staged ? 'U' : f.st], nameColor: f.st === 'D' ? 'var(--del)' : STC[f.st], hasAct: true, act: staged ? '−' : '+', actTitle: staged ? t.mUnstage : t.mStage, bg: s.active === 'diff' && s.diff && s.diff.path === f.path ? 'var(--sel2)' : 'transparent', onAct: e => { e.stopPropagation(); staged ? this.unstage(f.path) : this.stage(f.path); }, onOpen: () => this.openDiff(f, staged), onMenu: e => this.openMenu(e, this.fileMenu(f, staged)) });
+    const cf = s.conflict, file = cf ? R.CF[cf.file] : null;
+    base.hasOp = !!cf; base.isDetached = s.detached;
+    const dSha = (head || {}).sha || 'a41f9c2';
+    base.detachedText = v('graph.detached', { sha: dSha }); base.onBranchHere = () => this.newBranch(head);
+    if (cf) {
+      const n = this.opName(cf.op), allRes = this.allResolved();
+      const text = cf.op === 'rebase' ? v('operation.opRebase', { index: cf.idx, total: cf.total, subject: cf.subject }) : cf.op === 'cherryPick' ? v('operation.opCherry', { sha: cf.sha }) : xx('mergeOp', { source: cf.src, target: s.current });
+      base.op = { text, short: text, icon: cf.op === 'rebase' ? 'git-merge' : 'warning', canSkip: cf.op === 'rebase' || cf.op === 'cherryPick', abortLabel: v('operation.abortOp', { operation: n }),
+        continueDisabled: !allRes, continueOpacity: allRes ? 1 : 0.5, continueTip: allRes ? '' : v('operation.continueTip'), onContinue: () => this.continueOp(false), onSkip: () => this.continueOp(true), onAbort: () => this.abortOp() };
+    } else base.op = {};
+
+    const nCh = s.unstaged.length + s.staged.length + (cf ? R.CF.length : 0);
+    const cfFiles = cf ? R.CF.map((f, i) => ({ ...splitPath(f.path), st: this.cfResolved(i) ? 'M' : 'C', stColor: this.cfResolved(i) ? 'var(--mod)' : 'var(--conf)', nameColor: 'var(--conf)', hasAct: false, bg: s.active === 'merge' && cf.file === i ? 'var(--sel2)' : 'transparent', onOpen: () => { this.setState(y => ({ conflict: { ...y.conflict, file: i } })); this.openTab('merge'); }, onMenu: e => e.preventDefault() })) : [];
+    const fv = (f, staged) => { const sx = f.st === 'A' && !staged ? 'U' : f.st; return { ...splitPath(f.path), st: sx, stColor: STC[sx], nameColor: f.st === 'D' ? 'var(--del)' : STC[sx], hasAct: true, actIcon: staged ? 'remove' : 'add', actTitle: staged ? t.mUnstage : t.mStage, bg: 'transparent', onAct: e => { e.stopPropagation(); staged ? this.unstage(f.path) : this.stage(f.path); }, onOpen: () => this.diffTab(f, staged), onMenu: e => this.menu(e, 'webview/context · webviewSection: file', this.fileMenu(f, staged)) }; };
     const groups = [];
-    if (cfFiles.length) groups.push({ title: t.vMerge, count: cfFiles.length, hasAll: false, files: cfFiles, onMenu: e => e.preventDefault() });
-    if (s.staged.length) groups.push({ title: t.vStaged, count: s.staged.length, hasAll: true, allGlyph: '−', allTitle: t.unstageAll, onAll: () => this.setState(x => ({ unstaged: [...x.unstaged, ...x.staged], staged: [] })), files: s.staged.map(f => fv(f, true)), onMenu: e => e.preventDefault() });
-    groups.push({ title: t.vChanges, count: s.unstaged.length, hasAll: !!s.unstaged.length, allGlyph: '+', allTitle: t.stageAll, onAll: () => this.setState(x => ({ staged: [...x.staged, ...x.unstaged], unstaged: [] })), files: s.unstaged.map(f => fv(f, false)), onMenu: e => this.openMenu(e, [{ label: t.stageAll, action: () => this.setState(x => ({ staged: [...x.staged, ...x.unstaged], unstaged: [] })) }, { label: t.mStashAll, action: () => this.stash() }]) });
-    const canCommit = s.staged.length && s.msg.trim();
-    base.scm = { msg: s.msg, onMsg: e => this.setState({ msg: e.target.value }), ph: tr('msgPh', { b: s.current }), onAI: this.aiCommit, aiGlyph: s.aiBusy ? '…' : '✦', aiTitle: s.aiBusy ? t.aiGenerating : t.aiGenerate,
-      btnLabel: t.commitV || 'Commit', btnOpacity: canCommit ? 1 : 0.6, onCommit: () => this.commit(false), groups,
-      onCommitMenu: e => this.openMenu(e, [{ label: 'Commit', action: () => this.commit(false) }, { label: t.commitPush, action: () => this.commit(true) }, { label: t.commitAmend, action: () => { if (!s.msg.trim()) { this.toast(tr('noStagedT'), 'warn'); return; } this.setState(x => ({ commits: x.commits.map(c => c.id === head.id ? { ...c, msg: x.msg.trim() } : c), staged: [], msg: '' })); this.toast(tr('saved')); } }]) };
-    const remotes = {}; all.filter(r => r.type === 'remote').forEach(r => { const [g, ...rest] = r.name.split('/'); (remotes[g] = remotes[g] || []).push({ ...r, short: rest.join('/') }); });
-    const remoteItems = []; Object.keys(remotes).forEach(g => { remoteItems.push(item({ icon: '⇅', label: g, weight: 600 })); remotes[g].forEach(r => remoteItems.push(item({ pad: '40px', icon: '⎇', iconColor: LANE[r.c.lane], label: r.short, onClick: () => this.setState({ sel: r.c.id, active: 'graph' }), onMenu: e => this.openMenu(e, this.branchMenu(r.name, true)) }))); });
-    const PRC = { open: 'var(--info)', draft: 'var(--fg3)', merged: 'oklch(0.68 0.18 300)' };
-    const paneDefs = [
-      { key: 'changes', title: t.vChanges, count: nCh, isChanges: true },
-      { key: 'branches', title: t.vBranches, isList: true, items: all.filter(r => r.type === 'local').map(r => item({ icon: r.head ? '✓' : '⎇', iconColor: r.head ? 'var(--info)' : LANE[r.c.lane], label: r.name, weight: r.head ? 600 : 400, right: r.head && s.ahead ? s.ahead + '↑' : '', bg: sel === r.c.id ? 'var(--sel2)' : 'transparent', onClick: () => this.setState({ sel: r.c.id, active: 'graph' }), onDbl: () => this.checkout(r.name), onMenu: e => this.openMenu(e, this.branchMenu(r.name, false)) })) },
-      { key: 'remotes', title: t.vRemotes, isList: true, items: remoteItems },
-      { key: 'prs', title: t.sPrs, isList: true, items: s.repoPrs.map(p => item({ icon: '⇄', iconColor: PRC[p.state] || 'var(--info)', label: `#${p.num} ${p.title}`, right: t['st_' + p.state], onMenu: e => this.openMenu(e, [{ label: tr('mPrOpen', { p: 'GitHub' }), action: () => this.toast(tr('doneT', { x: tr('mPrOpen', { p: 'GitHub' }) })) }, { label: tr('mPrCheckout'), action: () => this.checkout(p.from) }]) })) },
-      { key: 'stash', title: t.sStash, isList: true, items: s.stashes.map((x, i) => item({ icon: '≡', label: x.msg, right: `{${i}}`, onDbl: () => this.pop(i, false), onMenu: e => this.openMenu(e, [{ label: t.mApply, action: () => this.pop(i, false) }, { label: t.mPop, action: () => this.pop(i, true) }, { sep: 1 }, { label: t.mDrop.replace('…', ''), danger: 1, action: () => this.setState(y => ({ stashes: y.stashes.filter((_, j) => j !== i) })) }]) })) },
-      { key: 'tags', title: t.sTags, isList: true, items: all.filter(r => r.type === 'tag').map(r => item({ icon: '◆', iconColor: 'var(--warn)', label: r.name, onClick: () => this.setState({ sel: r.c.id, active: 'graph' }) })) }
-    ];
-    base.panes = paneDefs.map(p => ({ isChanges: !!p.isChanges, isList: !!p.isList, items: p.items || [], title: p.title, count: p.count != null ? p.count : (p.items || []).length, hasCount: p.key === 'changes' ? nCh > 0 : false, open: !s.closed[p.key], chev: s.closed[p.key] ? '▸' : '▾', onToggle: () => this.setState(x => ({ closed: { ...x.closed, [p.key]: !x.closed[p.key] } })) }));
+    if (cfFiles.length) groups.push({ title: t.vMerge, count: cfFiles.length, hasAll: false, files: cfFiles });
+    if (s.staged.length) groups.push({ title: t.vStaged, count: s.staged.length, hasAll: true, allIcon: 'remove', allTitle: t.unstageAll, onAll: () => this.setState(y => ({ unstaged: [...y.unstaged, ...y.staged], staged: [] })), files: s.staged.map(f => fv(f, true)) });
+    groups.push({ title: t.vChanges, count: s.unstaged.length, hasAll: !!s.unstaged.length, allIcon: 'add', allTitle: t.stageAll, onAll: () => this.setState(y => ({ staged: [...y.staged, ...y.unstaged], unstaged: [] })), files: s.unstaged.map(f => fv(f, false)) });
+    const canCommit = !!(s.staged.length && s.msg.trim());
+    const subj = s.msg.split('\n')[0], glen = typeof Intl !== 'undefined' && Intl.Segmenter ? [...new Intl.Segmenter().segment(subj)].length : [...subj].length;
+    const k1 = this.aiKeyFor('Commit'), prov = k1 ? AP[k1.prov].label : '';
+    const ERR = { badKey: [v('errors.aiBadKey', { provider: prov, label: k1 ? k1.label : '' }), v('errors.reviewKey')], network: [v('errors.aiNetwork', { provider: prov }), tr('retry') === 'retry' ? v('engine.retry') : tr('retry')], quota: [v('errors.aiQuota', { provider: prov }), v('errors.reviewKey')], modelGone: [v('errors.aiModelGone', { model: s.cfg.modelCommit || (k1 || {}).model }), v('errors.pickModel')], orgLimit: [v('errors.aiOrgLimit', { org: 'ACME Studio', count: 200 }), v('errors.useMyKey')], noKey: [tr('aiNoKey'), xx('addKey')] };
+    const er = s.aiErr && ERR[s.aiErr];
+    base.scm = { msg: s.msg, onMsg: e => this.setState({ msg: e.target.value }), ph: s.current ? tr('msgPh', { b: s.current }) : dSha, onAI: this.aiCommit, aiIcon: s.aiBusy ? 'loading codicon-modifier-spin' : 'sparkle', aiTitle: v('command.generateCommitMessage'),
+      count: glen + '/72', countColor: glen > 72 ? 'var(--warn)' : 'var(--fg3)', hasErr: !!er, errText: er ? er[0] : '', errAction: er ? er[1] : '', onErrAction: () => { if (s.aiErr === 'network') { this.setState({ aiErr: null }); return; } this.openTab('settings'); },
+      btnLabel: s.empty ? v('graph.firstCommit', { branch: s.current }) : (t.commitV || 'Commit'), btnOpacity: canCommit ? 1 : 0.6, disabled: !canCommit, onCommit: () => this.commit(false), groups,
+      onCommitMenu: e => this.menu(e, 'webview/context · commit', [{ label: v('command.commit'), run: () => this.commit(false) }, { label: v('command.commitAndPush'), run: () => this.commit(true) }, { label: v('command.commitAmend'), run: () => { if (!s.msg.trim() || !head) return; this.setState(y => ({ commits: y.commits.map(c => c.id === head.id ? { ...c, msg: y.msg.trim().split('\n')[0] } : c), staged: [], msg: '' })); this.sb(this.v('status.committed', { sha: head.sha })); } }]) };
 
-    const tabDef = { graph: { icon: 'R', iconColor: 'oklch(0.74 0.12 190)', label: t.tabGraph, pinned: true }, merge: { icon: '⚠', iconColor: 'var(--conf)', label: s.conflict ? 'Merge: ' + R.CF[s.conflict.file].path.split('/').pop() : 'Merge' }, settings: { icon: '⚙︎', iconColor: 'var(--fg2)', label: t.tabSettings }, diff: { icon: '±', iconColor: 'var(--mod)', label: s.diff ? s.diff.path.split('/').pop() + ' ' + (s.diff.staged ? t.headV : t.workingTree) : '', italic: true } };
-    const openTabs = s.tabs.filter(id => id !== 'merge' || s.conflict).filter(id => id !== 'diff' || s.diff);
+    const graphLabel = s.multi ? v('repo.graphTab', { repo: s.repo }) : t.tabGraph;
+    const tabDef = { graph: { icon: 'git-commit', iconColor: 'oklch(0.74 0.12 190)', label: graphLabel, pinned: true }, merge: { icon: 'git-merge', iconColor: 'var(--conf)', label: cf ? 'Merge: ' + file.path.split('/').pop() : 'Merge' }, pr: { icon: 'git-pull-request-create', iconColor: 'var(--fg2)', label: t.prTitleM }, settings: { icon: 'gear', iconColor: 'var(--fg2)', label: t.tabSettings } };
+    const openTabs = s.tabs.filter(id => id !== 'merge' || cf);
     const active = openTabs.includes(s.active) ? s.active : 'graph';
-    base.tabs = openTabs.map(id => { const d = tabDef[id], on = active === id; return { icon: d.icon, iconColor: d.iconColor, label: d.label, fontStyle: d.italic ? 'italic' : 'normal', bg: on ? 'var(--bg)' : 'var(--bar)', color: on ? 'var(--fg)' : 'var(--fg2)', shadow: on ? 'inset 0 1px 0 var(--accent)' : 'none', closeVis: d.pinned ? 'hidden' : 'visible', onClick: () => this.setState({ active: id }), onClose: e => this.closeTab(id, e) }; });
-    Object.assign(base, { isGraph: active === 'graph', isDiff: active === 'diff', isMerge: active === 'merge', isSettings: active === 'settings' });
+    base.tabs = openTabs.map(id => { const d = tabDef[id], on = active === id; return { icon: d.icon, iconColor: d.iconColor, label: d.label, bg: on ? 'var(--bg)' : 'var(--bar)', color: on ? 'var(--fg)' : 'var(--fg2)', closeVis: d.pinned ? 'hidden' : 'visible', onClick: () => this.setState({ active: id }), onClose: e => this.closeTab(id, e) }; });
+    Object.assign(base, { isGraph: active === 'graph', isMerge: active === 'merge' && !!cf, isPR: active === 'pr', isSettings: active === 'settings' });
+    base.branchIcon = s.detached ? 'git-commit' : 'git-branch'; base.branchLabel = s.detached ? v('status.detached', { sha: dSha }) : s.current;
+    base.onPickRepo = () => this.pick(v('repo.pickRepo'), [['$(check) $(repo) web-app', () => this.setState({ repo: 'web-app' }), { hint: 'web-app' }], ['$(repo) api · ' + v('repo.submoduleOf', { repo: 'web-app' }), () => this.setState({ repo: 'api' }), { hint: 'web-app/services/api' }], ['$(repo) ui · ' + v('repo.nestedIn', { repo: 'monorepo' }), () => this.setState({ repo: 'ui' }), { hint: 'monorepo/packages/ui' }]].map(([label, run, o]) => ({ label, run, ...o })));
+    const tools = [['repo-fetch', v('command.fetch'), () => this.sb(tr('fetchedT'))], ['repo-pull', v('command.pull'), () => this.sb(tr('pulledT', { b: s.current }))], ['repo-push', v('command.push'), () => s.current ? this.push() : null], ['git-branch-create', v('command.createBranch'), () => this.newBranch(null)], ['git-stash', v('command.stash'), () => this.stash()], ['git-stash-pop', v('command.stashPop'), () => this.pop()], ['git-pull-request-create', v('command.createPullRequest'), () => this.openTab('pr')]];
+    base.tools = tools.map(([icon, label, onClick]) => ({ icon, label, onClick, badge: icon === 'repo-push' && s.ahead ? String(s.ahead) : '' }));
 
-    const tools = [['⟳', 'Fetch', () => this.toast(tr('fetchedT'))], ['↓', 'Pull', () => this.toast(tr('pulledT', { b: s.current }))], ['↑', 'Push' + (s.ahead ? ` ${s.ahead}` : ''), () => this.push()], ['⎇', t.branch, () => this.newBranch(null)], ['⊟', 'Stash', () => this.stash()], ['⊞', 'Pop', () => this.pop()], ['⇄', 'PR', () => this.openPR()]];
-    base.tools = tools.map(([glyph, label, onClick]) => ({ glyph, label, onClick, badge: glyph === '↑' && s.ahead ? String(s.ahead) : '' }));
-    base.cq = s.cq; base.onCq = e => this.setState({ cq: e.target.value });
-
-    if (active === 'graph') {
-      const hasWip = nCh > 0; const rowsData = hasWip ? [{ wip: true, id: 'wip', lane: head.lane }, ...s.commits] : s.commits; const cq = s.cq.trim().toLowerCase();
+    base.isEmptyRepo = s.empty; base.hasRows = !s.empty; base.emptyText = v('graph.emptyRepo', { branch: s.current }); base.onGoChanges = () => { const el = this.msgRef.current; if (el) el.focus(); };
+    if (active === 'graph' && !s.empty) {
+      const hasWip = nCh > 0; const rowsData = hasWip ? [{ wip: true, id: 'wip', lane: head.lane }, ...s.commits] : s.commits; const cq = s.cq.trim().toLowerCase(), sel = s.sel;
+      const wipText = cf ? (cf.op === 'merge' ? t.wipMerge : v('operation.wipOp', { operation: this.opName(cf.op) })) : tr('wipText', { n: nCh });
       base.rows = rowsData.map(c => { const on = sel === c.id;
-        if (c.wip) return { refs: [], hasMore: false, msg: s.conflict ? t.wipMerge : tr('wipText', { n: nCh }), weight: 400, fontStyle: 'italic', color: s.conflict ? 'var(--warn)' : 'var(--fg2)', author: '', date: '', sha: '', bg: 'transparent', opacity: 1, onClick: () => s.conflict ? this.openTab('merge') : null, onMenu: e => e.preventDefault() };
-        const refs = c.refs.map(r => { const col = r.type === 'tag' ? 'var(--warn)' : LANE[c.lane]; return { label: r.name, icon: r.head ? '✓' : r.type === 'remote' ? '⇅' : r.type === 'tag' ? '◆' : '', color: col, bg: tint(col, r.head ? 30 : 12), onMenu: e => this.openMenu(e, this.branchMenu(r.name, r.type === 'remote')) }; });
+        if (c.wip) return { refs: [], hasMore: false, msg: wipText, weight: 400, fontStyle: 'italic', color: cf ? 'var(--warn)' : 'var(--fg2)', author: '', date: '', sha: '', bg: 'transparent', opacity: 1, onClick: () => cf ? this.openTab('merge') : null, onMenu: e => e.preventDefault() };
+        const refs = c.refs.map(r => { const col = r.type === 'tag' ? 'var(--warn)' : LC(c.lane); const icon = r.head ? 'check' : r.type === 'remote' ? 'cloud' : r.type === 'tag' ? 'tag' : ''; return { label: r.name, icon, hasIcon: !!icon, color: col, bg: tint(col, r.head ? 30 : 12), onMenu: e => this.menu(e, 'webview/context · webviewSection: ' + (r.type === 'tag' ? 'tag' : 'branch'), this.branchMenu(r.name, r.type)) }; });
         const match = !cq || (c.msg + ' ' + c.sha + ' ' + R.AUTH[c.au]).toLowerCase().includes(cq);
-        return { refs: refs.slice(0, 2), hasMore: refs.length > 2, more: '+' + (refs.length - 2), msg: c.msg, weight: c.refs.some(r => r.head) ? 600 : 400, fontStyle: 'normal', color: 'var(--fg)', author: R.AUTH[c.au], date: c.date.slice(5), sha: c.sha, bg: on ? 'var(--sel)' : 'transparent', opacity: match ? 1 : 0.3, onClick: () => this.setState({ sel: c.id }), onMenu: e => this.openMenu(e, this.commitMenu(c)) }; });
-      const h = React.createElement, RH = 28, X = l => 14 + l * 20, Y = i => i * RH + RH / 2; const idx = {}; rowsData.forEach((r, i) => { idx[r.id] = i; });
+        return { refs: refs.slice(0, 2), hasMore: refs.length > 2, more: '+' + (refs.length - 2), msg: c.msg, weight: c.refs.some(r => r.head) ? 600 : 400, fontStyle: 'normal', color: 'var(--fg)', author: R.AUTH[c.au], date: c.date.slice(5), sha: c.sha, bg: on ? 'var(--sel)' : 'transparent', opacity: match ? 1 : 0.3, onClick: () => this.setState({ sel: c.id }), onMenu: e => this.menu(e, 'webview/context · webviewSection: commit', this.commitMenu(c)) }; });
+      const h = React.createElement, RH = 28, X0 = l => 14 + l * 20, Y = i => i * RH + RH / 2; const idx = {}; rowsData.forEach((r, i) => { idx[r.id] = i; });
       const paths = [], nodes = [];
       rowsData.forEach((r, i) => {
-        if (r.wip) { const j = idx[head.id]; paths.push(h('path', { key: 'wp', d: `M${X(r.lane)} ${Y(i)} L${X(r.lane)} ${Y(j)}`, fill: 'none', stroke: LANE[r.lane], strokeWidth: 2, strokeDasharray: '3 4' })); nodes.push(h('circle', { key: 'wc', cx: X(r.lane), cy: Y(i), r: 6, fill: 'var(--bg)', stroke: s.conflict ? 'var(--warn)' : LANE[r.lane], strokeWidth: 2, strokeDasharray: '3 3' })); return; }
-        r.parents.forEach((pid, k) => { const j = idx[pid]; if (j == null) return; const p = rowsData[j]; const x1 = X(r.lane), x2 = X(p.lane), y1 = Y(i), y2 = Y(j); let d, col;
-          if (x1 === x2) { d = `M${x1} ${y1} L${x2} ${y2}`; col = LANE[r.lane]; } else if (k === 0 && p.lane < r.lane) { d = `M${x1} ${y1} L${x1} ${y2 - RH} C${x1} ${y2 - 12} ${x2} ${y2 - 16} ${x2} ${y2}`; col = LANE[r.lane]; } else { d = `M${x1} ${y1} C${x1} ${y1 + 16} ${x2} ${y1 + 12} ${x2} ${y1 + RH} L${x2} ${y2}`; col = LANE[p.lane]; }
+        if (r.wip) { const j = idx[head.id]; paths.push(h('path', { key: 'wp', d: `M${X0(r.lane)} ${Y(i)} L${X0(r.lane)} ${Y(j)}`, fill: 'none', stroke: LC(r.lane), strokeWidth: 2, strokeDasharray: '3 4' })); nodes.push(h('circle', { key: 'wc', cx: X0(r.lane), cy: Y(i), r: 6, fill: 'var(--bg)', stroke: cf ? 'var(--warn)' : LC(r.lane), strokeWidth: 2, strokeDasharray: '3 3' })); return; }
+        r.parents.forEach((pid, k) => { const j = idx[pid], x1 = X0(r.lane), y1 = Y(i);
+          if (j == null) { paths.push(h('path', { key: r.id + '-' + k, d: `M${x1} ${y1} L${x1} ${rowsData.length * RH}`, fill: 'none', stroke: LC(r.lane), strokeWidth: 2 })); return; }
+          const p = rowsData[j]; const x2 = X0(p.lane), y2 = Y(j); let d, col;
+          if (x1 === x2) { d = `M${x1} ${y1} L${x2} ${y2}`; col = LC(r.lane); }
+          else { col = LC(k === 0 ? r.lane : p.lane); const busy = l => rowsData.some((q, m) => m > i && m < j && !q.wip && q.lane === l); const cand = k === 0 ? [r.lane, p.lane] : [p.lane, r.lane]; let lane = cand.find(l => !busy(l)); if (lane == null) lane = Math.max(...rowsData.map(q => q.lane || 0)) + 1; const xm = X0(lane);
+            if (j === i + 1) d = `M${x1} ${y1} C${x1} ${y1 + 16} ${x2} ${y2 - 16} ${x2} ${y2}`;
+            else d = (xm === x1 ? `M${x1} ${y1}` : `M${x1} ${y1} C${x1} ${y1 + 16} ${xm} ${y1 + 12} ${xm} ${y1 + RH}`) + ` L${xm} ${y2 - RH}` + (xm === x2 ? ` L${x2} ${y2}` : ` C${xm} ${y2 - 12} ${x2} ${y2 - 16} ${x2} ${y2}`); }
           paths.push(h('path', { key: r.id + '-' + k, d, fill: 'none', stroke: col, strokeWidth: 2 })); });
-        const cx = X(r.lane), cy = Y(i), merge = r.parents.length > 1, rad = merge ? 4 : 7;
-        nodes.push(h('g', { key: 'n' + r.id }, sel === r.id ? h('circle', { cx, cy, r: rad + 3, fill: 'none', stroke: LANE[r.lane], strokeWidth: 2, opacity: 0.6 }) : null, h('circle', { cx, cy, r: rad, fill: LANE[r.lane], stroke: 'var(--bg)', strokeWidth: 2 }), !merge ? h('text', { x: cx, y: cy + 0.5, textAnchor: 'middle', dominantBaseline: 'central', fontSize: 6.5, fontWeight: 700, fill: '#1b1b1b' }, r.au) : null));
+        const cx = X0(r.lane), cy = Y(i), mg = r.parents.length > 1, rad = mg ? 4 : 7;
+        nodes.push(h('g', { key: 'n' + r.id }, sel === r.id ? h('circle', { cx, cy, r: rad + 3, fill: 'none', stroke: LC(r.lane), strokeWidth: 2, opacity: 0.6 }) : null, h('circle', { cx, cy, r: rad, fill: LC(r.lane), stroke: 'var(--bg)', strokeWidth: 2 }), !mg ? h('text', { x: cx, y: cy + 0.5, textAnchor: 'middle', dominantBaseline: 'central', fontSize: 6.5, fontWeight: 700, fill: '#1b1b1b' }, r.au) : null));
       });
       base.graphSvg = h('svg', { width: 120, height: rowsData.length * RH, style: { position: 'absolute', left: 130, top: 0, pointerEvents: 'none', overflow: 'visible' } }, paths, nodes);
-      const c = s.commits.find(x => x.id === sel);
+      Object.assign(base, { showSkeleton: s.big && s.loading, skeleton: ['62%', '48%', '55%'], showLoadMore: s.big && !s.loading && s.loads < 2, onLoadMore: this.loadMore, showEnd: s.big && s.loads >= 2, endText: tr('v_end', { count: s.commits.length }) });
+      const c = s.commits.find(y => y.id === sel);
       base.hasDetail = !!c;
-      if (c) { const i = s.commits.indexOf(c), fs = R.FILESETS[c.id.startsWith('n') ? 0 : i % R.FILESETS.length], byId = Object.fromEntries(s.commits.map(x => [x.id, x])); const add = fs.reduce((a, f) => a + f[2], 0), del = fs.reduce((a, f) => a + f[3], 0);
-        base.dt = { sha: c.sha, msg: c.msg, author: R.AUTH[c.au], ini: c.au, avColor: LANE[c.lane], date: c.date.slice(5), parents: c.parents.map(p => byId[p] ? byId[p].sha : p).join('  ') || '—', filesLabel: tr('filesChanged', { n: fs.length }), add, del,
-          hasAI: s.cfg.aiSummary && !!s.aiKeys.length, aiText: L ? `Changes ${fs.length} files (+${add} −${del}), mainly in ${fs[0][0].split('/').slice(0, -1).join('/') || 'the root'}.` : `Modifica ${fs.length} archivos (+${add} −${del}), sobre todo en ${fs[0][0].split('/').slice(0, -1).join('/') || 'la raíz'}.`,
-          files: fs.map(([p, st]) => ({ ...splitPath(p), st, stColor: STC[st], onOpen: () => this.openDiff({ path: p, st }) })),
-          onCopy: () => this.copy(c.sha), onClose: () => this.setState({ sel: null }), onCherry: () => this.cherry(c), onRevert: () => this.revert(c), onBranch: () => this.newBranch(c) }; }
+      if (c) { const i = s.commits.indexOf(c), fs = R.FILESETS[c.id.startsWith('n') || c.id.startsWith('o') ? 0 : i % R.FILESETS.length], byId = Object.fromEntries(s.commits.map(y => [y.id, y])); const add = fs.reduce((a, f) => a + f[2], 0), del = fs.reduce((a, f) => a + f[3], 0);
+        const sm = s.aiSum[c.id], on = s.cfg.aiSummary && !!s.aiKeys.length;
+        base.dt = { sha: c.sha, msg: c.msg, author: R.AUTH[c.au], ini: c.au, avColor: LC(c.lane), date: c.date.slice(5), parents: c.parents.map(p => byId[p] ? byId[p].sha : p).join('  ') || '—', filesLabel: tr('filesChanged', { n: fs.length }), add, del,
+          aiOff: !on, aiOffText: !s.cfg.aiSummary ? t.sumOff : t.sumNoKey, onAiSettings: () => this.openTab('settings'), aiIdle: on && !sm, aiBusy: on && !!sm && sm.st === 'busy', aiDone: on && !!sm && sm.st === 'done', aiBy: sm && sm.st === 'done' ? tr('generatedBy', { provider: AP[sm.prov].label, model: sm.model }) : '', onSum: () => this.summarize(c),
+          aiText: L ? `Changes ${fs.length} files (+${add} −${del}), mainly in ${fs[0][0].split('/').slice(0, -1).join('/') || 'the root'}.` : `Modifica ${fs.length} archivos (+${add} −${del}), sobre todo en ${fs[0][0].split('/').slice(0, -1).join('/') || 'la raíz'}.`,
+          files: fs.map(([p, sx]) => ({ ...splitPath(p), st: sx, stColor: STC[sx], onOpen: () => this.diffTab({ path: p }, false, c.sha) })),
+          onCopy: () => this.copy(c.sha), onClose: () => this.setState({ sel: null }), onCherry: () => { this.addCommit(c.msg); this.sb(tr('cherryT', { s: c.sha })); }, onRevert: () => { this.addCommit(`Revert "${c.msg}"`); this.sb(tr('revertT', { s: c.sha })); }, onBranch: () => this.newBranch(c) }; }
     }
-    if (active === 'diff' && s.diff) {
-      const f = s.diff, fromStg = f.staged !== undefined;
-      base.df = { crumb: f.path.split('/').join(' › '), add: R.DIFF.filter(d => d[4] === 'm' || d[4] === 'a').length, del: R.DIFF.filter(d => d[4] === 'm' || d[4] === 'd').length, canStage: fromStg, stageLabel: f.staged ? t.unstageFile : t.stageFile,
-        onStage: () => { f.staged ? this.unstage(f.path) : this.stage(f.path); this.setState(x => ({ diff: { ...x.diff, staged: !f.staged } })); },
-        rows: R.DIFF.map(([ln, lt, rn, rt, ty]) => ({ ln: ln == null ? '' : ln, lt, rn: rn == null ? '' : rn, rt, lbg: ty === 'm' || ty === 'd' ? 'var(--del-bg)' : ty === 'a' ? 'var(--hatch)' : 'transparent', rbg: ty === 'm' || ty === 'a' ? 'var(--add-bg)' : ty === 'd' ? 'var(--hatch)' : 'transparent' })) };
-    }
-    if (active === 'merge' && s.conflict) {
-      const cf = s.conflict, file = R.CF[cf.file], ch = cf.choices[cf.file], SC = { ours: LANE[2], theirs: LANE[4] };
+    if (base.isMerge) {
+      const ch = cf.choices[cf.file], SC = { ours: LC(2), theirs: LC(4) };
       const pane = side => { const lines = []; let n = 0, hn = 0; const col = SC[side];
-        file.segs.forEach(sg => { if (sg.c) { sg.c.forEach(x => lines.push({ isCtx: true, isHead: false, isHunk: false, n: ++n, text: x })); return; }
-          const hi = hn++, sl = ch[hi][side], allOn = sl.every(Boolean), anyH = ch[hi].ours.some(Boolean) || ch[hi].theirs.some(Boolean);
-          lines.push({ isCtx: false, isHead: true, isHunk: false, title: tr('hunk', { n: hi + 1 }), color: col, headBg: tint(col, 14), btn: allOn ? '− ' + t.dropBlock : '+ ' + t.takeBlock, onPick: () => this.pick(hi, side) });
-          sg.h[side === 'ours' ? 0 : 1].forEach((x, li) => { const on = sl[li]; lines.push({ isCtx: false, isHead: false, isHunk: true, n: ++n, text: x, color: col, bg: tint(col, on ? 22 : 7), mark: on ? '−' : '+', tip: on ? t.lgRemove : t.lgAdd, btnBg: on ? col : 'transparent', btnColor: on ? '#1b1b1b' : col, opacity: on || !anyH ? 1 : 0.5, onToggle: () => this.pickLine(hi, side, li) }); }); });
+        file.segs.forEach(sg => { if (sg.c) { sg.c.forEach(y => lines.push({ isCtx: true, isHead: false, isHunk: false, n: ++n, text: y })); return; }
+          const hi = hn++, sl = ch[hi][side], allOn = sl.every(Boolean), anyH = ch[hi].empty || ch[hi].ours.some(Boolean) || ch[hi].theirs.some(Boolean);
+          lines.push({ isCtx: false, isHead: true, isHunk: false, title: tr('hunk', { n: hi + 1 }), color: col, headBg: tint(col, 14), btn: allOn ? '✓ ' + t.blockTaken : '+ ' + t.takeBlock, onPick: () => this.pickBlock(hi, side) });
+          sg.h[side === 'ours' ? 0 : 1].forEach((y, li) => { const on = sl[li]; lines.push({ isCtx: false, isHead: false, isHunk: true, n: ++n, text: y, color: col, bg: tint(col, on ? 22 : 7), mark: on ? '−' : '+', tip: on ? t.lgRemove : t.lgAdd, btnBg: on ? col : 'transparent', btnColor: on ? '#1b1b1b' : col, opacity: on || !anyH ? 1 : 0.5, onToggle: () => this.pickLine(hi, side, li) }); }); });
         return lines; };
-      const out = [], noop = () => {}; let hn = 0;
-      file.segs.forEach(sg => { if (sg.c) { sg.c.forEach(x => out.push({ isLine: true, isGap: false, text: x, bg: 'transparent', bar: 'transparent', vis: 'hidden', onRemove: noop })); return; }
-        const hi = hn++, c = ch[hi]; if (!c.ours.some(Boolean) && !c.theirs.some(Boolean)) { out.push({ isLine: false, isGap: true, text: tr('gapBlock', { n: hi + 1 }) }); return; }
-        ['ours', 'theirs'].forEach((side, si) => sg.h[si].forEach((x, li) => { if (c[side][li]) out.push({ isLine: true, isGap: false, text: x, bg: tint(SC[side], 12), bar: SC[side], vis: 'visible', onRemove: () => this.pickLine(hi, side, li) }); })); });
+      const out = [], noop = () => {}; let hn = 0, hasDup = false;
+      file.segs.forEach(sg => { if (sg.c) { sg.c.forEach(y => out.push({ isLine: true, isGap: false, isEmpty: false, text: y, bg: 'transparent', bar: 'transparent', vis: 'hidden', onRemove: noop })); return; }
+        const hi = hn++, c = ch[hi]; if (c.empty) { out.push({ isLine: false, isGap: false, isEmpty: true, onEmpty: () => this.leaveEmpty(hi) }); return; } if (!c.ours.some(Boolean) && !c.theirs.some(Boolean)) { out.push({ isLine: false, isGap: true, isEmpty: false, text: tr('gapBlock', { n: hi + 1 }), onEmpty: () => this.leaveEmpty(hi) }); return; }
+        const seen = {}; ['ours', 'theirs'].forEach((side, si) => sg.h[si].forEach((y, li) => { if (c[side][li]) { const ky = y.trim(); if (ky && seen[ky]) hasDup = true; seen[ky] = 1; out.push({ isLine: true, isGap: false, isEmpty: false, text: y, bg: tint(SC[side], 12), bar: SC[side], vis: 'visible', onRemove: () => this.pickLine(hi, side, li) }); } })); });
       let ln = 0; out.forEach(l => { if (l.isLine) l.n = ++ln; });
-      const res = this.cfResolved(cf.file), allRes = R.CF.every((_, i) => this.cfResolved(i));
-      base.cf = { path: file.path, sub: `${s.current} ← ${cf.src}`, takeA: () => this.takeAll('ours'), takeB: () => this.takeAll('theirs'), onComplete: this.completeMerge, completeOpacity: allRes ? 1 : 0.5,
-        panes: [{ letter: 'A', label: t.yours, name: s.current, color: SC.ours, lines: pane('ours') }, { letter: 'B', label: t.theirs, name: cf.src, color: SC.theirs, lines: pane('theirs') }], out,
-        outSub: tr('outputSub', { f: file.path.split('/').pop() }), status: res ? '✓ ' + t.resolved : t.conflicted, statusColor: res ? 'var(--add)' : 'var(--warn)' };
+      const res = this.cfResolved(cf.file), lv = { branch: cf.src, upstream: cf.upstream, sha: cf.sha, index: 0 };
+      base.cf = { path: file.path, takeA: () => this.takeAll('ours'), takeB: () => this.takeAll('theirs'), hasDup, out,
+        onEdit: () => this.nat({ kind: 'editor', api: 'window.showTextDocument', title: file.path, detail: v('operation.markResolved') + ' — B-21' }),
+        panes: [{ letter: 'A', label: v('operation.labelA.' + cf.op, lv), color: SC.ours, lines: pane('ours') }, { letter: 'B', label: v('operation.labelB.' + cf.op, lv), color: SC.theirs, lines: pane('theirs') }],
+        outSub: tr('outputSubC', { file: file.path.split('/').pop() }), status: res ? '✓ ' + t.resolved : t.conflicted, statusColor: res ? 'var(--add)' : 'var(--warn)' };
     }
-    if (active === 'settings') {
-      const cfg = s.cfg, setC = k => v => this.setState(x => ({ cfg: { ...x.cfg, [k]: v } }));
-      const E0 = { isEntity: false, isSetting: false, isButtons: false, isCheck: false, isSelect: false };
-      const chk = (cat, title, desc, k) => ({ ...E0, isSetting: true, isCheck: true, cat, title, desc, checked: !!cfg[k], onToggle: e => setC(k)(e.target.checked) });
-      const slc = (cat, title, desc, k, opts) => ({ ...E0, isSetting: true, isSelect: true, cat, title, desc, value: cfg[k], options: opts.map(([value, label]) => ({ value, label })), onChange: e => setC(k)(e.target.value) });
-      const btn = (label, onClick, primary) => ({ label, onClick, bg: primary ? 'var(--accent)' : 'var(--sel2)', color: primary ? 'var(--accent-fg)' : 'var(--fg)' });
-      base.setSections = [
-        { title: t.sAccount, hasAction: false, items: [
-          { ...E0, isEntity: true, abbr: 'MR', color: 'oklch(0.68 0.2 300)', title: 'Marta Ruiz', meta: '· marta@ramal.dev', sub: 'ACME Studio · Ramal Pro', subFont: 'inherit', hasBadge: false, onMenu: e => this.openMenu(e, [{ label: t.openDashboard, action: () => this.toast(tr('doneT', { x: t.openDashboard })) }, { label: t.signOut, danger: 1, action: () => this.toast(tr('signedOutT'), 'warn') }]) },
-          chk('Ramal › Account: ', t.syncSettings, t.syncD, 'sync'),
-          { ...E0, isButtons: true, buttons: [btn(t.openDashboard, () => this.toast(tr('doneT', { x: t.openDashboard })), true), btn(t.signOut, () => this.toast(tr('signedOutT'), 'warn'))] } ] },
-        { title: t.sPlatforms, hasAction: true, action: t.addAccountV, onAction: () => this.addAccount(), items: s.accounts.map(a => ({ ...E0, isEntity: true, abbr: P[a.platform].abbr, color: P[a.platform].color, title: '@' + a.user, meta: '· ' + P[a.platform].label, sub: a.host + ' · ' + a.method, subFont: MONO, hasBadge: !!a.def, badge: t.isDefault,
-          onMenu: e => this.openMenu(e, [{ label: t.mTest, action: () => this.toast(tr('doneT', { x: t.mTest + ' @' + a.user })) }, { label: t.makeDefault, action: () => this.setState(x => ({ accounts: x.accounts.map(y => y.platform === a.platform ? { ...y, def: y.id === a.id } : y) })) }, { sep: 1 }, { label: t.mRemoveAcc.replace('…', ''), danger: 1, action: () => this.setState(x => ({ accounts: x.accounts.filter(y => y.id !== a.id) })) }]) })) },
-        { title: t.sAI, hasAction: true, action: t.addKeyV, onAction: () => this.addKey(), items: [
-          ...s.aiKeys.map(k => ({ ...E0, isEntity: true, abbr: AP[k.prov].abbr, color: AP[k.prov].color, title: k.label, meta: '· ' + AP[k.prov].label, sub: k.masked + ' · ' + k.model, subFont: MONO, hasBadge: !!k.def, badge: t.isDefault,
-            onMenu: e => this.openMenu(e, [{ label: t.mMakeDefKey, action: () => this.setState(x => ({ aiKeys: x.aiKeys.map(y => ({ ...y, def: y.id === k.id })) })) }, { label: t.mTest, action: () => this.toast(tr('keyTestT', { p: AP[k.prov].label, m: k.model })) }, { sep: 1 }, { label: t.mRemoveKey.replace('…', ''), danger: 1, action: () => this.setState(x => ({ aiKeys: x.aiKeys.filter(y => y.id !== k.id) })) }]) })),
-          chk('Ramal › AI: ', t.fCommit, t.fCommitD, 'aiCommit'), chk('Ramal › AI: ', t.fPR, t.fPRD, 'aiPR'), chk('Ramal › AI: ', t.fSummary, t.fSummaryD, 'aiSummary'),
-          slc('Ramal › AI: ', t.apiKey, t.aiKeyV, 'aiKey', [['', t.useDefaultKey], ...s.aiKeys.map(k => [k.id, `${k.label} · ${AP[k.prov].label}`])]),
-          slc('Ramal › AI: ', t.language, t.aiLangV, 'aiLang', [['vscode', t.matchVs], ['en', 'English'], ['es', 'Español']]),
-          chk('Ramal › AI: ', t.conventional, t.conventionalD, 'conventional') ] },
-        { title: t.sGit, hasAction: false, items: [
-          slc('Ramal › Git: ', t.autoFetch, '', 'autoFetch', [['0', t.off], ['5', tr('everyN', { n: 5 })], ['15', tr('everyN', { n: 15 })], ['30', tr('everyN', { n: 30 })]]),
-          slc('Ramal › Git: ', t.pullDefault, '', 'pull', [['merge', 'merge'], ['rebase', 'rebase'], ['ff', 'ff-only']]),
-          chk('Ramal › Git: ', t.signCommits, t.signCommitsD, 'sign'), chk('Ramal › Git: ', t.prune, t.prune, 'prune') ] }
-      ];
+    if (base.isPR) {
+      const host = 'gitlab.acme.dev';
+      base.pr = { noAccount: s.prNoAcc, hasForm: !s.prNoAcc, noAccMsg: v('account.prNoAccountMsg', { host }), onAddAccount: () => this.addAccount(),
+        from: s.current || dSha, to: s.pr.to, toOpts: ['main', 'develop'], onTo: e => this.setState(y => ({ pr: { ...y.pr, to: e.target.value } })), acc: s.pr.acc, accOpts: s.accounts.filter(a => a.platform === 'github').map(a => ({ value: a.id, label: `GitHub · @${a.user}` })), onAcc: e => this.setState(y => ({ pr: { ...y.pr, acc: e.target.value } })),
+        aiLabel: s.aiBusy ? t.aiGenerating : t.aiPR, onAI: () => this.aiPR(), title: s.pr.title, onTitle: e => this.setState(y => ({ pr: { ...y.pr, title: e.target.value, err: '' } })), hasErr: !!s.pr.err, err: s.pr.err, desc: s.pr.desc, onDesc: e => this.setState(y => ({ pr: { ...y.pr, desc: e.target.value } })), draft: s.pr.draft, onDraft: e => this.setState(y => ({ pr: { ...y.pr, draft: e.target.checked } })),
+        onCreate: () => { if (!s.pr.title.trim()) { this.setState(y => ({ pr: { ...y.pr, err: tr('prTitle') + ' ·  ' + (L ? 'required' : 'obligatorio') } })); return; } this.closeTab('pr'); this.sb(xx('prCreated', { num: 143 })); } };
+    } else base.pr = {};
+    if (base.isSettings) {
+      const cfg = s.cfg, setC = (k, val) => this.setState(y => ({ cfg: { ...y.cfg, [k]: val } }));
+      const ago = m => m < 60 ? m + ' min' : m < 1440 ? Math.round(m / 60) + ' h' : Math.round(m / 1440) + ' d';
+      Object.assign(base, { cfg, syncIcon: s.signedIn && cfg.cloud ? 'cloud' : 'device-desktop', syncLine: s.signedIn && cfg.cloud ? tr('syncsWith', { ago: L ? '2 min ago' : 'hace 2 min' }) : V.settings.cfgLocal,
+        onCloud: e => setC('cloud', e.target.checked), onDashboard: () => this.nat({ kind: 'command', api: 'env.openExternal', title: 'https://ramal.bahoque.com/app' }), onSignOut: () => this.signOut(), onSignIn: () => this.signIn(),
+        onAddAccount: () => this.addAccount(), onAddKey: () => this.addKey(), onAiLang: e => setC('aiLang', e.target.value), onConventional: e => setC('conventional', e.target.checked), onExclude: e => setC('exclude', e.target.value), onInstr: e => setC('instr', e.target.value),
+        onAutoFetch: e => setC('autoFetch', e.target.value), onPullMode: e => setC('pull', e.target.value), onSign: e => setC('sign', e.target.checked), onPrune: e => setC('prune', e.target.checked),
+        langOpts: [['vscode', V.settings.matchVs], ['en', 'English'], ['es', 'Español']].map(([value, label]) => ({ value, label })),
+        fetchOpts: [['0', t.off], ['5', tr('everyN', { n: 5 })], ['15', tr('everyN', { n: 15 })], ['30', tr('everyN', { n: 30 })]].map(([value, label]) => ({ value, label })),
+        pullOpts: [['ff', tr('sFF')], ['ff-only', L ? 'Fast-forward only' : 'Solo fast-forward'], ['rebase', 'Rebase']].map(([value, label]) => ({ value, label })) });
+      base.accRows = s.accounts.map(a => { const stx = a.chk === 'expires' ? [xx('chkExp', { days: a.chkDays }), 'var(--warn)'] : a.chk === 'bad' ? [xx('chkBad'), 'var(--err)'] : [xx('chkOk', { ago: ago(a.chkMins || 2) }), 'var(--add)'];
+        return { abbr: P[a.platform].abbr, color: P[a.platform].color, title: '@' + a.user, meta: '· ' + P[a.platform].label, sub: a.host + ' · ' + a.method, status: stx[0], stColor: stx[1], hasBadge: !!a.def, badge: t.isDefault,
+          onMenu: e => this.menu(e, 'webview/context · webviewSection: account', [{ label: t.mTest, run: () => this.sb(xx('chkOk', { ago: L ? '0 min' : '0 min' })) }, { label: t.makeDefault, run: () => this.setState(y => ({ accounts: y.accounts.map(z => z.platform === a.platform ? { ...z, def: z.id === a.id } : z) })) }, { label: v('push.updateCreds'), run: () => this.input(v('account.tokenPrompt'), '', () => {}, { password: true }) }, { sep: 1 },
+            { label: t.mRemoveAcc, danger: 1, run: () => this.modal(v('confirm.disconnectAccount.message', { user: a.user, host: a.host }), v('confirm.disconnectAccount.detail', { platform: P[a.platform].label }), [[v('confirm.disconnectAccount.button'), () => this.setState(y => ({ accounts: y.accounts.filter(z => z.id !== a.id) }))]]) }]) }; });
+      base.keyRows = s.aiKeys.map(k => { const org = k.scope === 'org';
+        return { abbr: AP[k.prov].abbr, color: AP[k.prov].color, title: k.label, meta: '· ' + AP[k.prov].label, sub: k.masked + ' · ' + k.model, hasBadge: org || !!k.def, badge: org ? V.settings.fromOrg : t.isDefault, hasMenu: !org,
+          onMenu: e => { if (org) { e.preventDefault(); return; } this.menu(e, 'webview/context · webviewSection: aiKey', [{ label: t.mMakeDefKey, run: () => this.setState(y => ({ aiKeys: y.aiKeys.map(z => ({ ...z, def: z.id === k.id })) })) }, { label: t.mTest, run: () => this.sb(tr('keyTestT', { p: AP[k.prov].label, m: k.model })) }, { sep: 1 }, { label: t.mRemoveKey, danger: 1, run: () => this.modal(v('confirm.deleteAiKey.message', { label: k.label }), v('confirm.deleteAiKey.detail'), [[v('confirm.deleteAiKey.button'), () => this.setState(y => ({ aiKeys: y.aiKeys.filter(z => z.id !== k.id) }))]]) }]); } }; });
+      const keyOpts = s.aiKeys.map(k => ({ value: k.id, label: `${k.label} · ${AP[k.prov].label}` + (k.scope === 'org' ? ' · ' + V.settings.fromOrg : '') }));
+      base.fnRows = [['Commit', t.fCommit, 'aiCommit', 'fast'], ['PR', t.fPR, 'aiPR', 'balanced'], ['Summary', t.fSummary, 'aiSummary', 'balanced']].map(([fn, title, flag, tier]) => {
+        const k = this.aiKeyFor(fn), org = k && k.scope === 'org';
+        const modelOpts = !k ? [] : org ? [{ value: '', label: v('settings.orgModelFixed', { org: 'ACME Studio', model: k.model }) }] : [{ value: '', label: v('settings.keyModel', { model: k.model }) }, ...(MODELS[k.prov] || []).map(([m, tt]) => ({ value: m, label: m + (tt === tier ? ' · ' + (tier === 'fast' ? v('errors.recFast') : v('errors.recBalanced')) : '') }))];
+        return { title, checked: !!cfg[flag], onToggle: e => setC(flag, e.target.checked), keyVal: k ? k.id : '', keyOpts, onKey: e => this.setState(y => ({ cfg: { ...y.cfg, ['key' + fn]: e.target.value, ['model' + fn]: '' } })), modelVal: org ? '' : cfg['model' + fn], modelOpts, modelDisabled: !!org, modelOpacity: org ? 0.6 : 1, onModel: e => setC('model' + fn, e.target.value) };
+      });
     }
-    const k = this.aiKey();
-    base.statusL = [{ label: `⎇ ${s.current}${s.unstaged.length ? '*' : ''}`, color: 'var(--fg2)', onClick: e => this.openMenu(e, all.filter(r => r.type === 'local').map(r => ({ label: (r.head ? '✓ ' : '   ') + r.name, action: () => r.head ? null : this.checkout(r.name) }))) },
-      { label: `⟳ 0↓ ${s.ahead}↑`, color: 'var(--fg2)', onClick: () => this.push() },
-      ...(s.conflict ? [{ label: '⚠ ' + tr('conflictsN', { n: R.CF.filter((_, i) => !this.cfResolved(i)).length }), color: 'var(--warn)', onClick: () => this.openTab('merge') }] : [])];
-    base.statusR = [{ label: '✦ ' + (k ? AP[k.prov].label : '—'), color: 'var(--fg2)', onClick: () => this.openTab('settings') }, { label: 'Ramal: @marta-dev', color: 'var(--fg2)', onClick: () => this.openTab('settings') }];
-    if (s.menu) {
-      const run = (it, e) => { if (e) e.stopPropagation(); if (!it.keep) this.setState({ menu: null }); it.action && it.action(); };
-      const mi = s.menu.build ? s.menu.build() : s.menu.items;
-      base.menu = { x: s.menu.x, y: s.menu.y, items: mi.map((it, i) => ({ isSep: !!it.sep, notSep: !it.sep, label: it.label, hint: it.children ? '›' : (it.hint || ''), color: it.danger ? 'var(--del)' : 'var(--fg)', bg: s.menu.sub === i ? 'var(--sel2)' : 'transparent', showSub: !!it.children && s.menu.sub === i,
-        children: (it.children || []).map(ch => ({ label: ch.label, color: ch.danger ? 'var(--del)' : 'var(--fg)', onClick: e => run(ch, e) })), onEnter: () => this.setState(x => x.menu ? { menu: { ...x.menu, sub: it.children ? i : -1 } } : null), onClick: e => { if (it.children) { e.stopPropagation(); return; } run(it, e); } })) };
-    }
-    if (s.modal) { const m = s.modal, mv = m.values;
-      base.modal = { title: m.title, submit: m.submitLabel, btnBg: m.danger ? '#c72e0f' : 'var(--accent)', fields: m.fields.map(f => { const v = f.key ? mv[f.key] : undefined; return { isAction: f.type === 'action', onClick: () => f.run && f.run(), isInfo: f.type === 'info', isText: f.type === 'text', isArea: f.type === 'area', isSelect: f.type === 'select', isCheck: f.type === 'check',
-        label: f.type === 'action' && s.aiBusy ? t.aiGenerating : (f.label || ''), text: f.text || '', font: f.mono ? MONO : 'inherit', value: v == null ? '' : v, placeholder: f.placeholder || '', checked: !!v, onChange: e => this.setVal(f.key, e.target.value), onToggle: e => this.setVal(f.key, e.target.checked), options: f.options || [] }; }) }; }
-    if (s.palette) {
-      const cmds = [[t.tabGraph, () => this.openTab('graph'), '⇧⌘G'], ['Fetch', () => this.toast(tr('fetchedT'))], ['Pull', () => this.toast(tr('pulledT', { b: s.current }))], ['Push', () => this.push()], [t.aiGenerate + ' (commit)', this.aiCommit], [t.branchTitle, () => this.newBranch(null)], [t.prTitleM, () => this.openPR()], ['Stash', () => this.stash()], [t.mergeTitle + '…', () => this.openMerge('develop')], [t.tabSettings, () => this.openTab('settings')], [t.openDesktop, () => this.toast(tr('doneT', { x: t.openDesktop }))]];
-      const q = s.palette.q.toLowerCase();
-      base.pal = { q: s.palette.q, onQ: e => this.setState({ palette: { q: e.target.value } }), items: cmds.filter(c => !q || c[0].toLowerCase().includes(q)).map(([label, fn, key]) => ({ label, key: key || '', onClick: () => { this.setState({ palette: null }); fn(); } })) };
-    }
+
+    const stItem = (text, tip, o) => ({ text, tip: tip || '', color: 'var(--fg)', border: 'var(--border)', opacity: 1, ...o });
+    const L1 = [];
+    if (s.multi) L1.push(stItem('$(repo) ' + s.repo, v('status.repoTip', { repo: s.repo, index: 1, total: 3 })));
+    const off = xx('onlyGitOff');
+    L1.push(stItem(s.detached ? '$(git-commit) ' + v('status.detached', { sha: dSha }) : '$(git-branch) ' + s.current + (s.unstaged.length ? '*' : ''), (s.detached ? '' : v('status.branchTip', { count: nCh })) + ' · ' + off, { opacity: 0.5 }));
+    if (!s.detached) L1.push(stItem(s.empty ? '$(cloud-upload) ' + v('status.publish') : '$(sync) 0↓ ' + s.ahead + '↑', (s.empty ? v('status.publishTip', { branch: s.current }) : v('status.syncTip', { behind: 0, ahead: s.ahead })) + ' · ' + off, { opacity: 0.5 }));
+    if (cf) { const left = R.CF.filter((_, i) => !this.cfResolved(i)).length; L1.push(cf.op === 'rebase' ? stItem(`$(git-merge) Rebase ${cf.idx}/${cf.total}`, v('status.opTip', { index: cf.idx, total: cf.total }) + ' · statusBarItem.warningBackground', { border: 'var(--warn)', color: 'var(--warn)' }) : stItem('$(warning) ' + v('status.conflicts', { count: left }), 'statusBarItem.warningBackground', { border: 'var(--warn)', color: 'var(--warn)' })); }
+    if (s.sbMsg) L1.push(stItem(s.sbMsg.text, 'setStatusBarMessage · 4 s', { border: 'var(--add)' }));
+    base.statusL = L1;
+    const R1 = [], ka = this.aiKeyFor('Commit');
+    if (s.cfg.aiCommit || s.cfg.aiPR || s.cfg.aiSummary) R1.push(ka ? stItem('$(sparkle) ' + AP[ka.prov].label, v('status.aiTip', { provider: AP[ka.prov].label, model: s.cfg.modelCommit || ka.model, label: ka.label })) : stItem('$(sparkle) ' + v('status.aiNoKey')));
+    if (s.engine === 'restarting') R1.push(stItem('$(sync~spin) ' + v('status.restarting'), ''));
+    if (s.engine === 'stopped') R1.push(stItem('$(error) ' + v('status.stopped'), 'statusBarItem.errorBackground', { border: 'var(--err)', color: 'var(--err)' }));
+    R1.push(!s.signedIn ? stItem('$(account) ' + v('status.signedOut'), v('status.signedOutTip')) : !s.cfg.cloud ? stItem('$(account) Ramal', v('status.cloudOffTip')) : stItem('$(cloud) Ramal', v('status.signedInTip', { name: 'Marta Ruiz', email: 'marta@example.com', ago: L ? '2 min ago' : 'hace 2 min' })));
+    base.statusR = R1;
+
+    const KC = { menu: 'var(--info)', modal: 'var(--warn)', quickPick: 'var(--accent)', inputBox: 'var(--accent)', status: 'var(--add)', error: 'var(--err)', warning: 'var(--warn)', info: 'var(--info)', progress: 'var(--info)', editor: 'var(--fg2)', command: 'var(--fg2)' };
+    base.logEmpty = !s.log.length; base.onClearLog = () => this.setState({ log: [] });
+    base.log = s.log.map(e => {
+      const close = () => this.drop(e.id), err = e.input && e.touched && e.validate ? e.validate(e.value || '') : '';
+      const ok = () => { const er2 = e.validate ? e.validate(e.value || '') : ''; if (er2) { this.patchLog(e.id, { touched: true }); return; } close(); e.onOk && e.onOk(e.value || ''); };
+      const items = (e.items || []).map(it => Array.isArray(it) ? { label: it[0], run: it[1], ...(it[2] || {}) } : it).map(it => ({ isSep: !!it.sep, notSep: !it.sep, label: it.label, hint: it.hint || '', pad: it.sub ? '22px' : '6px', color: it.danger ? 'var(--err)' : 'var(--fg)', onClick: () => { if (!it.run) return; close(); it.run(); } }));
+      const buttons = e.input ? [{ label: xx('enter'), onClick: ok, bg: 'var(--accent)', color: 'var(--accent-fg)' }] : (e.buttons || []).map(([label, fn, primary], i) => ({ label, bg: i === 0 && e.kind !== 'status' ? 'var(--accent)' : 'var(--sel2)', color: i === 0 ? 'var(--accent-fg)' : 'var(--fg)', onClick: () => { close(); fn && fn(); } }));
+      return { kind: e.kind, kindColor: KC[e.kind] || 'var(--fg2)', api: e.api, hasTitle: !!e.title, title: e.title || '', hasDetail: !!e.detail, detail: e.detail || '', hasInput: !!e.input, value: e.value || '', ph: e.ph || '', inputType: e.password ? 'password' : 'text', inputBorder: err ? 'var(--err)' : 'var(--accent)', hasError: !!err, error: err,
+        onInput: ev => this.patchLog(e.id, { value: ev.target.value, touched: true }), hasItems: items.length > 0, items, hasButtons: buttons.length > 0, buttons, onClose: close };
+    });
     return base;
   }
 }

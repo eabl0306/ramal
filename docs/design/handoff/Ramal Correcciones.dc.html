@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:oklch(0.16 0.008 230);color:oklch(0.95 0.005 230);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px}
+*{box-sizing:border-box}
+a{color:oklch(0.74 0.12 190)} a:hover{color:oklch(0.95 0.005 230)}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:40px 48px 96px;display:flex;flex-direction:column;gap:40px;max-width:1280px">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:oklch(0.74 0.12 190);color:oklch(0.2 0.03 190);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Ramal</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:oklch(0.62 0.012 230)">#71 · B-01 – B-62</span></div>
+    <h1 style="margin:0;font-size:28px;font-weight:600;letter-spacing:-0.02em">Correcciones del prototipo: antes y después</h1>
+    <p style="margin:0;max-width:820px;color:oklch(0.76 0.012 230);line-height:1.5;text-wrap:pretty">Solo los bugs con tratamiento «Diseño». Las reglas de implementación y los que dibuja otro brief están en la tabla del README. Para verlos en vivo abre <a href="Ramal.dc.html">Ramal.dc.html</a>, <a href="Ramal VS Code.dc.html">Ramal VS Code.dc.html</a> y <a href="Ramal Web.dc.html">Ramal Web.dc.html</a>.</p>
+  </header>
+
+  <sc-for list="{{ groups }}" as="g" hint-placeholder-count="11">
+    <section id="{{ g.id }}" data-screen-label="{{ g.n }}" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:baseline;gap:12px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding:3px 8px;border-radius:6px;background:oklch(0.74 0.12 190 / 0.14);color:oklch(0.74 0.12 190)">{{ g.n }}</span><h2 style="margin:0;font-size:19px;font-weight:600;letter-spacing:-0.01em">{{ g.title }}</h2></div>
+      <div style="border:1px solid oklch(0.315 0.012 230);border-radius:14px;overflow:hidden;background:oklch(0.21 0.009 230)">
+        <div style="display:grid;grid-template-columns:70px minmax(0,1fr) minmax(0,1fr) 190px;gap:16px;padding:10px 18px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:oklch(0.62 0.012 230);border-bottom:1px solid oklch(0.315 0.012 230)"><span>Id</span><span>Antes</span><span>Después</span><span>Dónde verlo</span></div>
+        <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:70px minmax(0,1fr) minmax(0,1fr) 190px;gap:16px;padding:12px 18px;border-bottom:1px solid oklch(0.315 0.012 230);line-height:1.5;align-items:start">
+            <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ r.id }}</span>
+            <span style="color:oklch(0.76 0.012 230);padding-left:10px;box-shadow:inset 2px 0 0 oklch(0.7 0.17 25)">{{ r.before }}</span>
+            <span style="padding-left:10px;box-shadow:inset 2px 0 0 oklch(0.76 0.15 150)">{{ r.after }}</span>
+            <span style="font-size:12px;color:oklch(0.62 0.012 230)">{{ r.where }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const G = [
+  ['1', 'Estado y datos', [
+    ['B-02', 'Desktop arrancaba con el resolvedor abierto y un interruptor conflictUsed decidía si el merge daba conflicto. VS Code abría con una pestaña Merge.', 'Arranca en Inicio y en un grafo limpio. El conflicto aparece al hacer Merge de hotfix/login en la rama actual, como lo decidiría git.', 'Desktop y VS Code: menú de rama hotfix/login › Merge'],
+    ['B-05', 'Un repo sin cuenta ligada salía con «⌂» aunque tuviera remoto.', 'La insignia sale del host del remoto. Remoto sin cuenta: chip «Sin cuenta · Elegir cuenta», que abre la selección de cuenta.', 'Desktop › Repositorios › oss-charts'],
+    ['B-06', 'La tabla de repos de la web enseñaba rutas locales (~/code/…).', 'Segunda línea con propietario/repo; sin remoto, «Solo local · {device}».', 'Web › Panel › Repositorios']
+  ]],
+  ['2', 'Commit y mensajes', [
+    ['B-10', 'El resumen de IA del commit aparecía siempre, generado sin pedirlo.', 'Botón «Resumir con IA» bajo demanda: esqueleto de tres líneas, resultado con «Generado con {provider} · {model}», error con «Reintentar» y aviso con enlace a Ajustes › IA si está desactivado o sin llave.', 'Desktop y VS Code: detalle de commit (e12a7f0 muestra el error la primera vez)']
+  ]],
+  ['3', 'Grafo y diff', [
+    ['B-14', 'El color se leía con LANE[lane] y fallaba a partir del séptimo carril.', 'Color = carril módulo 6 en todos los usos (nodos, aristas, refs, avatares). Los datos de muestra aún no traen un séptimo carril.', 'Desktop y VS Code: grafo'],
+    ['B-15', 'Las aristas de merge bajaban por el carril del padre y podían cruzar nodos.', 'Se enrutan por el primer carril libre entre las dos filas: curva, vertical, curva. Ninguna cruza un nodo.', 'Desktop y VS Code: grafo'],
+    ['B-16', 'Una arista a un padre no cargado desaparecía.', 'Baja hasta el borde inferior, como una rama que sigue. El último commit de muestra tiene un padre fuera de la carga.', 'Desktop y VS Code: final del grafo'],
+    ['B-17', 'La vista unificada intercalaba líneas quitadas y añadidas.', 'Por hunks: primero el bloque quitado y después el añadido.', 'Desktop › diff › Unificada']
+  ]],
+  ['4', 'Resolvedor de conflictos', [
+    ['B-19', 'Elegir líneas iguales de A y B no avisaba.', 'Aviso --warn bajo la cabecera del Resultado si hay líneas repetidas.', 'Desktop y VS Code: conflicto 2 de session.ts, elige refresh_token en A y B'],
+    ['B-20', '«Quitar bloque» no hacía nada útil y un bloque solo podía resolverse con líneas.', 'Cada bloque tiene decisión explícita. «Dejar vacío» en el bloque sin resolver; el Resultado enseña «Bloque vacío» con «Deshacer». «Tomar bloque» pasa a «Bloque tomado».', 'Desktop y VS Code: Resultado'],
+    ['B-21', 'Solo se detectaban <<<<<<<, ======= y >>>>>>>.', 'También |||||||. «Marcar como resuelto igualmente» en la fila del archivo (⋯) y tras la edición manual, con confirmación si quedan marcadores.', 'Desktop: panel Merge en curso'],
+    ['B-22', 'La edición manual se perdía al cambiar de archivo y tocar una elección la borraba sin avisar.', 'Borrador por archivo («Editar a mano · borrador guardado»). Elegir líneas con edición manual pide «¿Descartar tu edición manual?».', 'Desktop: Editar a mano'],
+    ['B-23', 'Etiquetas fijas «Tu rama (actual)» y «Entrante»; subtítulo «al completar el merge».', 'Etiquetas según la operación (Tu rama ({branch}) / Entrante ({source}), claves para pull, rebase, cherry-pick, revert y stash) y subtítulo genérico «al continuar».', 'Desktop y VS Code: cabeceras A y B']
+  ]],
+  ['5', 'Rebase interactivo', [
+    ['B-25', 'Se podía iniciar con squash o fixup en el primer commit o con un reword vacío.', 'Error en línea bajo la fila (patrón C-03) y «Iniciar rebase» deshabilitado mientras haya errores.', 'Desktop: menú de commit › Rebase interactivo']
+  ]],
+  ['6', 'Acciones de Git', [
+    ['B-26', 'El menú de una rama decía «Push» y «Pull» y actuaba sobre la actual.', '«Push de {branch}», «Pull de {branch}», «Comparar {branch} con…», sobre la rama del menú.', 'Desktop y VS Code: menú de rama'],
+    ['B-27', 'Un único «Eliminar rama…».', '«Eliminar rama local…» y «Eliminar {remote}/{branch} del remoto…», cada uno con su confirmación.', 'Desktop y VS Code: menú de feature/auth'],
+    ['B-29', 'Varias acciones destructivas sin confirmación (tag, rama remota, abortar merge, reset --hard en VS Code, cerrar sesión en otro dispositivo…).', 'Todas con el patrón de peligro de la sección 10: título en pregunta, consecuencia, botón --danger y foco inicial en Cancelar.', 'Ver la lámina 10'],
+    ['B-31', '«Crear rama» aceptaba cualquier nombre y cambiaba espacios por guiones en silencio.', 'Error en línea: «Escribe un nombre.», badBranch y «Ya existe una rama con ese nombre.». Los demás modales de Desktop también marcan el campo en vez de no hacer nada.', 'Desktop: barra › Rama']
+  ]],
+  ['7', 'Cuentas y llaves', [
+    ['B-34', 'Máscaras distintas por producto (sk-ant-••••••••4f2a, slice(0,6)…).', 'Prefijo conocido + «…» + 4 últimos (sk-ant-…4f2a); menos de 12 caracteres, ••••••••.', 'Desktop y VS Code: llaves de IA'],
+    ['B-37', 'Token y llave en campo de texto visible; al editar salía la máscara como placeholder.', 'Campo de secreto oculto con «Mostrar/Ocultar» mientras se escribe; al editar, vacío con «Guardado. Escribe uno nuevo para cambiarlo.».', 'Desktop: Añadir cuenta y Añadir llave'],
+    ['B-38', 'Placeholder github.com para todas las plataformas.', 'Placeholder según la plataforma elegida (gitlab.com, bitbucket.org, git.tu-empresa.com, dev.azure.com/tu-organizacion).', 'Desktop: Añadir cuenta'],
+    ['B-39', 'Punto verde fijo en todas las tarjetas de cuenta.', 'Estado real: Comprobada hace…, Caduca en N días, Token caducado, No se pudo comprobar, Sin comprobar.', 'Desktop › Plataformas Git']
+  ]],
+  ['8', 'Textos e i18n', [
+    ['B-46', '«(simulado)» y datos fijos en signedOutT, planRenew, dlStarted, version y resetSent.', 'Textos con marcadores con nombre ({date}, {seats}, {file}, {version}) y sin «simulado».', 'Desktop › Cuenta y equipo; Web › landing y login'],
+    ['B-47', 'vsLanguage ofrecía fr y faltaba la clave commitV.', 'La prop solo ofrece en y es; commitV añadida.', 'VS Code: Tweaks'],
+    ['B-50', '«Propietaria».', '«Titular» en Desktop y web.', 'Desktop y Web: equipo']
+  ]],
+  ['9', 'Web y modales', [
+    ['B-52', 'Un solo contador mezclaba miembros e invitaciones.', '«4 miembros y 1 invitación pendiente · 5 de 6 asientos», compuesto con tres claves.', 'Desktop › Cuenta y equipo; Web › Equipo'],
+    ['B-53', 'El login exigía 8 caracteres.', 'En el login solo «Escribe tu contraseña.» si está vacía; el mínimo sigue en el registro.', 'Web › Iniciar sesión'],
+    ['B-56', 'Cerrar sesión de otro dispositivo sin confirmación.', 'Confirmación con el texto de X-03 (no promete borrado remoto).', 'Web › Resumen › dispositivo ⋯; Desktop › Sesiones activas'],
+    ['B-57', 'Botón «Guardar» global en Configuración en la nube.', 'Sin botón global: cada control guarda solo y lo confirma.', 'Web › Configuración en la nube'],
+    ['B-59', 'Borrar workspace con texto equivocado; la búsqueda no miraba el usuario de la cuenta; sin toasts al crear, renombrar o cambiar rol.', 'Texto propio, búsqueda por usuario (y lo dice el placeholder) y toasts wsCreated, renamed y roleChanged.', 'Web › Workspaces, Repositorios y Equipo']
+  ]],
+  ['10', 'Confirmaciones de peligro', [
+    ['Desktop', 'Faltaban tag, rama remota, abortar merge, descartar edición manual y cerrar sesión de otro dispositivo; otras usaban textos improvisados.', 'Todas las de la tabla con sus textos: reset --hard, descartar, stash, tag, rama local y remota, abortar, edición manual, quitar repo, workspace, cuenta, llave, miembro y sesión.', 'Desktop'],
+    ['VS Code', 'Faltaban reset --hard, eliminar stash, rama remota, abortar merge, desconectar cuenta y eliminar llave.', 'Añadidas con el mismo texto; en la extensión real serán showWarningMessage modal. El tag es de #68.', 'VS Code'],
+    ['Web', 'Workspace con texto equivocado; cancelar invitación era «Quitar».', 'Textos de la tabla; «Cancelar invitación» para pendientes; quitar repo, desconectar cuenta y sesión de dispositivo.', 'Web']
+  ]],
+  ['11', 'Datos de muestra', [
+    ['Sesiones', 'Sesiones con ciudad (Madrid, Barcelona).', '«{device} · {app} · {ago}» y la marca «Este dispositivo», sin ubicación (decisión #53).', 'Desktop › Sesiones activas'],
+    ['Dominios', 'Correos @ramal.dev y @acme.studio.', 'Correos @example.com.', 'Los tres productos'],
+    ['Bitbucket', 'Método «App password».', '«API token» (X-08).', 'Desktop › Plataformas Git']
+  ]]
+];
+class Component extends DCLogic {
+  renderVals() {
+    return { groups: G.map(([n, title, rows]) => ({ n, id: 'g' + n, title, rows: rows.map(([id, before, after, where]) => ({ id, before, after, where })) })) };
+  }
+}
+</script>
+</body>
+</html>

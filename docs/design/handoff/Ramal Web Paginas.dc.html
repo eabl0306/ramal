@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;
+--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);
+--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);
+--shadow:0 24px 70px oklch(0.05 0.01 230 / 0.55),0 2px 8px oklch(0.05 0.01 230 / 0.3);
+background:var(--bg);color:var(--text)}
+body[data-theme="light"]{--bg:oklch(0.975 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.945 0.006 230);--border:oklch(0.9 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);
+--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);
+--shadow:0 24px 70px oklch(0.3 0.02 230 / 0.18),0 2px 8px oklch(0.3 0.02 230 / 0.08)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+a{color:var(--accent);text-decoration:none;cursor:pointer} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+button:disabled{cursor:default}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media print{.noprint{display:none!important}}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px">
+
+  <div class="noprint" style="display:flex;flex-direction:column;gap:5px;padding:8px 12px;border-bottom:1px dashed var(--faint);background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:11px">
+    <sc-for list="{{ proto }}" as="pr" hint-placeholder-count="2"><div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span style="color:var(--faint);min-width:48px">{{ pr.label }}</span><sc-for list="{{ pr.chips }}" as="c"><button onClick="{{ c.onClick }}" style="height:22px;padding:0 8px;border-radius:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.id }}</button></sc-for></div></sc-for>
+  </div>
+
+  <sc-if value="{{ inPanel }}">
+    <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--border)"><div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600">Ramal</span><span style="color:var(--faint)">/</span><span style="height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;font-weight:500">ACME Studio</span><div style="flex:1"></div><div style="width:32px;height:32px;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px">MR</div></div>
+  </sc-if>
+  <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+    <header class="noprint" style="position:sticky;top:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 {{ pad }}px;background:color-mix(in oklch, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)">
+      <a href="./Ramal Web.dc.html" style="display:flex;align-items:center;gap:9px;color:var(--text)"><span style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</span><span style="font-weight:600;font-size:16px">Ramal</span></a>
+      <sc-if value="{{ wide }}"><nav style="display:flex;gap:4px;margin-left:8px"><sc-for list="{{ navLinks }}" as="n"><a onClick="{{ n.onClick }}" style="padding:8px 12px;border-radius:8px;color:var(--muted);font-weight:500;white-space:nowrap" style-hover="color:var(--text);background:var(--surface2)">{{ n.label }}</a></sc-for></nav></sc-if>
+      <div style="flex:1"></div>
+      <sc-if value="{{ wide }}">
+        <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)"><sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:26px;padding:0 9px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div>
+        <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)"><sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="width:30px;height:26px;border:0;border-radius:6px;cursor:pointer;font-size:12px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div>
+        <sc-for list="{{ authBtns }}" as="b"><button onClick="{{ b.onClick }}" style="height:38px;padding:0 16px;border-radius:10px;font-weight:600;cursor:pointer;white-space:nowrap;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for>
+      </sc-if>
+      <sc-if value="{{ narrow }}"><button onClick="{{ toggleSheet }}" aria-expanded="{{ sheet }}" style="height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ sheetLabel }}</button></sc-if>
+    </header>
+    <sc-if value="{{ showSheet }}">
+      <div style="position:fixed;top:64px;left:0;right:0;z-index:19;background:var(--surface);border-bottom:1px solid var(--border);box-shadow:var(--shadow);padding:14px {{ pad }}px 18px;display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ navLinks }}" as="n"><a onClick="{{ n.onClick }}" style="padding:12px 4px;font-weight:500;color:var(--text);border-bottom:1px solid var(--border)">{{ n.label }}</a></sc-for>
+        <div style="display:flex;gap:8px;align-items:center;padding:10px 0;flex-wrap:wrap">
+          <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)"><sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:30px;padding:0 10px;border:0;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div>
+          <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)"><sc-for list="{{ theme3 }}" as="o"><button onClick="{{ o.onClick }}" style="height:30px;padding:0 10px;border:0;border-radius:6px;cursor:pointer;font-size:12px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div>
+        </div>
+        <sc-for list="{{ authBtns }}" as="b"><button onClick="{{ b.onClick }}" style="height:44px;border-radius:10px;font-weight:600;cursor:pointer;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <main style="flex:1;display:flex;flex-direction:column">
+    <sc-if value="{{ isPricing }}" hint-placeholder-val="{{ true }}">
+      <section style="max-width:1080px;width:100%;margin:0 auto;padding:64px {{ pad }}px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">{{ t.prKicker }}</span>
+        <h1 style="margin:0;font-size:clamp(30px,5vw,48px);line-height:1.1;letter-spacing:-0.03em;font-weight:600;text-wrap:balance">{{ t.prTitle }}</h1>
+      </section>
+      <section style="max-width:960px;width:100%;margin:0 auto;padding:0 {{ pad }}px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px">
+        <div style="padding:26px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:16px">
+          <div style="font-weight:600;font-size:18px">{{ t.prFree }}</div>
+          <div><div style="font-size:36px;font-weight:600;font-family:'IBM Plex Mono',monospace">{{ t.prFreePrice }}</div><div style="color:var(--muted);margin-top:4px">{{ t.prFreeSub }}</div></div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;flex:1"><sc-for list="{{ freeList }}" as="li"><li style="display:flex;gap:10px;line-height:1.45"><span style="color:var(--ok);font-weight:700">✓</span><span>{{ li }}</span></li></sc-for></ul>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ goDownload }}" style="flex:1;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:600;white-space:nowrap">{{ t.prDownload }}</button><button onClick="{{ goSignup }}" style="flex:1;height:44px;border-radius:10px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:600;white-space:nowrap">{{ t.prSignup }}</button></div>
+        </div>
+        <div style="padding:26px;border-radius:14px;background:var(--surface);border:2px solid var(--accent);display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-weight:600;font-size:18px;flex:1">{{ t.prPro }}</span>
+            <div role="radiogroup" style="display:flex;padding:3px;border-radius:10px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ billOpts }}" as="o"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="height:28px;padding:0 10px;border:0;border-radius:7px;cursor:pointer;font-weight:500;font-size:13px;display:flex;align-items:center;gap:6px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}<sc-if value="{{ o.hasChip }}"><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:var(--ok);color:var(--surface)">{{ t.prSave }}</span></sc-if></button></sc-for></div>
+          </div>
+          <div><div style="font-size:30px;font-weight:600;font-family:'IBM Plex Mono',monospace;line-height:1.2">{{ proPrice }}</div><div style="color:var(--muted);margin-top:4px">{{ proSub }}</div></div>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;flex:1"><sc-for list="{{ proList }}" as="li"><li style="display:flex;gap:10px;line-height:1.45"><span style="color:var(--accent);font-weight:700">✓</span><span>{{ li }}</span></li></sc-for></ul>
+          <button onClick="{{ onTrial }}" style="height:44px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600;font-size:15px">{{ trialLabel }}</button>
+          <sc-if value="{{ showTrialSub }}"><div style="text-align:center;font-size:12px;color:var(--faint)">{{ t.prTrialSub }}</div></sc-if>
+        </div>
+      </section>
+      <p style="max-width:960px;width:100%;margin:16px auto 0;padding:0 {{ pad }}px;font-size:12px;color:var(--faint);line-height:1.6;text-wrap:pretty">{{ t.prFootnote }}</p>
+      <section style="max-width:960px;width:100%;margin:0 auto;padding:56px {{ pad }}px 0">
+        <h2 style="margin:0 0 16px;font-size:24px;font-weight:600">{{ t.prCompare }}</h2>
+        <div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);overflow:hidden">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 96px;gap:12px;padding:12px 18px;font-weight:600;border-bottom:1px solid var(--border)"><span></span><span style="text-align:center">{{ t.prFree }}</span><span style="text-align:center">{{ t.prPro }}</span></div>
+          <sc-for list="{{ compare }}" as="r"><div style="display:grid;grid-template-columns:minmax(0,1fr) 84px 96px;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--border)"><span style="line-height:1.45">{{ r.label }}</span><span style="text-align:center;font-weight:600;color:{{ r.freeColor }}">{{ r.free }}</span><span style="text-align:center;font-weight:600;color:var(--ok)">{{ t.prYes }}</span></div></sc-for>
+        </div>
+      </section>
+      <section style="max-width:760px;width:100%;margin:0 auto;padding:56px {{ pad }}px 72px">
+        <h2 style="margin:0 0 16px;font-size:24px;font-weight:600">FAQ</h2>
+        <sc-for list="{{ faq }}" as="q"><details style="border-bottom:1px solid var(--border);padding:14px 0"><summary style="cursor:pointer;font-weight:600;font-size:15px">{{ q.q }}</summary><p style="margin:10px 0 0;color:var(--muted);line-height:1.6">{{ q.a }}</p></details></sc-for>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+      <section style="max-width:1080px;width:100%;margin:0 auto;padding:36px {{ pad }}px 64px;display:flex;flex-direction:column;gap:18px">
+        <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ co.title }}</h1>
+        <sc-if value="{{ co.notOwner }}"><div role="alert" style="padding:14px 16px;border-radius:12px;background:color-mix(in oklch, var(--danger) 10%, transparent);color:var(--danger);display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1">{{ co.notOwnerText }}</span><a href="./Ramal Web Panel.dc.html" style="font-weight:600">{{ t.coGoBilling }}</a></div></sc-if>
+        <sc-if value="{{ co.isOwner }}">
+          <div style="display:grid;gap:18px;align-items:start;grid-template-columns:{{ co.cols }}">
+            <div style="padding:22px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:16px">
+              <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--faint)">{{ t.coSummary }}</div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:11px;font-weight:700">AS</span><div><div style="font-weight:600">ACME Studio</div><div style="font-size:13px;color:var(--muted)">{{ t.prPro }}</div></div></div>
+              <div role="radiogroup" style="display:flex;padding:3px;border-radius:10px;border:1px solid var(--border);background:var(--bg);align-self:flex-start"><sc-for list="{{ billOpts }}" as="o"><button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="height:30px;padding:0 12px;border:0;border-radius:7px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}<sc-if value="{{ o.hasChip }}"><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:var(--ok);color:var(--surface)">{{ t.prSave }}</span></sc-if></button></sc-for></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ t.coSeats }}</span><div style="display:flex;align-items:center;gap:8px"><button onClick="{{ co.dec }}" disabled="{{ co.decDis }}" aria-label="−" style="width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:16px;opacity:{{ co.decOp }}">−</button><span style="min-width:40px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600">{{ co.seats }}</span><button onClick="{{ co.inc }}" aria-label="+" style="width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:16px">+</button></div><span style="font-size:12px;color:var(--faint);line-height:1.45">{{ co.minText }}</span></div>
+              <div style="padding-top:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;gap:10px;color:var(--muted)"><span>{{ co.line }}</span></div><div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600">{{ co.total }}</div></div>
+              <ul style="margin:0;padding-left:18px;color:var(--faint);font-size:12px;line-height:1.6"><li>{{ t.coNote1 }}</li><li>{{ t.coNote2 }}</li></ul>
+            </div>
+            <div style="min-height:420px;padding:22px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)"><span style="width:8px;height:8px;border-radius:50%;background:var(--faint)"></span>{{ t.coPaddle }}</div>
+              <sc-if value="{{ co.isLoading }}"><div aria-busy="true" style="display:flex;flex-direction:column;gap:12px;animation:pulse 1.4s ease-in-out infinite"><span style="font-size:13px;color:var(--muted)">{{ t.coLoading }}</span><sc-for list="{{ co.skel }}" as="h"><span style="border-radius:9px;border:1px dashed var(--border);background:var(--bg);height:{{ h }}px"></span></sc-for></div></sc-if>
+              <sc-if value="{{ co.isSlot }}"><div style="flex:1;min-height:340px;border-radius:12px;border:1px dashed var(--faint);display:grid;place-items:center;text-align:center;padding:20px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ t.coPaddle }} · Paddle.js inline</div></sc-if>
+              <sc-if value="{{ co.isBlocked }}"><div role="alert" style="padding:14px;border-radius:10px;background:color-mix(in oklch, var(--danger) 10%, transparent);color:var(--danger);line-height:1.5;display:flex;flex-direction:column;gap:10px"><span>{{ t.coBlocked }}</span><button onClick="{{ co.retry }}" style="align-self:flex-start;height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-weight:500">{{ t.coRetry }}</button></div></sc-if>
+              <sc-if value="{{ co.isMsg }}"><div role="status" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:30px 10px"><div style="width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:700;background:{{ co.msgBg }};color:{{ co.msgColor }}">{{ co.msgIcon }}</div><p style="margin:0;max-width:360px;line-height:1.55">{{ co.msg }}</p><sc-if value="{{ co.hasMsgBtn }}"><a href="./Ramal Web Panel.dc.html" style="font-weight:600">{{ t.coGoBilling }}</a></sc-if></div></sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isCard }}" hint-placeholder-val="{{ false }}">
+      <section style="flex:1;display:grid;place-items:center;padding:48px 16px">
+        <div style="width:100%;max-width:{{ cd.width }}px;padding:{{ cd.pad }}px;border-radius:18px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px;text-align:{{ cd.align }};align-items:{{ cd.items }}">
+          <sc-if value="{{ cd.hasCode }}"><div style="font-family:'IBM Plex Mono',monospace;font-size:64px;font-weight:600;line-height:1;color:var(--faint)">{{ cd.code }}</div></sc-if>
+          <sc-if value="{{ cd.hasIni }}"><div style="width:52px;height:52px;border-radius:14px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:18px">{{ cd.ini }}</div></sc-if>
+          <sc-if value="{{ cd.hasIcon }}"><div style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:700;background:{{ cd.iconBg }};color:{{ cd.iconColor }}">{{ cd.icon }}</div></sc-if>
+          <sc-if value="{{ cd.isLoading }}"><div aria-busy="true" style="display:flex;flex-direction:column;gap:12px;width:100%;animation:pulse 1.4s ease-in-out infinite"><span style="height:22px;width:80%;border-radius:6px;background:var(--surface2)"></span><span style="height:12px;width:60%;border-radius:6px;background:var(--surface2)"></span><span style="height:44px;border-radius:10px;background:var(--surface2)"></span><span style="font-size:13px;color:var(--muted)">{{ t.invLoading }}</span></div></sc-if>
+          <sc-if value="{{ cd.hasTitle }}"><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em;line-height:1.3;text-wrap:balance">{{ cd.title }}</h1></sc-if>
+          <sc-if value="{{ cd.hasRole }}"><span style="height:24px;padding:0 10px;border-radius:12px;display:inline-flex;align-items:center;font-size:12px;font-weight:600;background:var(--accent-soft);color:var(--accent);align-self:flex-start">{{ cd.role }}</span></sc-if>
+          <sc-for list="{{ cd.texts }}" as="tx"><p style="margin:0;line-height:1.55;text-wrap:pretty;font-size:{{ tx.size }}px;color:{{ tx.color }}">{{ tx.text }}</p></sc-for>
+          <sc-if value="{{ cd.hasBox }}"><div role="alert" style="padding:10px 12px;border-radius:9px;font-size:13px;line-height:1.5;text-align:left;width:100%;background:{{ cd.boxBg }};color:{{ cd.boxColor }}">{{ cd.box }}</div></sc-if>
+          <div style="display:flex;gap:8px;flex-direction:{{ cd.btnDir }};width:100%;justify-content:center">
+            <sc-for list="{{ cd.btns }}" as="b"><button onClick="{{ b.onClick }}" disabled="{{ b.disabled }}" style="flex:1 1 auto;min-height:44px;padding:0 16px;border-radius:10px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}"><sc-if value="{{ b.busy }}">{{ b.spin }}</sc-if>{{ b.label }}</button></sc-for>
+          </div>
+          <sc-if value="{{ cd.hasFoot }}"><span style="font-size:12px;color:var(--faint)">{{ cd.foot }}</span></sc-if>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isLegal }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:1080px;width:100%;margin:0 auto;padding:40px {{ pad }}px 72px;display:flex;gap:48px;align-items:flex-start">
+        <article style="flex:1;min-width:0;max-width:720px">
+          <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:28px"><div style="flex:1;min-width:240px"><h1 style="margin:0;font-size:32px;font-weight:600;letter-spacing:-0.02em">{{ lg.title }}</h1><p style="margin:8px 0 0;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:12px">{{ lg.version }}</p></div><button class="noprint" onClick="{{ lg.print }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.print }}</button></div>
+          <sc-for list="{{ lg.sections }}" as="sec"><section id="{{ sec.id }}" style="padding:20px 0;border-top:1px solid var(--border);scroll-margin-top:80px"><h2 style="margin:0 0 10px;font-size:19px;font-weight:600;display:flex;gap:10px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--faint)">{{ sec.n }}</span><span style="flex:1">{{ sec.title }}</span><a href="{{ sec.href }}" aria-label="#" class="noprint" style="font-size:14px;color:var(--faint)">#</a></h2><sc-for list="{{ sec.paras }}" as="p"><p style="margin:0 0 10px;line-height:1.7;color:{{ p.color }}">{{ p.text }}</p></sc-for></section></sc-for>
+        </article>
+        <sc-if value="{{ lg.hasToc }}"><aside class="noprint" style="width:220px;flex-shrink:0;position:sticky;top:88px;display:flex;flex-direction:column;gap:4px"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);margin-bottom:6px">{{ t.lgToc }}</span><sc-for list="{{ lg.sections }}" as="sec"><a href="{{ sec.href }}" style="padding:5px 0;color:var(--muted);font-size:13px;line-height:1.4" style-hover="color:var(--text)">{{ sec.title }}</a></sc-for></aside></sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDocs }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ dc.isIndex }}">
+        <section style="max-width:1080px;width:100%;margin:0 auto;padding:48px {{ pad }}px 72px;display:flex;flex-direction:column;gap:22px">
+          <h1 style="margin:0;font-size:32px;font-weight:600;letter-spacing:-0.02em">{{ t.dcIndex }}</h1>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px"><sc-for list="{{ dc.cards }}" as="c"><a onClick="{{ c.onClick }}" style="padding:20px;border-radius:14px;background:var(--surface);border:1px solid var(--border);color:var(--text);display:flex;flex-direction:column;gap:8px" style-hover="border-color:var(--accent)"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent)">{{ c.n }}</span><span style="font-weight:600;font-size:16px">{{ c.title }}</span></a></sc-for></div>
+        </section>
+      </sc-if>
+      <sc-if value="{{ dc.isArticle }}">
+        <div style="max-width:1280px;width:100%;margin:0 auto;padding:32px {{ pad }}px 72px;display:flex;gap:36px;align-items:flex-start">
+          <sc-if value="{{ wideDoc }}"><nav style="width:240px;flex-shrink:0;position:sticky;top:88px;display:flex;flex-direction:column;gap:2px"><sc-for list="{{ dc.cards }}" as="c"><a onClick="{{ c.onClick }}" style="padding:8px 10px;border-radius:8px;font-weight:500;background:{{ c.bg }};color:{{ c.color }}">{{ c.title }}</a></sc-for></nav></sc-if>
+          <article style="flex:1;min-width:0;max-width:720px;display:flex;flex-direction:column;gap:14px">
+            <a onClick="{{ dc.back }}" style="font-size:13px">← {{ t.dcIndex }}</a>
+            <h1 style="margin:0;font-size:30px;font-weight:600;letter-spacing:-0.02em">{{ dc.title }}</h1>
+            <div style="padding:18px;border-radius:12px;border:1px dashed var(--faint);display:flex;flex-direction:column;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ t.dcSoon }}</span><sc-for list="{{ dc.lines }}" as="w"><span style="height:10px;border-radius:5px;background:var(--surface2);width:{{ w }}"></span></sc-for></div>
+          </article>
+          <sc-if value="{{ wideDoc }}"><aside style="width:200px;flex-shrink:0;position:sticky;top:88px;display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--faint)">{{ t.lgToc }}</span><sc-for list="{{ dc.toc }}" as="w"><span style="height:8px;border-radius:4px;background:var(--surface2);width:{{ w }}"></span></sc-for></aside></sc-if>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isReleases }}" hint-placeholder-val="{{ false }}">
+      <section style="max-width:760px;width:100%;margin:0 auto;padding:48px {{ pad }}px 72px;display:flex;flex-direction:column;gap:18px">
+        <sc-if value="{{ rn.isDetail }}"><a onClick="{{ rn.back }}" style="font-size:13px">← {{ t.rnAll }}</a></sc-if>
+        <h1 style="margin:0;font-size:32px;font-weight:600;letter-spacing:-0.02em">{{ rn.title }}</h1>
+        <sc-if value="{{ rn.isLoading }}"><sc-for list="{{ rn.skel }}" as="h"><div aria-busy="true" style="border-radius:14px;background:var(--surface);border:1px solid var(--border);animation:pulse 1.4s ease-in-out infinite;height:{{ h }}px"></div></sc-for></sc-if>
+        <sc-if value="{{ rn.isEmpty }}"><div style="padding:40px 24px;border-radius:14px;border:1px dashed var(--border);text-align:center;color:var(--muted)">{{ t.rnEmpty }}</div></sc-if>
+        <sc-if value="{{ rn.isError }}"><div role="alert" style="padding:16px 18px;border-radius:14px;background:color-mix(in oklch, var(--danger) 8%, var(--surface));border:1px solid color-mix(in oklch, var(--danger) 35%, transparent);display:flex;align-items:center;gap:12px;flex-wrap:wrap"><span style="flex:1;min-width:200px">{{ rn.errText }}</span><button onClick="{{ rn.retry }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.e500Retry }}</button></div></sc-if>
+        <sc-for list="{{ rn.list }}" as="r">
+          <article style="padding:20px 22px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><a onClick="{{ r.open }}" style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--text)">v{{ r.v }}</a><sc-if value="{{ r.beta }}"><span style="height:22px;padding:0 8px;border-radius:11px;display:flex;align-items:center;font-size:11px;font-weight:600;background:color-mix(in oklch, var(--warn) 16%, transparent);color:var(--warn)">{{ t.rnBeta }}</span></sc-if><span style="color:var(--faint);font-size:13px">{{ r.date }}</span><span style="flex:1"></span><a onClick="{{ r.dl }}" style="font-size:13px;font-weight:500">↓ {{ t.rnDownload }}</a></div>
+            <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;line-height:1.55;color:var(--muted)"><sc-for list="{{ r.notes }}" as="n"><li>{{ n }}</li></sc-for></ul>
+          </article>
+        </sc-for>
+      </section>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ inPanel }}"><span></span></sc-if>
+  <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+    <footer class="noprint" style="border-top:1px solid var(--border);padding:24px {{ pad }}px;display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap;color:var(--faint);font-size:13px">
+      <span style="font-weight:600;color:var(--text)">Ramal</span>
+      <sc-for list="{{ foot }}" as="l"><a onClick="{{ l.onClick }}" style="color:var(--faint)" style-hover="color:var(--text)">{{ l.label }}</a></sc-for>
+      <span style="flex:1"></span><span>© 2026 Ramal</span>
+    </footer>
+  </sc-if>
+
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:40;background:oklch(0.1 0.01 230 / 0.5);display:grid;place-items:center;padding:16px">
+      <div onClick="{{ stop }}" role="dialog" aria-modal="true" style="width:100%;max-width:460px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column">
+        <div style="padding:20px 22px 8px;font-size:16px;font-weight:600">{{ t.prPickOrg }}</div>
+        <div style="padding:8px 22px;display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ pickOrgs }}" as="o"><button onClick="{{ o.onClick }}" disabled="{{ o.disabled }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);cursor:pointer;text-align:left;opacity:{{ o.opacity }}"><span style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:10px;font-weight:700;background:var(--accent);color:var(--accent-ink)">{{ o.ini }}</span><span style="flex:1;font-weight:500">{{ o.name }}</span><span style="font-size:12px;color:var(--faint)">{{ o.note }}</span></button></sc-for>
+          <a onClick="{{ newOrg }}" style="padding:8px 0;font-weight:600">+ {{ t.prCreateOther }}</a>
+        </div>
+        <div style="padding:12px 22px 20px;display:flex;justify-content:flex-end"><button onClick="{{ closeModal }}" style="height:38px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.cancel }}</button></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;right:20px;bottom:20px;left:20px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none">
+    <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0"><div role="status" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:11px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-width:440px;animation:toastIn .2s ease-out"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--ok)"></span><span>{{ to.text }}</span></div></sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;W-17&quot;,&quot;W-18&quot;,&quot;W-11&quot;,&quot;W-27-terminos&quot;,&quot;W-27-privacidad&quot;,&quot;W-27-reembolsos&quot;,&quot;W-28&quot;,&quot;W-29-docs&quot;,&quot;W-29-releases&quot;,&quot;goodbye&quot;],&quot;default&quot;:&quot;W-17&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const SCREENS = {
+  'W-17': ['sin-sesion', 'con-sesion', 'con-organizaciones', 'con-plan'],
+  'W-18': ['cargando', 'formulario', 'paddle-bloqueado', 'activando', 'activado', 'activacion-lenta', 'no-es-titular'],
+  'W-11': ['cargando', 'sin-sesion', 'mismo-email', 'uniendote', 'unido', 'otro-email', 'caducada', 'no-existe', 'ya-miembro'],
+  'W-27-terminos': ['normal'], 'W-27-privacidad': ['normal'], 'W-27-reembolsos': ['normal'],
+  'W-28': ['404-publica', '404-panel', '500', 'sin-conexion'],
+  'W-29-docs': ['indice', 'articulo'], 'W-29-releases': ['lista', 'detalle', 'cargando', 'vacia', 'error'],
+  'goodbye': ['normal']
+};
+const ROUTE = { 'W-17': '/pricing', 'W-18': '/billing/checkout?org=acme', 'W-11': '/invitations#token=…', 'W-27-terminos': '/terms', 'W-27-privacidad': '/privacy', 'W-27-reembolsos': '/refunds', 'W-28': '/…', 'W-29-docs': '/docs', 'W-29-releases': '/releases', goodbye: '/goodbye' };
+const LX = { features: ['Funciones', 'Features'], download: ['Descargar', 'Download'], login: ['Iniciar sesión', 'Log in'], signup: ['Crear cuenta', 'Sign up'], openDash: ['Abrir panel', 'Open dashboard'], cancel: ['Cancelar', 'Cancel'], menu: ['Menú', 'Menu'], close: ['Cerrar', 'Close'], sys: ['Sistema', 'System'], light: ['Claro', 'Light'], dark: ['Oscuro', 'Dark'], roleMember: ['Miembro', 'Member'], roleAdmin: ['Admin', 'Admin'] };
+const fill = (s, v) => { if (v) for (const k in v) s = s.split('{' + k + '}').join(v[k]); return s; };
+const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
+
+class Component extends DCLogic {
+  state = { ready: false };
+  timers = [];
+  componentDidMount() {
+    this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs);
+    const go = () => window.RAMAL && window.RAMAL.WEB70 ? this.boot() : setTimeout(go, 30); go();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._rs); this.timers.forEach(clearTimeout); }
+  componentDidUpdate(pp) {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+    if (!this.state.ready) return;
+    if (pp.theme !== this.props.theme && this.props.theme) this.setState({ theme: this.props.theme });
+    if (pp.lang !== this.props.lang && this.props.lang) this.setState({ lang: this.props.lang });
+    if (pp.screen !== this.props.screen || pp.state !== this.props.state) this.apply(this.props.screen, this.props.state);
+  }
+  boot() {
+    const h = decodeURIComponent((location.hash || '').slice(1)), hs = SCREENS[h] ? h : null;
+    this.setState({ ready: true, vw: window.innerWidth, theme: this.props.theme || 'dark', lang: this.props.lang || 'es', toasts: [], bill: 'annual', seats: 5, sheet: false }, () => this.apply(this.props.screen || hs || 'W-17', this.props.state));
+  }
+  later(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
+  get L() { return this.state.lang === 'en' ? 1 : 0; }
+  t(k, v) {
+    const R = window.RAMAL, W = R.WEB70, n = v && (v.count ?? v.days); let e = null;
+    for (const ns of ['pricing', 'billing', 'team', 'legal', 'dashboard', 'account', 'download']) { const key = ns + '.' + k; e = W[key] || (n != null ? W[key + (n === 1 ? '_one' : '_other')] : null); if (e) break; }
+    if (!e) e = LX[k] || R.D[k] || (R.STATES || {})[k]; if (!e) return k; return fill(e[this.L], v);
+  }
+  toast(text) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
+  apply(screen, st) {
+    this.timers.forEach(clearTimeout); this.timers = [];
+    if (!SCREENS[screen]) screen = 'W-17'; const list = SCREENS[screen]; if (!list.includes(st)) st = list[0];
+    this.setState({ screen, st, modal: false, sheet: false, doc: 0 }); window.scrollTo(0, 0);
+    if ((screen === 'W-18' && st === 'cargando')) this.later(1300, () => this.setState({ st: 'formulario' }));
+    if (screen === 'W-18' && st === 'activando') this.later(1800, () => this.setState({ st: 'activado' }));
+    if (screen === 'W-11' && st === 'cargando') this.later(1200, () => this.setState({ st: 'sin-sesion' }));
+    if (screen === 'W-29-releases' && st === 'cargando') this.later(1200, () => this.setState({ st: 'lista' }));
+  }
+  go(screen, st) { this.apply(screen, st); }
+  B(label, onClick, kind, o = {}) { const K = { primary: ['var(--accent)', 'var(--accent-ink)', 'var(--accent)'], danger: ['var(--danger)', 'white', 'var(--danger)'], secondary: ['var(--bg)', 'var(--text)', 'var(--border)'] }[kind || 'secondary']; return { label, onClick: o.disabled ? undefined : onClick, disabled: !!o.disabled || !!o.busy, busy: !!o.busy, spin: o.busy ? this.spin() : null, bg: K[0], color: K[1], border: K[2] }; }
+  spin() { return React.createElement('span', { 'aria-hidden': true, style: { width: 14, height: 14, borderRadius: '50%', border: '2px solid currentColor', borderRightColor: 'transparent', display: 'inline-block', animation: 'spin .7s linear infinite' } }); }
+
+  renderVals() {
+    const s = this.state;
+    if (!s.ready || !window.RAMAL || !window.RAMAL.WEB70) return { t: {}, proto: [], isPublic: true, isPricing: true, cd: {}, co: {}, lg: {}, dc: {}, rn: {} };
+    const T = this.t.bind(this), L = this.L, vw = s.vw || 1280, wide = vw >= 900, pad = vw < 600 ? 16 : 28, sc = s.screen, st = s.st;
+    const t = {}; ['prKicker', 'prTitle', 'prFree', 'prFreePrice', 'prFreeSub', 'prPro', 'prSave', 'prDownload', 'prSignup', 'prTrialSub', 'prFootnote', 'prCompare', 'prYes', 'prPickOrg', 'prCreateOther', 'coSummary', 'coSeats', 'coPaddle', 'coLoading', 'coBlocked', 'coRetry', 'coGoBilling', 'coNote1', 'coNote2', 'invLoading', 'print', 'lgToc', 'dcIndex', 'dcSoon', 'rnAll', 'rnBeta', 'rnEmpty', 'rnDownload', 'e500Retry', 'cancel'].forEach(k => { t[k] = T(k); });
+    const chip = (id, on, onClick) => ({ id, onClick, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', border: on ? 'var(--accent)' : 'var(--border)' });
+    const proto = [{ label: 'screen', chips: Object.keys(SCREENS).map(id => chip(id, sc === id, () => this.apply(id))) }, { label: 'state', chips: SCREENS[sc].map(id => chip(id, st === id, () => this.apply(sc, id))).concat([chip(ROUTE[sc], false, () => {})]) }];
+    const loggedIn = (sc === 'W-17' && st !== 'sin-sesion') || sc === 'W-18' || (sc === 'W-11' && ['mismo-email', 'uniendote', 'unido', 'otro-email', 'ya-miembro'].includes(st));
+    const toWeb = () => { location.href = './Ramal Web.dc.html'; }, toAuth = h => { location.href = './Ramal Web Auth.dc.html#' + h; }, toPanel = () => { location.href = './Ramal Web Panel.dc.html'; };
+    const inPanel = sc === 'W-28' && st === '404-panel';
+    const base = { t, proto, wide, narrow: !wide, pad, wideDoc: vw >= 1100, isPublic: !inPanel, inPanel, toasts: s.toasts.map(x => ({ text: x.text })),
+      navLinks: [[T('features'), toWeb], [T('prNav'), () => this.apply('W-17', loggedIn ? 'con-sesion' : 'sin-sesion')], [T('download'), toWeb], ['VS Code', toWeb]].map(([label, onClick]) => ({ label, onClick })),
+      authBtns: loggedIn ? [this.B(T('openDash'), toPanel, 'primary')] : [this.B(T('login'), () => toAuth('login')), this.B(T('signup'), () => toAuth('signup'), 'primary')],
+      langOpts: [['es', 'ES'], ['en', 'EN']].map(([k, l]) => ({ label: l, bg: s.lang === k ? 'var(--accent)' : 'transparent', color: s.lang === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ lang: k }) })),
+      themeOpts: [['light', '☀︎'], ['dark', '☾']].map(([k, l]) => ({ label: l, title: k, bg: s.theme === k ? 'var(--accent)' : 'transparent', color: s.theme === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ theme: k }) })),
+      theme3: [['system', T('sys')], ['light', T('light')], ['dark', T('dark')]].map(([k, l]) => ({ label: l, bg: (s.theme3 || 'system') === k ? 'var(--accent)' : 'transparent', color: (s.theme3 || 'system') === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ theme3: k, theme: k === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : k }) })),
+      sheet: !!s.sheet, showSheet: !wide && !!s.sheet, sheetLabel: s.sheet ? T('close') : T('menu'), toggleSheet: () => this.setState({ sheet: !s.sheet }),
+      foot: [[T('ftDocs'), () => this.apply('W-29-docs')], [T('ftNotes'), () => this.apply('W-29-releases')], [T('ftStatus'), () => this.toast('/status')], [T('ftPricing'), () => this.apply('W-17')], [T('ftTerms'), () => this.apply('W-27-terminos')], [L ? 'Privacy' : 'Privacidad', () => this.apply('W-27-privacidad')], [T('ftRefunds'), () => this.apply('W-27-reembolsos')]].map(([label, onClick]) => ({ label, onClick })),
+      isPricing: sc === 'W-17', isCheckout: sc === 'W-18', isCard: ['W-11', 'W-28', 'goodbye'].includes(sc), isLegal: sc.startsWith('W-27'), isDocs: sc === 'W-29-docs', isReleases: sc === 'W-29-releases',
+      hasModal: !!s.modal, closeModal: () => this.setState({ modal: false }), stop: e => e.stopPropagation(), cd: {}, co: {}, lg: {}, dc: {}, rn: {} };
+    const ann = s.bill === 'annual';
+    base.billOpts = [['annual', T('prAnnual'), true], ['monthly', T('prMonthly'), false]].map(([k, l, c]) => ({ label: l, hasChip: c, on: s.bill === k, bg: s.bill === k ? 'var(--accent)' : 'transparent', color: s.bill === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ bill: k }) }));
+
+    if (sc === 'W-17') {
+      Object.assign(base, { proPrice: ann ? T('prProAnnual') : T('prProMonthly'), proSub: ann ? T('prProAnnualS') : T('prProMonthlyS'), freeList: [1, 2, 3, 4, 5].map(i => T('prF' + i)), proList: [1, 2, 3, 4, 5].map(i => T('prP' + i)),
+        compare: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({ label: T('cmp' + i), free: i <= 5 ? T('prYes') : T('prNo'), freeColor: i <= 5 ? 'var(--ok)' : 'var(--faint)' })), faq: [1, 2, 3, 4, 5].map(i => ({ q: T('faq' + i + 'Q'), a: T('faq' + i + 'A') })),
+        trialLabel: st === 'con-plan' ? T('prSeePlan') : T('prTrial'), showTrialSub: st !== 'con-plan', goDownload: toWeb, goSignup: () => toAuth('signup'),
+        onTrial: () => st === 'sin-sesion' ? toAuth('signup') : st === 'con-sesion' ? (location.href = './Ramal Web Panel.dc.html') : st === 'con-plan' ? toPanel() : this.setState({ modal: true }),
+        pickOrgs: [{ ini: 'AS', name: 'ACME Studio', note: T('prHasPlan'), disabled: true, opacity: 0.5 }, { ini: 'LR', name: 'Lab Ruiz', note: '', disabled: false, opacity: 1, onClick: () => this.apply('W-18', 'cargando') }], newOrg: () => { location.href = './Ramal Web Panel.dc.html'; } });
+    }
+    if (sc === 'W-18') {
+      const used = 5, price = ann ? 96 : 10, seats = Math.max(used, s.seats);
+      base.co = { title: T('coTitle', { org: 'ACME Studio' }), notOwner: st === 'no-es-titular', notOwnerText: T('coNotOwner', { org: 'ACME Studio' }), isOwner: st !== 'no-es-titular', cols: vw >= 900 ? 'minmax(0,0.9fr) minmax(0,1.1fr)' : 'minmax(0,1fr)',
+        seats: String(seats), dec: () => this.setState({ seats: Math.max(used, seats - 1) }), inc: () => this.setState({ seats: seats + 1 }), decDis: seats <= used, decOp: seats <= used ? 0.4 : 1, minText: T('seMin', { used, members: 4, pending: 1 }),
+        line: T('coLine', { seats, price }) + (ann ? (L ? ' / year' : ' / año') : (L ? ' / month' : ' / mes')), total: T('coTotal', { total: seats * price }),
+        isLoading: st === 'cargando', skel: [44, 44, 44, 120, 48], isSlot: st === 'formulario', isBlocked: st === 'paddle-bloqueado', retry: () => this.apply('W-18', 'cargando'),
+        isMsg: ['activando', 'activado', 'activacion-lenta'].includes(st), msg: st === 'activando' ? T('coActivating', { org: 'ACME Studio' }) : st === 'activado' ? T('coDone', { org: 'ACME Studio' }) : T('coSlow'), msgIcon: st === 'activado' ? '✓' : st === 'activando' ? '…' : '!', msgColor: st === 'activado' ? 'var(--ok)' : st === 'activando' ? 'var(--info)' : 'var(--warn)', msgBg: tint(st === 'activado' ? 'var(--ok)' : st === 'activando' ? 'var(--info)' : 'var(--warn)', 16), hasMsgBtn: st !== 'activando' };
+    }
+    if (base.isCard) {
+      const cd = { width: 420, pad: vw < 600 ? 22 : 32, align: 'left', items: 'stretch', hasCode: false, hasIni: false, hasIcon: false, isLoading: false, hasTitle: true, hasRole: false, texts: [], hasBox: false, btns: [], btnDir: 'column', hasFoot: false };
+      const txt = (text, o = {}) => ({ text, size: o.size || 14, color: o.color || 'var(--muted)' });
+      if (sc === 'W-11') {
+        const inv = { inviter: 'Diego León', org: 'ACME Studio', email: 'lucia@example.com', date: L ? 'Oct 9, 2026' : '9 oct 2026' };
+        Object.assign(cd, { hasIni: true, ini: 'AS', title: T('invTitle', inv), hasRole: true, role: T('roleMember'), texts: [txt(T('invMeta', inv), { size: 13 })] });
+        if (st === 'cargando') Object.assign(cd, { hasIni: false, hasTitle: false, hasRole: false, texts: [], isLoading: true });
+        if (st === 'sin-sesion') cd.btns = [this.B(T('invSignup', { email: inv.email }), () => toAuth('signup'), 'primary'), this.B(T('invHaveAcc'), () => toAuth('login'))], cd.hasFoot = true, cd.foot = T('invLocked');
+        if (st === 'mismo-email' || st === 'uniendote') cd.btns = [this.B(st === 'uniendote' ? T('invJoining') : T('invJoin', inv), () => { this.setState({ st: 'uniendote' }); this.later(900, () => this.setState({ st: 'unido' })); }, 'primary', { busy: st === 'uniendote' })];
+        if (st === 'unido' || st === 'ya-miembro') Object.assign(cd, { hasIcon: true, icon: '✓', iconColor: 'var(--ok)', iconBg: tint('var(--ok)', 16), hasIni: false, title: T('invJoined', inv), hasRole: false, texts: [], btns: [this.B(T('openDash'), toPanel, 'primary')] });
+        if (st === 'otro-email') Object.assign(cd, { hasBox: true, box: T('invMismatch', { email: inv.email, current: 'marta@example.com' }), boxBg: tint('var(--danger)', 10), boxColor: 'var(--danger)', btns: [this.B(T('invSwitch'), () => toAuth('login'))] });
+        if (st === 'caducada' || st === 'no-existe') Object.assign(cd, { hasIni: false, hasRole: false, hasIcon: true, icon: '!', iconColor: 'var(--danger)', iconBg: tint('var(--danger)', 16), title: st === 'caducada' ? T('invExpired') : T('invGone'), texts: [], btns: [this.B(T('nfHome'), toWeb)] });
+      }
+      if (sc === 'W-28') {
+        const is500 = st === '500', off = st === 'sin-conexion';
+        Object.assign(cd, { width: 520, align: 'center', items: 'center', hasCode: !off, code: is500 ? '500' : '404', title: is500 ? T('e500Title') : off ? T('offline') : T('nfTitle'), texts: off ? [] : [txt(is500 ? T('e500Text') : T('nfText'))], btnDir: 'row',
+          btns: is500 ? [this.B(T('e500Retry'), () => this.apply('W-28', '500'), 'primary'), this.B(T('e500Status'), () => this.toast('/status'))] : off ? [this.B(T('e500Retry'), () => {}, 'primary')] : [this.B(T('nfHome'), toWeb, st === '404-publica' ? 'primary' : 'secondary'), this.B(T('nfDash'), toPanel, st === '404-panel' ? 'primary' : 'secondary')] });
+      }
+      if (sc === 'goodbye') Object.assign(cd, { hasIcon: true, icon: '✓', iconColor: 'var(--ok)', iconBg: tint('var(--ok)', 16), title: T('byeTitle'), texts: [txt(T('byeText'))], btns: [this.B(T('byeHome'), toWeb, 'primary')] });
+      base.cd = cd;
+    }
+    if (base.isLegal) {
+      const kind = sc.split('-')[2], ids = { terminos: ['t', 9, 'lgTerms'], privacidad: ['p', 8, 'lgPrivacy'], reembolsos: ['r', 3, 'lgRefunds'] }[kind];
+      const ph = { text: T('placeholder'), color: 'var(--faint)' };
+      base.lg = { title: T(ids[2]), version: T('lgVersion', { version: '2026-09', date: L ? 'Oct 15, 2026' : '15 oct 2026' }), hasToc: vw >= 1024, print: () => window.print(),
+        sections: Array.from({ length: ids[1] }, (_, i) => { const key = ids[0] + (i + 1), id = 's' + (i + 1); const paras = [];
+          if (key === 't1') paras.push({ text: T('provider', { serviceProvider: '{serviceProvider}' }), color: 'var(--text)' });
+          if (key === 'p5') paras.push({ text: T('vendors'), color: 'var(--text)' });
+          if (key === 'p7') paras.push({ text: T('cookies'), color: 'var(--text)' });
+          paras.push(ph); return { id, n: String(i + 1).padStart(2, '0'), title: T(key), href: '#' + id, paras }; }) };
+    }
+    if (base.isDocs) {
+      const secs = ['dcStart', 'dcAccounts', 'dcVault', 'dcAi', 'dcTeams', 'dcTrouble'];
+      base.dc = { isIndex: st === 'indice', isArticle: st === 'articulo', title: T(secs[s.doc || 0]), back: () => this.setState({ st: 'indice' }), lines: ['92%', '84%', '96%', '60%', '88%', '74%'], toc: ['80%', '64%', '72%', '50%'],
+        cards: secs.map((k, i) => ({ n: String(i + 1).padStart(2, '0'), title: T(k), bg: (s.doc || 0) === i && st === 'articulo' ? 'var(--accent-soft)' : 'transparent', color: (s.doc || 0) === i && st === 'articulo' ? 'var(--accent)' : 'var(--text)', onClick: () => this.setState({ st: 'articulo', doc: i }) })) };
+    }
+    if (base.isReleases) {
+      const R0 = [{ v: '2.5.0-beta.1', beta: true, date: L ? 'Sep 30, 2026' : '30 sep 2026', notes: L ? ['Line-by-line conflict resolution in the merge editor.', 'ARM64 builds for Windows and Linux.'] : ['Resolución de conflictos línea a línea en el editor de merge.', 'Versiones ARM64 para Windows y Linux.'] }, { v: '2.4.0', beta: false, date: L ? 'Sep 16, 2026' : '16 sep 2026', notes: L ? ['Organization AI keys with per-feature models.', 'Device list in the web dashboard.', 'Fix: the graph kept its scroll after a fetch.'] : ['Llaves de IA de organización con modelo por función.', 'Lista de dispositivos en el panel web.', 'Corregido: el grafo conservaba el desplazamiento tras un fetch.'] }, { v: '2.3.1', beta: false, date: L ? 'Aug 28, 2026' : '28 ago 2026', notes: L ? ['Fix: Bitbucket tokens were marked as expired too early.'] : ['Corregido: los tokens de Bitbucket se marcaban como caducados antes de tiempo.'] }];
+      const detail = st === 'detalle', pick = R0[s.rel || 1];
+      base.rn = { title: detail ? 'v' + pick.v : T('rnTitle'), isDetail: detail, back: () => this.setState({ st: 'lista' }), isLoading: st === 'cargando', skel: [130, 110, 90], isEmpty: st === 'vacia', isError: st === 'error', errText: T('secError', { section: T('rnTitle') }), retry: () => this.apply('W-29-releases', 'cargando'),
+        list: (st === 'lista' ? R0 : detail ? [pick] : []).map((r, i) => ({ ...r, open: () => this.setState({ st: 'detalle', rel: i }), dl: toWeb })) };
+    }
+    return base;
+  }
+}
+</script>
+</body>
+</html>

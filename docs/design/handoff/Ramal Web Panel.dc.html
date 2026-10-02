@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;
+--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);
+--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);
+--shadow:0 24px 70px oklch(0.05 0.01 230 / 0.55),0 2px 8px oklch(0.05 0.01 230 / 0.3);
+background:var(--bg);color:var(--text)}
+body[data-theme="light"]{--bg:oklch(0.975 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.945 0.006 230);--border:oklch(0.9 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);
+--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);
+--shadow:0 24px 70px oklch(0.3 0.02 230 / 0.18),0 2px 8px oklch(0.3 0.02 230 / 0.08)}
+*{box-sizing:border-box}
+a{color:var(--accent);text-decoration:none;cursor:pointer} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+button:disabled{cursor:default}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px">
+
+  <div style="display:flex;flex-direction:column;gap:5px;padding:8px 12px;border-bottom:1px dashed var(--faint);background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:11px">
+    <sc-for list="{{ proto }}" as="pr" hint-placeholder-count="3">
+      <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+        <span style="color:var(--faint);min-width:56px">{{ pr.label }}</span>
+        <sc-for list="{{ pr.chips }}" as="c"><button onClick="{{ c.onClick }}" style="height:22px;padding:0 8px;border-radius:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.id }}</button></sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="height:56px;display:flex;align-items:center;gap:10px;padding:0 {{ pad }}px;background:var(--panel);border-bottom:1px solid var(--border)">
+    <sc-if value="{{ narrow }}"><button onClick="{{ openDrawer }}" aria-label="{{ t.rsMenu }}" style="width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:grid;place-items:center"><span style="display:flex;flex-direction:column;gap:3px"><span style="width:14px;height:2px;border-radius:1px;background:currentColor"></span><span style="width:14px;height:2px;border-radius:1px;background:currentColor"></span><span style="width:14px;height:2px;border-radius:1px;background:currentColor"></span></span></button></sc-if>
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div>
+      <sc-if value="{{ wide }}"><span style="font-weight:600">Ramal</span></sc-if>
+    </div>
+    <span style="color:var(--faint)">/</span>
+    <button onClick="{{ onOrg }}" style="height:32px;min-width:0;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500"><span style="width:18px;height:18px;flex-shrink:0;border-radius:5px;font-size:9px;font-weight:700;display:grid;place-items:center;background:{{ orgChip.bg }};color:{{ orgChip.color }}">{{ orgChip.ini }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">{{ orgChip.name }}</span><span style="color:var(--faint);font-size:10px">▾</span></button>
+    <div style="flex:1"></div>
+    <sc-if value="{{ wide }}"><a onClick="{{ goDownloads }}" style="font-weight:500;white-space:nowrap">↓ {{ t.download }}</a></sc-if>
+    <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+      <sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:24px;padding:0 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+    </div>
+    <sc-if value="{{ wide }}"><div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+      <sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="width:28px;height:24px;border:0;border-radius:6px;cursor:pointer;font-size:12px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+    </div></sc-if>
+    <div onClick="{{ onUser }}" style="width:32px;height:32px;flex-shrink:0;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px;cursor:pointer">MR</div>
+  </div>
+
+  <div style="display:flex;min-height:calc(100vh - 56px)">
+    <sc-if value="{{ wide }}">
+      <nav style="width:232px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:2px">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="9"><div onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}" style-hover="background:var(--surface2)"><span style="flex:1">{{ n.label }}</span><span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ n.count }}</span></div></sc-for>
+      </nav>
+    </sc-if>
+    <main style="flex:1;min-width:0">
+      <div style="max-width:1060px;margin:0 auto;padding:26px {{ pad }}px 64px;display:flex;flex-direction:column;gap:16px">
+        <sc-for list="{{ banners }}" as="bn">
+          <div role="status" style="display:flex;align-items:center;gap:10px 12px;padding:11px 14px;border-radius:12px;font-size:13px;line-height:1.5;flex-wrap:wrap;background:{{ bn.bg }};border:1px solid {{ bn.border }}">
+            <span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--surface);background:{{ bn.color }}">{{ bn.icon }}</span>
+            <span style="flex:1 1 260px;min-width:0;text-wrap:pretty">{{ bn.text }}</span>
+            <sc-if value="{{ bn.hasBtn }}"><button onClick="{{ bn.onBtn }}" style="height:30px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap">{{ bn.btn }}</button></sc-if>
+          </div>
+        </sc-for>
+        <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:2px">
+          <div style="flex:1;min-width:240px"><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ dh.title }}</h1><p style="margin:6px 0 0;color:var(--muted);max-width:680px;line-height:1.5;text-wrap:pretty">{{ dh.sub }}</p></div>
+          <sc-for list="{{ dh.btns }}" as="b"><span title="{{ b.tip }}" style="display:inline-flex"><button onClick="{{ b.onClick }}" disabled="{{ b.disabled }}" style="height:38px;padding:0 16px;border-radius:10px;font-weight:600;white-space:nowrap;cursor:pointer;opacity:{{ b.opacity }};border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></span></sc-for>
+        </div>
+        <sc-if value="{{ hasTabs }}">
+          <div role="tablist" style="display:flex;gap:4px;border-bottom:1px solid var(--border)"><sc-for list="{{ tabs }}" as="tb"><button role="tab" onClick="{{ tb.onClick }}" style="height:38px;padding:0 14px;border:0;background:transparent;cursor:pointer;font-weight:600;margin-bottom:-1px;color:{{ tb.color }};border-bottom:2px solid {{ tb.line }}">{{ tb.label }}</button></sc-for></div>
+        </sc-if>
+
+        <sc-for list="{{ items }}" as="it" hint-placeholder-count="3">
+          <sc-if value="{{ it.isSeg }}"><div style="display:flex;padding:3px;border-radius:10px;border:1px solid var(--border);background:var(--surface);align-self:flex-start;flex-wrap:wrap"><sc-for list="{{ it.opts }}" as="o"><button onClick="{{ o.onClick }}" style="height:30px;padding:0 12px;border:0;border-radius:7px;cursor:pointer;font-weight:500;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div></sc-if>
+
+          <sc-if value="{{ it.isTiles }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax({{ it.min }}px,1fr));gap:12px">
+              <sc-for list="{{ it.tiles }}" as="x"><div onClick="{{ x.onClick }}" style="padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--border);cursor:{{ x.cursor }};display:flex;flex-direction:column;gap:6px"><span style="font-size:{{ x.size }}px;font-weight:600;font-family:{{ x.font }};line-height:1.2">{{ x.value }}</span><span style="color:var(--muted);font-size:13px">{{ x.label }}</span></div></sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isBar }}">
+            <div style="padding:14px 18px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <div style="flex:1;min-width:220px"><div style="font-weight:600">{{ it.line }}</div><div style="height:6px;border-radius:3px;background:var(--bg);margin-top:8px;overflow:hidden"><div style="height:100%;border-radius:3px;width:{{ it.pct }};background:{{ it.color }}"></div></div></div>
+              <sc-if value="{{ it.hasBtn }}"><button onClick="{{ it.onBtn }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500">{{ it.btn }}</button></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isCallout }}">
+            <div style="padding:18px 20px;border-radius:14px;background:var(--accent-soft);border:1px solid color-mix(in oklch, var(--accent) 35%, transparent);display:flex;align-items:center;gap:14px 18px;flex-wrap:wrap">
+              <div style="flex:1 1 300px;min-width:0"><div style="font-weight:600">{{ it.title }}</div><div style="color:var(--muted);font-size:13px;margin-top:3px;line-height:1.5">{{ it.text }}</div></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ it.btns }}" as="b"><button onClick="{{ b.onClick }}" style="height:36px;padding:0 14px;border-radius:9px;cursor:pointer;font-weight:600;white-space:nowrap;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isPlan }}">
+            <div style="padding:20px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font-size:18px;font-weight:600">{{ it.name }}</span><sc-if value="{{ it.hasChip }}"><span style="height:24px;padding:0 10px;border-radius:12px;display:flex;align-items:center;font-size:12px;font-weight:600;color:{{ it.chipColor }};background:{{ it.chipBg }}">{{ it.chip }}</span></sc-if></div>
+              <sc-for list="{{ it.lines }}" as="ln"><div style="color:var(--muted);line-height:1.5">{{ ln }}</div></sc-for>
+              <sc-if value="{{ it.hasPrice }}"><div style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">{{ it.price }}</div></sc-if>
+              <sc-if value="{{ it.hasBtns }}"><div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ it.btns }}" as="b"><button onClick="{{ b.onClick }}" style="height:38px;padding:0 16px;border-radius:10px;cursor:pointer;font-weight:600;white-space:nowrap;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isCard }}">
+            <div id="{{ it.id }}" style="border-radius:14px;background:var(--surface);border:1px solid {{ it.border }};overflow:hidden">
+              <div style="display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:14px 18px">
+                <sc-if value="{{ it.hasBadge }}"><span style="width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ it.badgeBg }}">{{ it.abbr }}</span></sc-if>
+                <div style="flex:1 1 220px;min-width:0"><span style="font-weight:600">{{ it.title }}</span> <span style="color:var(--faint);font-size:12px">{{ it.count }}</span><sc-if value="{{ it.hasSub }}"><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;text-wrap:pretty">{{ it.sub }}</div></sc-if></div>
+                <sc-if value="{{ it.hasHeadBtn }}"><button onClick="{{ it.onHeadBtn }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500;white-space:nowrap">{{ it.headBtn }}</button></sc-if>
+              </div>
+              <sc-for list="{{ it.rows }}" as="rw">
+                <div onClick="{{ rw.onClick }}" onContextMenu="{{ rw.onMenu }}" style="display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:12px 18px;border-top:1px solid var(--border);cursor:{{ rw.cursor }};opacity:{{ rw.opacity }}" style-hover="background:{{ rw.hover }}">
+                  <sc-if value="{{ rw.hasAv }}"><span style="width:34px;height:34px;flex-shrink:0;border-radius:{{ rw.avRadius }};display:grid;place-items:center;font-size:10px;font-weight:700;color:{{ rw.avInk }};background:{{ rw.avBg }};border:1px solid {{ rw.avBorder }}">{{ rw.av }}</span></sc-if>
+                  <div style="flex:1 1 240px;min-width:0">
+                    <div style="font-weight:500;line-height:1.4"><span>{{ rw.label }}</span> <span style="font-weight:400;color:var(--muted)">{{ rw.meta }}</span></div>
+                    <sc-if value="{{ rw.hasCode }}"><div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">{{ rw.code }}</div></sc-if>
+                    <sc-for list="{{ rw.subs }}" as="sb"><div style="font-size:12px;margin-top:2px;line-height:1.5;text-wrap:pretty;color:{{ sb.color }}">{{ sb.text }}</div></sc-for>
+                    <sc-if value="{{ rw.hasChips }}"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><sc-for list="{{ rw.chips }}" as="ch"><span title="{{ ch.tip }}" style="height:22px;padding:0 8px;border-radius:11px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;white-space:nowrap;color:{{ ch.color }};background:{{ ch.bg }}">{{ ch.label }}</span></sc-for></div></sc-if>
+                  </div>
+                  <sc-if value="{{ rw.hasInput }}"><input value="{{ rw.value }}" onChange="{{ rw.onInput }}" onBlur="{{ rw.onBlur }}" type="{{ rw.inputType }}" disabled="{{ rw.inputDisabled }}" placeholder="{{ rw.ph }}" style="flex:0 1 260px;min-width:0;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0"></sc-if>
+                  <sc-if value="{{ rw.hasSelect }}"><select value="{{ rw.selValue }}" onChange="{{ rw.onSelect }}" onClick="{{ rw.stop }}" disabled="{{ rw.selDisabled }}" style="height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ rw.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if>
+                  <sc-if value="{{ rw.hasRole }}"><span style="height:24px;padding:0 10px;border-radius:12px;display:flex;align-items:center;font-size:12px;font-weight:600;background:var(--surface2);color:var(--muted)">{{ rw.roleLabel }}</span></sc-if>
+                  <sc-if value="{{ rw.hasNote }}"><span role="status" style="font-size:12px;white-space:nowrap;color:{{ rw.noteColor }}">{{ rw.note }}</span></sc-if>
+                  <sc-if value="{{ rw.hasToggle }}"><button onClick="{{ rw.onToggle }}" role="switch" aria-checked="{{ rw.on }}" disabled="{{ rw.toggleDisabled }}" style="width:38px;height:22px;flex-shrink:0;border-radius:11px;border:0;padding:0;cursor:pointer;position:relative;background:{{ rw.tbg }};opacity:{{ rw.tOpacity }}"><span style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;transform:{{ rw.tx }};transition:transform .15s"></span></button></sc-if>
+                  <sc-for list="{{ rw.btns }}" as="b"><span title="{{ b.tip }}" style="display:inline-flex"><button onClick="{{ b.onClick }}" disabled="{{ b.disabled }}" style="height:34px;padding:0 14px;border-radius:9px;background:var(--bg);cursor:pointer;font-weight:500;white-space:nowrap;opacity:{{ b.opacity }};border:1px solid {{ b.border }};color:{{ b.color }}">{{ b.label }}</button></span></sc-for>
+                  <sc-if value="{{ rw.hasMenu }}"><button onClick="{{ rw.onMenu }}" aria-label="{{ t.moreActions }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button></sc-if>
+                </div>
+              </sc-for>
+              <sc-if value="{{ it.hasFoot }}"><div style="display:flex;justify-content:flex-end;gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--border)"><span style="font-size:12px;color:{{ it.footNoteColor }}">{{ it.footNote }}</span><button onClick="{{ it.onFoot }}" disabled="{{ it.footBusy }}" style="height:36px;padding:0 16px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600">{{ it.foot }}</button></div></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isProfile }}">
+            <div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);overflow:hidden">
+              <div style="padding:14px 18px;font-weight:600">{{ it.title }}</div>
+              <div style="padding:4px 18px 16px;display:flex;flex-direction:column;gap:16px">
+                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                  <div style="width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:20px;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);opacity:{{ it.photoOpacity }}">MR</div>
+                  <div style="display:flex;flex-direction:column;gap:6px">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap"><button onClick="{{ it.onPhoto }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500">{{ it.photoBtn }}</button><button onClick="{{ it.onPhotoRm }}" style="height:32px;padding:0 12px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted)">{{ it.photoRm }}</button></div>
+                    <span style="font-size:12px;color:{{ it.photoHintColor }}">{{ it.photoHint }}</span>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+                  <sc-for list="{{ it.fields }}" as="f">
+                    <label style="display:flex;flex-direction:column;gap:6px;min-width:0">
+                      <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
+                      <sc-if value="{{ f.isInput }}"><input value="{{ f.value }}" onChange="{{ f.onChange }}" aria-invalid="{{ f.hasErr }}" style="height:38px;padding:0 12px;border-radius:9px;background:var(--bg);outline:0;border:1px solid {{ f.border }}"></sc-if>
+                      <sc-if value="{{ f.isSelect }}"><select value="{{ f.value }}" onChange="{{ f.onChange }}" style="height:38px;padding:0 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ f.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></sc-if>
+                      <sc-if value="{{ f.hasErr }}"><span role="alert" style="font-size:12px;color:var(--danger)">{{ f.err }}</span></sc-if>
+                      <sc-if value="{{ f.hasHint }}"><span style="font-size:12px;color:var(--faint)">{{ f.hint }}</span></sc-if>
+                    </label>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:10px;align-items:center;padding:12px 18px;border-top:1px solid var(--border)"><span role="status" style="font-size:12px;color:var(--muted)">{{ it.saveNote }}</span><button onClick="{{ it.onSave }}" disabled="{{ it.saving }}" style="height:36px;padding:0 16px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600">{{ it.saveLabel }}</button></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isWsGrid }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+              <sc-for list="{{ it.cards }}" as="c">
+                <div style="padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;align-items:center;gap:10px"><span style="width:12px;height:12px;border-radius:4px;background:{{ c.color }}"></span><span style="font-weight:600;font-size:16px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.name }}</span><sc-if value="{{ c.hasMenu }}"><button onClick="{{ c.onMenu }}" aria-label="{{ t.moreActions }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button></sc-if></div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <sc-for list="{{ c.repos }}" as="r"><span style="height:24px;padding:0 9px;border-radius:7px;display:flex;align-items:center;gap:6px;font-size:12px;background:var(--bg);border:1px solid var(--border)"><span style="width:14px;height:14px;border-radius:4px;display:grid;place-items:center;font-size:6px;font-weight:700;color:white;background:{{ r.color }}">{{ r.abbr }}</span>{{ r.name }}</span></sc-for>
+                    <sc-if value="{{ c.empty }}"><span style="color:var(--faint);font-size:13px">{{ c.emptyText }}</span></sc-if>
+                  </div>
+                  <sc-if value="{{ c.hasShare }}"><div onClick="{{ c.onShare }}" style="display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--border);cursor:pointer;font-size:13px"><span style="width:32px;height:18px;border-radius:9px;position:relative;background:{{ c.tbg }}"><span style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:white;transform:{{ c.tx }}"></span></span><span style="color:var(--muted)">{{ c.shareLabel }}</span></div></sc-if>
+                  <sc-if value="{{ c.hasBy }}"><div style="padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)">{{ c.by }}</div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isSearch }}"><div style="display:flex;align-items:center;gap:10px;padding:0 14px;height:42px;border-radius:10px;background:var(--surface);border:1px solid var(--border)"><span style="color:var(--faint)">⌕</span><input value="{{ it.value }}" onChange="{{ it.onChange }}" placeholder="{{ it.ph }}" style="flex:1;min-width:0;border:0;outline:0;background:transparent;height:100%"></div></sc-if>
+
+          <sc-if value="{{ it.isTable }}">
+            <div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);overflow:hidden">
+              <sc-if value="{{ it.showHead }}"><div style="display:grid;gap:14px;padding:10px 18px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--border);grid-template-columns:{{ it.cols }}"><sc-for list="{{ it.head }}" as="h"><span onClick="{{ h.onClick }}" style="cursor:{{ h.cursor }};text-align:{{ h.align }};white-space:nowrap">{{ h.label }}</span></sc-for></div></sc-if>
+              <sc-for list="{{ it.rows }}" as="r">
+                <div onClick="{{ r.onClick }}" style="display:grid;gap:{{ it.rowGap }};align-items:center;padding:12px 18px;border-bottom:1px solid var(--border);cursor:{{ r.cursor }};grid-template-columns:{{ it.rowCols }}" style-hover="background:var(--surface2)">
+                  <sc-for list="{{ r.cells }}" as="c">
+                    <div style="min-width:0;display:flex;align-items:center;gap:8px;justify-content:{{ c.justify }}">
+                      <sc-if value="{{ c.hasLbl }}"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--faint);min-width:110px">{{ c.lbl }}</span></sc-if>
+                      <sc-if value="{{ c.hasBadge }}"><span style="width:20px;height:20px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:8px;font-weight:700;color:{{ c.badgeInk }};background:{{ c.badgeBg }}">{{ c.abbr }}</span></sc-if>
+                      <div style="min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:{{ c.weight }};font-family:{{ c.font }};color:{{ c.color }}">{{ c.main }}</div><sc-if value="{{ c.hasSub }}"><div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.sub }}</div></sc-if></div>
+                      <sc-for list="{{ c.chips }}" as="x"><span style="height:22px;padding:0 8px;border-radius:6px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);white-space:nowrap"><span style="width:6px;height:6px;border-radius:2px;background:{{ x.color }}"></span>{{ x.name }}</span></sc-for>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isEmpty }}">
+            <div style="padding:44px 24px;border-radius:14px;background:var(--surface);border:1px dashed var(--border);display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px">
+              <div style="width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:20px;font-weight:700;background:var(--accent-soft);color:var(--accent)">{{ it.icon }}</div>
+              <sc-if value="{{ it.hasTitle }}"><div style="font-size:17px;font-weight:600;text-wrap:balance">{{ it.title }}</div></sc-if>
+              <p style="margin:0;color:var(--muted);max-width:480px;line-height:1.55;text-wrap:pretty">{{ it.text }}</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><sc-for list="{{ it.btns }}" as="b"><span title="{{ b.tip }}" style="display:inline-flex"><button onClick="{{ b.onClick }}" disabled="{{ b.disabled }}" style="height:38px;padding:0 16px;border-radius:10px;cursor:pointer;font-weight:600;white-space:nowrap;opacity:{{ b.opacity }};border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></span></sc-for></div>
+              <sc-if value="{{ it.hasLine }}"><span style="font-size:12px;color:var(--faint)">{{ it.line }}</span></sc-if>
+              <sc-if value="{{ it.hasLink }}"><a onClick="{{ it.onLink }}" style="font-weight:500">{{ it.link }}</a></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isError }}">
+            <div role="alert" style="padding:16px 18px;border-radius:14px;background:color-mix(in oklch, var(--danger) 8%, var(--surface));border:1px solid color-mix(in oklch, var(--danger) 35%, transparent);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <span style="width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--danger);color:var(--surface)">!</span>
+              <span style="flex:1;min-width:200px">{{ it.text }}</span>
+              <button onClick="{{ it.onRetry }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.retry }}</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isSkel }}">
+            <div aria-busy="true" style="display:grid;gap:12px;grid-template-columns:{{ it.cols }}">
+              <sc-for list="{{ it.boxes }}" as="bx"><div style="border-radius:14px;background:var(--surface);border:1px solid var(--border);padding:16px 18px;display:flex;flex-direction:column;gap:10px;height:{{ bx.h }}px;animation:pulse 1.4s ease-in-out infinite"><span style="height:10px;width:40%;border-radius:5px;background:var(--surface2)"></span><span style="height:8px;width:70%;border-radius:4px;background:var(--surface2)"></span></div></sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isSlot }}"><div style="padding:16px 18px;border-radius:14px;border:1px dashed var(--faint);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ it.text }}</div></sc-if>
+
+          <sc-if value="{{ it.isStatus }}">
+            <div role="status" style="padding:12px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:6px">
+              <sc-for list="{{ it.lines }}" as="ln"><div style="display:flex;align-items:center;gap:8px;font-size:13px"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ ln.dot }}"></span><span style="color:var(--muted)">{{ ln.text }}</span></div></sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ it.isDl }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+              <sc-for list="{{ it.cards }}" as="p"><div style="padding:18px;border-radius:14px;background:var(--surface);border:1px solid {{ p.border }};display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:600;font-size:16px;flex:1">{{ p.name }}</span><sc-if value="{{ p.isYours }}"><span style="font-size:11px;font-weight:600;color:var(--accent)">{{ p.yours }}</span></sc-if></div><span style="font-size:12px;color:var(--muted);line-height:1.5">{{ p.req }}</span><button onClick="{{ p.onMain }}" style="height:38px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600">↓ {{ p.main }}</button><a onClick="{{ p.onAll }}" style="font-size:13px">{{ p.all }}</a></div></sc-for>
+            </div>
+          </sc-if>
+        </sc-for>
+      </div>
+    </main>
+  </div>
+
+  <sc-if value="{{ hasDrawer }}">
+    <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;z-index:30;background:oklch(0.1 0.01 230 / 0.5)"></div>
+    <nav style="position:fixed;top:0;left:0;bottom:0;z-index:31;width:min(300px,86vw);background:var(--panel);border-right:1px solid var(--border);padding:14px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px"><span style="font-weight:600">Ramal</span><button onClick="{{ closeDrawer }}" aria-label="{{ t.rsClose }}" style="width:32px;height:32px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:18px">×</button></div>
+      <sc-for list="{{ nav }}" as="n"><div onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}"><span style="flex:1">{{ n.label }}</span><span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ n.count }}</span></div></sc-for>
+      <div style="height:1px;background:var(--border);margin:8px 4px"></div>
+      <div onClick="{{ goDownloads }}" style="padding:11px 12px;border-radius:9px;cursor:pointer;font-weight:500;color:var(--accent)">↓ {{ t.download }}</div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border);align-self:flex-start;margin:8px 12px"><sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="width:34px;height:28px;border:0;border-radius:6px;cursor:pointer;font-size:12px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div>
+    </nav>
+  </sc-if>
+
+  <sc-if value="{{ hasSide }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeSide }}" style="position:fixed;inset:0;z-index:35;background:oklch(0.1 0.01 230 / 0.4)"></div>
+    <aside role="dialog" aria-modal="true" style="position:fixed;top:0;right:0;bottom:0;z-index:36;width:{{ sideW }};background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border)"><span style="width:34px;height:34px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;font-size:10px;font-weight:700;background:{{ sd.iconBg }};color:{{ sd.iconInk }}">{{ sd.icon }}</span><div style="flex:1;min-width:0"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sd.title }}</div><div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sd.sub }}</div></div><button onClick="{{ closeSide }}" aria-label="{{ t.rsClose }}" style="width:32px;height:32px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:18px">×</button></div>
+      <div style="flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+        <sc-if value="{{ sd.hasBand }}"><div role="status" style="padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5;background:color-mix(in oklch, var(--warn) 10%, transparent);border:1px solid color-mix(in oklch, var(--warn) 35%, transparent)">{{ sd.band }}</div></sc-if>
+        <sc-if value="{{ sd.hasName }}"><label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ sd.nameLabel }}</span><input value="{{ sd.name }}" onChange="{{ sd.onName }}" onBlur="{{ sd.onNameBlur }}" maxlength="80" style="height:38px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0"><span role="status" style="font-size:12px;color:var(--muted)">{{ sd.nameNote }}</span></label></sc-if>
+        <sc-for list="{{ sd.rows }}" as="r">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--faint)">{{ r.label }}</span>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="min-width:0;word-break:break-all;font-family:{{ r.font }}">{{ r.value }}</span><sc-for list="{{ r.chips }}" as="ch"><span style="height:22px;padding:0 8px;border-radius:11px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;white-space:nowrap;color:{{ ch.color }};background:{{ ch.bg }}">{{ ch.label }}</span></sc-for><sc-if value="{{ r.hasBtn }}"><button onClick="{{ r.onBtn }}" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:12px">{{ r.btn }}</button></sc-if></div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ sd.hasNote }}"><p style="margin:0;font-size:13px;color:var(--muted);line-height:1.5">{{ sd.note }}</p></sc-if>
+      </div>
+      <div style="padding:14px 18px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ sd.btns }}" as="b"><button onClick="{{ b.onClick }}" style="height:40px;border-radius:10px;cursor:pointer;font-weight:600;border:1px solid {{ b.border }};background:{{ b.bg }};color:{{ b.color }}">{{ b.label }}</button></sc-for>
+        <sc-if value="{{ sd.hasLink }}"><a onClick="{{ sd.onLink }}" style="text-align:center;font-size:13px">{{ sd.link }}</a></sc-if>
+      </div>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:40;background:oklch(0.1 0.01 230 / 0.5);display:grid;place-items:center;padding:16px">
+      <div onClick="{{ stop }}" role="dialog" aria-modal="true" style="width:100%;max-width:{{ md.width }}px;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column">
+        <div style="padding:20px 22px 4px;font-size:16px;font-weight:600;line-height:1.35">{{ md.title }}</div>
+        <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ md.fields }}" as="f">
+            <sc-if value="{{ f.isBox }}"><div role="{{ f.role }}" style="display:flex;gap:10px;padding:10px 12px;border-radius:9px;font-size:13px;line-height:1.5;background:{{ f.bg }}"><span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px;color:var(--surface);background:{{ f.color }}">{{ f.icon }}</span><div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="text-wrap:pretty">{{ f.text }}</span><sc-if value="{{ f.hasLink }}"><a onClick="{{ f.onLink }}" style="font-weight:600;align-self:flex-start">{{ f.link }}</a></sc-if></div></div></sc-if>
+            <sc-if value="{{ f.isP }}"><p style="margin:0;color:var(--muted);line-height:1.55;font-size:13px">{{ f.text }}</p></sc-if>
+            <sc-if value="{{ f.isText }}"><label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span><input type="{{ f.type }}" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.ph }}" disabled="{{ f.disabled }}" aria-invalid="{{ f.hasErr }}" style="height:38px;padding:0 12px;border-radius:9px;background:var(--bg);outline:0;border:1px solid {{ f.border }};font-family:{{ f.font }}"><sc-if value="{{ f.hasErr }}"><span role="alert" style="font-size:12px;color:var(--danger)">{{ f.err }}</span></sc-if><sc-if value="{{ f.hasHint }}"><span style="font-size:12px;color:var(--faint);line-height:1.45">{{ f.hint }}</span></sc-if></label></sc-if>
+            <sc-if value="{{ f.isSelect }}"><label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span><select value="{{ f.value }}" onChange="{{ f.onChange }}" disabled="{{ f.disabled }}" style="height:38px;padding:0 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ f.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select><sc-if value="{{ f.hasHint }}"><span style="font-size:12px;color:var(--faint);line-height:1.45">{{ f.hint }}</span></sc-if></label></sc-if>
+            <sc-if value="{{ f.isSeg }}"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span><div style="display:flex;padding:3px;border-radius:10px;border:1px solid var(--border);background:var(--bg);align-self:flex-start"><sc-for list="{{ f.opts }}" as="o"><button onClick="{{ o.onClick }}" style="height:30px;padding:0 14px;border:0;border-radius:7px;cursor:pointer;font-weight:500;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div></div></sc-if>
+            <sc-if value="{{ f.isCheck }}"><label style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onToggle }}" style="accent-color:var(--accent);margin:0"><span>{{ f.label }}</span></label></sc-if>
+            <sc-if value="{{ f.isCounter }}"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span><div style="display:flex;align-items:center;gap:8px"><button onClick="{{ f.onDec }}" disabled="{{ f.decDisabled }}" aria-label="−" style="width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:16px;opacity:{{ f.decOpacity }}">−</button><span style="min-width:44px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600">{{ f.value }}</span><button onClick="{{ f.onInc }}" aria-label="+" style="width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-size:16px">+</button></div><sc-if value="{{ f.hasHint }}"><span style="font-size:12px;color:var(--faint);line-height:1.45">{{ f.hint }}</span></sc-if></div></sc-if>
+            <sc-if value="{{ f.isLines }}"><div style="padding:12px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;flex-direction:column;gap:6px"><sc-for list="{{ f.lines }}" as="ln"><div style="font-size:13px;font-weight:{{ ln.weight }};color:{{ ln.color }}">{{ ln.text }}</div></sc-for></div></sc-if>
+            <sc-if value="{{ f.isList }}"><div style="display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden"><sc-for list="{{ f.rows }}" as="r"><div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)"><span style="width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:9px;font-weight:700;background:var(--accent);color:var(--accent-ink)">{{ r.ini }}</span><span style="flex:1">{{ r.label }}</span><a onClick="{{ r.onClick }}" style="font-size:13px;font-weight:500">{{ r.link }}</a></div></sc-for></div></sc-if>
+            <sc-if value="{{ f.isBtn }}"><button onClick="{{ f.onClick }}" disabled="{{ f.disabled }}" style="height:38px;border-radius:9px;border:1px dashed var(--accent);background:transparent;color:var(--accent);cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px"><sc-if value="{{ f.busy }}">{{ f.spin }}</sc-if>{{ f.label }}</button></sc-if>
+            <sc-if value="{{ f.isSlot }}"><div style="height:260px;border-radius:12px;border:1px dashed var(--faint);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ f.text }}</div></sc-if>
+          </sc-for>
+        </div>
+        <div style="padding:14px 22px 20px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ closeModal }}" autoFocus="{{ md.focusCancel }}" style="height:38px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ md.cancel }}</button>
+          <sc-if value="{{ md.hasSubmit }}"><button onClick="{{ md.onSubmit }}" disabled="{{ md.disabled }}" style="height:38px;padding:0 18px;border-radius:9px;border:0;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px;opacity:{{ md.opacity }};background:{{ md.btnBg }};color:{{ md.btnColor }}"><sc-if value="{{ md.busy }}">{{ md.spin }}</sc-if>{{ md.submit }}</button></sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasMenu }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenu }}" onContextMenu="{{ closeMenu }}" style="position:fixed;inset:0;z-index:50"></div>
+    <div role="menu" style="position:fixed;left:{{ menu.x }}px;top:{{ menu.y }}px;z-index:51;min-width:230px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)">
+      <sc-for list="{{ menu.items }}" as="mi">
+        <sc-if value="{{ mi.isSep }}"><div style="height:1px;background:var(--border);margin:4px 6px"></div></sc-if>
+        <sc-if value="{{ mi.notSep }}"><div role="menuitem" onClick="{{ mi.onClick }}" title="{{ mi.tip }}" style="display:flex;align-items:center;gap:10px;min-height:32px;padding:4px 10px;border-radius:7px;white-space:nowrap;cursor:{{ mi.cursor }};opacity:{{ mi.opacity }};color:{{ mi.color }}" style-hover="background:var(--surface2)"><sc-if value="{{ mi.hasIni }}"><span style="width:20px;height:20px;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;background:{{ mi.iniBg }};color:{{ mi.iniInk }}">{{ mi.ini }}</span></sc-if><span style="flex:1">{{ mi.label }}</span><span style="font-size:11px;color:var(--faint)">{{ mi.hint }}</span></div></sc-if>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;right:20px;bottom:20px;left:20px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none">
+    <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0"><div role="status" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:11px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-width:440px;animation:toastIn .2s ease-out"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ to.color }}"></span><span>{{ to.text }}</span></div></sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;W-11&quot;,&quot;W-12&quot;,&quot;W-13&quot;,&quot;W-14&quot;,&quot;W-15&quot;,&quot;W-16&quot;,&quot;W-36&quot;,&quot;W-18&quot;,&quot;W-19&quot;,&quot;W-21&quot;,&quot;W-22&quot;,&quot;W-23&quot;,&quot;W-24&quot;,&quot;W-25&quot;,&quot;X-02&quot;],&quot;default&quot;:&quot;W-14&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;context&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;personal&quot;,&quot;org&quot;],&quot;default&quot;:&quot;org&quot;,&quot;tsType&quot;:&quot;'personal'|'org'&quot;},&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;owner&quot;,&quot;admin&quot;,&quot;member&quot;],&quot;default&quot;:&quot;owner&quot;,&quot;tsType&quot;:&quot;'owner'|'admin'|'member'&quot;},&quot;plan&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;trialing&quot;,&quot;active&quot;,&quot;past_due&quot;,&quot;cancel_scheduled&quot;,&quot;canceled&quot;,&quot;inactive&quot;],&quot;default&quot;:&quot;trialing&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;empty&quot;,&quot;loading&quot;,&quot;error&quot;],&quot;default&quot;:&quot;normal&quot;,&quot;tsType&quot;:&quot;'normal'|'empty'|'loading'|'error'&quot;}}">
+const SCREENS = ['W-11', 'W-12', 'W-13', 'W-14', 'W-15', 'W-16', 'W-36', 'W-18', 'W-19', 'W-21', 'W-22', 'W-23', 'W-24', 'W-25', 'X-02'];
+const SEC_OF = { 'W-11': 'overview', 'W-12': 'team', 'W-13': 'team', 'W-14': 'team', 'W-15': 'team', 'W-16': 'orgAi', 'W-36': 'orgAi', 'W-18': 'billing', 'W-19': 'overview', 'W-21': 'account', 'W-22': 'account', 'W-23': 'repos', 'W-24': 'account', 'W-25': 'sync', 'X-02': 'accounts' };
+const VARIANTS = { 'W-12': ['normal', 'email-sin-confirmar', 'limite-5'], 'W-25': ['todo-sincronizado', 'dispositivo-atrasado', 'sin-boveda', 'fallo-al-guardar'], 'W-21': ['normal', 'email-pendiente', 'email-sin-confirmar', 'usuario-cogido'], 'W-16': ['normal', 'modelo-retirado'], 'W-18': ['normal', 'checkout-202'] };
+const PLANS = ['none', 'trialing', 'active', 'past_due', 'cancel_scheduled', 'canceled', 'inactive'];
+const LX = {
+  dOverview: ['Resumen', 'Overview'], dWorkspaces: ['Workspaces', 'Workspaces'], dRepos: ['Repositorios', 'Repositories'], dAccounts: ['Cuentas vinculadas', 'Linked accounts'], dTeam: ['Equipo', 'Team'], dSync: ['Configuración en la nube', 'Cloud settings'],
+  hello: ['Hola, {n}', 'Hi, {n}'], ovSub: ['Esto es lo que se sincroniza con tus dispositivos.', 'This is what syncs to your devices.'], wsSub: ['Los workspaces agrupan repositorios. Los compartidos aparecen para todo el equipo.', 'Workspaces group repositories. Shared ones show up for the whole team.'],
+  reposSub: ['Repositorios vinculados a tu cuenta. Los locales solo existen en el dispositivo donde se añadieron.', 'Repositories linked to your account. Local ones only exist on the device where they were added.'],
+  searchRepos: ['Buscar repositorio, usuario de la cuenta o workspace…', 'Search repository, account username or workspace…'], colRepo: ['Repositorio', 'Repository'], colSource: ['Origen', 'Source'], colWs: ['Workspaces', 'Workspaces'], colSync: ['Actualizado', 'Updated'],
+  teamSub: ['Miembros de {o}, sus roles e invitaciones.', 'Members of {o}, their roles and invitations.'], invite: ['Invitar miembro', 'Invite member'], syncSub: ['Qué se guarda en tu cuenta y se aplica en cada dispositivo al iniciar sesión.', 'What is stored in your account and applied on each device when you sign in.'],
+  sWs: ['Workspaces y repositorios', 'Workspaces and repositories'], sAcc: ['Cuentas vinculadas', 'Linked accounts'], sAccD: ['Tokens cifrados de extremo a extremo', 'End-to-end encrypted tokens'], since: ['Conectado desde', 'Connected since'], lastSync: ['Última sincronización', 'Last sync'], sAiPrefs: ['Preferencias de IA', 'AI preferences'], sAiKeys: ['Llaves de IA', 'AI keys'], sGit: ['Preferencias de Git', 'Git preferences'], sLook: ['Apariencia', 'Appearance'],
+  shared: ['Compartido con {o}', 'Shared with {o}'], onlyYou: ['Solo tú', 'Only you'], newWs: ['Nuevo workspace', 'New workspace'], cancel: ['Cancelar', 'Cancel'], save: ['Guardar', 'Save'], download: ['Descargar', 'Download'], signOut: ['Cerrar sesión', 'Sign out'],
+  personal: ['Personal', 'Personal'], devicesT: ['Dispositivos', 'Devices'], name: ['Nombre', 'Name'], email: ['Email', 'Email'], role: ['Rol', 'Role'], copied: ['Copiado: {x}', 'Copied: {x}'], provider: ['Proveedor', 'Provider'], label: ['Etiqueta', 'Label'], apiKey: ['API key', 'API key'], baseUrl: ['URL base', 'Base URL'],
+  colMember: ['Miembro', 'Member'], colFn: ['Función', 'Function'], colKey: ['Llave', 'Key'], dlSub: ['La última versión de Ramal para tus equipos.', 'The latest version of Ramal for your devices.'], allOpts: ['Ver todas las opciones', 'See all options'], yours: ['Tu sistema', 'Your system'],
+  export: ['Exportar configuración', 'Export settings'], dataT: ['Datos', 'Data'], tz: ['Zona horaria', 'Time zone'], pwRow: ['Contraseña y formas de entrar', 'Password and sign-in methods'], pwRowD: ['Contraseña, GitHub vinculado. Se gestionan en Cuenta › Contraseña y Formas de entrar.', 'Password, GitHub linked. Managed in Account › Password and Sign-in methods.'],
+  typeD: ['Escritorio', 'Desktop'], typeV: ['VS Code', 'VS Code'], typeB: ['Navegador', 'Browser'], sysArch: ['Sistema', 'System'], version: ['Versión', 'Version'], typeL: ['Tipo', 'Type'], platAcc: ['Plataforma y cuenta', 'Platform and account'], remoteUrl: ['Remoto', 'Remote'],
+  usedOf: ['{used} de {limit}', '{used} of {limit}'], vaultSlot: ['K-10 · tarjeta de bóveda (brief #63)', 'K-10 · vault card (brief #63)'], features: ['Funciones', 'Features'], perDay: ['por miembro y día', 'per member per day'], tokensMonth: ['tokens al mes', 'tokens per month'],
+  reauthT: ['Confirma que eres tú', 'Confirm it\'s you'], reauthFor: ['Para eliminar tu cuenta necesitamos confirmar tu identidad.', 'To delete your account, we need to confirm your identity.'], password: ['Contraseña', 'Password'], confirm: ['Confirmar', 'Confirm'], withGoogle: ['Continuar con Google', 'Continue with Google'],
+  strongNote: ['Para esta acción no sirven GitHub ni GitLab: no pueden pedirte que vuelvas a entrar.', "GitHub and GitLab don't work for this action: they can't ask you to log in again."], deleting: ['Eliminando…', 'Deleting…'], creating: ['Creando…', 'Creating…'], sending: ['Enviando…', 'Sending…'],
+  invited: ['Invitación enviada a {e}', 'Invitation sent to {e}'], removed: ['{name} ya no está en {org}', '{name} is no longer in {org}'], revoked: ['Invitación retirada', 'Invitation withdrawn'], left: ['Saliste de {org}', 'You left {org}'], transferred: ['{name} es ahora titular de {org}', '{name} now owns {org}'], deletedOrg: ['{org} se eliminó', '{org} was deleted'],
+  keyAdded: ['Llave «{label}» guardada', 'Key "{label}" saved'], keyDeleted: ['Llave eliminada', 'Key deleted'], keyRotated: ['Llave rotada', 'Key rotated'], seatsSaved: ['Asientos de {org}: {n}', '{org} seats: {n}'], exported: ['Descarga iniciada: ramal-settings.json', 'Download started: ramal-settings.json'],
+  photoUp: ['Subiendo foto…', 'Uploading photo…'], profileSaved: ['Perfil guardado', 'Profile saved'], dlStarted: ['Descarga iniciada: {file}', 'Download started: {file}']
+};
+const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
+const fill = (s, v) => { if (v) for (const k in v) s = s.split('{' + k + '}').join(v[k]); return s; };
+const METHOD = { 'OAuth': 'oauth', 'Token (PAT)': 'pat', 'API token': 'api_token', 'SSH + Token': 'ssh_token' };
+const MODELS = { anthropic: [['claude-haiku-4-5', 'fast'], ['claude-sonnet-4-5', 'balanced'], ['claude-opus-4-1', '']], openai: [['gpt-5-mini', 'fast'], ['gpt-5', 'balanced']], google: [['gemini-2.5-flash', 'fast'], ['gemini-2.5-pro', 'balanced']], mistral: [['mistral-small-latest', 'fast'], ['mistral-large-latest', 'balanced']], groq: [['llama-3.1-8b-instant', 'fast'], ['llama-3.3-70b-versatile', 'balanced']], openrouter: [['openrouter/auto', '']] };
+
+class Component extends DCLogic {
+  state = { ready: false };
+  timers = [];
+  componentDidMount() {
+    this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs);
+    this._k = e => { if (e.key === 'Escape') this.setState({ modal: null, menu: null, side: null, drawer: false }); }; window.addEventListener('keydown', this._k);
+    const go = () => window.RAMAL && window.RAMAL.WEB70 ? this.boot() : setTimeout(go, 30); go();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._rs); window.removeEventListener('keydown', this._k); this.timers.forEach(clearTimeout); }
+  componentDidUpdate(pp) {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+    const p = this.props; if (!this.state.ready) return;
+    if (pp.theme !== p.theme && p.theme) this.setState({ theme: p.theme });
+    if (pp.lang !== p.lang && p.lang) this.setState({ lang: p.lang });
+    if (['screen', 'context', 'role', 'plan', 'state'].some(k => pp[k] !== p[k])) this.apply({ screen: p.screen, ctx: p.context, role: p.role, plan: p.plan, dstate: p.state });
+  }
+  boot() {
+    const p = this.props;
+    this.setState({ ready: true, vw: window.innerWidth, theme: p.theme || 'dark', lang: p.lang || 'es', toasts: [] }, () => this.apply({ screen: p.screen || 'W-14', ctx: p.context || 'org', role: p.role || 'owner', plan: p.plan || 'trialing', dstate: p.state || 'normal' }));
+  }
+  later(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
+  get L() { return this.state.lang === 'en' ? 1 : 0; }
+  t(k, v) {
+    const R = window.RAMAL, W = R.WEB70, n = v && (v.count ?? v.days);
+    const look = key => W[key] || (n != null ? W[key + (n === 1 ? '_one' : '_other')] : null);
+    let e = null;
+    for (const ns of ['dashboard', 'team', 'orgAi', 'billing', 'pricing', 'account', 'legal', 'download']) { e = look(ns + '.' + k); if (e) break; }
+    if (!e) e = LX[k] || R.D[k] || (R.STATES || {})[k] || (R.WAUTH && R.WAUTH['auth.' + k]); if (!e) return k;
+    return fill(e[this.L], v);
+  }
+  toast(text, kind) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3600); }
+  copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.toast(this.t('copied', { x })); }
+
+  apply(o) {
+    this.timers.forEach(clearTimeout); this.timers = [];
+    const R = window.RAMAL, cur = this.state;
+    const screen = SCREENS.includes(o.screen) ? o.screen : (cur.screen || 'W-14');
+    const ctx = screen === 'W-13' ? 'personal' : (o.ctx || cur.ctx || 'org');
+    const role = o.role || cur.role || 'owner', plan = o.plan || cur.plan || 'trialing';
+    const dstate = screen === 'W-19' && (!o.dstate || o.dstate === 'normal') ? 'empty' : (o.dstate || 'normal');
+    const variant = o.variant || (VARIANTS[screen] || ['normal'])[0];
+    const me = { name: 'Marta Ruiz', email: 'marta@example.com', ini: 'MR', lane: 1 };
+    const others = [{ name: 'Diego León', email: 'diego@example.com', ini: 'DL', lane: 0 }, { name: 'Aiko Tanaka', email: 'aiko@example.com', ini: 'AT', lane: 3, role: 'member' }, { name: 'Samuel Ortiz', email: 'samuel@example.com', ini: 'SO', lane: 2, role: 'member' }];
+    const members = role === 'owner' ? [{ ...me, role: 'owner' }, { ...others[0], role: 'admin' }, others[1], others[2]] : [{ ...others[0], role: 'owner' }, { ...me, role }, others[1], others[2]];
+    members.push({ name: 'lucia@example.com', email: 'lucia@example.com', ini: 'L', lane: 4, role: 'member', pending: true, exp: L => L ? 'Oct 9, 2026' : '9 oct 2026' });
+    members.push({ name: 'pablo@example.com', email: 'pablo@example.com', ini: 'P', lane: 5, role: 'member', pending: true, expired: true });
+    const n = {
+      screen, ctx, role, plan, dstate, variant, sec: SEC_OF[screen], modal: null, menu: null, side: null, drawer: false, rq: '', tab: screen === 'W-36' ? 'usage' : 'keys', period: 'month', sort: 'requests',
+      orgName: 'ACME Studio', orgs: [{ id: 'acme', name: 'ACME Studio', ini: 'AS', role }, { id: 'lab', name: 'Lab Ruiz', ini: 'LR', role: 'owner' }],
+      members, seats: screen === 'W-15' ? 6 : 8, verified: !(screen === 'W-12' && variant === 'email-sin-confirmar') && !(screen === 'W-21' && variant === 'email-sin-confirmar'),
+      workspaces: R.WS.map((w, i) => ({ ...w, shared: ctx === 'org' && i !== 2, by: ctx === 'org' && i === 1 && role !== 'owner' ? 'Diego León' : (ctx === 'org' && i === 1 && role === 'owner' ? '' : '') })).concat(ctx === 'org' ? [{ id: 'w4', name: 'Diseño', color: 'oklch(0.68 0.21 355)', shared: true, by: 'Aiko Tanaka' }] : []),
+      repos: R.REPOS.map(r => ({ ...r })), accounts: R.ACCOUNTS.map(a => ({ ...a })),
+      devices: [
+        { id: 'd1', type: 'desktop', name: 'MacBook Pro de Marta', app: 'Ramal Desktop 2.4.0', os: 'macOS 15.1', arch: 'arm64', mins: 2, since: ['12 mar 2026', 'Mar 12, 2026'], sync: 2 },
+        { id: 'd2', type: 'vscode', name: 'ubuntu-dev', app: 'Ramal for VS Code 1.3.0', os: 'Ubuntu 24.04', arch: 'x64', mins: 40, since: ['2 jun 2026', 'Jun 2, 2026'], sync: 40 },
+        { id: 'd3', type: 'desktop', name: 'PC-OFICINA', app: 'Ramal Desktop 2.3.1', os: 'Windows 11', arch: 'x64', mins: 4320, since: ['20 ene 2026', 'Jan 20, 2026'], sync: 4320, update: '2.4.0' },
+        { id: 'd4', type: 'browser', name: 'Firefox en Linux', app: 'ramal.bahoque.com', os: 'Linux', arch: 'x64', mins: 0, since: ['1 oct 2026', 'Oct 1, 2026'], sync: 0, current: true }
+      ],
+      keys: [
+        { id: 'o1', prov: 'openai', label: 'ACME producción', masked: 'sk-proj-…9b1c', def: true, model: 'gpt-5', fn: { commit: 'gpt-5-mini', pr: '', summary: '' }, by: 'Diego León', mins: 12 },
+        { id: 'o2', prov: 'anthropic', label: 'ACME Claude', masked: 'sk-ant-…77de', def: false, model: 'claude-sonnet-4-5', fn: { commit: 'claude-haiku-4-5', pr: '', summary: screen === 'W-16' && variant === 'modelo-retirado' ? 'claude-3-opus' : '' }, gone: screen === 'W-16' && variant === 'modelo-retirado' ? 'claude-3-opus' : '', by: 'Marta Ruiz', mins: 300 }
+      ],
+      policy: { proxy: true, f: { commit: true, pr: true, summary: false }, daily: '200', cap: '5000000', noCap: false }, polNote: {},
+      sync: { ws: true, acc: true, aiPrefs: true, aiKeys: false, git: true, look: true }, syncNote: {}, vault: !(screen === 'W-25' && variant === 'sin-boveda'),
+      profile: { name: 'Marta Ruiz', user: screen === 'W-21' && variant === 'usuario-cogido' ? 'marta' : 'marta-ruiz', tz: 'America/Mexico_City', mailLang: 'es' }, profErr: screen === 'W-21' && variant === 'usuario-cogido' ? 'user' : '', profNote: '', photo: 'ok',
+      emailPending: screen === 'W-21' && variant === 'email-pendiente' ? 'marta.ruiz@example.com' : '', exportState: 'idle', invitesForMe: [{ org: 'Estudio Norte', role: 'member', inviter: 'Ana Gil' }]
+    };
+    if (screen === 'W-15') { n.modal = { kind: 'invite', email: '', role: 'member' }; n.seats = members.filter(m => !m.pending || !m.expired).length; }
+    if (screen === 'W-22') n.side = { kind: 'device', id: 'd3' };
+    if (screen === 'W-23') n.side = { kind: 'repo', id: 'r1' };
+    if (screen === 'W-24') this.later(80, () => { const el = document.getElementById('danger'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80 }); });
+    if (screen === 'W-18' && variant === 'checkout-202') n.modal = { kind: 'seats', n: 9 };
+    this.setState(n);
+    if (dstate === 'loading') this.later(1600, () => this.setState({ dstate: 'normal' }));
+  }
+  go(sec) { this.setState({ sec, drawer: false, menu: null, side: null, rq: '' }); window.scrollTo(0, 0); }
+  openMenu(e, items, alignRight) { e.preventDefault(); e.stopPropagation(); const r = e.currentTarget.getBoundingClientRect(), h = items.reduce((a, i) => a + (i.sep ? 9 : 34), 14); const x = alignRight ? r.right - 240 : r.left; this.setState({ menu: { x: Math.max(8, Math.min(x, window.innerWidth - 248)), y: Math.max(8, Math.min(r.bottom + 6, window.innerHeight - h - 8)), items } }); }
+  isOrg() { return this.state.ctx === 'org'; }
+  isAdmin() { return this.state.role === 'owner' || this.state.role === 'admin'; }
+  ago(m) { const L = this.L; if (m < 1) return L ? 'just now' : 'ahora'; if (m < 60) return L ? `${m} min ago` : `hace ${m} min`; if (m < 1440) { const h = Math.round(m / 60); return L ? `${h} h ago` : `hace ${h} h`; } const d = Math.round(m / 1440); return L ? `${d} d ago` : `hace ${d} d`; }
+  date(k) { const D = { trialEnd: ['5 oct 2026', 'Oct 5, 2026'], renewY: ['2 oct 2027', 'Oct 2, 2027'], renewM: ['2 nov 2026', 'Nov 2, 2026'], cancelAt: ['2 nov 2026', 'Nov 2, 2026'], inv: ['9 oct 2026', 'Oct 9, 2026'], newTrial: ['16 oct 2026', 'Oct 16, 2026'] }; return D[k][this.L]; }
+  owner() { return this.state.members.find(m => m.role === 'owner'); }
+  counts() { const ms = this.state.members, mem = ms.filter(m => !m.pending).length, pend = ms.filter(m => m.pending && !m.expired).length; return { mem, pend, used: mem + pend }; }
+  ro() { return this.isOrg() && this.state.plan === 'inactive'; }
+  B(label, onClick, kind, o = {}) { const K = { primary: ['var(--accent)', 'var(--accent-ink)', 'var(--accent)'], danger: ['var(--danger)', 'white', 'var(--danger)'], secondary: ['var(--surface)', 'var(--text)', 'var(--border)'] }[kind || 'secondary']; return { label, onClick: o.disabled ? undefined : onClick, disabled: !!o.disabled, opacity: o.disabled ? 0.5 : 1, tip: o.tip || '', bg: K[0], color: K[1], border: K[2] }; }
+  RB(label, onClick, o = {}) { return { label, onClick: e => { if (e && e.stopPropagation) e.stopPropagation(); if (!o.disabled) onClick(e); }, disabled: !!o.disabled, opacity: o.disabled ? 0.5 : 1, tip: o.tip || '', border: o.danger ? 'var(--danger)' : 'var(--border)', color: o.danger ? 'var(--danger)' : 'var(--text)' }; }
+  row(o) { return { hasAv: false, hasCode: false, subs: [], hasChips: false, chips: [], hasInput: false, hasSelect: false, hasRole: false, hasNote: false, hasToggle: false, btns: [], hasMenu: false, opacity: 1, cursor: 'default', hover: 'transparent', meta: '', ...o, hasChips: !!(o.chips && o.chips.length), hasCode: !!o.code }; }
+  chip(label, c, tip) { return { label, color: c, bg: tint(c, 16), tip: tip || '' }; }
+  card(o) { return { isCard: 1, border: 'var(--border)', hasSub: !!o.sub, sub: o.sub || '', count: o.count || '', hasHeadBtn: !!o.headBtn, hasBadge: !!o.abbr, hasFoot: false, rows: [], ...o }; }
+  empty(icon, text, btns, o = {}) { return { isEmpty: 1, icon, text, btns: btns || [], hasTitle: !!o.title, title: o.title || '', hasLine: !!o.line, line: o.line || '', hasLink: !!o.link, link: o.link || '', onLink: o.onLink }; }
+  skel(cols, hs) { return { isSkel: 1, cols, boxes: hs.map(h => ({ h })) }; }
+  saveFlow(field, key, fn) { this.setState(s => ({ [field]: { ...s[field], [key]: 'saving' } })); fn && fn(); this.later(700, () => { const fail = this.state.screen === 'W-25' && this.state.variant === 'fallo-al-guardar' && field === 'syncNote'; this.setState(s => ({ [field]: { ...s[field], [key]: fail ? 'fail' : 'saved' } })); this.later(1800, () => this.setState(s => ({ [field]: { ...s[field], [key]: s[field][key] === 'saved' ? '' : s[field][key] } }))); }); }
+  noteOf(v) { const T = this.t.bind(this); return v === 'saving' ? [T('saving'), 'var(--muted)'] : v === 'saved' ? ['✓ ' + T('saved'), 'var(--ok)'] : v === 'fail' ? [T('saveFail'), 'var(--danger)'] : ['', 'var(--muted)']; }
+
+  // ---------- modals
+  openModal(m) { this.setState({ modal: m, menu: null }); }
+  setM(p) { this.setState(s => ({ modal: { ...s.modal, ...p } })); }
+  createOrg() { if (this.state.orgs.length >= 5 || (this.state.screen === 'W-12' && this.state.variant === 'limite-5')) { this.toast(this.t('orgLimit'), 'warn'); return; } this.openModal({ kind: 'createOrg', name: '' }); }
+  confirm(title, info, btn, fn, o = {}) { this.openModal({ kind: 'confirm', title, info, btn, fn, link: o.link, onLink: o.onLink, extra: o.extra }); }
+
+  modalView() {
+    const s = this.state, m = s.modal, T = this.t.bind(this), L = this.L, R = window.RAMAL; if (!m) return null;
+    const box = (kind, text, o = {}) => { const c = { info: 'var(--info)', warn: 'var(--warn)', danger: 'var(--danger)' }[kind]; return { isBox: 1, role: kind === 'danger' ? 'alert' : 'status', text, bg: tint(c, 10), color: c, icon: kind === 'info' ? 'i' : '!', hasLink: !!o.link, link: o.link || '', onLink: o.onLink }; };
+    const txt = (label, k, o = {}) => ({ isText: 1, label, type: o.type || 'text', value: m[k] == null ? '' : m[k], onChange: e => this.setM({ [k]: e.target.value, err: '' }), ph: o.ph || '', disabled: !!o.disabled, hasErr: !!o.err, err: o.err || '', border: o.err ? 'var(--danger)' : 'var(--border)', hasHint: !!o.hint && !o.err, hint: o.hint || '', font: o.mono ? "'IBM Plex Mono',monospace" : 'inherit' });
+    const sel = (label, value, options, onChange, o = {}) => ({ isSelect: 1, label, value, options, onChange, disabled: !!o.disabled, hasHint: !!o.hint, hint: o.hint || '' });
+    const seg = (label, value, opts, onPick) => ({ isSeg: 1, label, opts: opts.map(([v, l]) => ({ label: l, bg: value === v ? 'var(--accent)' : 'transparent', color: value === v ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => onPick(v) })) });
+    const base = { title: '', fields: [], width: 460, cancel: T('cancel'), hasSubmit: true, submit: '', onSubmit: null, disabled: false, opacity: 1, busy: !!m.busy, spin: this.spin(), btnBg: 'var(--accent)', btnColor: 'var(--accent-ink)', focusCancel: false };
+    const danger = () => Object.assign(base, { btnBg: 'var(--danger)', btnColor: 'white', focusCancel: true });
+    const lock = (dis) => { base.disabled = !!dis || !!m.busy; base.opacity = dis ? 0.5 : 1; };
+    const org = s.orgName, own = this.owner(), c = this.counts();
+    if (m.kind === 'confirm') { base.title = m.title; base.fields.push(box('danger', m.info, { link: m.link, onLink: m.onLink })); if (m.extra) base.fields.push(...m.extra); danger(); base.submit = m.btn; base.onSubmit = () => { this.setState({ modal: null }); m.fn(); }; }
+    if (m.kind === 'createOrg') {
+      const nm = (m.name || '').trim(), bad = nm.length < 1 || nm.length > 60;
+      base.title = T('orgNewTitle'); base.fields.push(txt(T('orgName'), 'name', { ph: 'ACME Studio', hint: '1–60', disabled: m.busy }), box('info', T('orgTrialInfo')));
+      base.submit = m.busy ? T('creating') : T('orgCreate'); lock(bad);
+      base.onSubmit = () => { this.setM({ busy: true }); this.later(900, () => { const id = 'n' + Date.now(); this.setState(x => ({ modal: null, orgs: [...x.orgs, { id, name: nm, ini: nm.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(), role: 'owner' }], orgName: nm, ctx: 'org', role: 'owner', plan: 'trialing', members: [x.members.find(y => y.email === 'marta@example.com') && { name: 'Marta Ruiz', email: 'marta@example.com', ini: 'MR', lane: 1, role: 'owner' }].filter(Boolean), sec: 'team' })); this.toast(T('orgCreated', { org: nm, date: this.date('newTrial') })); }); };
+    }
+    if (m.kind === 'invite') {
+      const full = c.used >= s.seats, em = (m.email || '').trim(), valid = /^\S+@\S+\.\S+$/.test(em);
+      base.title = T('inviteTitle', { org }); base.width = 480;
+      if (full) base.fields.push(box('warn', T('seatsFull', { used: c.used, total: s.seats }), s.role === 'owner' ? { link: T('addSeats'), onLink: () => this.openModal({ kind: 'seats', n: s.seats + 1, back: 'invite' }) } : {}), ...(s.role !== 'owner' ? [{ isP: 1, text: T('askOwner', { owner: own.name }) }] : []));
+      base.fields.push(txt(T('email'), 'email', { type: 'email', ph: 'nombre@example.com', err: m.err, disabled: m.busy }));
+      if (m.dup) base.fields.push({ isBtn: 1, label: T('resend'), onClick: () => { this.setState({ modal: null }); this.toast(T('invited', { e: em })); }, busy: false });
+      base.fields.push(seg(T('role'), m.role, [['member', T('roleMember')], ['admin', T('roleAdmin')]], v => this.setM({ role: v })), { isP: 1, text: T('inviteInfo') });
+      base.submit = m.busy ? T('sending') : T('invite'); lock(full || !valid);
+      base.onSubmit = () => {
+        const ex = s.members.find(x => x.email === em);
+        if (ex && !ex.pending) { this.setM({ err: T('inviteMember', { email: em }) }); return; }
+        if (ex && ex.pending) { this.setM({ err: T('inviteDup', { email: em }), dup: true }); return; }
+        this.setM({ busy: true }); this.later(800, () => { this.setState(x => ({ modal: null, members: [...x.members, { name: em, email: em, ini: em[0].toUpperCase(), lane: x.members.length % 6, role: m.role, pending: true, exp: L2 => L2 ? 'Oct 9, 2026' : '9 oct 2026' }] })); this.toast(T('invited', { e: em })); });
+      };
+    }
+    if (m.kind === 'seats') {
+      const trial = s.plan === 'trialing', price = s.plan === 'past_due' ? 10 : 96, per = s.plan === 'past_due' ? 'month' : 'year', diff = m.n - s.seats;
+      base.title = T('seTitle', { org });
+      base.fields.push({ isCounter: 1, label: T('addSeats'), value: String(m.n), onDec: () => this.setM({ n: Math.max(c.used, m.n - 1), err: '' }), onInc: () => this.setM({ n: m.n + 1 }), decDisabled: m.n <= c.used, decOpacity: m.n <= c.used ? 0.4 : 1, hasHint: true, hint: T('seMin', { used: c.used, members: c.mem, pending: c.pend }) });
+      if (trial) base.fields.push(box('info', T('seTrial')));
+      else if (diff !== 0) {
+        const today = Math.round(Math.abs(diff) * price * 0.82);
+        base.fields.push({ isLines: 1, lines: [{ text: diff > 0 ? T('seToday', { amount: today, date: this.date(per === 'year' ? 'renewY' : 'renewM') }) : T('seCredit'), weight: 600, color: 'var(--text)' }, { text: T('seFrom', { date: this.date(per === 'year' ? 'renewY' : 'renewM'), total: m.n * price }), weight: 400, color: 'var(--muted)' }, { text: T('seTaxes'), weight: 400, color: 'var(--faint)' }] });
+        if (m.pad) base.fields.push(box('warn', T('seConfirmPad')));
+      }
+      if (m.err) base.fields.push(box('danger', m.err));
+      const today = Math.round(Math.abs(diff) * price * 0.82);
+      base.submit = trial || diff === 0 ? T('save') : m.pad ? T('seConfirmBtn') + ' ↗' : diff > 0 ? T('seConfirm', { amount: today }) : T('seReduce', { seats: m.n }); lock(false);
+      base.onSubmit = () => {
+        if (m.n < c.used) { this.setM({ err: T('seBelow', { used: c.used }) }); return; }
+        if (!trial && diff > 0 && s.screen === 'W-18' && s.variant === 'checkout-202' && !m.pad) { this.setM({ pad: true }); return; }
+        this.setM({ busy: true }); this.later(800, () => { this.setState({ seats: m.n, modal: m.back === 'invite' ? { kind: 'invite', email: '', role: 'member' } : null }); this.toast(T('seatsSaved', { org, n: m.n })); });
+      };
+    }
+    if (m.kind === 'transfer') {
+      const cands = s.members.filter(x => !x.pending && x.role !== 'owner'), who = cands.find(x => x.email === m.to) || cands[0];
+      base.title = T('orgTransferT', { org }); base.fields.push(sel(T('colMember'), who.email, cands.map(x => ({ value: x.email, label: x.name })), e => this.setM({ to: e.target.value })), box('danger', T('orgTransferI', { name: who.name })));
+      danger(); base.submit = T('orgTransferB');
+      base.onSubmit = () => this.openModal({ kind: 'reauth', strong: false, next: () => { this.setState(x => ({ role: 'admin', members: x.members.map(y => y.email === who.email ? { ...y, role: 'owner' } : y.role === 'owner' ? { ...y, role: 'admin' } : y) })); this.toast(T('transferred', { name: who.name, org })); } });
+    }
+    if (m.kind === 'deleteOrg') {
+      base.title = T('orgDelete').replace('…', ''); base.fields.push(box('danger', T('orgDeleteI')), txt(T('orgTypeName', { org }), 'typed', { ph: org })); danger(); base.submit = T('orgDeleteB'); lock((m.typed || '') !== org);
+      base.onSubmit = () => { this.setState(x => ({ modal: null, ctx: 'personal', orgs: x.orgs.filter(o => o.name !== org), sec: 'overview' })); this.toast(T('deletedOrg', { org })); };
+    }
+    if (m.kind === 'reauth') {
+      base.title = T('reauthT'); base.fields.push({ isP: 1, text: m.strong ? T('reauthFor') : T('raFor', { action: T('action.' + (m.action || 'transferOrg')) }) }, txt(T('password'), 'pw', { type: 'password', ph: '••••••••' }), { isBtn: 1, label: T('withGoogle'), onClick: () => { this.setState({ modal: null }); m.next(); } });
+      if (m.strong) base.fields.push({ isP: 1, text: T('strongNote') });
+      base.submit = T('confirm'); lock(!m.pw); base.onSubmit = () => { this.setState({ modal: null }); m.next(); };
+    }
+    if (m.kind === 'blocked') {
+      base.title = T('dzBlockedT'); base.fields.push(box('warn', T('dzBlocked')), { isList: 1, rows: s.orgs.filter(o => o.role === 'owner').map(o => ({ ini: o.ini, label: o.name, link: T('dzGoOrg', { org: o.name }), onClick: () => this.setState({ modal: null, ctx: 'org', orgName: o.name, sec: 'team' }) })) });
+      base.hasSubmit = false; base.cancel = T('closeLabel');
+    }
+    if (m.kind === 'deleteAccount') {
+      base.title = T('dzConfirmT'); base.width = 520; base.fields.push(box('danger', T('dzGone')), box('info', T('dzStays')), txt(T('dzType'), 'typed', { type: 'email', ph: 'marta@example.com', disabled: m.busy }));
+      danger(); base.submit = m.busy ? T('deleting') : T('dzDeleteB'); lock((m.typed || '').trim() !== 'marta@example.com');
+      base.onSubmit = () => { this.setM({ busy: true }); this.later(900, () => { location.href = './Ramal Web Paginas.dc.html#goodbye'; }); };
+    }
+    if (m.kind === 'key' || m.kind === 'editKey') {
+      const AP = R.AIPROV, provs = ['anthropic', 'openai', 'google', 'mistral', 'groq', 'openrouter', 'custom'], edit = m.kind === 'editKey', p = m.prov || 'anthropic', models = MODELS[p] || [['custom-model', '']];
+      base.title = edit ? T('oaiEdit').replace('…', '') + ' · ' + m.label : T('oaiAdd'); base.width = 580;
+      base.fields.push(sel(T('provider'), p, provs.map(k => ({ value: k, label: AP[k].label })), e => this.setM({ prov: e.target.value, loaded: false, err: '', def: '' }), { disabled: edit, hint: edit ? '' : T('oaiOllama') }));
+      if (p === 'custom' && !edit) base.fields.push(txt(T('baseUrl'), 'url', { ph: 'https://', mono: true }));
+      base.fields.push(txt(T('label'), 'label', { ph: 'ACME producción' }));
+      if (!edit) {
+        base.fields.push(txt(T('apiKey'), 'key', { type: 'password', ph: AP[p].ph, mono: true, hint: T('oaiNeverShown') }));
+        base.fields.push({ isBtn: 1, label: m.checking ? T('oaiChecking', { provider: AP[p].label }) : T('oaiLoad'), busy: !!m.checking, spin: this.spin(), disabled: !m.key || m.checking, onClick: () => {
+          this.setM({ checking: true, err: '' }); this.later(1000, () => { const k = (this.state.modal.key || '').toLowerCase(); const err = k.includes('bad') ? T('oaiBadKey', { provider: AP[p].label }) : k.includes('quota') ? T('oaiQuota', { provider: AP[p].label }) : k.includes('net') ? T('oaiNet', { provider: AP[p].label }) : ''; this.setM({ checking: false, loaded: !err, err, def: models[0][0] }); }); } });
+        if (m.err) base.fields.push(box('danger', m.err));
+      } else base.fields.push({ isP: 1, text: T('oaiNeverShown') + ' ' + T('oaiRotate').replace('…', '') + '.' });
+      if (m.loaded || edit) {
+        const def = m.def || models[0][0], mo = (tier) => models.map(([id, tr]) => ({ value: id, label: id + (tr && tr === tier ? ' · ' + T(tier === 'fast' ? 'recFast' : 'recBalanced') : '') }));
+        base.fields.push(sel(T('oaiDefModel'), def, mo('balanced'), e => this.setM({ def: e.target.value })));
+        [['commit', 'fCommit', 'fast'], ['pr', 'fPR', 'balanced'], ['summary', 'fSummary', 'balanced']].forEach(([k, lk, tier]) => base.fields.push(sel(T(lk), (m.fn || {})[k] || '', [{ value: '', label: T('oaiSameAsDef', { model: def }) }, ...mo(tier)], e => this.setM({ fn: { ...(this.state.modal.fn || {}), [k]: e.target.value } }), { hint: m.gone && k === 'summary' && !(m.fn || {}).summary ? '' : m.gone && k === 'summary' ? T('oaiModelGone', { model: m.gone }) : '' })));
+        base.fields.push({ isCheck: 1, label: T('oaiUseDefault'), checked: !!m.isDef, onToggle: e => this.setM({ isDef: e.target.checked }) });
+      }
+      base.submit = T('oaiSave'); lock(!(m.loaded || edit) || !(m.label || '').trim());
+      base.onSubmit = () => { const lab = (m.label || '').trim(); this.setState(x => { let keys = edit ? x.keys.map(y => y.id === m.id ? { ...y, label: lab, model: m.def || y.model, fn: m.fn || y.fn, gone: (m.fn || {}).summary === m.gone ? y.gone : '' } : y) : [...x.keys, { id: 'o' + Date.now(), prov: p, label: lab, masked: AP[p].ph.replace('…', '') + '…' + Math.random().toString(16).slice(2, 6), def: false, model: m.def, fn: m.fn || { commit: '', pr: '', summary: '' }, by: 'Marta Ruiz', mins: -1 }]; if (m.isDef) keys = keys.map((y, i) => ({ ...y, def: edit ? y.id === m.id : i === keys.length - 1 })); return { modal: null, keys }; }); this.toast(T('keyAdded', { label: lab })); };
+    }
+    if (m.kind === 'rotate') { base.title = T('oaiRotateT', { label: m.label }); base.fields.push(txt(T('oaiRotateNew'), 'key', { type: 'password', mono: true, hint: T('oaiNeverShown') }), box('info', T('oaiRotateI'))); base.submit = T('oaiSave'); lock(!m.key); base.onSubmit = () => { this.setState({ modal: null }); this.toast(T('keyRotated')); }; }
+    if (m.kind === 'email') {
+      base.title = T('emChange').replace('…', ''); base.fields.push(txt(T('emNew'), 'email', { type: 'email', ph: 'nombre@example.com' })); base.submit = T('emChange').replace('…', ''); lock(!/^\S+@\S+\.\S+$/.test(m.email || ''));
+      base.onSubmit = () => { this.setState({ modal: null, emailPending: m.email.trim() }); };
+    }
+    return base;
+  }
+  spin() { return React.createElement('span', { 'aria-hidden': true, style: { width: 14, height: 14, flexShrink: 0, borderRadius: '50%', border: '2px solid currentColor', borderRightColor: 'transparent', display: 'inline-block', animation: 'spin .7s linear infinite' } }); }
+
+  // ---------- sections
+  section() {
+    const s = this.state, T = this.t.bind(this), R = window.RAMAL, P = R.PLAT, AP = R.AIPROV, L = this.L, org = s.orgName, adm = this.isAdmin(), own = this.owner(), cnt = this.counts(), ro = this.ro();
+    const out = { dh: { title: '', sub: '', btns: [] }, items: [], tabs: [] };
+    const accById = Object.fromEntries(s.accounts.map(a => [a.id, a])), wsById = Object.fromEntries(s.workspaces.map(w => [w.id, w]));
+    const secName = { overview: T('dOverview'), workspaces: T('dWorkspaces'), repos: T('dRepos'), accounts: T('dAccounts'), team: T('dTeam'), orgAi: T('nav.orgAi'), billing: T('nav.billing'), sync: T('dSync'), account: T('nav.account'), downloads: T('download') }[s.sec];
+    const err = () => [{ isError: 1, text: T('secError', { section: secName }), onRetry: () => { this.setState({ dstate: 'loading' }); this.later(900, () => this.setState({ dstate: 'normal' })); } }];
+    const st = s.dstate, rowsSkel = n => this.skel('minmax(0,1fr)', Array(n).fill(58));
+    const repoSrc = r => { const a = accById[r.acc], rm = a ? { plat: a.platform } : r.remote, p = rm ? P[rm.plat] : null; return { p, a, slug: a ? `${a.user}/${r.name}` : r.remote ? r.remote.slug : T('rdLocal', { device: 'MacBook Pro de Marta' }), url: a ? `https://${a.host}/${a.user}/${r.name}.git` : r.remote ? `https://${r.remote.host}/${r.remote.slug}.git` : '' }; };
+    const devIcon = d => ({ desktop: 'D', vscode: 'VS', browser: 'WEB' })[d.type];
+    const devRow = d => this.row({ hasAv: true, av: devIcon(d), avBg: 'var(--bg)', avInk: 'var(--muted)', avBorder: 'var(--border)', avRadius: '9px', label: d.name, subs: [{ text: `${d.app} · ${d.os} · ${d.arch}`, color: 'var(--faint)' }, { text: T('dsLast', { ago: this.ago(d.mins) }), color: 'var(--muted)' }], chips: [...(d.current ? [this.chip(T('dsThisBrowser'), 'var(--accent)')] : []), ...(d.update ? [this.chip(T('dsUpdate', { version: d.update }), 'var(--warn)')] : [])], cursor: 'pointer', hover: 'var(--surface2)', onClick: () => this.setState({ side: { kind: 'device', id: d.id } }) });
+
+    if (s.sec === 'overview') {
+      out.dh = { title: T('hello', { n: 'Marta' }), sub: T('ovSub'), btns: [] };
+      if (st === 'loading') { out.items.push(this.skel('repeat(auto-fit,minmax(200px,1fr))', [96, 96, 96, 96]), rowsSkel(3)); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      const empty = st === 'empty';
+      const tile = (v, label, sec) => ({ value: String(v), label, size: 28, font: "'IBM Plex Mono',monospace", cursor: 'pointer', onClick: () => this.go(sec) });
+      out.items.push({ isTiles: 1, min: 200, tiles: [tile(empty ? 0 : s.workspaces.length, T('dWorkspaces'), 'workspaces'), tile(empty ? 0 : s.repos.length, T('dRepos'), 'repos'), tile(empty ? 0 : s.accounts.length, T('dAccounts'), 'accounts'), this.isOrg() ? tile(cnt.mem, T('dTeam'), 'team') : { value: T('pcTile'), label: T('pcTrial'), size: 15, font: 'inherit', cursor: 'pointer', onClick: () => this.go('team') }] });
+      if (s.verified && s.invitesForMe.length && !empty) out.items.push(this.card({ title: T('invPendingT'), rows: s.invitesForMe.map((iv, i) => this.row({ hasAv: true, av: 'EN', avBg: 'var(--accent)', avInk: 'var(--accent-ink)', avBorder: 'transparent', avRadius: '9px', label: T('invRow', { org: iv.org, role: T('roleMember'), inviter: iv.inviter }), btns: [this.RB(T('invDecline'), () => { this.setState(x => ({ invitesForMe: x.invitesForMe.filter((_, j) => j !== i) })); this.toast(T('invDeclined')); }), this.RB(T('invAccept'), () => { this.setState(x => ({ invitesForMe: x.invitesForMe.filter((_, j) => j !== i), orgs: [...x.orgs, { id: 'en', name: iv.org, ini: 'EN', role: 'member' }], ctx: 'org', orgName: iv.org, role: 'member' })); this.toast(T('invJoined', { org: iv.org })); })] })) }));
+      const rd = s.devices.filter(d => d.type !== 'browser');
+      out.items.push(empty ? this.empty('▢', T('emDevices'), [this.B(T('emGetDesktop'), () => this.go('downloads'), 'primary'), this.B(T('emGetVs'), () => this.go('downloads'))]) : this.card({ title: T('devicesT'), headBtn: T('dsSeeAll'), onHeadBtn: () => this.go('account'), rows: rd.map(devRow) }));
+    }
+    if (s.sec === 'workspaces') {
+      out.dh = { title: T('dWorkspaces'), sub: T('wsSub'), btns: ro ? [] : [this.B('+ ' + T('newWs'), () => this.toast(T('newWs')), 'primary')] };
+      if (st === 'loading') { out.items.push(this.skel('repeat(auto-fill,minmax(280px,1fr))', [150, 150, 150])); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      if (st === 'empty') { out.items.push(this.empty('▦', T('emWs'), [this.B(T('emWsBtn'), () => {}, 'primary')])); return out; }
+      out.items.push({ isWsGrid: 1, cards: s.workspaces.map(w => { const rs = s.repos.filter(r => r.wss.includes(w.id)); const mine = !w.by; return { name: w.name, color: w.color, empty: !rs.length, emptyText: T('workspaces.empty') === 'workspaces.empty' ? (L ? 'No repositories' : 'Sin repositorios') : T('workspaces.empty'), repos: rs.map(r => { const sx = repoSrc(r); return { name: r.alias || r.name, abbr: sx.p ? sx.p.abbr : '⌂', color: sx.p ? sx.p.color : 'var(--faint)' }; }),
+        hasShare: this.isOrg() && mine && !ro, tbg: w.shared ? 'var(--accent)' : 'var(--border)', tx: w.shared ? 'translateX(14px)' : 'none', shareLabel: w.shared ? T('shared', { o: org }) : T('onlyYou'), onShare: () => this.setState(x => ({ workspaces: x.workspaces.map(z => z.id === w.id ? { ...z, shared: !z.shared } : z) })),
+        hasBy: !!w.by, by: T('tmSharedBy', { name: w.by }), hasMenu: true,
+        onMenu: e => this.openMenu(e, mine && !ro ? [{ label: L ? 'Rename…' : 'Renombrar…', run: () => {} }, { sep: 1 }, { label: L ? 'Delete…' : 'Eliminar…', danger: 1, run: () => this.confirm(L ? `Delete "${w.name}"?` : `¿Eliminar «${w.name}»?`, T('c_wsInfo', { org }), L ? 'Delete' : 'Eliminar', () => this.setState(x => ({ workspaces: x.workspaces.filter(z => z.id !== w.id) }))) }] : [{ label: L ? 'Copy name' : 'Copiar nombre', run: () => this.copy(w.name) }], true) }; }) });
+    }
+    if (s.sec === 'repos') {
+      out.dh = { title: T('dRepos'), sub: T('reposSub'), btns: [] };
+      if (st === 'loading') { out.items.push(rowsSkel(6)); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      if (st === 'empty') { out.items.push(this.empty('⌂', T('emRepos'), [this.B(T('emGetDesktop'), () => this.go('downloads'), 'primary')])); return out; }
+      out.items.push({ isSearch: 1, value: s.rq, onChange: e => this.setState({ rq: e.target.value }), ph: T('searchRepos') });
+      const q = s.rq.trim().toLowerCase();
+      const rows = s.repos.filter(r => { if (!q) return true; const sx = repoSrc(r); return [r.name, r.alias, sx.slug, sx.a ? sx.a.user : '', sx.p ? sx.p.label : '', ...r.wss.map(id => (wsById[id] || {}).name || '')].join(' ').toLowerCase().includes(q); });
+      if (!rows.length) { out.items.push(this.empty('⌕', T('emSearch', { query: s.rq.trim() }), [this.B(T('emSearchBtn'), () => this.setState({ rq: '' }))])); return out; }
+      const stack = (s.vw || 1280) < 768, C = (lbl, o) => ({ hasLbl: stack, lbl, hasBadge: false, hasSub: false, weight: 400, font: 'inherit', color: 'var(--text)', chips: [], justify: 'flex-start', main: '', sub: '', ...o, hasSub: !!(o && o.sub) });
+      out.items.push({ isTable: 1, showHead: !stack, cols: 'minmax(0,1.4fr) minmax(0,1.3fr) minmax(0,1fr) 96px', rowCols: stack ? 'minmax(0,1fr)' : 'minmax(0,1.4fr) minmax(0,1.3fr) minmax(0,1fr) 96px', rowGap: stack ? '8px' : '14px',
+        head: [T('colRepo'), T('colSource'), T('colWs'), T('colSync')].map(label => ({ label, cursor: 'default', align: 'left' })),
+        rows: rows.map(r => { const sx = repoSrc(r); return { cursor: 'pointer', onClick: () => this.setState({ side: { kind: 'repo', id: r.id } }), cells: [
+          C(T('colRepo'), { main: r.alias || r.name, sub: sx.slug, weight: 600 }),
+          C(T('colSource'), { hasBadge: true, abbr: sx.p ? sx.p.abbr : '⌂', badgeBg: sx.p ? sx.p.color : 'var(--surface2)', badgeInk: sx.p ? 'white' : 'var(--muted)', main: sx.p ? sx.p.label : T('rdLocal', { device: 'MacBook Pro de Marta' }), sub: sx.a ? '@' + sx.a.user : '' }),
+          C(T('colWs'), { main: r.wss.length ? '' : '—', color: 'var(--faint)', chips: r.wss.map(id => wsById[id]).filter(Boolean).map(w => ({ name: w.name, color: w.color })) }),
+          C(T('colSync'), { main: this.ago(r.mins), color: 'var(--muted)' })] }; }) });
+    }
+    if (s.sec === 'accounts') {
+      out.dh = { title: T('dAccounts'), sub: T('laSub'), btns: [] };
+      if (st === 'loading') { out.items.push(rowsSkel(5)); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      out.items.push({ isCallout: 1, title: T('laCallT'), text: T('laCallText'), btns: [this.B(T('laOpenDesk'), () => this.toast('ramal://settings/platforms'), 'primary'), this.B(T('laDownload'), () => this.go('downloads'))] });
+      if (st === 'empty' || !s.accounts.length) { out.items.push(this.empty('@', T('emAccounts'), [])); return out; }
+      Object.keys(P).forEach(k => { const list = s.accounts.filter(a => a.platform === k); if (!list.length) return;
+        out.items.push(this.card({ abbr: P[k].abbr, badgeBg: P[k].color, title: P[k].label, count: String(list.length), rows: list.map((a, i) => {
+          const stc = { ok: this.chip(T('laChecked', { ago: this.ago(a.chkMins || 2) }), 'var(--ok)'), expires: this.chip(T('laExpiresIn', { days: a.chkDays || 5 }), 'var(--warn)'), expired: this.chip(T('laExpired'), 'var(--danger)'), fail: this.chip(T('laRejected'), 'var(--danger)'), none: this.chip(T('laNoSecret'), 'var(--faint)', T('laNoSecretTip')) }[a.chk || 'ok'];
+          const used = s.repos.filter(r => r.acc === a.id).length;
+          return this.row({ hasAv: true, av: a.user.slice(0, 2).toUpperCase(), avBg: R.LANE[(i + k.length) % 6], avInk: 'oklch(0.2 0.02 230)', avBorder: 'transparent', avRadius: '50%', label: '@' + a.user, meta: '· ' + a.name, code: `${a.host} · ${T('method.' + (METHOD[a.method] || 'pat'))}`,
+            chips: [...(a.def ? [this.chip(T('oaiDefault'), 'var(--accent)')] : []), stc, { label: T('laUsedIn', { count: used }), color: 'var(--muted)', bg: 'var(--bg)', tip: a.scopes }], hasMenu: true,
+            onMenu: e => this.openMenu(e, [{ label: L ? 'Remove…' : 'Quitar…', danger: 1, run: () => this.confirm(T('laRemoveT', { user: a.user, host: a.host }), T('laRemoveI', { platform: P[k].label }), T('laRemoveB'), () => { this.setState(x => ({ accounts: x.accounts.filter(y => y.id !== a.id) })); this.toast(T('laRemoved', { user: a.user })); }, { link: T('laTokensPage', { platform: P[k].label }) + ' ↗', onLink: () => this.toast({ github: `https://${a.host}/settings/applications`, gitlab: `https://${a.host}/-/user_settings/personal_access_tokens`, bitbucket: 'https://id.atlassian.com/manage-profile/security/api-tokens', azure: 'https://dev.azure.com/banca/_usersSettings/tokens', gitea: `https://${a.host}/user/settings/applications` }[k]) }) }], true) }); }) })); });
+    }
+    if (s.sec === 'team') {
+      if (!this.isOrg()) {
+        out.dh = { title: T('dTeam'), sub: '', btns: [] };
+        out.items.push(this.empty('+', T('pcText'), [this.B(T('orgCreate'), () => this.createOrg(), 'primary', { disabled: !s.verified, tip: s.verified ? '' : T('vNeedTip') })], { title: T('pcTitle'), line: T('pcTrial'), link: T('pcPricing'), onLink: () => { location.href = './Ramal Web Paginas.dc.html#W-17'; } }));
+        return out;
+      }
+      out.dh = { title: T('dTeam'), sub: T('teamSub', { o: org }), btns: adm && !ro ? [this.B('+ ' + T('invite'), () => this.openModal({ kind: 'invite', email: '', role: 'member' }), 'primary')] : [] };
+      if (st === 'loading') { out.items.push(this.skel('minmax(0,1fr)', [74]), rowsSkel(5)); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      const full = cnt.used >= s.seats;
+      out.items.push({ isBar: 1, line: T('tmLine', { members: T('tmMembers', { count: cnt.mem }), pending: T('tmPending', { count: cnt.pend }), seats: T('tmSeats', { used: cnt.used, total: s.seats }) }), pct: Math.min(100, Math.round(cnt.used / s.seats * 100)) + '%', color: full ? 'var(--warn)' : 'var(--accent)', hasBtn: s.role === 'owner' && !ro, btn: T('addSeats'), onBtn: () => this.openModal({ kind: 'seats', n: s.seats + 1 }) });
+      if (st === 'empty') out.items.push(this.empty('+', T('emTeam'), adm ? [this.B(T('invite'), () => this.openModal({ kind: 'invite', email: '', role: 'member' }), 'primary')] : []));
+      const list = st === 'empty' ? s.members.filter(m => m.email === 'marta@example.com') : s.members;
+      out.items.push(this.card({ title: T('dTeam'), rows: list.map(m => {
+        const isOwner = m.role === 'owner', me = m.email === 'marta@example.com', canEdit = adm && !isOwner && !m.pending && !me && !ro;
+        const sub = m.pending ? (m.expired ? T('inviteExpired') : T('invitePend', { date: this.date('inv') })) : m.email;
+        const items = s.role === 'member' || ro ? [{ label: T('tmCopyEmail'), run: () => this.copy(m.email) }] : isOwner ? [{ label: T('tmCopyEmail'), run: () => this.copy(m.email) }] : m.pending ? [{ label: T('resend'), run: () => (m.resent ? this.toast(T('resendSoon'), 'warn') : (this.setState(x => ({ members: x.members.map(y => y.email === m.email ? { ...y, resent: true } : y) })), this.toast(T('invited', { e: m.email })))) }, { label: T('tmCopyEmail'), run: () => this.copy(m.email) }, { sep: 1 }, { label: T('revokeInvB') + '…', danger: 1, run: () => this.confirm(T('revokeInvT', { email: m.email }), T('revokeInvI'), T('revokeInvB'), () => { this.setState(x => ({ members: x.members.filter(y => y.email !== m.email) })); this.toast(T('revoked')); }) }]
+          : [{ label: T('tmCopyEmail'), run: () => this.copy(m.email) }, ...(me ? [] : [{ sep: 1 }, { label: T('rmMemberB') + '…', danger: 1, run: () => this.confirm(T('rmMemberT', { name: m.name, org }), T('rmMemberI', { org }), T('rmMemberB'), () => { this.setState(x => ({ members: x.members.filter(y => y.email !== m.email) })); this.toast(T('removed', { name: m.name, org })); }) }])];
+        return this.row({ hasAv: true, av: m.ini, avBg: R.LANE[m.lane % 6], avInk: 'oklch(0.2 0.02 230)', avBorder: 'transparent', avRadius: '50%', opacity: m.pending ? 0.5 : 1, label: m.name, subs: [{ text: sub, color: m.expired ? 'var(--danger)' : 'var(--faint)' }],
+          hasSelect: canEdit, selValue: m.role, selDisabled: false, options: [{ value: 'admin', label: T('roleAdmin') }, { value: 'member', label: T('roleMember') }], stop: e => e.stopPropagation(), onSelect: e => { const v = e.target.value; this.setState(x => ({ members: x.members.map(y => y.email === m.email ? { ...y, role: v } : y) })); this.toast(T('roleChanged', { name: m.name, role: T(v === 'admin' ? 'roleAdmin' : 'roleMember') })); },
+          hasRole: !canEdit, roleLabel: T(isOwner ? 'roleOwner' : m.role === 'admin' ? 'roleAdmin' : 'roleMember'), hasMenu: true, onMenu: e => this.openMenu(e, items, true) }); }) }));
+      const isOwn = s.role === 'owner', active = ['active', 'past_due', 'cancel_scheduled'].includes(s.plan);
+      out.items.push(this.card({ title: T('orgCard'), rows: [
+        this.row({ label: T('orgName'), hasInput: true, value: s.orgEdit != null ? s.orgEdit : org, inputDisabled: !adm || ro, onInput: e => this.setState({ orgEdit: e.target.value }), onBlur: () => {}, inputType: 'text', ph: 'ACME Studio', btns: adm && !ro ? [this.RB(T('save'), () => { const v = (s.orgEdit || '').trim(); if (!v || v.length > 60) return; this.setState(x => ({ orgName: v, orgEdit: null, orgs: x.orgs.map(o => o.name === org ? { ...o, name: v } : o) })); this.toast(T('orgRenamed')); }, { disabled: s.orgEdit == null || s.orgEdit.trim() === org })] : [] }),
+        this.row({ label: T('orgOwnerRow'), meta: '· ' + own.name, btns: isOwn && !ro ? [this.RB(T('orgTransfer'), () => this.openModal({ kind: 'transfer' }))] : [] }),
+        this.row({ label: T('orgLeave').replace('…', ''), btns: [this.RB(T('orgLeave'), () => this.confirm(T('orgLeaveT', { org }), T('orgLeaveI', { org }), T('orgLeaveB'), () => { this.setState(x => ({ ctx: 'personal', orgs: x.orgs.filter(o => o.name !== org), sec: 'overview' })); this.toast(T('left', { org })); }), { disabled: isOwn, tip: isOwn ? T('orgLeaveTip') : '', danger: !isOwn })] }),
+        ...(isOwn ? [this.row({ label: T('orgDelete').replace('…', ''), subs: active ? [{ text: T('orgHasSub', { org }), color: 'var(--warn)' }] : [], btns: [this.RB(active ? T('goBilling') : T('orgDelete'), () => active ? this.go('billing') : this.openModal({ kind: 'reauth', strong: true, action: 'deleteOrg', next: () => this.openModal({ kind: 'deleteOrg', typed: '' }) }), { danger: !active })] })] : [])] }));
+    }
+    if (s.sec === 'orgAi') {
+      out.dh = { title: T('nav.orgAi'), sub: T('oaiSub'), btns: adm && s.tab === 'keys' && !ro ? [this.B('+ ' + T('oaiAdd'), () => this.openModal({ kind: 'key', prov: 'anthropic', label: '' }), 'primary')] : [] };
+      if (adm) out.tabs = [['keys', T('oaiTabKeys')], ['usage', T('oaiTabUsage')]].map(([k, l]) => ({ label: l, color: s.tab === k ? 'var(--text)' : 'var(--muted)', line: s.tab === k ? 'var(--accent)' : 'transparent', onClick: () => this.setState({ tab: k }) }));
+      const tab = adm ? s.tab : 'keys';
+      if (st === 'loading') { out.items.push(tab === 'usage' ? this.skel('repeat(auto-fit,minmax(180px,1fr))', [90, 90, 90, 90]) : rowsSkel(3), rowsSkel(tab === 'usage' ? 5 : 2)); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      if (tab === 'keys') {
+        if (st === 'empty' || !s.keys.length) { out.items.push(this.empty('✦', adm ? T('oaiEmptyAdm') : T('oaiEmptyMem'), adm ? [this.B(T('oaiAdd'), () => this.openModal({ kind: 'key', prov: 'anthropic', label: '' }), 'primary')] : [])); return out; }
+        if (!adm) out.items.push(this.card({ title: T('oaiMyUsage', { used: 37, limit: s.policy.daily }), rows: [] }));
+        out.items.push(this.card({ title: T('oaiTabKeys'), rows: s.keys.map(k => { const mf = x => k.fn[x] || k.model;
+          return this.row({ hasAv: true, av: AP[k.prov].abbr, avBg: AP[k.prov].color, avInk: 'white', avBorder: 'transparent', avRadius: '9px', label: k.label, meta: '· ' + AP[k.prov].label, code: k.masked,
+            subs: [{ text: T('oaiModels', { commitModel: mf('commit'), prModel: mf('pr'), summaryModel: mf('summary') }), color: 'var(--muted)' }, { text: T('oaiAddedBy', { name: k.by, ago: k.mins < 0 ? (L ? 'never' : 'nunca') : this.ago(k.mins) }), color: 'var(--faint)' }],
+            chips: [...(k.def ? [this.chip(T('oaiDefault'), 'var(--accent)')] : []), ...(k.gone ? [this.chip(T('oaiModelGone', { model: k.gone }), 'var(--warn)')] : [])], hasMenu: adm && !ro,
+            onMenu: e => this.openMenu(e, [{ label: T('oaiTest'), run: () => k.prov === 'anthropic' && s.variant === 'modelo-retirado' ? this.toast(T('oaiQuota', { provider: AP[k.prov].label }), 'warn') : this.toast(T('oaiTestOk', { provider: AP[k.prov].label, latency: 412 })) }, { label: T('oaiEdit'), run: () => this.openModal({ kind: 'editKey', id: k.id, prov: k.prov, label: k.label, def: k.model, fn: { ...k.fn }, isDef: k.def, gone: k.gone }) }, { label: T('oaiRotate'), run: () => this.openModal({ kind: 'rotate', label: k.label, key: '' }) }, ...(k.def ? [] : [{ label: T('oaiMakeDef'), run: () => this.setState(x => ({ keys: x.keys.map(y => ({ ...y, def: y.id === k.id })) })) }]), { sep: 1 }, { label: T('oaiDelete'), danger: 1, run: () => this.confirm(T('oaiDeleteT', { label: k.label }), T('oaiDeleteI'), T('oaiDeleteB'), () => { this.setState(x => ({ keys: x.keys.filter(y => y.id !== k.id) })); this.toast(T('keyDeleted')); }) }], true) }); }) }));
+        const pol = s.policy, note = k => this.noteOf(s.polNote[k]), setP = (k, v) => this.saveFlow('polNote', k, () => this.setState(x => ({ policy: { ...x.policy, [k]: v } })));
+        const tog = (on, fn, dis) => ({ hasToggle: true, on, tbg: on ? 'var(--accent)' : 'var(--border)', tx: on ? 'translateX(16px)' : 'none', onToggle: fn, toggleDisabled: !!dis, tOpacity: dis ? 0.5 : 1 });
+        out.items.push(this.card({ title: T('polTitle'), rows: [
+          this.row({ label: T('polProxy'), ...tog(pol.proxy, () => setP('proxy', !pol.proxy), !adm || ro), hasNote: !!s.polNote.proxy, note: note('proxy')[0], noteColor: note('proxy')[1] }),
+          ...[['commit', 'fCommit'], ['pr', 'fPR'], ['summary', 'fSummary']].map(([k, lk]) => this.row({ label: T(lk), meta: '· ' + T('polFeatures'), ...tog(pol.f[k], () => setP('f', { ...pol.f, [k]: !pol.f[k] }), !adm || ro || !pol.proxy) })),
+          this.row({ label: T('polDaily'), hasInput: true, inputType: 'number', value: pol.daily, inputDisabled: !adm || ro, onInput: e => this.setState(x => ({ policy: { ...x.policy, daily: e.target.value } })), onBlur: () => this.saveFlow('polNote', 'daily'), hasNote: !!s.polNote.daily, note: note('daily')[0], noteColor: note('daily')[1] }),
+          this.row({ label: T('polBudget'), hasInput: !pol.noCap, inputType: 'number', value: pol.cap, inputDisabled: !adm || ro, onInput: e => this.setState(x => ({ policy: { ...x.policy, cap: e.target.value } })), onBlur: () => this.saveFlow('polNote', 'cap'), hasNote: !!s.polNote.cap || pol.noCap, note: pol.noCap && !s.polNote.cap ? T('polNoCap') : note('cap')[0], noteColor: note('cap')[1], btns: adm && !ro ? [this.RB(pol.noCap ? (L ? 'Set a cap' : 'Poner tope') : T('polNoCap'), () => setP('noCap', !pol.noCap))] : [] })] }));
+      } else {
+        out.items.push({ isSeg: 1, opts: [['month', T('usThisMonth')], ['last', T('usLastMonth')], ['7d', T('usLast7')]].map(([k, l]) => ({ label: l, bg: s.period === k ? 'var(--accent)' : 'transparent', color: s.period === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ period: k }) })) });
+        if (st === 'empty') { out.items.push(this.empty('∑', T('usEmpty'), [])); return out; }
+        const f = s.period === '7d' ? 0.25 : s.period === 'last' ? 1.1 : 1;
+        const data = [['Diego León', 'fCommit', 'ACME producción', 412, 820000, 61000, 2, 37], ['Aiko Tanaka', 'fCommit', 'ACME producción', 388, 790000, 58000, 0, 188], ['Samuel Ortiz', 'fPR', 'ACME Claude', 96, 1200000, 140000, 5, 12], ['Marta Ruiz', 'fSummary', 'ACME Claude', 51, 410000, 32000, 1, 4], ['Aiko Tanaka', 'fPR', 'ACME Claude', 44, 610000, 71000, 0, 0]].map(r => ({ who: r[0], fn: T(r[1]), key: r[2], req: Math.round(r[3] * f), tin: Math.round(r[4] * f), tout: Math.round(r[5] * f), err: r[6], today: r[7] }));
+        const sum = k => data.reduce((a, r) => a + r[k], 0), fmt = n => n >= 1e6 ? (n / 1e6).toFixed(1).replace('.', L ? '.' : ',') + ' M' : n >= 1e3 ? Math.round(n / 1e3) + ' k' : String(n);
+        out.items.push({ isTiles: 1, min: 170, tiles: [[sum('req'), 'usRequests'], [sum('tin'), 'usTokensIn'], [sum('tout'), 'usTokensOut'], [sum('err'), 'usErrors']].map(([v, k]) => ({ value: fmt(v), label: T(k), size: 26, font: "'IBM Plex Mono',monospace", cursor: 'default' })) });
+        if (!s.policy.noCap) { const used = sum('tin') + sum('tout'), cap = +s.policy.cap || 1; out.items.push({ isBar: 1, line: T('usBudget', { used: fmt(used), cap: fmt(cap) }), pct: Math.min(100, Math.round(used / cap * 100)) + '%', color: used / cap > 0.9 ? 'var(--warn)' : 'var(--accent)', hasBtn: false }); }
+        const lim = +s.policy.daily || 200, sk = s.sort; data.sort((a, b) => sk === 'who' ? a.who.localeCompare(b.who) : b[sk] - a[sk]);
+        const stack = (s.vw || 1280) < 768, cols = 'minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.1fr) 80px 90px 90px 64px 90px';
+        const H = [['who', T('colMember')], ['fn', T('colFn')], ['key', T('colKey')], ['req', T('usRequests')], ['tin', T('usTokensIn')], ['tout', T('usTokensOut')], ['err', T('usErrors')], ['today', T('usToday')]];
+        const C = (lbl, main, o = {}) => ({ hasLbl: stack, lbl, hasBadge: false, hasSub: false, weight: 400, font: o.mono ? "'IBM Plex Mono',monospace" : 'inherit', color: o.color || 'var(--text)', chips: [], justify: stack || !o.right ? 'flex-start' : 'flex-end', main, sub: '' });
+        out.items.push({ isTable: 1, showHead: !stack, cols, rowCols: stack ? 'minmax(0,1fr)' : cols, rowGap: stack ? '6px' : '12px', head: H.map(([k, l], i) => ({ label: l + (sk === k ? ' ↓' : ''), cursor: 'pointer', align: i >= 3 ? 'right' : 'left', onClick: () => this.setState({ sort: k }) })),
+          rows: data.map(r => ({ cursor: 'default', cells: [C(H[0][1], r.who, {}), C(H[1][1], r.fn), C(H[2][1], r.key, { color: 'var(--muted)' }), C(H[3][1], fmt(r.req), { mono: 1, right: 1 }), C(H[4][1], fmt(r.tin), { mono: 1, right: 1 }), C(H[5][1], fmt(r.tout), { mono: 1, right: 1 }), C(H[6][1], String(r.err), { mono: 1, right: 1, color: r.err ? 'var(--danger)' : 'var(--muted)' }), C(H[7][1], T('usedOf', { used: r.today, limit: lim }), { mono: 1, right: 1, color: r.today / lim >= 0.9 ? 'var(--warn)' : 'var(--text)' })] })) });
+      }
+    }
+    if (s.sec === 'billing') {
+      out.dh = { title: T('biTitle'), sub: T('biSub', { org }), btns: [] };
+      if (st === 'loading') { out.items.push(this.skel('minmax(0,1fr)', [190])); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      const isOwn = s.role === 'owner', pl = s.plan, seats = s.seats;
+      const CH = { trialing: [T('stTrial'), 'var(--info)'], active: [T('stActive'), 'var(--ok)'], past_due: [T('stPastDue'), 'var(--warn)'], cancel_scheduled: [T('stCancelAt', { date: this.date('cancelAt') }), 'var(--warn)'], canceled: [T('stCanceled'), 'var(--danger)'], inactive: [T('stInactive'), 'var(--danger)'] }[pl];
+      const seatsLine = T('tmLine', { members: T('tmMembers', { count: cnt.mem }), pending: T('tmPending', { count: cnt.pend }), seats: T('tmSeats', { used: cnt.used, total: seats }) });
+      const lines = pl === 'trialing' ? [T('biTrialLine', { date: this.date('trialEnd'), days: 3 }), seatsLine] : pl === 'active' ? [T('biAnnualLine', { seats, date: this.date('renewY') }), seatsLine] : pl === 'past_due' || pl === 'cancel_scheduled' ? [T('biMonthlyLine', { seats, date: this.date('renewM') }), seatsLine] : [seatsLine];
+      const price = pl === 'active' ? T('biPriceYear', { total: seats * 96 }) : pl === 'past_due' || pl === 'cancel_scheduled' ? T('biPriceMonth', { total: seats * 10 }) : '';
+      const checkout = () => { location.href = './Ramal Web Paginas.dc.html#W-18'; }, portal = () => this.toast('Paddle · customer portal ↗');
+      const btns = !isOwn ? [] : pl === 'trialing' || pl === 'canceled' || pl === 'inactive' || pl === 'none' ? [this.B(T('biChoose'), checkout, 'primary'), ...(pl === 'trialing' ? [this.B(T('biSeats'), () => this.openModal({ kind: 'seats', n: seats }))] : [])] : pl === 'active' ? [this.B(T('biSeats'), () => this.openModal({ kind: 'seats', n: seats }), 'primary'), this.B(T('biPortal') + ' ↗', portal)] : pl === 'past_due' ? [this.B(T('biUpdatePay') + ' ↗', portal, 'primary')] : [this.B(T('biPortal') + ' ↗', portal)];
+      out.items.push({ isPlan: 1, name: 'Ramal Pro', hasChip: !!CH, chip: CH ? CH[0] : '', chipColor: CH ? CH[1] : '', chipBg: CH ? tint(CH[1], 16) : '', lines, hasPrice: !!price, price, hasBtns: btns.length > 0, btns });
+    }
+    if (s.sec === 'sync') {
+      out.dh = { title: T('dSync'), sub: T('syncSub'), btns: [] };
+      if (st === 'loading') { out.items.push(rowsSkel(6)); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      const late = s.screen === 'W-25' && s.variant === 'dispositivo-atrasado';
+      out.items.push({ isStatus: 1, lines: s.devices.filter(d => d.type !== 'browser').map(d => ({ dot: (late && d.id === 'd3') || d.sync > 1440 ? 'var(--warn)' : 'var(--ok)', text: T('syDevices', { device: d.name, ago: this.ago(late && d.id === 'd3' ? 8640 : d.sync) }) })) });
+      out.items.push({ isSlot: 1, text: T('vaultSlot') });
+      const sy = s.sync, keys = { ws: ['sWs'], acc: ['sAcc', 'secret'], aiPrefs: ['sAiPrefs'], aiKeys: ['sAiKeys', 'secret'], git: ['sGit'], look: ['sLook'] };
+      const flip = k => { const on = sy[k], sec = keys[k][1];
+        if (on && sec) { const cnt2 = k === 'acc' ? s.accounts.length : 2; this.confirm(T(k === 'acc' ? 'syAccOffT' : 'syKeysOffT'), T(k === 'acc' ? 'syAccOffI' : 'syKeysOffI', { count: cnt2 }), T('syOffB'), () => this.saveFlow('syncNote', k, () => this.setState(x => ({ sync: { ...x.sync, [k]: false } })))); return; }
+        if (!on && sec && !s.vault) { this.saveFlow('syncNote', k); return; }
+        this.saveFlow('syncNote', k, () => this.setState(x => ({ sync: { ...x.sync, [k]: !on } }))); };
+      out.items.push(this.card({ title: L ? 'What syncs' : 'Qué se sincroniza', rows: Object.keys(keys).map(k => { const on = sy[k], sec = keys[k][1], nt = this.noteOf(s.syncNote[k]);
+        const desc = sec && !s.vault ? T('syNeedVault') : k === 'aiKeys' && on ? T('syKeysOn') : k === 'acc' && on ? T('sAccD') : !on && !sec ? T('syPaused') : '';
+        return this.row({ label: T(keys[k][0]), subs: desc ? [{ text: desc, color: sec && !s.vault ? 'var(--warn)' : 'var(--muted)' }] : [], hasToggle: true, on, tbg: on ? 'var(--accent)' : 'var(--border)', tx: on ? 'translateX(16px)' : 'none', onToggle: () => flip(k), toggleDisabled: sec && !s.vault && !on, tOpacity: sec && !s.vault && !on ? 0.5 : 1, hasNote: !!nt[0], note: nt[0], noteColor: nt[1] }); }) }));
+    }
+    if (s.sec === 'account') {
+      out.dh = { title: T('acTitle'), sub: T('acSub'), btns: [] };
+      if (st === 'loading') { out.items.push(this.skel('minmax(0,1fr)', [230, 90]), rowsSkel(4)); return out; }
+      if (st === 'error') { out.items.push(...err()); return out; }
+      const pf = s.profile, setPf = (k, v) => this.setState(x => ({ profile: { ...x.profile, [k]: v }, profErr: k === 'user' ? '' : x.profErr }));
+      const tzs = ['America/Mexico_City', 'America/Argentina/Buenos_Aires', 'America/New_York', 'America/Los_Angeles', 'Europe/Madrid', 'Europe/London', 'Asia/Tokyo'];
+      out.items.push({ isProfile: 1, title: L ? 'Profile' : 'Perfil', photoOpacity: s.photo === 'up' ? 0.5 : 1, photoBtn: s.photo === 'up' ? T('photoUp') : T('prfPhoto'), photoRm: T('prfPhotoRm'), photoHint: s.photo === 'big' ? T('prfTooBig') : s.photo === 'type' ? T('prfBadType') : T('prfPhotoHint'), photoHintColor: s.photo === 'big' || s.photo === 'type' ? 'var(--danger)' : 'var(--faint)',
+        onPhoto: () => { const next = { ok: 'up', up: 'big', big: 'type', type: 'ok' }[s.photo]; this.setState({ photo: next === 'up' ? 'up' : next }); if (next === 'up') this.later(1000, () => this.setState({ photo: 'big' })); }, onPhotoRm: () => this.setState({ photo: 'ok' }),
+        fields: [
+          { isInput: true, label: T('name'), value: pf.name, onChange: e => setPf('name', e.target.value), border: 'var(--border)' },
+          { isInput: true, label: T('prfUsername'), value: pf.user, onChange: e => setPf('user', e.target.value.toLowerCase()), hasErr: s.profErr === 'user', err: T('prfUserTaken'), border: s.profErr === 'user' ? 'var(--danger)' : 'var(--border)', hasHint: s.profErr !== 'user', hint: T('prfUserHint') },
+          { isSelect: true, label: T('prfTz'), value: pf.tz, onChange: e => setPf('tz', e.target.value), options: tzs.map(z => ({ value: z, label: z.split('/').slice(1).join(' / ').replace(/_/g, ' ') + ' (' + z.split('/')[0].replace(/_/g, ' ') + ')' })) },
+          { isSelect: true, label: T('prfMailLang'), value: pf.mailLang, onChange: e => setPf('mailLang', e.target.value), options: [{ value: 'es', label: 'Español' }, { value: 'en', label: 'English' }] }],
+        saveNote: s.profNote, saving: s.profNote === T('saving'), saveLabel: T('prfSave'),
+        onSave: () => { if (s.profile.user === 'marta') { this.setState({ profErr: 'user' }); return; } if (!/^[a-z0-9-]{3,39}$/.test(s.profile.user)) return; this.setState({ profNote: T('saving') }); this.later(800, () => { this.setState({ profNote: '✓ ' + T('saved') }); this.toast(T('profileSaved')); }); } });
+      out.items.push(this.card({ title: T('emCard'), rows: [this.row({ label: 'marta@example.com', chips: [s.verified ? this.chip(T('emVerified'), 'var(--ok)') : this.chip(T('emUnverified'), 'var(--warn)')], subs: s.emailPending ? [{ text: T('emPending', { new: s.emailPending, current: 'marta@example.com' }), color: 'var(--info)' }] : !s.verified ? [{ text: T('emNeedVerify'), color: 'var(--warn)' }] : [], btns: [this.RB(T('emChange'), () => this.openModal({ kind: 'reauth', strong: false, action: 'changeEmail', next: () => this.openModal({ kind: 'email', email: '' }) }), { disabled: !s.verified, tip: s.verified ? '' : T('emNeedVerify') })] })] }));
+      out.items.push(this.card({ title: T('pwRow'), rows: [this.row({ label: T('pwRow'), subs: [{ text: T('pwRowD'), color: 'var(--muted)' }], btns: [this.RB(T('pwChange'), () => { location.href = './Ramal Web Auth.dc.html#W-33'; })] })] }));
+      out.items.push(this.card({ id: 'devices', title: T('dsTitle'), headBtn: T('dsOthersOut'), onHeadBtn: () => this.confirm(T('dsOthersT'), T('dsOthersI'), T('dsOthersOut'), () => { const n = s.devices.filter(d => !d.current).length; this.setState(x => ({ devices: x.devices.filter(d => d.current) })); this.toast(T('dsOthersDone', { count: n })); }), rows: s.devices.map(devRow) }));
+      const ex = s.exportState;
+      out.items.push(this.card({ title: T('dataT'), rows: [this.row({ label: T('export'), subs: [{ text: ex === 'prep' ? T('exPreparing') : ex === 'ready' ? T('exReady') : T('exNoSecrets'), color: ex === 'ready' ? 'var(--ok)' : 'var(--muted)' }], btns: [this.RB(ex === 'ready' ? '↓ JSON' : T('export'), () => { if (ex === 'ready') { this.toast(T('exported')); this.setState({ exportState: 'idle' }); return; } this.setState({ exportState: 'prep' }); this.later(1500, () => this.setState({ exportState: 'ready' })); }, { disabled: ex === 'prep' })] })] }));
+      out.items.push(this.card({ id: 'danger', title: T('dzTitle'), border: tint('var(--danger)', 45), rows: [this.row({ label: T('dzDelete').replace('…', ''), subs: [{ text: T('dzGone'), color: 'var(--muted)' }], btns: [this.RB(T('dzDelete'), () => this.openModal({ kind: 'reauth', strong: true, next: () => this.isOrg() && s.role === 'owner' && cnt.mem > 1 ? this.openModal({ kind: 'blocked' }) : this.openModal({ kind: 'deleteAccount', typed: '' }) }), { danger: true })] })] }));
+    }
+    if (s.sec === 'downloads') {
+      out.dh = { title: T('download'), sub: T('dlSub'), btns: [] };
+      const web = () => { location.href = './Ramal Web.dc.html'; };
+      out.items.push({ isDl: 1, cards: [['macOS', L ? 'macOS 12 or later' : 'macOS 12 o posterior', 'Apple Silicon (.dmg)', 'Ramal-2.4.0-arm64.dmg', 1], ['Windows', 'Windows 10 y 11', 'x64 (.exe)', 'Ramal-Setup-2.4.0-x64.exe'], ['Linux', 'Ubuntu 22.04+, Debian 12+', 'Debian / Ubuntu (.deb)', 'ramal_2.4.0_amd64.deb'], ['VS Code', L ? 'VS Code 1.138 or later' : 'VS Code 1.138 o posterior', L ? 'Install extension' : 'Instalar extensión', 'ramal.ramal']].map(([name, req, main, file, yours]) => ({ name, req, main, isYours: !!yours, yours: T('yours'), border: yours ? 'var(--accent)' : 'var(--border)', onMain: () => this.toast(T('dlStarted', { file })), all: T('allOpts'), onAll: web })) });
+    }
+    return out;
+  }
+
+  sideView() {
+    const s = this.state, sd = s.side, T = this.t.bind(this), L = this.L, R = window.RAMAL, P = R.PLAT; if (!sd) return null;
+    const ch = (label, c) => ({ label, color: c, bg: tint(c, 16) });
+    if (sd.kind === 'device') {
+      const d = s.devices.find(x => x.id === sd.id); if (!d) return null;
+      const typeL = { desktop: T('typeD'), vscode: T('typeV'), browser: T('typeB') }[d.type];
+      return { icon: { desktop: 'D', vscode: 'VS', browser: 'WEB' }[d.type], iconBg: 'var(--bg)', iconInk: 'var(--muted)', title: d.name, sub: d.app,
+        hasBand: !!sd.rotate, band: T('dvRotate', { device: d.name }), hasName: true, nameLabel: T('dvRename'), name: sd.name != null ? sd.name : d.name, nameNote: sd.note || '',
+        onName: e => this.setState({ side: { ...sd, name: e.target.value } }), onNameBlur: () => { const v = (sd.name || '').trim(); if (sd.name == null || !v || v === d.name) return; this.setState({ side: { ...sd, note: T('saving') } }); this.later(700, () => { this.setState(x => ({ devices: x.devices.map(y => y.id === d.id ? { ...y, name: v } : y), side: { ...x.side, note: '✓ ' + T('saved') } })); }); },
+        rows: [{ label: T('typeL'), value: typeL, font: 'inherit', chips: d.current ? [ch(T('dsThisBrowser'), 'var(--accent)')] : [], hasBtn: false }, { label: T('sysArch'), value: `${d.os} · ${d.arch}`, font: 'inherit', chips: [], hasBtn: false }, { label: T('version'), value: d.app, font: "'IBM Plex Mono',monospace", chips: d.update ? [ch(T('dsUpdate', { version: d.update }), 'var(--warn)')] : [], hasBtn: false }, { label: T('since'), value: d.since[L], font: 'inherit', chips: [], hasBtn: false }, { label: T('lastSync'), value: this.ago(d.sync), font: 'inherit', chips: [], hasBtn: false }],
+        hasNote: false, note: '', hasLink: false,
+        btns: [{ label: d.current ? T('signOut') : T('dvSignOut'), bg: 'transparent', color: 'var(--danger)', border: 'var(--danger)', onClick: () => d.current ? this.toast(T('signOut')) : this.confirm(T('dvOutT', { device: d.name }), T('dvOutI'), T('dvOutB'), () => { this.setState(x => ({ devices: x.devices.filter(y => y.id !== d.id), side: null })); this.toast(T('dvOutDone', { device: d.name })); }) }] };
+    }
+    if (sd.kind === 'repo') {
+      const r = s.repos.find(x => x.id === sd.id); if (!r) return null;
+      const a = s.accounts.find(x => x.id === r.acc), rm = a ? { plat: a.platform, host: a.host, slug: `${a.user}/${r.name}` } : r.remote, p = rm ? P[rm.plat] : null, url = rm ? `https://${rm.host}/${rm.slug}.git` : '';
+      const wss = r.wss.map(id => s.workspaces.find(w => w.id === id)).filter(Boolean);
+      return { icon: p ? p.abbr : '⌂', iconBg: p ? p.color : 'var(--surface2)', iconInk: p ? 'white' : 'var(--muted)', title: r.alias || r.name, sub: r.name, hasBand: false, hasName: false,
+        rows: [...(url ? [{ label: T('remoteUrl'), value: url, font: "'IBM Plex Mono',monospace", chips: [], hasBtn: true, btn: T('rdCopyUrl'), onBtn: () => this.copy(url) }, { label: T('platAcc'), value: p.label + (a ? ' · @' + a.user : ''), font: 'inherit', chips: [], hasBtn: false }] : [{ label: T('colSource'), value: T('rdLocal', { device: 'MacBook Pro de Marta' }), font: 'inherit', chips: [], hasBtn: false }]),
+          { label: T('colWs'), value: wss.length ? '' : '—', font: 'inherit', chips: wss.map(w => ch(w.name, w.color)), hasBtn: true, btn: L ? 'Edit' : 'Editar', onBtn: e => this.openMenu(e, s.workspaces.map(w => ({ label: (r.wss.includes(w.id) ? '✓  ' : '     ') + w.name, run: () => this.setState(x => ({ repos: x.repos.map(z => z.id !== r.id ? z : { ...z, wss: z.wss.includes(w.id) ? z.wss.filter(i => i !== w.id) : [...z.wss, w.id] }) })) })), true) },
+          { label: T('colSync'), value: this.ago(r.mins), font: 'inherit', chips: [], hasBtn: false }],
+        hasNote: !url, note: T('rdLocalNote'),
+        btns: url ? [{ label: T('rdOpen'), bg: 'var(--accent)', color: 'var(--accent-ink)', border: 'var(--accent)', onClick: () => this.toast('ramal://open?repo=' + encodeURIComponent(url)) }] : [], hasLink: true, link: T('rdNoDesktop'), onLink: () => this.go('downloads') };
+    }
+    return null;
+  }
+
+  renderVals() {
+    const s = this.state;
+    if (!s.ready || !window.RAMAL || !window.RAMAL.WEB70) return { t: {}, proto: [], nav: [], items: [], banners: [], dh: { btns: [] }, orgChip: {}, sd: {}, md: {}, menu: {} };
+    const T = this.t.bind(this), L = this.L, vw = s.vw || 1280, wide = vw >= 900, org = s.orgName, isOrg = this.isOrg(), adm = this.isAdmin(), own = this.owner();
+    const t = {}; ['rsMenu', 'rsClose', 'download', 'retry', 'moreActions'].forEach(k => { t[k] = T(k); });
+    const chip = (id, on, onClick) => ({ id, onClick, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', border: on ? 'var(--accent)' : 'var(--border)' });
+    const proto = [
+      { label: 'screen', chips: SCREENS.map(id => chip(id, s.screen === id, () => this.apply({ screen: id, ctx: id === 'W-13' ? 'personal' : (s.ctx === 'personal' && s.screen === 'W-13' ? 'org' : s.ctx), role: s.role, plan: s.plan }))) },
+      { label: 'context', chips: ['personal', 'org'].map(id => chip(id, s.ctx === id, () => this.setState({ ctx: id, sec: id === 'personal' && ['orgAi', 'billing'].includes(s.sec) ? 'overview' : s.sec }))) },
+      { label: 'role', chips: ['owner', 'admin', 'member'].map(id => chip(id, s.role === id, () => this.apply({ screen: s.screen, ctx: s.ctx, role: id, plan: s.plan, dstate: s.dstate }))) },
+      { label: 'plan', chips: PLANS.map(id => chip(id, s.plan === id, () => this.setState({ plan: id }))) },
+      { label: 'state', chips: ['normal', 'empty', 'loading', 'error'].map(id => chip(id, s.dstate === id, () => { this.setState({ dstate: id }); if (id === 'loading') this.later(1600, () => this.setState({ dstate: 'normal' })); })) }];
+    if (VARIANTS[s.screen]) proto.push({ label: 'variante', chips: VARIANTS[s.screen].map(id => chip(id, s.variant === id, () => this.apply({ screen: s.screen, ctx: s.ctx, role: s.role, plan: s.plan, dstate: s.dstate, variant: id }))) });
+    const sec = (!isOrg && ['orgAi', 'billing'].includes(s.sec)) ? 'overview' : s.sec;
+    if (sec !== s.sec) this.state.sec = sec;
+    const NAV = [['overview', T('dOverview'), ''], ['workspaces', T('dWorkspaces'), s.workspaces.length], ['repos', T('dRepos'), s.repos.length], ['accounts', T('dAccounts'), s.accounts.length], ['team', T('dTeam'), isOrg ? this.counts().mem : ''], ...(isOrg ? [['orgAi', T('nav.orgAi'), ''], ['billing', T('nav.billing'), '']] : []), ['sync', T('dSync'), ''], ['account', T('nav.account'), '']];
+    const nav = NAV.map(([k, l, c]) => ({ label: l, count: String(c), bg: sec === k ? 'var(--accent-soft)' : 'transparent', color: sec === k ? 'var(--accent)' : 'var(--text)', onClick: () => this.go(k) }));
+    const curOrg = s.orgs.find(o => o.name === org) || { ini: 'AS' };
+    const orgChip = isOrg ? { ini: curOrg.ini, name: org, bg: 'var(--accent)', color: 'var(--accent-ink)' } : { ini: 'MR', name: T('personal'), bg: 'oklch(0.68 0.2 300)', color: 'oklch(0.2 0.02 300)' };
+    const roleL = r => T(r === 'owner' ? 'roleOwner' : r === 'admin' ? 'roleAdmin' : 'roleMember');
+    const onOrg = e => this.openMenu(e, [{ label: T('personal'), ini: 'MR', iniBg: 'oklch(0.68 0.2 300)', iniInk: 'oklch(0.2 0.02 300)', hint: !isOrg ? '✓' : '', run: () => this.setState({ ctx: 'personal' }) }, ...s.orgs.map(o => ({ label: o.name, ini: o.ini, iniBg: 'var(--accent)', iniInk: 'var(--accent-ink)', hint: (isOrg && o.name === org ? '✓  ' : '') + roleL(o.name === org ? s.role : o.role), run: () => this.setState({ ctx: 'org', orgName: o.name, role: o.name === 'ACME Studio' ? (s.orgs[0].role) : o.role }) })), { sep: 1 },
+      { label: T('newOrg'), disabled: !s.verified, tip: s.verified ? '' : T('vNeedTip'), run: () => this.createOrg() }]);
+    const onUser = e => this.openMenu(e, [{ label: 'marta@example.com', disabled: true }, { sep: 1 }, { label: T('nav.account'), run: () => this.go('account') }, { label: T('dSync'), run: () => this.go('sync') }, { sep: 1 }, { label: T('signOut'), danger: 1, run: () => this.toast(T('signOut')) }], true);
+    const banners = [];
+    const bn = (kind, text, btn, onBtn) => { const c = { info: 'var(--info)', warn: 'var(--warn)', danger: 'var(--danger)' }[kind]; banners.push({ text, color: c, bg: tint(c, 10), border: tint(c, 30), icon: kind === 'info' ? 'i' : '!', hasBtn: !!btn, btn: btn || '', onBtn }); };
+    if (isOrg) {
+      const isOwn = s.role === 'owner', ck = () => { location.href = './Ramal Web Paginas.dc.html#W-18'; };
+      if (s.plan === 'trialing') bn('info', isOwn ? T('bnTrialOwner', { org, days: 3 }) : T('bnTrialMember', { org, days: 3, owner: own.name }), isOwn ? T('biChoose') : '', ck);
+      if (s.plan === 'past_due') bn('warn', isOwn ? T('bnPastOwner', { org }) : T('bnPastMember', { org }), isOwn ? T('biUpdatePay') + ' ↗' : '', () => this.toast('Paddle · customer portal ↗'));
+      if (s.plan === 'inactive' || s.plan === 'canceled') bn('danger', T('bnEnded', { org }), isOwn ? T('biChoose') : '', ck);
+      if (sec === 'team' && s.role === 'member') bn('info', T('roTeam', { org }));
+      if (sec === 'orgAi' && !adm) bn('info', T('roOrgKeys'));
+      if (sec === 'billing' && s.role !== 'owner') bn('info', T('roBilling'));
+    }
+    if (!s.verified && (sec === 'team' || sec === 'overview' || sec === 'account')) bn('info', T('vBanner', { email: 'marta@example.com' }), T('vResend'), () => this.toast(T('vResent', { email: 'marta@example.com' })));
+    const body = this.section(), sd = this.sideView(), md = this.modalView();
+    return { t, proto, wide, narrow: !wide, pad: vw < 600 ? 16 : 28, nav, orgChip, onOrg, onUser, banners, dh: body.dh, items: body.items, hasTabs: body.tabs.length > 0, tabs: body.tabs,
+      langOpts: [['es', 'ES'], ['en', 'EN']].map(([k, l]) => ({ label: l, bg: s.lang === k ? 'var(--accent)' : 'transparent', color: s.lang === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ lang: k }) })),
+      themeOpts: [['light', '☀︎'], ['dark', '☾']].map(([k, l]) => ({ label: l, title: k, bg: s.theme === k ? 'var(--accent)' : 'transparent', color: s.theme === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ theme: k }) })),
+      goDownloads: () => this.go('downloads'), openDrawer: () => this.setState({ drawer: true }), closeDrawer: () => this.setState({ drawer: false }), hasDrawer: !wide && !!s.drawer,
+      hasSide: !!sd, sd: sd || {}, sideW: vw < 768 ? '100vw' : '420px', closeSide: () => this.setState({ side: null }),
+      hasModal: !!md, md: md || {}, closeModal: () => this.setState({ modal: null }), stop: e => e.stopPropagation(),
+      hasMenu: !!s.menu, menu: s.menu ? { x: s.menu.x, y: s.menu.y, items: s.menu.items.map(it => ({ isSep: !!it.sep, notSep: !it.sep, label: it.label, hint: it.hint || '', tip: it.tip || '', hasIni: !!it.ini, ini: it.ini || '', iniBg: it.iniBg || '', iniInk: it.iniInk || '', color: it.danger ? 'var(--danger)' : 'var(--text)', opacity: it.disabled ? 0.45 : 1, cursor: it.disabled ? 'default' : 'pointer', onClick: () => { if (it.disabled) return; this.setState({ menu: null }); it.run && it.run(); } })) } : {}, closeMenu: e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ menu: null }); },
+      toasts: s.toasts.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : 'var(--ok)' })) };
+  }
+}
+</script>
+</body>
+</html>

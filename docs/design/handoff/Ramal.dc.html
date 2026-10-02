@@ -142,7 +142,8 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
                     </div>
                     <div style="min-width:0;display:flex;flex-direction:column;gap:3px">
                       <span style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.srcLine }}</span>
-                      <span style="font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.srcSub }}</span>
+                      <sc-if value="{{ r.noAcc }}"><button onClick="{{ r.onChoose }}" title="{{ t.chooseAcc }}" style="align-self:flex-start;height:20px;padding:0 8px;border-radius:6px;border:1px dashed var(--warn);background:color-mix(in oklch, var(--warn) 10%, transparent);color:var(--text);font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap">{{ t.noAccChip }} · {{ t.chooseAcc }}</button></sc-if>
+                      <sc-if value="{{ r.hasSrcSub }}"><span style="font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.srcSub }}</span></sc-if>
                     </div>
                     <div style="min-width:0;display:flex;flex-direction:column;gap:4px">
                       <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">⎇ {{ r.branch }}</span>
@@ -268,7 +269,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
               <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;gap:6px">
                 <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ t.plan }}</span>
                 <span style="font-size:18px;font-weight:600">{{ t.planName }}</span>
-                <span style="color:var(--muted);font-size:12px">{{ t.planRenew }}</span>
+                <span style="color:var(--muted);font-size:12px">{{ acct.renew }}</span>
                 <div style="margin-top:8px"><button onClick="{{ acct.onManage }}" style="height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap" style-hover="background:var(--surface2)">{{ t.manageSub }}</button></div>
               </div>
               <div style="padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;gap:6px">
@@ -331,8 +332,9 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
                         <span style="color:var(--faint)">{{ t.scopes }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ a.scopes }}</span>
                       </div>
                       <div style="display:flex;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--border);font-size:12px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:var(--ok)"></span>
-                        <span style="color:var(--muted);flex:1">{{ a.usedIn }}</span>
+                        <span style="width:7px;height:7px;flex-shrink:0;border-radius:50%;background:{{ a.chkColor }}"></span>
+                        <span style="white-space:nowrap;color:{{ a.chkColor }}">{{ a.chkText }}</span>
+                        <span style="color:var(--muted);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">· {{ a.usedIn }}</span>
                         <sc-if value="{{ a.notDef }}"><button onClick="{{ a.onMakeDef }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-weight:500;font-size:12px">{{ t.makeDefault }}</button></sc-if>
                       </div>
                     </div>
@@ -569,10 +571,12 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
                   <span style="font-weight:600">{{ t.output }}</span>
                   <span style="color:var(--muted);flex:1 1 120px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cf.outSub }}</span>
                   <span style="font-weight:600;white-space:nowrap;color:{{ cf.statusColor }}">{{ cf.status }}</span>
+                  <sc-if value="{{ cf.canMark }}"><button onClick="{{ cf.onMark }}" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;white-space:nowrap">{{ t.markResolved }}</button></sc-if>
                   <sc-if value="{{ cf.hasManual }}"><button onClick="{{ cf.onReset }}" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;white-space:nowrap">{{ t.resetManual }}</button></sc-if>
-                  <sc-if value="{{ cf.notEditing }}"><button onClick="{{ cf.onEdit }}" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;white-space:nowrap" style-hover="border-color:var(--accent)">✎ {{ t.editManual }}</button></sc-if>
+                  <sc-if value="{{ cf.notEditing }}"><button onClick="{{ cf.onEdit }}" style="height:26px;padding:0 10px;border-radius:7px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;white-space:nowrap" style-hover="border-color:var(--accent)">✎ {{ cf.editLabel }}</button></sc-if>
                   <sc-if value="{{ cf.editing }}"><button onClick="{{ cf.onDone }}" style="height:26px;padding:0 12px;border-radius:7px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:12px;font-weight:600">{{ t.doneEdit }}</button></sc-if>
                 </div>
+                <sc-if value="{{ cf.hasDup }}"><div role="alert" style="display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12px;background:color-mix(in oklch, var(--warn) 12%, transparent);border-bottom:1px solid color-mix(in oklch, var(--warn) 35%, var(--border))"><span aria-hidden="true" style="color:var(--warn)">⚠</span><span>{{ t.dupWarn }}</span></div></sc-if>
                 <sc-if value="{{ cf.editing }}">
                   <textarea value="{{ cf.editText }}" onChange="{{ cf.onEditText }}" spellcheck="false" style="flex:1;min-height:0;margin:0;padding:10px 14px 10px 54px;border:0;outline:0;resize:none;background:var(--bg);font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:22px;box-shadow:inset 3px 0 0 var(--info)"></textarea>
                 </sc-if>
@@ -587,7 +591,10 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
                         </div>
                       </sc-if>
                       <sc-if value="{{ l.isGap }}">
-                        <div style="margin:4px 12px 4px 40px;padding:8px 12px;border-radius:8px;border:1px dashed var(--warn);background:color-mix(in oklch, var(--warn) 8%, transparent);color:var(--warn);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500">{{ l.text }}</div>
+                        <div style="margin:4px 12px 4px 40px;padding:6px 6px 6px 12px;border-radius:8px;border:1px dashed var(--warn);background:color-mix(in oklch, var(--warn) 8%, transparent);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:500;display:flex;align-items:center;gap:10px"><span style="flex:1;color:var(--warn)">{{ l.text }}</span><button onClick="{{ l.onEmpty }}" style="height:24px;padding:0 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11.5px;font-weight:500;white-space:nowrap">{{ t.leaveEmpty }}</button></div>
+                      </sc-if>
+                      <sc-if value="{{ l.isEmpty }}">
+                        <div style="margin:2px 12px 2px 40px;display:flex;align-items:center;gap:8px;font-family:'IBM Plex Sans',sans-serif;font-size:11px;color:var(--faint)"><span style="flex:1;height:1px;background:var(--border)"></span><span>{{ t.emptyBlock }}</span><button onClick="{{ l.onEmpty }}" style="border:0;padding:0;background:transparent;color:var(--accent);cursor:pointer;font-size:11px;font-weight:500">{{ t.undo }}</button><span style="flex:1;height:1px;background:var(--border)"></span></div>
                       </sc-if>
                     </sc-for>
                   </div>
@@ -608,23 +615,24 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
                   <sc-for list="{{ rb.items }}" as="it" hint-placeholder-count="3">
                     <div draggable="true" onDragStart="{{ it.onDragStart }}" onDragOver="{{ it.onDragOver }}" onDrop="{{ it.onDrop }}" style="display:grid;grid-template-columns:22px 110px 76px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;opacity:{{ it.opacity }}">
                       <span style="color:var(--faint);cursor:grab;text-align:center;letter-spacing:-2px">⋮⋮</span>
-                      <select value="{{ it.action }}" onChange="{{ it.onAction }}" style="height:30px;padding:0 8px;border-radius:7px;border:1px solid {{ it.color }};background:var(--bg);color:{{ it.color }};font-family:'IBM Plex Mono',monospace;font-weight:600">
+                      <select value="{{ it.action }}" onChange="{{ it.onAction }}" aria-invalid="{{ it.hasErr }}" style="height:30px;padding:0 8px;border-radius:7px;border:1px solid {{ it.selBorder }};background:var(--bg);color:{{ it.color }};font-family:'IBM Plex Mono',monospace;font-weight:600">
                         <sc-for list="{{ it.options }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
                       </select>
                       <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ it.sha }}</span>
-                      <sc-if value="{{ it.isReword }}"><input value="{{ it.newMsg }}" onChange="{{ it.onMsg }}" style="height:30px;padding:0 10px;border-radius:7px;border:1px solid var(--accent);background:var(--bg);outline:0;min-width:0"></sc-if>
+                      <sc-if value="{{ it.isReword }}"><input value="{{ it.newMsg }}" onChange="{{ it.onMsg }}" aria-invalid="{{ it.hasErr }}" style="height:30px;padding:0 10px;border-radius:7px;border:1px solid {{ it.msgBorder }};background:var(--bg);outline:0;min-width:0"></sc-if>
                       <sc-if value="{{ it.notReword }}"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:{{ it.deco }}">{{ it.msg }}</span></sc-if>
                       <div style="display:flex;gap:4px">
                         <button onClick="{{ it.onUp }}" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer" style-hover="background:var(--surface2)">↑</button>
                         <button onClick="{{ it.onDown }}" style="width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:transparent;cursor:pointer" style-hover="background:var(--surface2)">↓</button>
                       </div>
                     </div>
+                    <sc-if value="{{ it.hasErr }}"><div role="alert" style="display:flex;gap:6px;margin:-4px 0 4px 46px;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ it.err }}</span></div></sc-if>
                   </sc-for>
                 </div>
                 <div style="display:flex;align-items:center;gap:10px;padding-top:6px">
                   <span style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">{{ rb.summary }}</span>
                   <button onClick="{{ rb.onCancel }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ t.cancel }}</button>
-                  <button onClick="{{ rb.onStart }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-weight:600">{{ t.startRebase }}</button>
+                  <button onClick="{{ rb.onStart }}" disabled="{{ rb.blocked }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;cursor:pointer;font-weight:600;background:{{ rb.btnBg }};color:{{ rb.btnColor }}">{{ t.startRebase }}</button>
                 </div>
               </div>
             </div>
@@ -646,6 +654,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
                   <span style="width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:{{ f.iconColor }};border:1px solid {{ f.iconColor }}">{{ f.icon }}</span>
                   <span style="flex:1;min-width:0;font-family:'IBM Plex Mono',monospace;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.path }}</span>
                   <span style="font-size:11px;color:{{ f.iconColor }}">{{ f.status }}</span>
+                  <sc-if value="{{ f.canMark }}"><button onClick="{{ f.onMenu }}" aria-label="{{ t.moreActions }}" style="width:24px;height:24px;flex-shrink:0;border-radius:6px;border:0;background:transparent;cursor:pointer;color:var(--muted)" style-hover="background:var(--surface)">⋯</button></sc-if>
                 </div>
               </sc-for>
             </div>
@@ -705,7 +714,11 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
                 <button onClick="{{ dt.onClose }}" style="width:28px;height:28px;border-radius:7px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">×</button>
               </div>
               <div style="font-size:16px;font-weight:600;line-height:1.4;text-wrap:pretty">{{ dt.msg }}</div>
-              <sc-if value="{{ dt.hasAI }}"><div style="padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:12.5px;line-height:1.55;text-wrap:pretty"><span style="color:var(--accent);font-weight:600">✦ IA · </span>{{ dt.aiText }}</div></sc-if>
+              <sc-if value="{{ dt.aiIdle }}"><button onClick="{{ dt.onSum }}" style="align-self:flex-start;height:28px;padding:0 12px;border-radius:7px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);cursor:pointer;font-size:12px;font-weight:600">✦ {{ t.summarize }}</button></sc-if>
+              <sc-if value="{{ dt.aiBusy }}"><div aria-busy="true" aria-label="{{ t.aiGenerating }}" style="padding:12px;border-radius:10px;background:var(--accent-soft);display:flex;flex-direction:column;gap:8px"><span style="height:9px;width:94%;border-radius:5px;background:var(--surface2)"></span><span style="height:9px;width:86%;border-radius:5px;background:var(--surface2)"></span><span style="height:9px;width:52%;border-radius:5px;background:var(--surface2)"></span></div></sc-if>
+              <sc-if value="{{ dt.aiDone }}"><div style="padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:12.5px;line-height:1.55;text-wrap:pretty"><div>{{ dt.aiText }}</div><div style="margin-top:6px;font-size:11px;color:var(--muted)">✦ {{ dt.aiBy }}</div></div></sc-if>
+              <sc-if value="{{ dt.aiFail }}"><div role="alert" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:color-mix(in oklch, var(--danger) 10%, transparent);border:1px solid color-mix(in oklch, var(--danger) 40%, var(--border));font-size:12.5px"><span style="flex:1">{{ t.summaryFail }}</span><button onClick="{{ dt.onSum }}" style="height:26px;padding:0 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:12px;font-weight:500">{{ t.retry }}</button></div></sc-if>
+              <sc-if value="{{ dt.aiOff }}"><div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;font-size:12px;color:var(--muted)"><span>{{ dt.aiOffText }}</span><button onClick="{{ dt.onAiSettings }}" style="border:0;padding:0;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;font-weight:500">{{ t.openAiSettings }}</button></div></sc-if>
               <div style="display:flex;align-items:center;gap:10px">
                 <span style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:oklch(0.2 0.02 230);background:{{ dt.avColor }}">{{ dt.ini }}</span>
                 <div><div style="font-weight:500">{{ dt.author }}</div><div style="font-size:12px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ dt.date }}</div></div>
@@ -748,10 +761,21 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
         <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px;overflow:auto">
           <sc-for list="{{ modal.fields }}" as="f">
             <sc-if value="{{ f.isAction }}"><button onClick="{{ f.onClick }}" style="height:36px;border-radius:9px;border:1px dashed var(--accent);background:var(--accent-soft);color:var(--accent);cursor:pointer;font-weight:600">{{ f.label }}</button></sc-if>
-            <sc-if value="{{ f.isInfo }}"><div style="padding:10px 12px;border-radius:9px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--muted);line-height:1.5;font-family:{{ f.font }}">{{ f.text }}</div></sc-if>
+            <sc-if value="{{ f.isInfo }}"><div style="padding:10px 12px;border-radius:9px;background:var(--bg);border:1px solid var(--border);font-size:12.5px;color:var(--muted);line-height:1.5;white-space:pre-wrap;word-break:break-word;font-family:{{ f.font }}">{{ f.text }}</div></sc-if>
             <sc-if value="{{ f.isText }}">
               <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
-                <input value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" style="height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--border);background:var(--bg);outline:0;font-family:{{ f.font }}"></label>
+                <input value="{{ f.value }}" onChange="{{ f.onChange }}" onBlur="{{ f.onBlur }}" placeholder="{{ f.placeholder }}" aria-invalid="{{ f.hasErr }}" style="height:36px;padding:0 12px;border-radius:9px;border:1px solid {{ f.border }};background:var(--bg);outline:0;font-family:{{ f.font }}">
+                <sc-if value="{{ f.hasErr }}"><span role="alert" style="display:flex;gap:6px;align-items:flex-start;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ f.err }}</span></span></sc-if>
+                <sc-if value="{{ f.hasHelp }}"><span style="font-size:12px;color:var(--faint);line-height:1.4">{{ f.help }}</span></sc-if></label>
+            </sc-if>
+            <sc-if value="{{ f.isSecret }}">
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
+                <span style="display:flex;align-items:center;height:36px;border-radius:9px;border:1px solid {{ f.border }};background:var(--bg)">
+                  <input type="{{ f.inputType }}" value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.placeholder }}" autocomplete="off" spellcheck="false" aria-invalid="{{ f.hasErr }}" style="flex:1;min-width:0;height:100%;padding:0 12px;border:0;background:transparent;outline:0;font-family:'IBM Plex Mono',monospace">
+                  <sc-if value="{{ f.canReveal }}"><button onClick="{{ f.onReveal }}" type="button" style="height:26px;margin-right:5px;padding:0 10px;border-radius:6px;border:0;background:var(--surface2);cursor:pointer;font-size:11.5px;font-weight:500">{{ f.revealLabel }}</button></sc-if>
+                </span>
+                <sc-if value="{{ f.hasErr }}"><span role="alert" style="display:flex;gap:6px;align-items:flex-start;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ f.err }}</span></span></sc-if>
+                <sc-if value="{{ f.hasHelp }}"><span style="font-size:12px;color:var(--faint);line-height:1.4">{{ f.help }}</span></sc-if></label>
             </sc-if>
             <sc-if value="{{ f.isArea }}">
               <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--muted)">{{ f.label }}</span>
@@ -773,7 +797,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
           </sc-for>
         </div>
         <div style="padding:14px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
-          <button onClick="{{ closeModal }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500" style-hover="background:var(--surface2)">{{ t.cancel }}</button>
+          <button onClick="{{ closeModal }}" autoFocus="{{ modal.danger }}" style="height:36px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500" style-hover="background:var(--surface2)">{{ t.cancel }}</button>
           <button onClick="{{ submitModal }}" style="height:36px;padding:0 18px;border-radius:9px;border:0;cursor:pointer;font-weight:600;background:{{ modal.btnBg }};color:{{ modal.btnColor }}">{{ modal.submit }}</button>
         </div>
       </div>
@@ -816,6 +840,10 @@ const STC = { M: 'var(--warn)', A: 'var(--ok)', D: 'var(--danger)', R: 'var(--in
 const PRC = { open: 'var(--info)', draft: 'var(--faint)', approved: 'var(--ok)', changes: 'var(--warn)', merged: 'oklch(0.68 0.18 300)', closed: 'var(--danger)' };
 const CKC = { pass: 'var(--ok)', fail: 'var(--danger)', pending: 'var(--warn)' };
 const ACTC = { pick: 'var(--accent)', reword: 'var(--info)', edit: 'var(--warn)', squash: 'oklch(0.68 0.18 300)', fixup: 'oklch(0.68 0.18 300)', drop: 'var(--danger)' };
+const MARK = /^(<<<<<<<|\|\|\|\|\|\|\||=======|>>>>>>>)/m;
+const BADREF = /(\s|\.\.|[~^:?*\[\\]|\/$|\.lock$|^\/|^-|@\{)/;
+const URLOK = /^(https?:\/\/[^\s/]+\/\S+|ssh:\/\/\S+|git@[^\s:]+:\S+|[\w.-]+\/[\w.-]+)$/;
+const EMAILOK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
 const splitPath = p => { const a = p.split('/'); const base = a.pop(); return { base, dir: a.join('/') }; };
 const nowStr = () => { const d = new Date(); return `2026-09-30 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
@@ -843,7 +871,7 @@ class Component extends DCLogic {
       tab: 'home', view: 'repos', wsId: 'w1', openTabs: ['r1'],
       repos: R.REPOS.map(r => ({ ...r })), workspaces: R.WS.map(w => ({ ...w })), accounts: R.ACCOUNTS.map(a => ({ ...a })), prs: R.PRS.slice(),
       q: '', fKind: 'all', fPlat: [], fAcc: '', fWs: '', groupBy: '', prState: 'all',
-      sel: 'wip', center: 'conflict', diffFile: null, diffMode: 'split',
+      sel: 'wip', center: 'graph', diffFile: null, aiSum: {}, diffMode: 'split',
       unstaged: R.UNSTAGED.slice(), staged: R.STAGED.slice(), msg: '', desc: '', amend: false,
       commits: R.mkCommits(), ahead: 2, current: 'feature/graph-ui',
       setSec: 'profile', setOpen: false, graphNodes: this.props.graphNodes || 'avatar', aiBusy: null,
@@ -851,13 +879,13 @@ class Component extends DCLogic {
       aiKeys: R.AIKEYS.map(k => ({ ...k })), members: R.MEMBERS.map(m => ({ ...m })), sessions: R.SESSIONS.slice(),
       ai: { commit: true, pr: true, summary: true, commitKey: '', prKey: '', summaryKey: '', lang: 'app', conventional: true, instructions: '', exclude: true },
       git: { name: 'Marta Ruiz', email: 'marta@ramal.dev', defBranch: 'main', sign: true, autoFetch: '15', pull: 'rebase', prune: true },
-      menu: null, modal: null, toasts: [], conflict: { src: 'hotfix/login', file: 0, choices: this.initChoices(), manual: {} }, conflictUsed: true, rebase: null,
+      menu: null, modal: null, toasts: [], conflict: null, rebase: null,
       sbq: '', cq: '', closed: {}, stashes: R.STASHES.slice(), repoPrs: R.REPO_PRS.slice()
     });
   }
 
-  tr(k, v) { const e = window.RAMAL.D[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
-  ago(m) { const en = this.state.lang === 'en'; if (m < 60) return en ? `${m} min ago` : `hace ${m} min`; if (m < 1440) { const h = Math.round(m / 60); return en ? `${h}h ago` : `hace ${h} h`; } const d = Math.round(m / 1440); return en ? `${d}d ago` : `hace ${d} d`; }
+  tr(k, v) { const e = window.RAMAL.D[k] || (window.RAMAL.STATES || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  ago(m) { const en = this.state.lang === 'en'; if (m < 1) return this.tr('justNow'); if (m >= 1440 && m < 2880) return this.tr('yesterday'); if (m >= 10080 && m < 43200) { const w = Math.round(m / 10080); return this.tr(w === 1 ? 'weeksAgo_one' : 'weeksAgo_other', { count: w }); } if (m < 60) return en ? `${m} min ago` : `hace ${m} min`; if (m < 1440) { const h = Math.round(m / 60); return en ? `${h}h ago` : `hace ${h} h`; } const d = Math.round(m / 1440); return en ? `${d}d ago` : `hace ${d} d`; }
   toast(text, kind = 'ok') { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
   copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.toast(this.tr('copied', { x }), 'info'); }
   done(label) { this.toast(this.tr('doneT', { x: label.replace('…', '') }), 'info'); }
@@ -882,8 +910,10 @@ class Component extends DCLogic {
   }
   closeMenu = e => { if (e && e.preventDefault) e.preventDefault(); this.setState({ menu: null }); };
 
-  openForm(cfg) { const values = {}; cfg.fields.forEach(f => { if (f.key) values[f.key] = f.value !== undefined ? f.value : (f.type === 'check' ? false : ''); }); this.setState({ modal: { ...cfg, values }, menu: null }); }
-  setVal(k, v) { this.setState(s => ({ modal: { ...s.modal, values: { ...s.modal.values, [k]: v } } })); }
+  openForm(cfg) { const values = {}; cfg.fields.forEach(f => { if (f.key) values[f.key] = f.value !== undefined ? f.value : (f.type === 'check' ? false : ''); }); this.setState({ modal: { ...cfg, values, errors: {}, reveal: {} }, menu: null }); }
+  setVal(k, v) { this.setState(s => { const errors = { ...(s.modal.errors || {}) }; delete errors[k]; return { modal: { ...s.modal, values: { ...s.modal.values, [k]: v }, errors } }; }); }
+  fieldErr(errs) { this.setState(s => s.modal ? { modal: { ...s.modal, errors: errs } } : null); return false; }
+  blurField(f) { const m = this.state.modal; if (!m || !f.validate) return; const v = m.values[f.key]; if (v === '' || v == null) return; const e = f.validate(v, m.values); if (e) this.setState(s => ({ modal: { ...s.modal, errors: { ...(s.modal.errors || {}), [f.key]: e } } })); }
   submitModal = () => { const m = this.state.modal; if (!m) return; if (m.onSubmit(m.values) !== false) this.setState({ modal: null }); };
   confirm(title, info, label, fn, extra) { this.openForm({ title, danger: true, submitLabel: label, fields: [{ type: 'info', text: info }, ...(extra || [])], onSubmit: fn }); }
 
@@ -892,12 +922,12 @@ class Component extends DCLogic {
   closeTab(id, e) { e.stopPropagation(); this.setState(s => { const ot = s.openTabs.filter(x => x !== id); return { openTabs: ot, tab: s.tab === id ? (ot[ot.length - 1] || 'home') : s.tab }; }); }
 
   aliasRepo(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('mAlias'), submitLabel: tr('save'), fields: [{ type: 'info', text: tr('aliasHint') }, { type: 'text', key: 'alias', label: tr('alias'), value: r.alias, placeholder: r.name }], onSubmit: v => { this.updRepo(r.id, { alias: v.alias.trim() }); this.toast(tr('saved')); } }); }
-  renameRepo(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('mRename'), submitLabel: tr('save'), fields: [{ type: 'info', text: tr('renameInfo') + '\n' + r.path, mono: true }, { type: 'text', key: 'name', label: tr('name'), value: r.name, mono: true }], onSubmit: v => { const n = v.name.trim(); if (!n) return false; this.updRepo(r.id, { name: n, path: r.path.replace(/[^/]+$/, n) }); this.toast(tr('saved')); } }); }
+  renameRepo(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('mRename'), submitLabel: tr('save'), fields: [{ type: 'info', text: tr('renameInfo') + '\n' + r.path, mono: true }, { type: 'text', key: 'name', label: tr('name'), value: r.name, mono: true }], onSubmit: v => { const n = v.name.trim(); if (!n) return this.fieldErr({ name: tr('reqName') }); this.updRepo(r.id, { name: n, path: r.path.replace(/[^/]+$/, n) }); this.toast(tr('saved')); } }); }
   removeRepo(r) { const tr = this.tr.bind(this); this.confirm(tr('removeTitle', { n: this.disp(r) }), tr('removeInfo'), tr('remove'), () => { this.setState(s => { const ot = s.openTabs.filter(x => x !== r.id); return { repos: s.repos.filter(x => x.id !== r.id), openTabs: ot, tab: s.tab === r.id ? 'home' : s.tab }; }); this.toast(tr('removedT', { n: this.disp(r) })); }, [{ type: 'check', key: 'disk', label: tr('alsoDisk') }]); }
   toggleWs(r, ws) { this.setState(s => ({ repos: s.repos.map(x => x.id !== r.id ? x : { ...x, wss: ws == null ? [] : x.wss.includes(ws) ? x.wss.filter(y => y !== ws) : [...x.wss, ws] }) })); }
-  newWs(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('newWsTitle'), submitLabel: tr('create'), fields: [{ type: 'text', key: 'name', label: tr('name'), placeholder: 'Frontend' }], onSubmit: v => { const n = v.name.trim(); if (!n) return false; const id = 'w' + Date.now(); const L = window.RAMAL.LANE; this.setState(s => ({ workspaces: [...s.workspaces, { id, name: n, color: L[s.workspaces.length % L.length] }], repos: r ? s.repos.map(x => x.id === r.id ? { ...x, wss: [...x.wss, id] } : x) : s.repos, view: r ? s.view : 'ws', wsId: r ? s.wsId : id })); this.toast(tr('wsCreatedT', { n })); } }); }
+  newWs(r) { const tr = this.tr.bind(this); this.openForm({ title: tr('newWsTitle'), submitLabel: tr('create'), fields: [{ type: 'text', key: 'name', label: tr('name'), placeholder: 'Frontend' }], onSubmit: v => { const n = v.name.trim(); if (!n) return this.fieldErr({ name: tr('reqName') }); const id = 'w' + Date.now(); const L = window.RAMAL.LANE; this.setState(s => ({ workspaces: [...s.workspaces, { id, name: n, color: L[s.workspaces.length % L.length] }], repos: r ? s.repos.map(x => x.id === r.id ? { ...x, wss: [...x.wss, id] } : x) : s.repos, view: r ? s.view : 'ws', wsId: r ? s.wsId : id })); this.toast(tr('wsCreatedT', { n })); } }); }
   renameWs(w) { const tr = this.tr.bind(this); this.openForm({ title: tr('renameWsTitle'), submitLabel: tr('save'), fields: [{ type: 'text', key: 'name', label: tr('name'), value: w.name }], onSubmit: v => { this.setState(s => ({ workspaces: s.workspaces.map(x => x.id === w.id ? { ...x, name: v.name.trim() || w.name } : x) })); this.toast(tr('saved')); } }); }
-  deleteWs(w) { const tr = this.tr.bind(this); this.confirm(tr('deleteWsTitle', { n: w.name }), tr('deleteWsInfo'), tr('del'), () => { this.setState(s => ({ workspaces: s.workspaces.filter(x => x.id !== w.id), repos: s.repos.map(r => ({ ...r, wss: r.wss.filter(y => y !== w.id) })), view: 'repos' })); }); }
+  deleteWs(w) { const tr = this.tr.bind(this); this.confirm(tr('deleteWsTitle', { n: w.name }), tr('c_wsInfo', { org: 'ACME Studio' }), tr('del'), () => { this.setState(s => ({ workspaces: s.workspaces.filter(x => x.id !== w.id), repos: s.repos.map(r => ({ ...r, wss: r.wss.filter(y => y !== w.id) })), view: 'repos' })); }); }
   openAllWs(w) { this.state.repos.filter(r => r.wss.includes(w.id)).forEach(r => this.openRepo(r.id)); }
 
   repoMenu(r) {
@@ -907,8 +937,9 @@ class Component extends DCLogic {
       { label: tr('mAlias'), action: () => this.aliasRepo(r) },
       { label: tr('mRename'), hint: 'F2', action: () => this.renameRepo(r) },
       { sep: 1 },
+      ...(!r.acc && r.remote ? [{ label: tr('chooseAcc') + '…', action: () => this.chooseAccount(r) }] : []),
       { label: tr('mMoveWs'), children: (() => { const cur = this.state.repos.find(x => x.id === r.id) || r; return [...this.state.workspaces.map(w => ({ label: (cur.wss.includes(w.id) ? '✓  ' : '     ') + w.name, keep: 1, action: () => this.toggleWs(r, w.id) })), { label: '     ' + tr('mNoWsAll'), keep: 1, action: () => this.toggleWs(r, null) }, { label: '     + ' + tr('newWs'), action: () => this.newWs(r) }]; })() },
-      ...(r.acc ? [{ label: tr('mFetch'), action: () => this.toast(tr('fetchedT')) }] : []),
+      ...(r.acc || r.remote ? [{ label: tr('mFetch'), action: () => this.toast(tr('fetchedT')) }] : []),
       { label: tr('mReveal'), action: () => this.done(tr('mReveal')) },
       { label: tr('mTerminal'), action: () => this.done(tr('mTerminal')) },
       { label: tr('mCopyPath'), action: () => this.copy(r.path) },
@@ -920,29 +951,35 @@ class Component extends DCLogic {
     const tr = this.tr.bind(this);
     return [{ label: tr('openAll'), action: () => this.openAllWs(w) }, { label: tr('fetchAll'), action: () => this.toast(tr('fetchedT')) }, { sep: 1 }, { label: tr('mRenameWs'), action: () => this.renameWs(w) }, { label: tr('mDeleteWs'), danger: 1, action: () => this.deleteWs(w) }];
   }
+  chooseAccount(r) {
+    const tr = this.tr.bind(this), P = window.RAMAL.PLAT; const accs = this.state.accounts.filter(a => a.platform === r.remote.plat);
+    this.openForm({ title: tr('chooseAccTitle', { repo: this.disp(r) }), submitLabel: tr('save'), fields: [{ type: 'info', text: tr('chooseAccD', { host: r.remote.host }) }, { type: 'select', key: 'acc', label: tr('asAccount'), value: accs[0] ? accs[0].id : '', options: accs.map(a => ({ value: a.id, label: `${P[a.platform].label} · @${a.user} (${a.host})` })) }], onSubmit: v => { if (!v.acc) return false; this.updRepo(r.id, { acc: v.acc }); this.toast(tr('saved')); } });
+  }
   accMenu(a) {
-    const tr = this.tr.bind(this);
-    return [{ label: tr('mTest'), action: () => this.toast(tr('doneT', { x: tr('mTest') + ' @' + a.user })) }, ...(a.def ? [] : [{ label: tr('makeDefault'), action: () => this.makeDef(a) }]), { label: tr('mEditToken'), action: () => this.addAccount(a.platform, a) }, { sep: 1 }, { label: tr('mRemoveAcc'), danger: 1, action: () => this.confirm(tr('mRemoveAcc').replace('…', '') + ' @' + a.user, a.host, tr('remove'), () => { this.setState(s => ({ accounts: s.accounts.filter(x => x.id !== a.id) })); this.toast(tr('accRemovedT')); }) }];
+    const tr = this.tr.bind(this), pl = window.RAMAL.PLAT[a.platform].label;
+    const remove = () => this.confirm(tr('c_accTitle', { user: a.user, platform: pl }), tr('c_accInfo', { platform: pl }), tr('c_disconnect'), () => { let promoted = null; this.setState(s => { let accs = s.accounts.filter(x => x.id !== a.id); if (a.def) { const nx = accs.find(x => x.platform === a.platform); if (nx) { promoted = nx; accs = accs.map(x => x.id === nx.id ? { ...x, def: true } : x); } } return { accounts: accs }; }); this.toast(tr('accRemovedT')); setTimeout(() => { if (promoted) this.toast(tr('defT', { u: promoted.user }), 'info'); }, 0); });
+    return [{ label: tr('mTest'), action: () => this.toast(tr('doneT', { x: tr('mTest') + ' @' + a.user })) }, ...(a.def ? [] : [{ label: tr('makeDefault'), action: () => this.makeDef(a) }]), { label: tr('mEditToken'), action: () => this.addAccount(a.platform, a) }, { sep: 1 }, { label: tr('mRemoveAcc'), danger: 1, action: remove }];
   }
   makeDef(a) { this.setState(s => ({ accounts: s.accounts.map(x => x.platform === a.platform ? { ...x, def: x.id === a.id } : x) })); this.toast(this.tr('defT', { u: a.user })); }
   addAccount(plat, edit) {
     const tr = this.tr.bind(this), P = window.RAMAL.PLAT;
-    const hosts = { github: 'github.com', gitlab: 'gitlab.com', bitbucket: 'bitbucket.org', gitea: 'git.ejemplo.com', azure: 'dev.azure.com/org' };
+    const en = this.state.lang === 'en';
+    const hosts = { github: 'github.com', gitlab: 'gitlab.com', bitbucket: 'bitbucket.org', gitea: en ? 'git.your-company.com' : 'git.tu-empresa.com', azure: en ? 'dev.azure.com/your-organization' : 'dev.azure.com/tu-organizacion' };
     this.openForm({
       title: edit ? tr('mEditToken').replace('…', '') : tr('accTitleM'), submitLabel: edit ? tr('save') : tr('create'),
       fields: [
         { type: 'select', key: 'platform', label: tr('platform'), value: plat || 'github', options: Object.keys(P).map(k => ({ value: k, label: P[k].label })) },
-        { type: 'text', key: 'host', label: tr('host'), value: edit ? edit.host : '', placeholder: hosts[plat || 'github'], mono: true },
-        { type: 'seg', key: 'method', label: tr('method'), value: 'OAuth', options: [{ value: 'OAuth', label: 'OAuth' }, { value: 'Token (PAT)', label: 'Token' }, { value: 'SSH', label: 'SSH' }] },
-        { type: 'text', key: 'user', label: tr('user'), value: edit ? edit.user : '', placeholder: 'usuario' },
-        { type: 'text', key: 'token', label: tr('token'), placeholder: 'ghp_••••••••••••', mono: true, showIf: v => v.method !== 'OAuth' },
+        { type: 'text', key: 'host', label: tr('host'), value: edit ? edit.host : '', placeholder: v => hosts[v.platform] || hosts.github, mono: true },
+        { type: 'seg', key: 'method', label: tr('method'), value: edit ? (/SSH/.test(edit.method) ? 'SSH' : edit.method === 'OAuth' ? 'OAuth' : 'Token (PAT)') : 'OAuth', options: [{ value: 'OAuth', label: 'OAuth' }, { value: 'Token (PAT)', label: 'Token' }, { value: 'SSH', label: 'SSH' }] },
+        { type: 'text', key: 'user', label: tr('user'), value: edit ? edit.user : '', placeholder: en ? 'username' : 'usuario' },
+        { type: 'secret', key: 'token', label: tr('token'), placeholder: edit ? '' : 'ghp_…', help: edit ? tr('secretSaved') : '', showIf: v => v.method !== 'OAuth' },
         { type: 'text', key: 'name', label: tr('label'), value: edit ? edit.name : '', placeholder: tr('labelPh') }
       ],
       onSubmit: v => {
-        const user = (v.user || '').trim(); if (!user) return false;
-        if (edit) { this.setState(s => ({ accounts: s.accounts.map(x => x.id === edit.id ? { ...x, user, host: v.host || x.host, method: v.method, name: v.name || x.name } : x) })); this.toast(tr('saved')); return; }
+        const user = (v.user || '').trim(); if (!user) return this.fieldErr({ user: tr('reqUser') });
+        if (edit) { this.setState(s => ({ accounts: s.accounts.map(x => x.id === edit.id ? { ...x, user, host: v.host || x.host, name: v.name || x.name } : x) })); this.toast(tr('saved')); return; }
         const p = v.platform; const has = this.state.accounts.some(a => a.platform === p);
-        this.setState(s => ({ accounts: [...s.accounts, { id: 'a' + Date.now(), platform: p, user, name: v.name || '—', host: v.host || hosts[p], method: v.method, def: !has, scopes: 'repo' }] }));
+        this.setState(s => ({ accounts: [...s.accounts, { id: 'a' + Date.now(), platform: p, user, name: v.name || '—', host: v.host || hosts[p], method: v.method, def: !has, scopes: 'repo', chk: 'ok', chkMins: 0 }] }));
         this.toast(tr('accAddedT', { u: user }));
       }
     });
@@ -951,20 +988,20 @@ class Component extends DCLogic {
     const tr = this.tr.bind(this), P = window.RAMAL.PLAT;
     this.openForm({ title: tr('cloneTitle'), submitLabel: tr('clone'), wide: true, fields: [
       { type: 'select', key: 'acc', label: tr('asAccount'), value: 'a1', options: this.state.accounts.map(a => ({ value: a.id, label: `${P[a.platform].label} · @${a.user} (${a.host})` })) },
-      { type: 'text', key: 'url', label: tr('cloneUrl'), placeholder: 'acme/web-app', mono: true },
+      { type: 'text', key: 'url', label: tr('cloneUrl'), placeholder: 'acme/web-app', mono: true, validate: x => URLOK.test(x.trim()) ? '' : tr('badUrl') },
       { type: 'text', key: 'dest', label: tr('cloneDest'), value: '~/code', mono: true },
       { type: 'select', key: 'ws', label: tr('workspaces'), value: '', options: [{ value: '', label: tr('noWs') }, ...this.state.workspaces.map(w => ({ value: w.id, label: w.name }))] },
       { type: 'check', key: 'sub', label: 'git clone --recurse-submodules', value: true }
-    ], onSubmit: v => { const n = (v.url || '').split('/').pop().replace(/\.git$/, '').trim(); if (!n) return false; this.addRepoItem({ name: n, path: `${v.dest}/${n}`, acc: v.acc, wss: v.ws ? [v.ws] : [] }); this.toast(tr('clonedT', { n })); } });
+    ], onSubmit: v => { const u = (v.url || '').trim(); if (!URLOK.test(u)) return this.fieldErr({ url: u ? tr('badUrl') : tr('reqName') }); const n = u.split(/[/:]/).pop().replace(/\.git$/, '').trim(); this.addRepoItem({ name: n, path: `${v.dest}/${n}`, acc: v.acc, wss: v.ws ? [v.ws] : [] }); this.toast(tr('clonedT', { n })); } });
   };
-  openRepoDialog = () => { const tr = this.tr.bind(this); this.openForm({ title: tr('openTitle'), submitLabel: tr('openRepo'), fields: [{ type: 'text', key: 'path', label: tr('openPath'), placeholder: '~/code/mi-proyecto', mono: true }], onSubmit: v => { const p = (v.path || '').trim(); if (!p) return false; this.addRepoItem({ name: p.split('/').pop(), path: p, acc: null, wss: [] }); } }); };
+  openRepoDialog = () => { const tr = this.tr.bind(this); this.openForm({ title: tr('openTitle'), submitLabel: tr('openRepo'), fields: [{ type: 'text', key: 'path', label: tr('openPath'), placeholder: '~/code/mi-proyecto', mono: true }], onSubmit: v => { const p = (v.path || '').trim(); if (!p) return this.fieldErr({ path: tr('reqPath') }); this.addRepoItem({ name: p.split('/').pop(), path: p, acc: null, wss: [] }); } }); };
   initDialog = () => {
     const tr = this.tr.bind(this), P = window.RAMAL.PLAT;
     this.openForm({ title: tr('initTitle'), submitLabel: tr('create'), fields: [
       { type: 'text', key: 'path', label: tr('openPath'), value: '~/code/', mono: true },
       { type: 'check', key: 'pub', label: tr('publish') },
       { type: 'select', key: 'acc', label: tr('asAccount'), value: 'a1', options: this.state.accounts.map(a => ({ value: a.id, label: `${P[a.platform].label} · @${a.user}` })), showIf: v => v.pub }
-    ], onSubmit: v => { const p = (v.path || '').replace(/\/$/, ''); const n = p.split('/').pop(); if (!n || n === '~') return false; this.addRepoItem({ name: n, path: p, acc: v.pub ? v.acc : null, wss: [], _x: null }); } });
+    ], onSubmit: v => { const p = (v.path || '').replace(/\/$/, ''); const n = p.split('/').pop(); if (!n || n === '~') return this.fieldErr({ path: tr('reqPath') }); this.addRepoItem({ name: n, path: p, acc: v.pub ? v.acc : null, wss: [], _x: null }); } });
   };
   addRepoItem(o) { const id = 'r' + Date.now(); this.setState(s => ({ repos: [{ id, alias: '', wss: [], branch: 'main', ahead: 0, behind: 0, changes: 0, mins: 0, ...o }, ...s.repos] })); this.openRepo(id); }
 
@@ -1007,7 +1044,7 @@ class Component extends DCLogic {
 
   stage(p) { this.setState(s => { const f = s.unstaged.find(x => x.path === p); return f ? { unstaged: s.unstaged.filter(x => x.path !== p), staged: [...s.staged, f] } : null; }); }
   unstage(p) { this.setState(s => { const f = s.staged.find(x => x.path === p); return f ? { staged: s.staged.filter(x => x.path !== p), unstaged: [...s.unstaged, f] } : null; }); }
-  discard(p) { const tr = this.tr.bind(this); this.confirm(tr('discardTitle'), (p || '*') + '\n' + tr('discardInfo'), tr('del'), () => { this.setState(s => p ? { unstaged: s.unstaged.filter(x => x.path !== p), staged: s.staged.filter(x => x.path !== p), center: 'graph' } : { unstaged: [], staged: [], center: 'graph' }); this.toast(tr('discardedT')); }); }
+  discard(p) { const tr = this.tr.bind(this); this.confirm(tr('discardTitle'), tr('c_discardInfo', { file: p || tr('allChanges') }), tr('c_discard'), () => { this.setState(s => p ? { unstaged: s.unstaged.filter(x => x.path !== p), staged: s.staged.filter(x => x.path !== p), center: 'graph' } : { unstaged: [], staged: [], center: 'graph' }); this.toast(tr('discardedT')); }); }
   fileMenu(f, staged) {
     const tr = this.tr.bind(this);
     return [
@@ -1034,13 +1071,14 @@ class Component extends DCLogic {
     this.setState(s => ({ unstaged: [...s.unstaged, ...files.filter(f => !s.unstaged.some(x => x.path === f.path))], stashes: drop ? s.stashes.filter((_, j) => j !== i) : s.stashes, sel: 'wip' }));
     this.toast(tr('poppedT'));
   }
-  stashMenu(i) { const tr = this.tr.bind(this); return [{ label: tr('mApply'), action: () => this.applyStash(i, false) }, { label: tr('mPop'), action: () => this.applyStash(i, true) }, { sep: 1 }, { label: tr('mDrop'), danger: 1, action: () => this.confirm(tr('mDrop').replace('…', '') + ` stash@{${i}}`, this.state.stashes[i].msg, tr('del'), () => { this.setState(s => ({ stashes: s.stashes.filter((_, j) => j !== i) })); this.toast(tr('droppedT')); }) }]; }
+  stashMenu(i) { const tr = this.tr.bind(this); return [{ label: tr('mApply'), action: () => this.applyStash(i, false) }, { label: tr('mPop'), action: () => this.applyStash(i, true) }, { sep: 1 }, { label: tr('mDrop'), danger: 1, action: () => this.confirm(tr('c_dropStashTitle', { stash: `stash@{${i}}` }), tr('c_dropStashInfo', { message: this.state.stashes[i].msg }), tr('c_drop'), () => { this.setState(s => ({ stashes: s.stashes.filter((_, j) => j !== i) })); this.toast(tr('droppedT')); }) }]; }
 
   newBranch(c) {
     const tr = this.tr.bind(this); const base = c || this.head();
-    this.openForm({ title: tr('branchTitle'), submitLabel: tr('create'), fields: [{ type: 'info', text: `${base.sha}  ${base.msg}`, mono: true }, { type: 'text', key: 'name', label: tr('branchName'), placeholder: 'feature/…', mono: true }, { type: 'check', key: 'co', label: tr('checkoutAfter'), value: true }], onSubmit: v => { const n = (v.name || '').trim().replace(/\s+/g, '-'); if (!n) return false; this.setState(s => ({ commits: s.commits.map(x => x.id === base.id ? { ...x, refs: [...x.refs, { name: n, type: 'local' }] } : x) })); this.toast(tr('branchT', { b: n })); if (v.co) setTimeout(() => this.checkout(n), 0); } });
+    this.openForm({ title: tr('branchTitle'), submitLabel: tr('create'), fields: [{ type: 'info', text: `${base.sha}  ${base.msg}`, mono: true }, { type: 'text', key: 'name', label: tr('branchName'), placeholder: 'feature/…', mono: true, help: tr('branchHelp'), validate: x => BADREF.test(x.trim()) ? tr('badBranch') : this.refExists(x.trim(), 'local') ? tr('branchExists') : '' }, { type: 'check', key: 'co', label: tr('checkoutAfter'), value: true }], onSubmit: v => { const n = (v.name || '').trim(); if (!n) return this.fieldErr({ name: tr('reqName') }); if (BADREF.test(n)) return this.fieldErr({ name: tr('badBranch') }); if (this.refExists(n, 'local')) return this.fieldErr({ name: tr('branchExists') }); this.setState(s => ({ commits: s.commits.map(x => x.id === base.id ? { ...x, refs: [...x.refs, { name: n, type: 'local' }] } : x) })); this.toast(tr('branchT', { b: n })); if (v.co) setTimeout(() => this.checkout(n), 0); } });
   }
-  newTag(c) { const tr = this.tr.bind(this); this.openForm({ title: tr('tagTitle'), submitLabel: tr('create'), fields: [{ type: 'info', text: `${c.sha}  ${c.msg}`, mono: true }, { type: 'text', key: 'name', label: tr('tagName'), placeholder: 'v2.4.0', mono: true }, { type: 'text', key: 'msg', label: tr('tagMsg') }, { type: 'check', key: 'push', label: tr('pushTagToo') }], onSubmit: v => { const n = (v.name || '').trim(); if (!n) return false; this.setState(s => ({ commits: s.commits.map(x => x.id === c.id ? { ...x, refs: [...x.refs, { name: n, type: 'tag' }] } : x) })); this.toast(tr('tagT', { b: n })); } }); }
+  refExists(n, type) { return this.state.commits.some(c => c.refs.some(r => r.type === type && r.name === n)); }
+  newTag(c) { const tr = this.tr.bind(this); this.openForm({ title: tr('tagTitle'), submitLabel: tr('create'), fields: [{ type: 'info', text: `${c.sha}  ${c.msg}`, mono: true }, { type: 'text', key: 'name', label: tr('tagName'), placeholder: 'v2.4.0', mono: true, validate: x => BADREF.test(x.trim()) ? tr('badBranch') : this.refExists(x.trim(), 'tag') ? tr('tagExists') : '' }, { type: 'text', key: 'msg', label: tr('tagMsg') }, { type: 'check', key: 'push', label: tr('pushTagToo') }], onSubmit: v => { const n = (v.name || '').trim(); if (!n) return this.fieldErr({ name: tr('reqName') }); if (this.refExists(n, 'tag')) return this.fieldErr({ name: tr('tagExists') }); this.setState(s => ({ commits: s.commits.map(x => x.id === c.id ? { ...x, refs: [...x.refs, { name: n, type: 'tag' }] } : x) })); this.toast(tr('tagT', { b: n })); } }); }
   cherry(c) { const tr = this.tr.bind(this); this.openForm({ title: tr('cherryTitle'), submitLabel: tr('cherryBtn'), fields: [{ type: 'info', text: `${c.sha}  ${c.msg}\n→ ${this.state.current}`, mono: true }, { type: 'check', key: 'x', label: tr('cherryX') }, { type: 'check', key: 'nc', label: tr('noCommit') }], onSubmit: v => { if (v.nc) { this.setState(s => ({ staged: [...s.staged, ...window.RAMAL.FILESETS[1].map(f => ({ path: f[0], st: f[1] }))], sel: 'wip' })); } else this.addCommit(c.msg + (v.x ? ` (cherry picked from ${c.sha})` : '')); this.toast(tr('cherryT', { s: c.sha })); } }); }
   revert(c) { this.addCommit(`Revert "${c.msg}"`); this.toast(this.tr('revertT', { s: c.sha })); }
   reset(c, mode) { const tr = this.tr.bind(this); const go = () => { if (mode === 'hard') this.setState({ unstaged: [], staged: [] }); this.toast(tr('resetT', { m: '--' + mode, s: c.sha })); }; if (mode === 'hard') this.confirm(tr('resetHardTitle', { s: c.sha }), tr('resetHardInfo'), 'Reset --hard', go); else go(); }
@@ -1068,24 +1106,27 @@ class Component extends DCLogic {
     if (!isCur) it.push({ label: remote ? tr('mCheckoutTrack', { b: name.split('/').slice(1).join('/') }) : tr('mCheckout') + ' ' + name, action: () => this.checkout(name, remote) });
     if (!isCur) it.push({ sep: 1 }, { label: tr('mMerge', { a: name, b: cur }), action: () => this.openMerge(name) }, { label: tr('mRebaseOnto', { a: cur, b: name }), action: () => this.openRebase(name) }, { label: tr('mRebaseIOnto', { a: cur, b: name }), action: () => this.startInteractive(name) });
     it.push({ sep: 1 });
-    if (!remote) it.push({ label: tr('mPush'), action: () => this.push() }, { label: tr('mPull'), action: () => this.toast(tr('pulledT', { b: name })) }, { label: tr('mUpstream'), action: () => this.done(tr('mUpstream')) });
+    if (!remote) it.push({ label: tr('pushOf', { branch: name }), action: () => isCur ? this.push() : this.toast(tr('pushedT', { b: 'origin/' + name })) }, { label: tr('pullOf', { branch: name }), action: () => this.toast(tr('pulledT', { b: name })) }, { label: tr('mUpstream'), action: () => this.done(tr('mUpstream')) });
     it.push({ label: tr('mCreatePR'), action: () => this.openPR(remote ? name.split('/').slice(1).join('/') : name) });
-    if (!isCur) it.push({ label: tr('mCompare', { b: cur }), action: () => this.setState({ diffFile: { path: 'src/graph/lanes.ts', st: 'M' }, center: 'diff' }) });
+    if (!isCur) it.push({ label: tr('compareOf', { branch: name }), action: () => this.setState({ diffFile: { path: 'src/graph/lanes.ts', st: 'M' }, center: 'diff' }) });
     it.push({ sep: 1 });
     if (!remote) it.push({ label: tr('mRename'), action: () => this.renameBranch(name) });
     it.push({ label: tr('mCopySha').replace('SHA', tr('name')), action: () => this.copy(name) });
-    if (!isCur) it.push({ label: remote ? tr('mDeleteRemote') : tr('mDelete'), danger: 1, action: () => this.deleteBranch(name) });
+    if (!remote && !isCur) it.push({ label: tr('deleteLocal'), danger: 1, action: () => this.deleteBranch(name) });
+    const rn = remote ? name : 'origin/' + name;
+    if (remote || this.refExists(rn, 'remote')) { const [rm, ...rb] = rn.split('/'); it.push({ label: tr('deleteRemote', { remote: rm, branch: rb.join('/') }), danger: 1, action: () => this.deleteRemoteBranch(rm, rb.join('/')) }); }
     return it;
   }
   remoteMenu(g) { const tr = this.tr.bind(this); return [{ label: tr('mFetchRemote', { r: g }), action: () => this.toast(tr('fetchedT')) }, { label: tr('mEditRemote'), action: () => this.openForm({ title: tr('mEditRemote').replace('…', ''), submitLabel: tr('save'), fields: [{ type: 'text', key: 'url', label: 'URL', value: `git@github.com:${g === 'origin' ? 'marta-dev' : 'ramal-app'}/gitflow-desktop.git`, mono: true }], onSubmit: () => this.toast(tr('saved')) }) }, { label: tr('mCopyLink'), action: () => this.copy(`github.com/${g}/gitflow-desktop`) }]; }
-  tagMenu(n) { const tr = this.tr.bind(this); return [{ label: tr('mCheckout') + ' ' + n, action: () => this.toast(tr('checkoutT', { b: n + ' (detached HEAD)' }), 'warn') }, { label: tr('mPushTag'), action: () => this.toast(tr('pushedT', { b: 'origin ' + n })) }, { label: tr('mCopySha').replace('SHA', tr('name')), action: () => this.copy(n) }, { sep: 1 }, { label: tr('mDeleteTag'), danger: 1, action: () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => !(r.type === 'tag' && r.name === n)) })) })); this.toast(tr('deletedT', { b: n })); } }]; }
+  tagMenu(n) { const tr = this.tr.bind(this); return [{ label: tr('mCheckout') + ' ' + n, action: () => this.toast(tr('checkoutT', { b: n + ' (detached HEAD)' }), 'warn') }, { label: tr('mPushTag'), action: () => this.toast(tr('pushedT', { b: 'origin ' + n })) }, { label: tr('mCopySha').replace('SHA', tr('name')), action: () => this.copy(n) }, { sep: 1 }, { label: tr('mDeleteTag'), danger: 1, action: () => this.confirm(tr('c_tagTitle', { tag: n }), tr('c_tagInfo'), tr('del'), () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => !(r.type === 'tag' && r.name === n)) })) })); this.toast(tr('deletedT', { b: n })); }) }]; }
   renameBranch(n) { const tr = this.tr.bind(this); this.openForm({ title: tr('renameBranchTitle'), submitLabel: tr('save'), fields: [{ type: 'text', key: 'name', label: tr('branchName'), value: n, mono: true }], onSubmit: v => { const nn = (v.name || '').trim(); if (!nn) return false; this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.map(r => r.type === 'local' && r.name === n ? { ...r, name: nn } : r) })), current: s.current === n ? nn : s.current })); this.toast(tr('saved')); } }); }
-  deleteBranch(n) { const tr = this.tr.bind(this); this.confirm(tr('deleteBranchTitle', { b: n }), tr('deleteBranchInfo'), tr('del'), () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => r.name !== n) })) })); this.toast(tr('deletedT', { b: n })); }, [{ type: 'check', key: 'f', label: tr('forceDelete') }]); }
+  deleteBranch(n) { const tr = this.tr.bind(this); this.confirm(tr('c_branchTitle', { branch: n }), tr('c_branchInfo'), tr('del'), () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => !(r.type === 'local' && r.name === n)) })) })); this.toast(tr('deletedT', { b: n })); }, [{ type: 'check', key: 'f', label: tr('forceDelete') }]); }
+  deleteRemoteBranch(rm, b) { const tr = this.tr.bind(this), full = rm + '/' + b; this.confirm(tr('c_remoteTitle', { remote: rm, branch: b }), tr('c_remoteInfo', { remote: rm }), tr('c_remoteBtn'), () => { this.setState(s => ({ commits: s.commits.map(c => ({ ...c, refs: c.refs.filter(r => !(r.type === 'remote' && r.name === full)) })) })); this.toast(tr('deletedT', { b: full })); }); }
 
   openMerge(src) {
     const tr = this.tr.bind(this);
     this.openForm({ title: tr('mergeTitle'), submitLabel: tr('mergeTitle'), fields: [{ type: 'info', text: `${src}  →  ${this.state.current}`, mono: true }, { type: 'seg', key: 'st', label: tr('strategy'), value: 'noff', options: [{ value: 'ff', label: tr('sFF') }, { value: 'noff', label: tr('sNoFF') }, { value: 'squash', label: tr('sSquash') }] }, { type: 'check', key: 'edit', label: tr('editMsg') }], onSubmit: () => {
-      if (!this.state.conflictUsed) { this.setState({ conflict: { src, file: 0, choices: this.initChoices(), manual: {} }, conflictUsed: true, center: 'conflict', sel: 'wip' }); this.toast(tr('conflictsT'), 'warn'); }
+      if (src === 'hotfix/login') { this.setState({ conflict: { src, op: 'merge', file: 0, choices: this.initChoices(), manual: {}, drafts: {}, forced: {} }, center: 'conflict', sel: 'wip' }); this.toast(tr('conflictsT'), 'warn'); }
       else { const t = this.state.commits.find(c => c.refs.some(r => r.name === src)); this.addCommit(`Merge branch '${src}' into ${this.state.current}`, t && t.id); this.toast(tr('mergedT', { a: src, b: this.state.current })); }
     } });
   }
@@ -1098,8 +1139,10 @@ class Component extends DCLogic {
   }
   rbSet(i, patch) { this.setState(s => ({ rebase: { ...s.rebase, items: s.rebase.items.map((x, j) => j === i ? { ...x, ...patch } : x) } })); }
   rbMove(i, j) { this.setState(s => { const it = s.rebase.items.slice(); if (j < 0 || j >= it.length) return null; const [x] = it.splice(i, 1); it.splice(j, 0, x); return { rebase: { ...s.rebase, items: it } }; }); }
+  rbErr(items, i) { const x = items[i]; if (i === 0 && (x.action === 'squash' || x.action === 'fixup')) return this.tr('firstSquash'); if (x.action === 'reword' && !(x.newMsg || '').trim()) return this.tr('rewordEmpty'); return ''; }
   rbStart = () => {
     const s = this.state; const tr = this.tr.bind(this); const items = s.rebase.items;
+    if (items.some((_, i) => this.rbErr(items, i))) return;
     const order = items.map(x => x.id);
     this.setState(x => ({ commits: x.commits.filter(c => !items.find(i => i.id === c.id && i.action === 'drop')).map(c => { const i = items.find(k => k.id === c.id); return i && i.action === 'reword' ? { ...c, msg: i.newMsg } : c; }), rebase: null, center: 'graph' }));
     this.toast(tr('rebaseT', { a: s.current, b: s.rebase.onto }));
@@ -1122,7 +1165,7 @@ class Component extends DCLogic {
       { type: 'text', key: 'rev', label: tr('reviewers'), placeholder: tr('reviewersPh') },
       { type: 'check', key: 'draft', label: tr('draft') }
     ], onSubmit: v => {
-      if (!(v.title || '').trim()) return false;
+      if (!(v.title || '').trim()) return this.fieldErr({ title: tr('reqTitle') });
       const num = 143 + this.state.repoPrs.length - 2; const a = this.state.accounts.find(x => x.id === v.acc);
       const pr = { num, title: v.title, from: v.from, to: v.to, state: v.draft ? 'draft' : 'open' };
       this.setState(s => ({ repoPrs: [pr, ...s.repoPrs], prs: [{ repo: s.tab, ...pr, author: a ? a.user : 'marta-dev', checks: 'pending', reviews: '0/2', mins: 0 }, ...s.prs] }));
@@ -1131,12 +1174,24 @@ class Component extends DCLogic {
   }
   prMenu(p, platLabel) { const tr = this.tr.bind(this); return [{ label: tr('mPrOpen', { p: platLabel }), action: () => this.done(tr('mPrOpen', { p: platLabel })) }, { label: tr('mPrCheckout'), action: () => this.checkout(p.from) }, { label: tr('mCopyLink'), action: () => this.copy(`https://github.com/marta-dev/gitflow-desktop/pull/${p.num}`) }]; }
 
-  initChoices() { const o = {}; window.RAMAL.CF.forEach((file, i) => { o[i] = file.segs.filter(sg => sg.h).map(sg => ({ ours: sg.h[0].map(() => false), theirs: sg.h[1].map(() => false) })); }); return o; }
-  updHunks(fn) { this.setState(s => { const cf = s.conflict; const manual = { ...cf.manual }; delete manual[cf.file]; return { conflict: { ...cf, manual, editing: false, choices: { ...cf.choices, [cf.file]: fn(cf.choices[cf.file].map(h => ({ ours: h.ours.slice(), theirs: h.theirs.slice() }))) } } }; }); }
-  pick(hi, side) { this.updHunks(hs => { const a = hs[hi][side]; const all = a.every(Boolean); hs[hi][side] = a.map(() => !all); return hs; }); }
-  pickLine(hi, side, li) { this.updHunks(hs => { hs[hi][side][li] = !hs[hi][side][li]; return hs; }); }
-  takeAll(side) { const o = side === 'ours' ? 'theirs' : 'ours'; this.updHunks(hs => hs.map(h => ({ [side]: h[side].map(() => true), [o]: h[o].map(() => false) }))); }
-  cfResolved(i) { const cf = this.state.conflict; if (cf.manual && cf.manual[i] != null) return !/^(<<<<<<<|=======|>>>>>>>)/m.test(cf.manual[i]); return cf.choices[i].every(h => h.ours.some(Boolean) || h.theirs.some(Boolean)); }
+  initChoices() { const o = {}; window.RAMAL.CF.forEach((file, i) => { o[i] = file.segs.filter(sg => sg.h).map(sg => ({ ours: sg.h[0].map(() => false), theirs: sg.h[1].map(() => false), empty: false })); }); return o; }
+  updHunks(fn) {
+    const cf0 = this.state.conflict;
+    const apply = () => this.setState(s => { const cf = s.conflict; const manual = { ...cf.manual }; delete manual[cf.file]; const drafts = { ...(cf.drafts || {}) }; delete drafts[cf.file]; const forced = { ...(cf.forced || {}) }; delete forced[cf.file]; return { conflict: { ...cf, manual, drafts, forced, editing: false, choices: { ...cf.choices, [cf.file]: fn(cf.choices[cf.file].map(h => ({ ours: h.ours.slice(), theirs: h.theirs.slice(), empty: !!h.empty }))) } } }; });
+    const touched = (cf0.manual && cf0.manual[cf0.file] != null) || (cf0.drafts && cf0.drafts[cf0.file] != null);
+    if (touched) { const tr = this.tr.bind(this); this.confirm(tr('discManTitle'), tr('discManBody', { file: window.RAMAL.CF[cf0.file].path.split('/').pop() }), tr('discManBtn'), apply); } else apply();
+  }
+  pick(hi, side) { this.updHunks(hs => { const a = hs[hi][side]; const all = a.every(Boolean); hs[hi][side] = a.map(() => !all); hs[hi].empty = false; return hs; }); }
+  pickLine(hi, side, li) { this.updHunks(hs => { hs[hi][side][li] = !hs[hi][side][li]; hs[hi].empty = false; return hs; }); }
+  leaveEmpty(hi) { this.updHunks(hs => { const e = !hs[hi].empty; hs[hi] = { ours: hs[hi].ours.map(() => false), theirs: hs[hi].theirs.map(() => false), empty: e }; return hs; }); }
+  takeAll(side) { const o = side === 'ours' ? 'theirs' : 'ours'; this.updHunks(hs => hs.map(h => ({ [side]: h[side].map(() => true), [o]: h[o].map(() => false), empty: false }))); }
+  cfResolved(i) { const cf = this.state.conflict; if (cf.forced && cf.forced[i]) return true; if (cf.manual && cf.manual[i] != null) return !MARK.test(cf.manual[i]); return cf.choices[i].every(h => h.empty || h.ours.some(Boolean) || h.theirs.some(Boolean)); }
+  markResolved(i) {
+    const tr = this.tr.bind(this), cf = this.state.conflict, file = window.RAMAL.CF[i].path.split('/').pop();
+    const go = () => this.setState(s => ({ conflict: { ...s.conflict, forced: { ...(s.conflict.forced || {}), [i]: true } } }));
+    const markers = cf.manual && cf.manual[i] != null ? MARK.test(cf.manual[i]) : true;
+    if (markers) this.openForm({ title: tr('markResTitle', { file }), submitLabel: tr('markResBtn'), fields: [{ type: 'info', text: tr('markResBody') }], onSubmit: go }); else go();
+  }
   completeMerge = () => {
     const tr = this.tr.bind(this); const cf = this.state.conflict;
     if (!window.RAMAL.CF.every((_, i) => this.cfResolved(i))) { this.toast(tr('stillConflicts'), 'warn'); return; }
@@ -1144,7 +1199,13 @@ class Component extends DCLogic {
     this.addCommit(`Merge branch '${cf.src}' into ${this.state.current}`, t && t.id);
     this.setState({ conflict: null, center: 'graph' }); this.toast(tr('mergeDoneT'));
   };
-  abortMerge = () => { this.setState({ conflict: null, conflictUsed: false, center: 'graph' }); this.toast(this.tr('abortedT'), 'warn'); };
+  abortMerge = () => { const tr = this.tr.bind(this); this.confirm(tr('c_abortMergeTitle'), tr('c_abortInfo'), tr('c_abort'), () => { this.setState({ conflict: null, center: 'graph' }); this.toast(tr('abortedT'), 'warn'); }); };
+  summarize(c) {
+    const k = this.aiKey('summary'); if (!this.state.ai.summary || !k) return;
+    this.setState(s => ({ aiSum: { ...s.aiSum, [c.id]: { st: 'busy' } } }));
+    const fail = c.id === 'c4' && !(this.state.aiSum[c.id] && this.state.aiSum[c.id].tried);
+    setTimeout(() => this.setState(s => ({ aiSum: { ...s.aiSum, [c.id]: fail ? { st: 'fail', tried: true } : { st: 'done', prov: k.prov, model: k.model } } })), 900);
+  }
 
   aiKey(feat) { const s = this.state; return s.aiKeys.find(k => k.id === s.ai[feat + 'Key']) || s.aiKeys.find(k => k.def) || s.aiKeys[0]; }
   aiCheck(feat) { const tr = this.tr.bind(this); if (!this.state.ai[feat]) { this.toast(tr('aiDisabled'), 'warn'); return null; } const k = this.aiKey(feat); if (!k) { this.toast(tr('aiNoKey'), 'warn'); return null; } return k; }
@@ -1172,13 +1233,14 @@ class Component extends DCLogic {
     this.openForm({ title: edit ? tr('editKeyTitle') : tr('addKey'), submitLabel: edit ? tr('save') : tr('create'), fields: [
       { type: 'select', key: 'prov', label: tr('provider'), value: edit ? edit.prov : 'anthropic', options: Object.keys(AP).map(k => ({ value: k, label: AP[k].label })) },
       { type: 'text', key: 'label', label: tr('label'), value: edit ? edit.label : '', placeholder: tr('keyLabelPh') },
-      { type: 'text', key: 'key', label: tr('apiKey'), placeholder: edit ? edit.masked : 'sk-…', mono: true },
+      { type: 'secret', key: 'key', label: tr('apiKey'), placeholder: edit ? '' : 'sk-…', help: edit ? tr('secretSaved') : '' },
       { type: 'text', key: 'model', label: tr('model'), value: edit ? edit.model : '', placeholder: 'claude-sonnet-4-5', mono: true },
       { type: 'text', key: 'url', label: tr('baseUrl'), placeholder: 'https://', mono: true, showIf: v => !!AP[v.prov].url },
       { type: 'seg', key: 'scope', label: tr('scope'), value: edit ? edit.scope : 'personal', options: [{ value: 'personal', label: tr('sc_personal') }, { value: 'org', label: tr('sc_org') + ' · ACME' }] }
     ], onSubmit: v => {
-      const p = AP[v.prov]; const raw = (v.key || '').trim(); if (!edit && !raw && v.prov !== 'ollama') return false;
-      const masked = raw ? (raw.slice(0, Math.min(7, raw.length)) + '••••••••' + raw.slice(-4)) : (edit ? edit.masked : '—');
+      const p = AP[v.prov]; const raw = (v.key || '').trim(); if (!edit && !raw && v.prov !== 'ollama') return this.fieldErr({ key: tr('reqKey') });
+      const pre = (raw.match(/^(sk-ant-|sk-proj-|sk-or-|gsk_|AIza|sk-)/) || [''])[0];
+      const masked = raw ? (raw.length < 12 ? '••••••••' : pre + '…' + raw.slice(-4)) : (edit ? edit.masked : '—');
       const k = { prov: v.prov, label: (v.label || '').trim() || p.label, scope: v.scope, masked, model: (v.model || '').trim() || p.model };
       if (edit) this.setState(s => ({ aiKeys: s.aiKeys.map(x => x.id === edit.id ? { ...x, ...k } : x) }));
       else this.setState(s => ({ aiKeys: [...s.aiKeys, { id: 'k' + Date.now(), def: !s.aiKeys.length, ...k }] }));
@@ -1188,22 +1250,24 @@ class Component extends DCLogic {
   keyMenu(k) {
     const tr = this.tr.bind(this), p = window.RAMAL.AIPROV[k.prov];
     return [{ label: tr('mTest'), action: () => this.toast(tr('keyTestT', { p: p.label, m: k.model })) }, ...(k.def ? [] : [{ label: tr('mMakeDefKey'), action: () => { this.setState(s => ({ aiKeys: s.aiKeys.map(x => ({ ...x, def: x.id === k.id })) })); this.toast(tr('keyDefT', { l: k.label })); } }]), { label: tr('mEditKey'), action: () => this.addKey(k) }, { label: tr('mCopySha').replace('SHA', tr('model')), action: () => this.copy(k.model) }, { sep: 1 },
-      { label: tr('mRemoveKey'), danger: 1, action: () => this.confirm(tr('mRemoveKey').replace('…', '') + ' · ' + k.label, p.label + ' · ' + k.masked, tr('del'), () => { this.setState(s => { const ks = s.aiKeys.filter(x => x.id !== k.id); if (k.def && ks[0]) ks[0] = { ...ks[0], def: true }; return { aiKeys: ks }; }); this.toast(tr('keyRemovedT')); }) }];
+      { label: tr('mRemoveKey'), danger: 1, action: () => this.confirm(tr('c_keyTitle', { label: k.label }), tr('c_keyInfo', { provider: p.label, mask: k.masked }), tr('del'), () => { this.setState(s => { const ks = s.aiKeys.filter(x => x.id !== k.id); if (k.def && ks[0]) ks[0] = { ...ks[0], def: true }; return { aiKeys: ks }; }); this.toast(tr('keyRemovedT')); }) }];
   }
-  invite() { const tr = this.tr.bind(this); this.openForm({ title: tr('inviteTitle', { o: 'ACME Studio' }), submitLabel: tr('invite'), fields: [{ type: 'text', key: 'email', label: tr('email'), placeholder: 'nombre@empresa.com' }, { type: 'seg', key: 'role', label: tr('role'), value: 'member', options: [{ value: 'member', label: tr('r_member') }, { value: 'admin', label: tr('r_admin') }] }], onSubmit: v => { const e = (v.email || '').trim(); if (!e.includes('@')) return false; this.setState(s => ({ members: [...s.members, { name: e, email: e, role: v.role, ini: e[0].toUpperCase(), lane: s.members.length % 5, pending: true }] })); this.toast(tr('invitedT', { e })); } }); }
+  invite() { const tr = this.tr.bind(this); this.openForm({ title: tr('inviteTitle', { o: 'ACME Studio' }), submitLabel: tr('invite'), fields: [{ type: 'text', key: 'email', label: tr('email'), placeholder: 'nombre@example.com', validate: x => EMAILOK.test(x.trim()) ? '' : tr('errEmail') }, { type: 'seg', key: 'role', label: tr('role'), value: 'member', options: [{ value: 'member', label: tr('r_member') }, { value: 'admin', label: tr('r_admin') }] }], onSubmit: v => { const e = (v.email || '').trim(); if (!EMAILOK.test(e)) return this.fieldErr({ email: e ? tr('errEmail') : tr('errEmail') }); this.setState(s => ({ members: [...s.members, { name: e, email: e, role: v.role, ini: e[0].toUpperCase(), lane: s.members.length % 5, pending: true }] })); this.toast(tr('invitedT', { e })); } }); }
   memberMenu(m) {
     const tr = this.tr.bind(this); if (m.role === 'owner') return [{ label: tr('mCopyPath').replace(tr('mCopyPath').split(' ').pop(), 'email'), action: () => this.copy(m.email) }];
     const setRole = r => this.setState(s => ({ members: s.members.map(x => x.email === m.email ? { ...x, role: r } : x) }));
     return [{ label: tr('role'), children: ['admin', 'member'].map(r => ({ label: (m.role === r ? '✓  ' : '     ') + tr('r_' + r), action: () => setRole(r) })) }, ...(m.pending ? [{ label: tr('mResend'), action: () => this.toast(tr('invitedT', { e: m.email })) }] : []), { sep: 1 },
-      { label: tr('mRemoveMember'), danger: 1, action: () => this.confirm(tr('mRemoveMember').replace('…', ''), m.name + ' · ' + m.email, tr('remove'), () => this.setState(s => ({ members: s.members.filter(x => x.email !== m.email) }))) }];
+      { label: tr('mRemoveMember'), danger: 1, action: () => this.confirm(tr('c_memberTitle', { name: m.name, org: 'ACME Studio' }), tr('c_memberInfo', { email: m.email }), tr('remove'), () => this.setState(s => ({ members: s.members.filter(x => x.email !== m.email) }))) }];
   }
 
   renderVals() {
     const s = this.state;
     if (!s.ready || !window.RAMAL) return { isHome: true, isReposView: true, t: {} };
     const R = window.RAMAL, P = R.PLAT, LANE = R.LANE, L = s.lang === 'en' ? 1 : 0, tr = this.tr.bind(this);
-    const t = {}; for (const k in R.D) t[k] = R.D[k][L];
+    const t = {}; for (const k in (R.STATES || {})) t[k] = R.STATES[k][L]; for (const k in R.D) t[k] = R.D[k][L];
     const accById = Object.fromEntries(s.accounts.map(a => [a.id, a]));
+    const remOf = r => { const a = accById[r.acc]; return a ? { plat: a.platform, host: a.host } : (r.remote || null); };
+    const LC = l => LANE[l % LANE.length];
     const wsById = Object.fromEntries(s.workspaces.map(w => [w.id, w]));
     const repoById = Object.fromEntries(s.repos.map(r => [r.id, r]));
     const disp = r => r.alias || r.name;
@@ -1211,20 +1275,20 @@ class Component extends DCLogic {
     const isHome = !isSettings && (s.tab === 'home' || !repoById[s.tab]);
 
     const repoV = r => {
-      const a = accById[r.acc], p = a ? P[a.platform] : null, wl = r.wss.map(id => wsById[id]).filter(Boolean), w = wl[0];
+      const a = accById[r.acc], rem = remOf(r), p = rem ? P[rem.plat] : null, wl = r.wss.map(id => wsById[id]).filter(Boolean), w = wl[0];
       const st = []; if (r.ahead || r.behind) st.push(`↑${r.ahead}  ↓${r.behind}`); if (r.changes) st.push(tr('changes', { n: r.changes }));
       const open = s.prs.filter(x => x.repo === r.id && (x.state === 'open' || x.state === 'draft' || x.state === 'approved' || x.state === 'changes')).length;
       return {
         id: r.id, displayName: disp(r), subName: r.name, hasSub: !!r.alias, path: r.path,
         abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)',
-        srcLine: p ? `${p.label} · @${a.user}` : t.localOnly, srcSub: p ? a.host + ' · ' + a.name : t.noRemote,
+        srcLine: a ? `${p.label} · @${a.user}` : p ? `${p.label} · ${rem.host}` : t.localOnly, srcSub: a ? a.host + ' · ' + a.name : t.noRemote, hasSrcSub: !p || !!a, noAcc: !!p && !a, onChoose: e => { e.stopPropagation(); this.chooseAccount(r); },
         branch: r.branch, stats: st.join(' · ') || '—', hasWs: !!w, wsName: w ? w.name : '', wsColor: w ? w.color : '', hasWsMore: wl.length > 1, wsMore: '+' + (wl.length - 1), wsAll: wl.map(x => x.name).join(', '), updated: this.ago(r.mins),
         prCount: open ? tr('openPrs', { n: open }) : '',
         onOpen: () => this.openRepo(r.id), onMenu: e => this.openMenu(e, () => this.repoMenu(r))
       };
     };
 
-    const tabs = s.openTabs.filter(id => repoById[id]).map(id => { const r = repoById[id], a = accById[r.acc], p = a ? P[a.platform] : null, act = s.tab === id; return { label: disp(r), abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)', bg: act ? 'var(--bg)' : 'transparent', color: act ? 'var(--text)' : 'var(--muted)', shadow: act ? 'inset 0 2px 0 var(--accent)' : 'none', onClick: () => this.setState({ tab: id, menu: null }), onClose: e => this.closeTab(id, e), onMenu: e => this.openMenu(e, () => this.repoMenu(r)) }; });
+    const tabs = s.openTabs.filter(id => repoById[id]).map(id => { const r = repoById[id], rm = remOf(r), p = rm ? P[rm.plat] : null, act = s.tab === id; return { label: disp(r), abbr: p ? p.abbr : '⌂', badgeBg: p ? p.color : 'var(--surface2)', badgeColor: p ? 'white' : 'var(--muted)', bg: act ? 'var(--bg)' : 'transparent', color: act ? 'var(--text)' : 'var(--muted)', shadow: act ? 'inset 0 2px 0 var(--accent)' : 'none', onClick: () => this.setState({ tab: id, menu: null }), onClose: e => this.closeTab(id, e), onMenu: e => this.openMenu(e, () => this.repoMenu(r)) }; });
     const hAct = isHome;
     const base = {
       t, tabs, homeTab: { bg: hAct ? 'var(--bg)' : 'transparent', color: hAct ? 'var(--text)' : 'var(--muted)', shadow: hAct ? 'inset 0 2px 0 var(--accent)' : 'none' },
@@ -1237,7 +1301,7 @@ class Component extends DCLogic {
       lightBg: s.theme === 'light' ? 'var(--accent)' : 'transparent', lightColor: s.theme === 'light' ? 'var(--accent-ink)' : 'var(--muted)',
       darkBg: s.theme === 'dark' ? 'var(--accent)' : 'transparent', darkColor: s.theme === 'dark' ? 'var(--accent-ink)' : 'var(--muted)',
       isHome, isRepo: !isHome && !isSettings,
-      toasts: s.toasts.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : x.kind === 'err' ? 'var(--danger)' : x.kind === 'info' ? 'var(--accent)' : 'var(--ok)' })),
+      toasts: s.toasts.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : x.kind === 'err' ? 'var(--danger)' : x.kind === 'info' ? 'var(--info)' : 'var(--ok)' })),
       stop: e => e.stopPropagation(), closeModal: () => this.setState({ modal: null }), submitModal: this.submitModal, closeMenu: this.closeMenu,
       hasMenu: !!s.menu, hasModal: !!s.modal
     };
@@ -1254,11 +1318,13 @@ class Component extends DCLogic {
       })) };
     }
     if (s.modal) {
-      const m = s.modal, mv = m.values;
-      base.modal = { title: m.title, sub: m.sub || '', hasSub: !!m.sub, w: m.wide ? 580 : 460, submit: m.submitLabel, btnBg: m.danger ? 'var(--danger)' : 'var(--accent)', btnColor: m.danger ? 'white' : 'var(--accent-ink)',
+      const m = s.modal, mv = m.values, me = m.errors || {}, mr = m.reveal || {};
+      base.modal = { danger: !!m.danger, title: m.title, sub: m.sub || '', hasSub: !!m.sub, w: m.wide ? 580 : 460, submit: m.submitLabel, btnBg: m.danger ? 'var(--danger)' : 'var(--accent)', btnColor: m.danger ? 'white' : 'var(--accent-ink)',
         fields: m.fields.filter(f => !f.showIf || f.showIf(mv)).map(f => { const v = f.key ? mv[f.key] : undefined; return {
-          isAction: f.type === 'action', onClick: () => f.run && f.run(), isInfo: f.type === 'info', isText: f.type === 'text', isArea: f.type === 'area', isSelect: f.type === 'select', isSeg: f.type === 'seg', isCheck: f.type === 'check',
-          label: f.type === 'action' && s.aiBusy === 'pr' ? t.aiGenerating : (f.label || ''), text: f.text || '', font: f.mono ? "'IBM Plex Mono',monospace" : 'inherit', value: v == null ? '' : v, placeholder: f.placeholder || '', checked: !!v,
+          isAction: f.type === 'action', onClick: () => f.run && f.run(), isInfo: f.type === 'info', isText: f.type === 'text', isSecret: f.type === 'secret',
+          err: me[f.key] || '', hasErr: !!me[f.key], border: me[f.key] ? 'var(--danger)' : 'var(--border)', help: f.help || '', hasHelp: !!f.help && !me[f.key], onBlur: () => this.blurField(f),
+          inputType: mr[f.key] ? 'text' : 'password', canReveal: !!v, revealLabel: mr[f.key] ? t.hide : t.show, onReveal: () => this.setState(x => ({ modal: { ...x.modal, reveal: { ...(x.modal.reveal || {}), [f.key]: !mr[f.key] } } })), isArea: f.type === 'area', isSelect: f.type === 'select', isSeg: f.type === 'seg', isCheck: f.type === 'check',
+          label: f.type === 'action' && s.aiBusy === 'pr' ? t.aiGenerating : (f.label || ''), text: f.text || '', font: f.mono ? "'IBM Plex Mono',monospace" : 'inherit', value: v == null ? '' : v, placeholder: typeof f.placeholder === 'function' ? f.placeholder(mv) : (f.placeholder || ''), checked: !!v,
           onChange: e => this.setVal(f.key, e.target.value), onToggle: e => this.setVal(f.key, e.target.checked),
           options: (f.options || []).map(o => ({ value: o.value, label: o.label, bg: v === o.value ? 'var(--accent)' : 'transparent', color: v === o.value ? 'var(--accent-ink)' : 'var(--text)', onClick: () => this.setVal(f.key, o.value) }))
         }; }) };
@@ -1283,20 +1349,22 @@ class Component extends DCLogic {
         const p = s.profile;
         sh = { title: t.secProfile, sub: t.profileSub, hasAction: true, action: t.saveChanges, onAction: () => this.toast(tr('saved')) };
         base.pf = { ini: p.name.split(' ').map(x => x[0]).join('').slice(0, 2).toUpperCase(), name: p.name, user: p.user, email: p.email, onPhoto: () => this.done(t.changePhoto) };
-        cards = [card(t.secProfile, '', [row(t.fullName, '', inp(p.name, setP('name'))), row(t.username, '', inp(p.user, setP('user'), true)), row(t.email, '', inp(p.email, setP('email'))), row(t.timezone, '', sel(p.tz, ['Europe/Madrid', 'America/Mexico_City', 'America/Bogota', 'America/Buenos_Aires', 'America/New_York', 'UTC'].map(z => [z, z.replace('_', ' ')]), setP('tz')))])];
+        cards = [card(t.secProfile, '', [row(t.fullName, '', inp(p.name, setP('name'))), row(t.username, '', inp(p.user, setP('user'), true)), row(t.email, '', inp(p.email, setP('email'))), row(t.timezone, '', sel(p.tz, ['Europe/Madrid', 'America/Mexico_City', 'America/Bogota', 'America/Buenos_Aires', 'America/New_York', 'UTC'].map(z => [z, z.replace(/_/g, ' ')]), setP('tz')))])];
       }
       if (sec === 'account') {
         sh = { title: t.secAccount, sub: t.accountSub, hasAction: false };
-        base.acct = { email: s.profile.email, org: 'ACME Studio', count: tr('members', { n: s.members.length }), onManage: () => this.done(t.manageSub), onSignOut: () => this.toast(tr('signedOutT'), 'warn'), onInvite: () => this.invite(),
+        const nMem = s.members.filter(x => !x.pending).length, nPend = s.members.filter(x => x.pending).length, SEATS = 6;
+        base.acct = { email: s.profile.email, org: 'ACME Studio', renew: tr('planRenew', { date: L ? 'October 12, 2026' : '12 de octubre de 2026', seats: SEATS }),
+          count: tr('teamLine', { members: tr(nMem === 1 ? 'members_one' : 'members_other', { count: nMem }), pending: tr(nPend === 1 ? 'pendingInv_one' : 'pendingInv_other', { count: nPend }), seats: tr('seatsUsed', { used: nMem + nPend, seats: SEATS }) }), onManage: () => this.done(t.manageSub), onSignOut: () => this.toast(tr('signedOutT'), 'warn'), onInvite: () => this.invite(),
           members: s.members.map(m => { const rc = m.role === 'owner' ? 'var(--accent)' : m.role === 'admin' ? 'var(--info)' : 'var(--muted)'; return { ini: m.ini, name: m.name, sub: m.pending ? t.pending : m.email, avBg: LANE[m.lane], opacity: m.pending ? 0.5 : 1, role: t['r_' + m.role], roleColor: rc, roleBg: tint(rc, 14), onMenu: e => this.openMenu(e, () => this.memberMenu(this.state.members.find(x => x.email === m.email) || m)) }; }),
-          sessions: s.sessions.map((x, i) => ({ dev: x.dev, where: x.city + ' · ' + (x.current ? t.thisDevice : this.ago(x.mins)), current: !!x.current, other: !x.current, onRevoke: () => { this.setState(y => ({ sessions: y.sessions.filter((_, j) => j !== i) })); this.toast(tr('revokedT', { d: x.dev })); } })) };
+          sessions: s.sessions.map((x, i) => ({ dev: x.dev, where: x.app + ' · ' + this.ago(x.mins), current: !!x.current, other: !x.current, onRevoke: () => this.confirm(tr('c_sessTitle', { device: x.dev }), tr('c_sessInfo'), tr('c_signOut'), () => { this.setState(y => ({ sessions: y.sessions.filter((_, j) => j !== i) })); this.toast(tr('revokedT', { d: x.dev })); }) })) };
       }
       if (sec === 'integrations') sh = { title: t.secIntegrations, sub: t.intSub, hasAction: true, action: '+ ' + t.addAccount, onAction: () => this.addAccount('github') };
       if (sec === 'integrations') {
         base.addAccount = () => this.addAccount('github');
         base.accGroups = Object.keys(P).map(k => { const list = s.accounts.filter(a => a.platform === k); return {
           label: P[k].label, abbr: P[k].abbr, color: P[k].color, count: list.length, empty: !list.length, addLabel: tr('addTo', { p: P[k].label }), onAdd: () => this.addAccount(k),
-          accounts: list.map((a, i) => ({ user: a.user, ini: a.user.slice(0, 2).toUpperCase(), avBg: LANE[(i + k.length) % LANE.length], name: a.name, host: a.host, method: a.method, scopes: a.scopes, isDef: a.def, notDef: !a.def, usedIn: tr('usedIn', { n: s.repos.filter(r => r.acc === a.id).length }), onMakeDef: () => this.makeDef(a), onMenu: e => this.openMenu(e, this.accMenu(a)) }))
+          accounts: list.map((a, i) => ({ ...({ ok: { chkColor: 'var(--ok)', chkText: tr('accChecked', { ago: this.ago(a.chkMins || 0) }) }, expires: { chkColor: 'var(--warn)', chkText: tr(a.chkDays === 1 ? 'accExpires_one' : 'accExpires_other', { count: a.chkDays }) }, expired: { chkColor: 'var(--danger)', chkText: t.accExpired }, fail: { chkColor: 'var(--danger)', chkText: t.accCheckFail } }[a.chk] || { chkColor: 'var(--faint)', chkText: t.accNotChecked }), user: a.user, ini: a.user.slice(0, 2).toUpperCase(), avBg: LANE[(i + k.length) % LANE.length], name: a.name, host: a.host, method: a.method, scopes: a.scopes, isDef: a.def, notDef: !a.def, usedIn: tr('usedIn', { n: s.repos.filter(r => r.acc === a.id).length }), onMakeDef: () => this.makeDef(a), onMenu: e => this.openMenu(e, this.accMenu(a)) }))
         }; });
       }
 
@@ -1334,8 +1402,9 @@ class Component extends DCLogic {
         const q = s.q.trim().toLowerCase();
         const list = s.repos.filter(r => {
           const a = accById[r.acc];
-          if (s.fKind === 'local' && a) return false; if (s.fKind === 'remote' && !a) return false;
-          if (s.fPlat.length && (!a || !s.fPlat.includes(a.platform))) return false;
+          const rm = remOf(r);
+          if (s.fKind === 'local' && rm) return false; if (s.fKind === 'remote' && !rm) return false;
+          if (s.fPlat.length && (!rm || !s.fPlat.includes(rm.plat))) return false;
           if (s.fAcc && r.acc !== s.fAcc) return false;
           if (s.fWs === 'none' ? r.wss.some(id => wsById[id]) : (s.fWs && !r.wss.includes(s.fWs))) return false;
           if (q) { const hay = [r.name, r.alias, r.path, r.branch, a ? a.user : '', a ? P[a.platform].label : '', a ? a.host : ''].join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
@@ -1344,7 +1413,7 @@ class Component extends DCLogic {
         let groups;
         let gdefs = null;
         if (s.groupBy === 'ws') gdefs = [...s.workspaces.map(w => ({ name: w.name, dot: w.color, items: list.filter(r => r.wss.includes(w.id)) })), { name: t.noWs, dot: 'var(--border)', items: list.filter(r => !r.wss.some(id => wsById[id])) }];
-        if (s.groupBy === 'plat') gdefs = [...Object.keys(P).map(k => ({ name: P[k].label, dot: P[k].color, items: list.filter(r => accById[r.acc] && accById[r.acc].platform === k) })), { name: t.localOnly, dot: 'var(--border)', items: list.filter(r => !accById[r.acc]) }];
+        if (s.groupBy === 'plat') gdefs = [...Object.keys(P).map(k => ({ name: P[k].label, dot: P[k].color, items: list.filter(r => remOf(r) && remOf(r).plat === k) })), { name: t.localOnly, dot: 'var(--border)', items: list.filter(r => !remOf(r)) }];
         if (s.groupBy === 'acc') gdefs = [...s.accounts.map(a => ({ name: `${P[a.platform].label} · @${a.user}`, dot: P[a.platform].color, items: list.filter(r => r.acc === a.id) })), { name: t.localOnly, dot: 'var(--border)', items: list.filter(r => !accById[r.acc]) }];
         if (gdefs) { groups = gdefs.filter(g => g.items.length).map(g => ({ showHeader: true, name: g.name, dot: g.dot, count: g.items.length, repos: g.items.map(repoV) })); }
         else groups = [{ showHeader: false, name: '', dot: '', count: 0, repos: list.map(repoV) }];
@@ -1400,27 +1469,35 @@ class Component extends DCLogic {
     const rows = rowsData.map(c => {
       const on = sel === c.id;
       if (c.wip) return { isWip: true, notWip: false, bg: on ? 'var(--accent-soft)' : 'transparent', opacity: 1, refs: [], hasMore: false, wipText: s.conflict ? t.wipMerge : tr('wipText', { n: nCh }), wipColor: s.conflict ? 'var(--warn)' : 'var(--muted)', onClick: () => this.select('wip'), onMenu: e => this.openMenu(e, this.wipMenu()) };
-      const refs = c.refs.map(r => { const col = r.type === 'tag' ? 'var(--warn)' : LANE[c.lane]; return { label: r.name, icon: r.head ? '✓' : r.type === 'remote' ? '⇅' : r.type === 'tag' ? '◆' : '⎇', color: col, bg: tint(col, r.head ? 32 : 14), onMenu: e => this.openMenu(e, r.type === 'tag' ? this.tagMenu(r.name) : this.branchMenu(r.name, r.type === 'remote')) }; });
+      const refs = c.refs.map(r => { const col = r.type === 'tag' ? 'var(--warn)' : LC(c.lane); return { label: r.name, icon: r.head ? '✓' : r.type === 'remote' ? '⇅' : r.type === 'tag' ? '◆' : '⎇', color: col, bg: tint(col, r.head ? 32 : 14), onMenu: e => this.openMenu(e, r.type === 'tag' ? this.tagMenu(r.name) : this.branchMenu(r.name, r.type === 'remote')) }; });
       const match = !cq || (c.msg + ' ' + c.sha + ' ' + R.AUTH[c.au]).toLowerCase().includes(cq);
-      return { isWip: false, notWip: true, bg: on ? 'var(--accent-soft)' : 'transparent', opacity: match ? 1 : 0.28, refs: refs.slice(0, 2), hasMore: refs.length > 2, more: '+' + (refs.length - 2), msg: c.msg, weight: c.refs.some(r => r.head) ? 600 : 400, author: R.AUTH[c.au], ini: c.au, avColor: LANE[c.lane], date: c.date.slice(5), sha: c.sha, onClick: () => this.select(c.id), onMenu: e => this.openMenu(e, this.commitMenu(c)) };
+      return { isWip: false, notWip: true, bg: on ? 'var(--accent-soft)' : 'transparent', opacity: match ? 1 : 0.28, refs: refs.slice(0, 2), hasMore: refs.length > 2, more: '+' + (refs.length - 2), msg: c.msg, weight: c.refs.some(r => r.head) ? 600 : 400, author: R.AUTH[c.au], ini: c.au, avColor: LC(c.lane), date: c.date.slice(5), sha: c.sha, onClick: () => this.select(c.id), onMenu: e => this.openMenu(e, this.commitMenu(c)) };
     });
     const h = React.createElement, X = l => 16 + l * 20, Y = i => i * 40 + 20;
     const idx = {}; rowsData.forEach((r, i) => { idx[r.id] = i; });
     const paths = [], nodes = [], dot = s.graphNodes === 'dot';
     rowsData.forEach((r, i) => {
-      if (r.wip) { const j = idx[head.id]; paths.push(h('path', { key: 'wp', d: `M${X(r.lane)} ${Y(i)} L${X(r.lane)} ${Y(j)}`, fill: 'none', stroke: LANE[r.lane], strokeWidth: 2, strokeDasharray: '3 4' })); nodes.push(h('circle', { key: 'wc', cx: X(r.lane), cy: Y(i), r: 8, fill: 'var(--bg)', stroke: s.conflict ? 'var(--warn)' : LANE[r.lane], strokeWidth: 2, strokeDasharray: '3 3' })); return; }
+      if (r.wip) { const j = idx[head.id]; paths.push(h('path', { key: 'wp', d: `M${X(r.lane)} ${Y(i)} L${X(r.lane)} ${Y(j)}`, fill: 'none', stroke: LC(r.lane), strokeWidth: 2, strokeDasharray: '3 4' })); nodes.push(h('circle', { key: 'wc', cx: X(r.lane), cy: Y(i), r: 8, fill: 'var(--bg)', stroke: s.conflict ? 'var(--warn)' : LC(r.lane), strokeWidth: 2, strokeDasharray: '3 3' })); return; }
       r.parents.forEach((pid, k) => {
-        const j = idx[pid]; if (j == null) return; const p = rowsData[j];
-        const x1 = X(r.lane), x2 = X(p.lane), y1 = Y(i), y2 = Y(j); let d, col;
-        if (x1 === x2) { d = `M${x1} ${y1} L${x2} ${y2}`; col = LANE[r.lane]; }
-        else if (k === 0 && p.lane < r.lane) { d = `M${x1} ${y1} L${x1} ${y2 - 40} C${x1} ${y2 - 18} ${x2} ${y2 - 22} ${x2} ${y2}`; col = LANE[r.lane]; }
-        else { d = `M${x1} ${y1} C${x1} ${y1 + 22} ${x2} ${y1 + 18} ${x2} ${y1 + 40} L${x2} ${y2}`; col = LANE[p.lane]; }
+        const j = idx[pid], x1 = X(r.lane), y1 = Y(i);
+        if (j == null) { paths.push(h('path', { key: r.id + '-' + k, d: `M${x1} ${y1} L${x1} ${rowsData.length * 40}`, fill: 'none', stroke: LC(r.lane), strokeWidth: 2 })); return; }
+        const p = rowsData[j]; const x2 = X(p.lane), y2 = Y(j); let d, col;
+        if (x1 === x2) { d = `M${x1} ${y1} L${x2} ${y2}`; col = LC(r.lane); }
+        else {
+          col = LC(k === 0 ? r.lane : p.lane);
+          const busy = l => rowsData.some((q, m) => m > i && m < j && !q.wip && q.lane === l);
+          const cand = k === 0 ? [r.lane, p.lane] : [p.lane, r.lane];
+          let lane = cand.find(l => !busy(l)); if (lane == null) lane = Math.max(...rowsData.map(q => q.lane || 0)) + 1;
+          const xm = X(lane);
+          if (j === i + 1) d = `M${x1} ${y1} C${x1} ${y1 + 22} ${x2} ${y2 - 22} ${x2} ${y2}`;
+          else d = (xm === x1 ? `M${x1} ${y1}` : `M${x1} ${y1} C${x1} ${y1 + 22} ${xm} ${y1 + 18} ${xm} ${y1 + 40}`) + ` L${xm} ${y2 - 40}` + (xm === x2 ? ` L${x2} ${y2}` : ` C${xm} ${y2 - 18} ${x2} ${y2 - 22} ${x2} ${y2}`);
+        }
         paths.push(h('path', { key: r.id + '-' + k, d, fill: 'none', stroke: col, strokeWidth: 2 }));
       });
       const cx = X(r.lane), cy = Y(i), merge = r.parents.length > 1, rad = merge ? 5 : (dot ? 6 : 9);
       nodes.push(h('g', { key: 'n' + r.id },
-        sel === r.id ? h('circle', { cx, cy, r: rad + 4, fill: 'none', stroke: LANE[r.lane], strokeWidth: 2, opacity: 0.55 }) : null,
-        h('circle', { cx, cy, r: rad, fill: LANE[r.lane], stroke: 'var(--bg)', strokeWidth: 2 }),
+        sel === r.id ? h('circle', { cx, cy, r: rad + 4, fill: 'none', stroke: LC(r.lane), strokeWidth: 2, opacity: 0.55 }) : null,
+        h('circle', { cx, cy, r: rad, fill: LC(r.lane), stroke: 'var(--bg)', strokeWidth: 2 }),
         !merge && !dot ? h('text', { x: cx, y: cy + 0.5, textAnchor: 'middle', dominantBaseline: 'central', fontSize: 7.5, fontWeight: 700, fill: 'oklch(0.2 0.02 230)', fontFamily: 'IBM Plex Sans' }, r.au) : null));
     });
     const graphSvg = h('svg', { width: 130, height: rowsData.length * 40, style: { position: 'absolute', left: 200, top: 0, pointerEvents: 'none', overflow: 'visible' } }, paths, nodes);
@@ -1429,10 +1506,10 @@ class Component extends DCLogic {
     const sq = s.sbq.trim().toLowerCase(), m = x => !sq || x.toLowerCase().includes(sq);
     const item = o => ({ pad: '8px', weight: 400, iconColor: 'var(--faint)', right: '', rightColor: 'var(--faint)', bg: 'transparent', onDbl: () => {}, onClick: () => {}, ...o });
     const remoteGroups = {}; all.filter(r => r.type === 'remote').forEach(r => { const [g, ...rest] = r.name.split('/'); (remoteGroups[g] = remoteGroups[g] || []).push({ ...r, short: rest.join('/') }); });
-    const remoteItems = []; Object.keys(remoteGroups).forEach(g => { const list = remoteGroups[g].filter(r => m(r.name)); if (!list.length) return; remoteItems.push(item({ icon: '⇅', label: g, weight: 600, onMenu: e => this.openMenu(e, this.remoteMenu(g)) })); list.forEach(r => remoteItems.push(item({ pad: '26px', icon: '⎇', iconColor: LANE[r.c.lane], label: r.short, bg: sel === r.c.id ? 'var(--accent-soft)' : 'transparent', onClick: () => this.select(r.c.id), onDbl: () => this.checkout(r.name, true), onMenu: e => this.openMenu(e, this.branchMenu(r.name, true)) }))); });
-    const pl = repo && accById[repo.acc] ? P[accById[repo.acc].platform].label : 'GitHub';
+    const remoteItems = []; Object.keys(remoteGroups).forEach(g => { const list = remoteGroups[g].filter(r => m(r.name)); if (!list.length) return; remoteItems.push(item({ icon: '⇅', label: g, weight: 600, onMenu: e => this.openMenu(e, this.remoteMenu(g)) })); list.forEach(r => remoteItems.push(item({ pad: '26px', icon: '⎇', iconColor: LC(r.c.lane), label: r.short, bg: sel === r.c.id ? 'var(--accent-soft)' : 'transparent', onClick: () => this.select(r.c.id), onDbl: () => this.checkout(r.name, true), onMenu: e => this.openMenu(e, this.branchMenu(r.name, true)) }))); });
+    const pl = repo && remOf(repo) ? P[remOf(repo).plat].label : 'GitHub';
     const sections = [
-      { key: 'local', title: t.sLocal, items: all.filter(r => r.type === 'local' && m(r.name)).map(r => item({ icon: r.head ? '✓' : '⎇', iconColor: r.head ? 'var(--accent)' : LANE[r.c.lane], label: r.name, weight: r.head ? 600 : 400, right: r.head && s.ahead ? '↑' + s.ahead : '', rightColor: 'var(--accent)', bg: sel === r.c.id ? 'var(--accent-soft)' : 'transparent', onClick: () => this.select(r.c.id), onDbl: () => this.checkout(r.name), onMenu: e => this.openMenu(e, this.branchMenu(r.name, false)) })) },
+      { key: 'local', title: t.sLocal, items: all.filter(r => r.type === 'local' && m(r.name)).map(r => item({ icon: r.head ? '✓' : '⎇', iconColor: r.head ? 'var(--accent)' : LC(r.c.lane), label: r.name, weight: r.head ? 600 : 400, right: r.head && s.ahead ? '↑' + s.ahead : '', rightColor: 'var(--accent)', bg: sel === r.c.id ? 'var(--accent-soft)' : 'transparent', onClick: () => this.select(r.c.id), onDbl: () => this.checkout(r.name), onMenu: e => this.openMenu(e, this.branchMenu(r.name, false)) })) },
       { key: 'remote', title: t.sRemote, items: remoteItems },
       { key: 'prs', title: t.sPrs, items: s.repoPrs.filter(p => m(p.title)).map(p => item({ icon: '⇄', iconColor: PRC[p.state], label: `#${p.num} ${p.title}`, right: t['st_' + p.state], rightColor: PRC[p.state], onClick: () => { const c = s.commits.find(c => c.refs.some(r => r.name === p.from)); if (c) this.select(c.id); }, onMenu: e => this.openMenu(e, this.prMenu(p, pl)) })) },
       { key: 'stash', title: t.sStash, items: s.stashes.filter(x => m(x.msg)).map((x, i) => item({ icon: '≡', label: x.msg, right: `{${i}}`, onDbl: () => this.applyStash(i, false), onMenu: e => this.openMenu(e, this.stashMenu(i)) })) },
@@ -1468,7 +1545,8 @@ class Component extends DCLogic {
     if (s.diffFile) {
       const f = s.diffFile, fromStg = f.staged !== undefined; const isSplit = s.diffMode === 'split';
       const add = R.DIFF.filter(d => d[4] === 'm' || d[4] === 'a').length, del = R.DIFF.filter(d => d[4] === 'm' || d[4] === 'd').length;
-      const uni = []; R.DIFF.forEach(([ln, lt, rn, rt, ty]) => { if (ty === 'c') uni.push({ o: ln, n: rn, s: '', t: lt, bg: 'transparent', sc: '' }); if (ty === 'm' || ty === 'd') uni.push({ o: ln, n: '', s: '−', t: lt, bg: 'var(--del-bg)', sc: 'var(--danger)' }); if (ty === 'm' || ty === 'a') uni.push({ o: '', n: rn, s: '+', t: rt, bg: 'var(--add-bg)', sc: 'var(--ok)' }); });
+      const uni = []; let dels = [], adds = []; const flush = () => { uni.push(...dels, ...adds); dels = []; adds = []; };
+      R.DIFF.forEach(([ln, lt, rn, rt, ty]) => { if (ty === 'c') { flush(); uni.push({ o: ln, n: rn, s: '', t: lt, bg: 'transparent', sc: '' }); return; } if (ty === 'm' || ty === 'd') dels.push({ o: ln, n: '', s: '−', t: lt, bg: 'var(--del-bg)', sc: 'var(--danger)' }); if (ty === 'm' || ty === 'a') adds.push({ o: '', n: rn, s: '+', t: rt, bg: 'var(--add-bg)', sc: 'var(--ok)' }); }); flush();
       base.df = {
         path: f.path, st: f.st, stColor: STC[f.st] || 'var(--muted)', add, del, isSplit, isUni: !isSplit,
         splitBg: isSplit ? 'var(--accent)' : 'transparent', splitColor: isSplit ? 'var(--accent-ink)' : 'var(--muted)', uniBg: !isSplit ? 'var(--accent)' : 'transparent', uniColor: !isSplit ? 'var(--accent-ink)' : 'var(--muted)',
@@ -1487,42 +1565,47 @@ class Component extends DCLogic {
       const pane = side => { const lines = []; let n = 0, hn = 0; const col = SC[side];
         file.segs.forEach(sg => {
           if (sg.c) { sg.c.forEach(x => lines.push({ isCtx: true, isHead: false, isHunk: false, n: ++n, text: x })); return; }
-          const hi = hn++, sel = ch[hi][side], all = sel.every(Boolean), anyH = ch[hi].ours.some(Boolean) || ch[hi].theirs.some(Boolean);
-          lines.push({ isCtx: false, isHead: true, isHunk: false, title: tr('hunk', { n: hi + 1 }), color: col, headBg: tint(col, 16), btn: all ? '− ' + t.dropBlock : '+ ' + t.takeBlock, btnBg: all ? col : 'transparent', btnColor: all ? INK : col, onPick: () => this.pick(hi, side) });
+          const hi = hn++, sel = ch[hi][side], all = sel.every(Boolean), anyH = ch[hi].empty || ch[hi].ours.some(Boolean) || ch[hi].theirs.some(Boolean);
+          lines.push({ isCtx: false, isHead: true, isHunk: false, title: tr('hunk', { n: hi + 1 }), color: col, headBg: tint(col, 16), btn: all ? '✓ ' + t.blockTaken : '+ ' + t.takeBlock, btnBg: all ? col : 'transparent', btnColor: all ? INK : col, onPick: () => this.pick(hi, side) });
           sg.h[side === 'ours' ? 0 : 1].forEach((x, li) => { const on = sel[li]; lines.push({ isCtx: false, isHead: false, isHunk: true, n: ++n, text: x, color: col, bg: tint(col, on ? 24 : 8), mark: on ? '−' : '+', tip: on ? t.lgRemove : t.lgAdd, btnBg: on ? col : 'transparent', btnBorder: col, btnColor: on ? INK : col, opacity: on || !anyH ? 1 : 0.5, onToggle: () => this.pickLine(hi, side, li) }); });
         }); return lines; };
       const manual = cf.manual && cf.manual[cf.file];
-      const out = []; const plain = [];
+      const out = []; const plain = []; let hasDup = false;
       const noop = () => {};
       if (manual != null) manual.split('\n').forEach(x => out.push({ isLine: true, isGap: false, text: x, bg: 'transparent', bar: 'var(--info)', vis: 'hidden', onRemove: noop }));
       else { let hn = 0; file.segs.forEach(sg => {
         if (sg.c) { sg.c.forEach(x => { out.push({ isLine: true, isGap: false, text: x, bg: 'transparent', bar: 'transparent', vis: 'hidden', onRemove: noop }); plain.push(x); }); return; }
         const hi = hn++, c = ch[hi];
-        if (!c.ours.some(Boolean) && !c.theirs.some(Boolean)) { out.push({ isLine: false, isGap: true, text: tr('gapBlock', { n: hi + 1 }) }); plain.push('<<<<<<< ' + s.current, ...sg.h[0], '=======', ...sg.h[1], '>>>>>>> ' + cf.src); return; }
-        ['ours', 'theirs'].forEach((side, si) => sg.h[si].forEach((x, li) => { if (c[side][li]) { out.push({ isLine: true, isGap: false, text: x, bg: tint(SC[side], 12), bar: SC[side], vis: 'visible', onRemove: () => this.pickLine(hi, side, li) }); plain.push(x); } }));
+        if (c.empty) { out.push({ isLine: false, isGap: false, isEmpty: true, onEmpty: () => this.leaveEmpty(hi) }); return; }
+        if (!c.ours.some(Boolean) && !c.theirs.some(Boolean)) { out.push({ isLine: false, isGap: true, text: tr('gapBlock', { n: hi + 1 }), onEmpty: () => this.leaveEmpty(hi) }); plain.push('<<<<<<< ' + s.current, ...sg.h[0], '=======', ...sg.h[1], '>>>>>>> ' + cf.src); return; }
+        const seen = {};
+        ['ours', 'theirs'].forEach((side, si) => sg.h[si].forEach((x, li) => { if (c[side][li]) { const kx = x.trim(); if (kx && seen[kx]) hasDup = true; seen[kx] = 1; out.push({ isLine: true, isGap: false, text: x, bg: tint(SC[side], 12), bar: SC[side], vis: 'visible', onRemove: () => this.pickLine(hi, side, li) }); plain.push(x); } }));
       }); }
       let ln = 0; out.forEach(l => { if (l.isLine) l.n = ++ln; });
       const res = this.cfResolved(cf.file);
       const setCf = p => this.setState(x => ({ conflict: { ...x.conflict, ...p } }));
+      const op = cf.op || 'merge', draft = cf.drafts && cf.drafts[cf.file];
       base.cf = { title: tr('conflictTitle', { f: file.path }), sub: `A: ${s.current}  ←  B: ${cf.src}`, takeA: () => this.takeAll('ours'), takeB: () => this.takeAll('theirs'),
-        panes: [{ letter: 'A', label: t.yours, name: s.current, color: SC.ours, lines: pane('ours') }, { letter: 'B', label: t.theirs, name: cf.src, color: SC.theirs, lines: pane('theirs') }], out,
-        outSub: tr('outputSub', { f: file.path.split('/').pop() }) + (manual != null ? ' · ' + t.manualNote : ''),
-        status: res ? '✓ ' + t.resolved : t.conflicted, statusColor: res ? 'var(--ok)' : 'var(--warn)',
+        panes: [{ letter: 'A', label: tr('opA_' + op, { branch: s.current }), name: '', color: SC.ours, lines: pane('ours') }, { letter: 'B', label: tr('opB_' + op, { source: cf.src }), name: '', color: SC.theirs, lines: pane('theirs') }], out,
+        outSub: tr('outputSubC', { file: file.path.split('/').pop() }) + (manual != null ? ' · ' + t.manualNote : ''),
+        hasDup: hasDup && manual == null, editLabel: draft != null && manual == null ? `${t.editManual} · ${t.draftNote}` : t.editManual,
+        status: res ? '✓ ' + t.resolved : t.conflicted, statusColor: res ? 'var(--ok)' : 'var(--warn)', canMark: manual != null && !res && !cf.editing, onMark: () => this.markResolved(cf.file),
         editing: !!cf.editing, notEditing: !cf.editing, hasManual: manual != null && !cf.editing, editText: cf.editText || '',
-        onEdit: () => setCf({ editing: true, editText: manual != null ? manual : plain.join('\n') }),
-        onEditText: e => setCf({ editText: e.target.value }),
-        onDone: () => this.setState(x => ({ conflict: { ...x.conflict, editing: false, manual: { ...x.conflict.manual, [x.conflict.file]: x.conflict.editText } } })),
-        onReset: () => this.setState(x => { const m = { ...x.conflict.manual }; delete m[x.conflict.file]; return { conflict: { ...x.conflict, manual: m } }; }) };
+        onEdit: () => setCf({ editing: true, editText: draft != null ? draft : manual != null ? manual : plain.join('\n') }),
+        onEditText: e => { const v = e.target.value; this.setState(x => ({ conflict: { ...x.conflict, editText: v, drafts: { ...(x.conflict.drafts || {}), [x.conflict.file]: v } } })); },
+        onDone: () => this.setState(x => { const d = { ...(x.conflict.drafts || {}) }; delete d[x.conflict.file]; return { conflict: { ...x.conflict, editing: false, drafts: d, manual: { ...x.conflict.manual, [x.conflict.file]: x.conflict.editText } } }; }),
+        onReset: () => this.setState(x => { const m = { ...x.conflict.manual }; delete m[x.conflict.file]; const d = { ...(x.conflict.drafts || {}) }; delete d[x.conflict.file]; return { conflict: { ...x.conflict, manual: m, drafts: d } }; }) };
       const nRes = R.CF.filter((_, i) => this.cfResolved(i)).length, allRes = nRes === R.CF.length;
       base.cfp = { desc: `${cf.src} → ${s.current}`, progress: tr('cfProgress', { n: nRes, m: R.CF.length }),
-        files: R.CF.map((f, i) => { const ok = this.cfResolved(i); return { path: f.path, icon: ok ? '✓' : '!', iconColor: ok ? 'var(--ok)' : 'var(--warn)', status: ok ? t.resolved : t.conflicted, bg: cf.file === i && center === 'conflict' ? 'var(--accent-soft)' : 'transparent', onClick: () => this.setState(x => ({ conflict: { ...x.conflict, file: i, editing: false }, center: 'conflict' })) }; }),
+        files: R.CF.map((f, i) => { const ok = this.cfResolved(i); return { path: f.path, icon: ok ? '✓' : '!', iconColor: ok ? 'var(--ok)' : 'var(--warn)', status: ok ? t.resolved : t.conflicted, canMark: !ok, onMenu: e => { e.stopPropagation(); this.openMenu(e, [{ label: t.markResolved + '…', action: () => this.markResolved(i) }]); }, bg: cf.file === i && center === 'conflict' ? 'var(--accent-soft)' : 'transparent', onClick: () => this.setState(x => ({ conflict: { ...x.conflict, file: i, editing: false }, center: 'conflict' })) }; }),
         btnBg: allRes ? 'var(--accent)' : 'var(--surface2)', btnColor: allRes ? 'var(--accent-ink)' : 'var(--faint)', onComplete: this.completeMerge, onAbort: this.abortMerge };
     }
 
     if (s.rebase) {
       const its = s.rebase.items; const acts = ['pick', 'reword', 'edit', 'squash', 'fixup', 'drop'];
-      base.rb = { title: `${s.current} → ${s.rebase.onto}`,
-        items: its.map((x, i) => ({ ...x, color: ACTC[x.action], opacity: x.action === 'drop' ? 0.5 : 1, isReword: x.action === 'reword', notReword: x.action !== 'reword', deco: x.action === 'drop' ? 'line-through' : 'none',
+      const errs = its.map((_, i) => this.rbErr(its, i)), blocked = errs.some(Boolean);
+      base.rb = { title: `${s.current} → ${s.rebase.onto}`, blocked, btnBg: blocked ? 'var(--surface2)' : 'var(--accent)', btnColor: blocked ? 'var(--faint)' : 'var(--accent-ink)',
+        items: its.map((x, i) => ({ ...x, color: ACTC[x.action], err: errs[i], hasErr: !!errs[i], selBorder: errs[i] && x.action !== 'reword' ? 'var(--danger)' : ACTC[x.action], msgBorder: errs[i] ? 'var(--danger)' : 'var(--accent)', opacity: x.action === 'drop' ? 0.5 : 1, isReword: x.action === 'reword', notReword: x.action !== 'reword', deco: x.action === 'drop' ? 'line-through' : 'none',
           options: acts.map(a => ({ value: a, label: t['act_' + a] })), onAction: e => this.rbSet(i, { action: e.target.value }), onMsg: e => this.rbSet(i, { newMsg: e.target.value }),
           onUp: () => this.rbMove(i, i - 1), onDown: () => this.rbMove(i, i + 1),
           onDragStart: e => { this._drag = i; e.dataTransfer.effectAllowed = 'move'; }, onDragOver: e => e.preventDefault(), onDrop: e => { e.preventDefault(); if (this._drag != null) this.rbMove(this._drag, i); this._drag = null; } })),
@@ -1551,10 +1634,11 @@ class Component extends DCLogic {
       const fs = R.FILESETS[c.id.startsWith('n') ? 0 : i % R.FILESETS.length];
       const byId = Object.fromEntries(s.commits.map(x => [x.id, x]));
       base.dt = {
-        sha: c.sha, msg: c.msg, author: R.AUTH[c.au], ini: c.au, avColor: LANE[c.lane], date: c.date, parents: c.parents.map(p => byId[p] ? byId[p].sha : p).join('  ') || '—',
+        sha: c.sha, msg: c.msg, author: R.AUTH[c.au], ini: c.au, avColor: LC(c.lane), date: c.date, parents: c.parents.map(p => byId[p] ? byId[p].sha : p).join('  ') || '—',
         filesLabel: tr('filesChanged', { n: fs.length }), add: fs.reduce((a, f) => a + f[2], 0), del: fs.reduce((a, f) => a + f[3], 0),
         files: fs.map(([p, st, a, d]) => ({ ...splitPath(p), st, stColor: STC[st], stat: `+${a} −${d}`, bg: center === 'diff' && s.diffFile && s.diffFile.path === p ? 'var(--accent-soft)' : 'transparent', onOpen: () => this.setState({ diffFile: { path: p, st }, center: 'diff' }), onMenu: e => this.openMenu(e, [{ label: tr('mViewDiff'), action: () => this.setState({ diffFile: { path: p, st }, center: 'diff' }) }, { label: tr('mHistory'), action: () => this.done(tr('mHistory')) }, { label: tr('mBlame'), action: () => this.done(tr('mBlame')) }, { label: tr('mCopyPath'), action: () => this.copy(p) }]) })),
-        hasAI: s.ai.summary && !!s.aiKeys.length, aiText: L ? `Changes ${fs.length} files (+${fs.reduce((a, f) => a + f[2], 0)} −${fs.reduce((a, f) => a + f[3], 0)}). Main change: “${c.msg}”, mostly in ${fs[0][0].split('/').slice(0, -1).join('/') || 'the project root'}.` : `Modifica ${fs.length} archivos (+${fs.reduce((a, f) => a + f[2], 0)} −${fs.reduce((a, f) => a + f[3], 0)}). Cambio principal: «${c.msg}», sobre todo en ${fs[0][0].split('/').slice(0, -1).join('/') || 'la raíz del proyecto'}.`,
+        ...(() => { const st = s.aiSum[c.id], on = s.ai.summary && !!s.aiKeys.length; const AP = R.AIPROV; return { aiOff: !on, aiOffText: !s.ai.summary ? t.sumOff : t.sumNoKey, onAiSettings: () => this.setState({ tab: 'settings', setOpen: true, setSec: 'ai' }), aiIdle: on && !st, aiBusy: on && !!st && st.st === 'busy', aiDone: on && !!st && st.st === 'done', aiFail: on && !!st && st.st === 'fail', aiBy: st && st.st === 'done' ? tr('generatedBy', { provider: AP[st.prov].label, model: st.model }) : '', onSum: () => this.summarize(c) }; })(),
+        aiText: L ? `Changes ${fs.length} files (+${fs.reduce((a, f) => a + f[2], 0)} −${fs.reduce((a, f) => a + f[3], 0)}). Main change: “${c.msg}”, mostly in ${fs[0][0].split('/').slice(0, -1).join('/') || 'the project root'}.` : `Modifica ${fs.length} archivos (+${fs.reduce((a, f) => a + f[2], 0)} −${fs.reduce((a, f) => a + f[3], 0)}). Cambio principal: «${c.msg}», sobre todo en ${fs[0][0].split('/').slice(0, -1).join('/') || 'la raíz del proyecto'}.`,
         onCopy: () => this.copy(c.sha), onClose: () => this.select('wip'), onCherry: () => this.cherry(c), onRevert: () => this.revert(c), onBranch: () => this.newBranch(c)
       };
     }

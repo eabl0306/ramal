@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="./ramal-data.js"></script>
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;
+--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
+--text:oklch(0.95 0.005 230);--muted:oklch(0.76 0.012 230);--faint:oklch(0.62 0.012 230);
+--accent:oklch(0.74 0.12 190);--accent-ink:oklch(0.2 0.03 190);--accent-soft:oklch(0.74 0.12 190 / 0.14);
+--ok:oklch(0.76 0.15 150);--warn:oklch(0.8 0.14 80);--danger:oklch(0.7 0.17 25);--info:oklch(0.74 0.12 245);
+--shadow:0 24px 70px oklch(0.05 0.01 230 / 0.55),0 2px 8px oklch(0.05 0.01 230 / 0.3);
+background:var(--bg);color:var(--text)}
+body[data-theme="light"]{--bg:oklch(0.975 0.004 230);--panel:oklch(0.985 0.003 230);--surface:oklch(1 0 0);--surface2:oklch(0.945 0.006 230);--border:oklch(0.9 0.008 230);
+--text:oklch(0.24 0.012 230);--muted:oklch(0.44 0.012 230);--faint:oklch(0.54 0.01 230);
+--accent:oklch(0.54 0.1 190);--accent-ink:oklch(0.99 0.005 190);--accent-soft:oklch(0.54 0.1 190 / 0.1);
+--ok:oklch(0.52 0.13 150);--warn:oklch(0.58 0.13 70);--danger:oklch(0.55 0.18 25);--info:oklch(0.52 0.13 250);
+--shadow:0 24px 70px oklch(0.3 0.02 230 / 0.18),0 2px 8px oklch(0.3 0.02 230 / 0.08)}
+*{box-sizing:border-box}
+a{color:var(--accent);text-decoration:none} a:hover{color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+button:disabled{cursor:default}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px">
+
+  <div style="display:flex;flex-direction:column;gap:6px;padding:8px 12px;border-bottom:1px dashed var(--faint);background:var(--panel);font-family:'IBM Plex Mono',monospace;font-size:11px">
+    <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+      <span style="color:var(--faint);margin-right:4px">screen</span>
+      <sc-for list="{{ scrChips }}" as="c" hint-placeholder-count="15"><button onClick="{{ c.onClick }}" style="height:22px;padding:0 8px;border-radius:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.id }}</button></sc-for>
+    </div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+      <span style="color:var(--faint);margin-right:4px">state</span>
+      <sc-for list="{{ stChips }}" as="c" hint-placeholder-count="6"><button onClick="{{ c.onClick }}" style="height:22px;padding:0 8px;border-radius:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.id }}</button></sc-for>
+      <sc-if value="{{ hasClient }}"><span style="color:var(--faint);margin:0 4px 0 10px">client</span><sc-for list="{{ clChips }}" as="c"><button onClick="{{ c.onClick }}" style="height:22px;padding:0 8px;border-radius:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }}">{{ c.id }}</button></sc-for></sc-if>
+      <span style="flex:1"></span><span style="color:var(--faint)">{{ route }}</span>
+    </div>
+  </div>
+
+  <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+    <div style="height:64px;display:flex;align-items:center;gap:12px;padding:0 {{ navPad }}px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div>
+        <span style="font-weight:600;font-size:16px;letter-spacing:-0.01em">Ramal</span>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+        <sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:26px;padding:0 9px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+      </div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+        <sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="width:30px;height:26px;border:0;border-radius:6px;cursor:pointer;font-size:13px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+      </div>
+      <sc-if value="{{ navOut }}">
+        <a onClick="{{ goLogin }}" style="padding:8px 6px;color:var(--text);cursor:pointer;font-weight:500;white-space:nowrap">{{ x.login }}</a>
+        <sc-if value="{{ wide }}"><button onClick="{{ goSignup }}" style="height:38px;padding:0 18px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap">{{ x.signup }}</button></sc-if>
+      </sc-if>
+      <sc-if value="{{ navIn }}"><button onClick="{{ goPanel }}" style="height:38px;padding:0 16px;border-radius:10px;border:0;background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer;white-space:nowrap">{{ x.openDash }}</button></sc-if>
+    </div>
+
+    <section style="min-height:calc(100vh - 140px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px 16px">
+      <sc-for list="{{ banners }}" as="bn">
+        <div role="status" style="width:100%;max-width:420px;display:flex;gap:10px;padding:11px 14px;border-radius:12px;font-size:13px;line-height:1.5;background:{{ bn.bg }};color:{{ bn.color }};border:1px solid {{ bn.border }}"><span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px;color:var(--surface);background:{{ bn.iconColor }}">{{ bn.icon }}</span><span style="flex:1">{{ bn.text }}</span></div>
+      </sc-for>
+      <sc-if value="{{ hasCard }}" hint-placeholder-val="{{ true }}">
+      <div style="width:100%;max-width:420px;padding:{{ cardPad }}px;border-radius:18px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px">
+        <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="4">
+          <sc-if value="{{ b.isHead }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-if value="{{ b.hasLogo }}">
+                <div style="position:relative;width:44px;height:44px">
+                  <div style="width:44px;height:44px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:20px">R</div>
+                  <sc-if value="{{ b.isVs }}"><span style="position:absolute;right:-7px;bottom:-7px;width:24px;height:24px;border-radius:8px;border:2px solid var(--surface);background:oklch(0.55 0.15 250);color:white;display:grid;place-items:center;font-size:8px;font-weight:700">VS</span></sc-if>
+                  <sc-if value="{{ b.isDesk }}"><span style="position:absolute;right:-7px;bottom:-7px;width:24px;height:24px;border-radius:8px;border:2px solid var(--surface);background:var(--surface2);color:var(--text);display:grid;place-items:center"><span style="width:12px;height:9px;border:1.5px solid currentColor;border-radius:2px"></span></span></sc-if>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.hasIcon }}"><div style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:700;background:{{ b.iconBg }};color:{{ b.iconColor }}">{{ b.icon }}</div></sc-if>
+              <div>
+                <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em;line-height:1.25;text-wrap:balance">{{ b.title }}</h1>
+                <sc-if value="{{ b.hasSub }}"><p style="margin:6px 0 0;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ b.sub }}</p></sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ b.isBox }}">
+            <div role="{{ b.role }}" style="display:flex;gap:10px;padding:10px 12px;border-radius:9px;font-size:13px;line-height:1.5;background:{{ b.bg }};color:{{ b.color }}">
+              <span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px;color:var(--surface);background:{{ b.iconColor }}">{{ b.icon }}</span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+                <span style="text-wrap:pretty">{{ b.text }}</span>
+                <sc-if value="{{ b.hasText2 }}"><span style="text-wrap:pretty">{{ b.text2 }}</span></sc-if>
+                <sc-if value="{{ b.hasCode }}"><code style="align-self:flex-start;padding:2px 6px;border-radius:5px;background:var(--bg);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text)">{{ b.code }}</code></sc-if>
+                <sc-if value="{{ b.hasLink }}"><a onClick="{{ b.onLink }}" style="align-self:flex-start;font-weight:600;cursor:pointer">{{ b.link }}</a></sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ b.isField }}">
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <span style="display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:600;color:var(--muted)"><span>{{ b.label }}</span><sc-if value="{{ b.hasLink }}"><a onClick="{{ b.onLink }}" style="cursor:pointer;font-weight:500">{{ b.link }}</a></sc-if></span>
+              <input type="{{ b.type }}" value="{{ b.value }}" onChange="{{ b.onChange }}" placeholder="{{ b.ph }}" disabled="{{ b.disabled }}" readonly="{{ b.readonly }}" aria-invalid="{{ b.hasErr }}" style="height:42px;padding:0 12px;border-radius:10px;border:1px solid {{ b.border }};background:var(--bg);outline:0;opacity:{{ b.opacity }}">
+              <sc-if value="{{ b.hasErr }}"><span role="alert" style="font-size:12px;color:var(--danger)">{{ b.err }}</span></sc-if>
+              <sc-if value="{{ b.hasHint }}"><span style="font-size:12px;line-height:1.45;color:{{ b.hintColor }}">{{ b.hint }}</span></sc-if>
+            </label>
+          </sc-if>
+          <sc-if value="{{ b.isMeter }}">
+            <div style="display:flex;align-items:center;gap:10px;margin-top:-8px">
+              <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px"><sc-for list="{{ b.segs }}" as="sg"><span style="height:4px;border-radius:2px;background:{{ sg.bg }}"></span></sc-for></div>
+              <span style="font-size:12px;font-weight:600;min-width:64px;text-align:right;color:{{ b.color }}">{{ b.label }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ b.isCode }}">
+            <label style="display:flex;flex-direction:column;gap:6px">
+              <input value="{{ b.value }}" onChange="{{ b.onChange }}" placeholder="XXXX-XXXX" disabled="{{ b.disabled }}" maxlength="9" autocomplete="off" spellcheck="false" aria-invalid="{{ b.hasErr }}" style="height:60px;padding:0 12px;border-radius:12px;border:1px solid {{ b.border }};background:var(--bg);outline:0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;opacity:{{ b.opacity }}">
+              <sc-if value="{{ b.hasErr }}"><span role="alert" style="font-size:12px;color:var(--danger)">{{ b.err }}</span></sc-if>
+            </label>
+          </sc-if>
+          <sc-if value="{{ b.isCheck }}">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;color:var(--muted);cursor:pointer"><input type="checkbox" checked="{{ b.checked }}" onChange="{{ b.onChange }}" disabled="{{ b.disabled }}" style="margin-top:3px;accent-color:var(--accent)"><span>{{ b.pre }}<a href="/terms" onClick="{{ b.onTerms }}">{{ b.l1 }}</a>{{ b.mid }}<a href="/privacy" onClick="{{ b.onPrivacy }}">{{ b.l2 }}</a>{{ b.post }}</span></label>
+              <sc-if value="{{ b.hasErr }}"><span role="alert" style="font-size:12px;color:var(--danger);padding-left:22px">{{ b.err }}</span></sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ b.isRow }}">
+            <div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:12px;background:var(--bg);border:1px solid var(--border)">
+              <sc-if value="{{ b.hasLabel }}"><span style="font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--faint)">{{ b.label }}</span></sc-if>
+              <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                <sc-if value="{{ b.hasBadge }}"><span style="width:28px;height:28px;flex-shrink:0;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:{{ b.color }}">{{ b.abbr }}</span></sc-if>
+                <div style="flex:1;min-width:0"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.value }}</div><sc-if value="{{ b.hasSub }}"><div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.sub }}</div></sc-if></div>
+              </div>
+              <sc-if value="{{ b.hasLink }}"><a onClick="{{ b.onLink }}" style="align-self:flex-start;font-size:13px;font-weight:500;cursor:pointer">{{ b.link }}</a></sc-if>
+              <sc-if value="{{ b.hasNote }}"><span style="font-size:12px;line-height:1.45;color:var(--warn)">{{ b.note }}</span></sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ b.isBtns }}">
+            <div style="display:flex;gap:8px;flex-direction:{{ b.dir }}">
+              <sc-for list="{{ b.btns }}" as="bt">
+                <button onClick="{{ bt.onClick }}" disabled="{{ bt.disabled }}" autoFocus="{{ bt.focus }}" aria-busy="{{ bt.busy }}" style="flex:1 1 auto;height:{{ bt.h }}px;min-height:{{ bt.h }}px;padding:0 14px;border-radius:10px;cursor:pointer;font-weight:{{ bt.weight }};font-size:{{ bt.size }}px;display:flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap;border:1px solid {{ bt.border }};background:{{ bt.bg }};color:{{ bt.color }};opacity:{{ bt.opacity }}">
+                  <sc-if value="{{ bt.hasSpin }}">{{ bt.spin }}</sc-if>
+                  <sc-if value="{{ bt.hasBadge }}"><span style="width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:8px;font-weight:700;color:white;background:{{ bt.badgeColor }}">{{ bt.abbr }}</span></sc-if>
+                  <span>{{ bt.label }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ b.isSep }}"><div style="display:flex;align-items:center;gap:10px;color:var(--faint);font-size:12px"><span style="flex:1;height:1px;background:var(--border)"></span>{{ b.label }}<span style="flex:1;height:1px;background:var(--border)"></span></div></sc-if>
+          <sc-if value="{{ b.isText }}"><p style="margin:0;line-height:1.55;text-wrap:pretty;font-size:{{ b.size }}px;color:{{ b.color }};text-align:{{ b.align }}">{{ b.text }}</p></sc-if>
+          <sc-if value="{{ b.isLink }}"><div style="text-align:center;color:var(--muted);font-size:13px">{{ b.pre }} <a onClick="{{ b.onClick }}" style="cursor:pointer;font-weight:600">{{ b.link }}</a></div></sc-if>
+          <sc-if value="{{ b.isSkel }}">
+            <div aria-busy="true" style="display:flex;flex-direction:column;gap:12px">
+              <span style="width:44px;height:44px;border-radius:12px;background:var(--surface2)"></span>
+              <sc-for list="{{ b.lines }}" as="ln"><span style="border-radius:6px;background:var(--surface2);height:{{ ln.h }}px;width:{{ ln.w }}"></span></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ b.isSpin }}"><div role="status" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:18px 0;color:var(--muted)">{{ b.spin }}<span>{{ b.text }}</span></div></sc-if>
+          <sc-if value="{{ b.isNote }}"><div style="padding:8px 10px;border-radius:8px;border:1px dashed var(--faint);font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;color:var(--faint);display:flex;flex-direction:column;gap:4px"><span>{{ b.text }}</span><sc-if value="{{ b.hasLink }}"><a href="{{ b.href }}" target="_blank" style="font-family:'IBM Plex Mono',monospace">{{ b.link }}</a></sc-if></div></sc-if>
+        </sc-for>
+      </div>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isPanel }}" hint-placeholder-val="{{ false }}">
+    <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div>
+        <span style="font-weight:600">Ramal</span>
+      </div>
+      <span style="color:var(--faint)">/</span>
+      <span style="height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;font-weight:500;white-space:nowrap"><span style="width:18px;height:18px;border-radius:5px;background:var(--accent);color:var(--accent-ink);font-size:9px;font-weight:700;display:grid;place-items:center">{{ orgIni }}</span>{{ orgName }}</span>
+      <div style="flex:1"></div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+        <sc-for list="{{ langOpts }}" as="o"><button onClick="{{ o.onClick }}" style="height:24px;padding:0 8px;border:0;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+      </div>
+      <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
+        <sc-for list="{{ themeOpts }}" as="o"><button onClick="{{ o.onClick }}" title="{{ o.title }}" style="width:28px;height:24px;border:0;border-radius:6px;cursor:pointer;font-size:12px;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for>
+      </div>
+      <div style="width:32px;height:32px;flex-shrink:0;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px">MR</div>
+    </div>
+    <div style="display:flex;min-height:calc(100vh - 116px)">
+      <sc-if value="{{ wide }}">
+        <div style="width:232px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ dNav }}" as="n" hint-placeholder-count="7"><div style="display:flex;align-items:center;padding:9px 12px;border-radius:9px;font-weight:500;background:{{ n.bg }};color:{{ n.color }}">{{ n.label }}</div></sc-for>
+        </div>
+      </sc-if>
+      <div style="flex:1;min-width:0">
+        <div style="max-width:860px;margin:0 auto;padding:28px {{ panelPad }}px 60px;display:flex;flex-direction:column;gap:18px">
+          <sc-for list="{{ pBanners }}" as="bn">
+            <div role="status" style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5;flex-wrap:wrap;background:{{ bn.bg }};border:1px solid {{ bn.border }};color:{{ bn.color }}">
+              <span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px;color:var(--surface);background:{{ bn.iconColor }}">{{ bn.icon }}</span>
+              <span style="flex:1 1 260px;min-width:0;text-wrap:pretty">{{ bn.text }}</span>
+              <sc-if value="{{ bn.hasActions }}"><span style="display:flex;gap:14px;white-space:nowrap"><a onClick="{{ bn.onA }}" style="font-weight:600;cursor:pointer">{{ bn.a }}</a><a onClick="{{ bn.onB }}" style="color:var(--muted);cursor:pointer">{{ bn.b }}</a></span></sc-if>
+            </div>
+          </sc-for>
+          <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:220px"><h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ ph.title }}</h1><p style="margin:6px 0 0;color:var(--muted)">{{ ph.sub }}</p></div>
+            <sc-for list="{{ ph.actions }}" as="ac"><span title="{{ ac.tip }}" style="display:inline-flex"><button disabled="{{ ac.disabled }}" style="height:38px;padding:0 16px;border-radius:10px;font-weight:600;white-space:nowrap;cursor:pointer;opacity:{{ ac.opacity }};border:1px solid {{ ac.border }};background:{{ ac.bg }};color:{{ ac.color }}">{{ ac.label }}</button></span></sc-for>
+          </div>
+          <sc-for list="{{ cards }}" as="cd">
+            <div id="{{ cd.id }}" style="border-radius:14px;background:var(--surface);overflow:hidden;border:1px solid {{ cd.border }};box-shadow:{{ cd.ring }};transition:border-color .4s,box-shadow .4s">
+              <div style="padding:14px 18px"><div style="font-weight:600">{{ cd.title }}</div><sc-if value="{{ cd.hasSub }}"><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5">{{ cd.sub }}</div></sc-if></div>
+              <sc-for list="{{ cd.rows }}" as="rw">
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:12px 18px;border-top:1px solid var(--border)">
+                  <sc-if value="{{ rw.hasBadge }}"><span style="width:30px;height:30px;flex-shrink:0;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:700;color:{{ rw.badgeInk }};background:{{ rw.color }}">{{ rw.abbr }}</span></sc-if>
+                  <div style="flex:1 1 220px;min-width:0"><div style="font-weight:500">{{ rw.label }} <span style="font-weight:400;color:var(--muted)">{{ rw.meta }}</span></div><sc-if value="{{ rw.hasDesc }}"><div style="font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5;text-wrap:pretty">{{ rw.desc }}</div></sc-if></div>
+                  <sc-if value="{{ rw.hasBtn }}"><span title="{{ rw.tip }}" style="display:inline-flex"><button onClick="{{ rw.onBtn }}" disabled="{{ rw.disabled }}" style="height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-weight:500;white-space:nowrap;opacity:{{ rw.opacity }}">{{ rw.btn }}</button></span></sc-if>
+                  <sc-if value="{{ rw.hasMenu }}"><button onClick="{{ rw.onMenu }}" aria-label="{{ rw.menuLabel }}" style="width:30px;height:30px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:16px" style-hover="background:var(--surface2)">⋯</button></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasModal }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:40;background:oklch(0.1 0.01 230 / 0.5);display:grid;place-items:center;padding:16px">
+      <div onClick="{{ stop }}" role="dialog" aria-modal="true" style="width:100%;max-width:460px;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column">
+        <div style="padding:20px 22px 4px;font-size:16px;font-weight:600">{{ modal.title }}</div>
+        <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ modal.blocks }}" as="b">
+            <sc-if value="{{ b.isText }}"><p style="margin:0;line-height:1.55;text-wrap:pretty;font-size:{{ b.size }}px;color:{{ b.color }};text-align:{{ b.align }}">{{ b.text }}</p></sc-if>
+            <sc-if value="{{ b.isBox }}">
+              <div role="{{ b.role }}" style="display:flex;gap:10px;padding:10px 12px;border-radius:9px;font-size:13px;line-height:1.5;background:{{ b.bg }};color:{{ b.color }}">
+                <span style="width:18px;height:18px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px;color:var(--surface);background:{{ b.iconColor }}">{{ b.icon }}</span>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="text-wrap:pretty">{{ b.text }}</span><sc-if value="{{ b.hasLink }}"><a onClick="{{ b.onLink }}" style="align-self:flex-start;font-weight:600;cursor:pointer">{{ b.link }}</a></sc-if></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ b.isField }}">
+              <label style="display:flex;flex-direction:column;gap:6px">
+                <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ b.label }}</span>
+                <input type="{{ b.type }}" value="{{ b.value }}" onChange="{{ b.onChange }}" placeholder="{{ b.ph }}" disabled="{{ b.disabled }}" aria-invalid="{{ b.hasErr }}" style="height:38px;padding:0 12px;border-radius:9px;border:1px solid {{ b.border }};background:var(--bg);outline:0;opacity:{{ b.opacity }}">
+                <sc-if value="{{ b.hasErr }}"><span role="alert" style="font-size:12px;color:var(--danger)">{{ b.err }}</span></sc-if>
+                <sc-if value="{{ b.hasHint }}"><span style="font-size:12px;color:{{ b.hintColor }}">{{ b.hint }}</span></sc-if>
+              </label>
+            </sc-if>
+            <sc-if value="{{ b.isMeter }}">
+              <div style="display:flex;align-items:center;gap:10px;margin-top:-6px">
+                <div style="flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px"><sc-for list="{{ b.segs }}" as="sg"><span style="height:4px;border-radius:2px;background:{{ sg.bg }}"></span></sc-for></div>
+                <span style="font-size:12px;font-weight:600;min-width:64px;text-align:right;color:{{ b.color }}">{{ b.label }}</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ b.isBtns }}">
+              <div style="display:flex;gap:8px;flex-direction:{{ b.dir }}">
+                <sc-for list="{{ b.btns }}" as="bt">
+                  <button onClick="{{ bt.onClick }}" disabled="{{ bt.disabled }}" aria-busy="{{ bt.busy }}" style="flex:1 1 auto;height:{{ bt.h }}px;min-height:{{ bt.h }}px;padding:0 14px;border-radius:9px;cursor:pointer;font-weight:{{ bt.weight }};font-size:{{ bt.size }}px;display:flex;align-items:center;justify-content:center;gap:10px;white-space:nowrap;border:1px solid {{ bt.border }};background:{{ bt.bg }};color:{{ bt.color }};opacity:{{ bt.opacity }}">
+                    <sc-if value="{{ bt.hasSpin }}">{{ bt.spin }}</sc-if>
+                    <sc-if value="{{ bt.hasBadge }}"><span style="width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:8px;font-weight:700;color:white;background:{{ bt.badgeColor }}">{{ bt.abbr }}</span></sc-if>
+                    <span>{{ bt.label }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ b.isSep }}"><div style="display:flex;align-items:center;gap:10px;color:var(--faint);font-size:12px"><span style="flex:1;height:1px;background:var(--border)"></span>{{ b.label }}<span style="flex:1;height:1px;background:var(--border)"></span></div></sc-if>
+            <sc-if value="{{ b.isLink }}"><div style="text-align:center;color:var(--muted);font-size:13px">{{ b.pre }} <a onClick="{{ b.onClick }}" style="cursor:pointer;font-weight:600">{{ b.link }}</a></div></sc-if>
+            <sc-if value="{{ b.isSpin }}"><div role="status" style="display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px">{{ b.spin }}<span>{{ b.text }}</span></div></sc-if>
+          </sc-for>
+        </div>
+        <div style="padding:14px 22px 20px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ closeModal }}" autoFocus="{{ modal.focusCancel }}" style="height:38px;padding:0 16px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:500">{{ x.cancel }}</button>
+          <sc-if value="{{ modal.hasSubmit }}"><button onClick="{{ modal.onSubmit }}" disabled="{{ modal.busy }}" aria-busy="{{ modal.busy }}" style="height:38px;padding:0 18px;border-radius:9px;border:0;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:8px;background:{{ modal.btnBg }};color:{{ modal.btnColor }}"><sc-if value="{{ modal.busy }}">{{ modal.spin }}</sc-if>{{ modal.submit }}</button></sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ hasMenu }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMenu }}" style="position:fixed;inset:0;z-index:50"></div>
+    <div style="position:fixed;left:{{ menu.x }}px;top:{{ menu.y }}px;z-index:51;min-width:200px;padding:6px;border-radius:12px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)">
+      <sc-for list="{{ menu.items }}" as="it"><div onClick="{{ it.onClick }}" title="{{ it.tip }}" style="display:flex;align-items:center;height:32px;padding:0 10px;border-radius:7px;white-space:nowrap;cursor:{{ it.cursor }};opacity:{{ it.opacity }};color:{{ it.color }}" style-hover="background:var(--surface2)">{{ it.label }}</div></sc-for>
+    </div>
+  </sc-if>
+
+  <div style="position:fixed;right:20px;bottom:20px;left:20px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none">
+    <sc-for list="{{ toasts }}" as="to" hint-placeholder-count="0">
+      <div role="status" style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:11px;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-width:420px;animation:toastIn .2s ease-out"><span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:{{ to.color }}"></span><span>{{ to.text }}</span></div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;es&quot;,&quot;en&quot;],&quot;default&quot;:&quot;es&quot;,&quot;tsType&quot;:&quot;'es'|'en'&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;W-01&quot;,&quot;W-02&quot;,&quot;W-03&quot;,&quot;W-03-cambio-email&quot;,&quot;W-03-deshacer-email&quot;,&quot;W-04-error&quot;,&quot;W-04-completar&quot;,&quot;W-05&quot;,&quot;W-06&quot;,&quot;W-07&quot;,&quot;W-08&quot;,&quot;W-09&quot;,&quot;W-33&quot;,&quot;W-34&quot;,&quot;W-35&quot;],&quot;default&quot;:&quot;W-01&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;client&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;desktop&quot;,&quot;vscode&quot;],&quot;default&quot;:&quot;desktop&quot;,&quot;tsType&quot;:&quot;'desktop'|'vscode'&quot;}}">
+const SCREENS = [
+  ['W-01', ['formulario', 'enviando', 'enviado', 'reenviar-bloqueado', 'email-no-valido', 'demasiadas', 'sin-conexion']],
+  ['W-02', ['formulario', 'no-coinciden', 'no-cumple', 'guardando', 'guardada', 'enlace-no-valido']],
+  ['W-03', ['banner', 'reenviado', 'demasiados', 'ya-verificado', 'verificando', 'verificado', 'verificado-sin-sesion', 'enlace-no-valido', 'enlace-no-valido-sin-sesion']],
+  ['W-03-cambio-email', ['confirmando', 'confirmado', 'direccion-usada', 'enlace-no-valido']],
+  ['W-03-deshacer-email', ['confirmar', 'deshaciendo', 'hecho', 'enlace-no-valido']],
+  ['W-04-error', ['conectando', 'cancelado', 'fallo', 'cuenta-existente', 'email-sin-verificar']],
+  ['W-04-completar', ['formulario', 'terminos', 'creando', 'caducado']],
+  ['W-05', ['sin-sesion', 'reautenticar', 'validando', 'lista', 'autorizando', 'peticion-no-valida', 'vscode-vuelve', 'vscode-cancelado']],
+  ['W-06', ['sin-sesion', 'codigo', 'formato-no-valido', 'buscando', 'encontrado', 'reautenticar', 'no-existe', 'demasiados', 'aprobado', 'rechazado']],
+  ['W-07', ['login-enviando', 'registro-enviando', 'credenciales', 'email-en-uso', 'demasiados', 'campos-422', 'error-servidor', 'sin-conexion']],
+  ['W-08', ['caducado', 'desconocido']],
+  ['W-09', ['caducada', 'cerrada-otro-dispositivo', 'con-sesion']],
+  ['W-33', ['con-contrasena', 'sin-contrasena', 'modal', 'actual-incorrecta', 'no-cumple', 'guardando', 'cambiada', 'anadida']],
+  ['W-34', ['vinculadas', 'vinculada', 'ya-usada', 'email-sin-verificar', 'quitar', 'unica-forma']],
+  ['W-35', ['metodos', 'metodos-fuertes', 'contrasena-incorrecta', 'no-vinculado', 'esperando', 'reenviar', 'pagina-confirmada', 'pagina-no-valida']]
+];
+const SMAP = Object.fromEntries(SCREENS);
+const ROUTES = { 'W-01': '/forgot-password', 'W-02': '/reset-password#token=…', 'W-03': '/verify-email#token=…', 'W-03-cambio-email': '/email-change/confirm#token=…', 'W-03-deshacer-email': '/email-change/revert#token=…', 'W-04-error': '/login?error=…', 'W-04-completar': '/signup/complete', 'W-05': '/authorize/app?client_id=…', 'W-06': '/activate', 'W-07': '/login · /signup', 'W-08': '/connect/error?reason=…', 'W-09': '/login?returnTo=…', 'W-33': '/account#password', 'W-34': '/account#sign-in', 'W-35': '/reauthenticate#token=…', login: '/login', signup: '/signup' };
+const LX = {
+  login: ['Iniciar sesión', 'Log in'], signup: ['Crear cuenta', 'Sign up'], openDash: ['Abrir panel', 'Open dashboard'], cancel: ['Cancelar', 'Cancel'],
+  loginTitle: ['Iniciar sesión', 'Log in'], loginSub: ['Accede a tu configuración y a tu equipo.', 'Access your settings and your team.'], signupTitle: ['Crear cuenta', 'Create account'], signupSub: ['Sincroniza Ramal entre tus equipos y trabaja en equipo.', 'Sync Ramal across your machines and work as a team.'],
+  withP: ['Continuar con {p}', 'Continue with {p}'], orEmail: ['o con email', 'or with email'], or: ['o', 'or'], email: ['Email', 'Email'], password: ['Contraseña', 'Password'], forgot: ['¿La olvidaste?', 'Forgot it?'], name: ['Nombre', 'Name'], orgName: ['Organización (opcional)', 'Organization (optional)'],
+  pwHint: ['Mínimo 8 caracteres', 'At least 8 characters'], noAccount: ['¿No tienes cuenta?', 'No account yet?'], haveAccount: ['¿Ya tienes cuenta?', 'Already have an account?'],
+  errEmail: ['Escribe un email válido.', 'Enter a valid email.'], errTerms: ['Debes aceptar los términos.', 'You must accept the terms.'], pwRequired: ['Escribe tu contraseña.', 'Enter your password.'],
+  terms: [['Acepto los ', 'términos del servicio', ' y la ', 'política de privacidad', '.'], ['I accept the ', 'terms of service', ' and ', 'privacy policy', '.']],
+  dOverview: ['Resumen', 'Overview'], dWorkspaces: ['Workspaces', 'Workspaces'], dRepos: ['Repositorios', 'Repositories'], dAccounts: ['Cuentas vinculadas', 'Linked accounts'], dTeam: ['Equipo', 'Team'], dSync: ['Configuración en la nube', 'Cloud settings'], dAccount: ['Cuenta', 'Account'],
+  hello: ['Hola, {n}', 'Hi, {n}'], ovSub: ['Esto es lo que se sincroniza con tus dispositivos.', 'This is what syncs to your devices.'], newOrg: ['Crear organización…', 'Create organization…'], invite: ['Invitar miembro', 'Invite member'],
+  accSub: ['Tu perfil, cómo entras en Ramal y tus dispositivos.', 'Your profile, how you log in to Ramal, and your devices.']
+};
+const PROV = { github: { label: 'GitHub', abbr: 'GH', color: 'oklch(0.5 0.03 260)' }, gitlab: { label: 'GitLab', abbr: 'GL', color: 'oklch(0.64 0.18 45)' }, google: { label: 'Google', abbr: 'G', color: 'oklch(0.6 0.15 255)' } };
+const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
+const fill = (s, v) => { if (v) for (const k in v) s = s.split('{' + k + '}').join(v[k]); return s; };
+const fmtCode = v => { const c = v.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 8); return c.length > 4 ? c.slice(0, 4) + '-' + c.slice(4) : c; };
+const mmss = n => '0:' + String(n).padStart(2, '0');
+const strength = p => { if (!p) return 0; if (p.length < 8) return 1; let sc = 0; if (p.length >= 12) sc++; if (/[A-Z]/.test(p) && /[a-z]/.test(p)) sc++; if (/\d/.test(p)) sc++; if (/[^A-Za-z0-9]/.test(p)) sc++; return sc >= 2 ? 3 : 2; };
+const F0 = () => ({ email: 'marta@example.com', pw: '', pw2: '', cur: '', name: 'Marta Ruiz', org: '', code: '', terms: false, raPw: '' });
+
+class Component extends DCLogic {
+  state = { ready: false };
+  timers = [];
+  componentDidMount() {
+    this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs);
+    this._k = e => { if (e.key === 'Escape') this.setState({ modal: null, menu: null }); }; window.addEventListener('keydown', this._k);
+    this.tick = setInterval(() => this.setState(s => s.sec > 0 ? { sec: s.sec - 1 } : null), 1000);
+    const go = () => window.RAMAL && window.RAMAL.WAUTH ? this.boot() : setTimeout(go, 30); go();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._rs); window.removeEventListener('keydown', this._k); clearInterval(this.tick); this.clear(); }
+  componentDidUpdate(pp) {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+    if (pp.theme !== this.props.theme && this.props.theme) this.setState({ theme: this.props.theme });
+    if (pp.lang !== this.props.lang && this.props.lang) this.setState({ lang: this.props.lang });
+    if (pp.client !== this.props.client && this.props.client) this.setState({ client: this.props.client });
+    if ((pp.screen !== this.props.screen || pp.state !== this.props.state) && this.state.ready) this.apply(this.props.screen || this.state.screen, this.props.state || '');
+  }
+  boot() {
+    const h = decodeURIComponent((location.hash || '').slice(1)), hs = SMAP[h] ? h : null;
+    this.setState({ ready: true, vw: window.innerWidth, theme: this.props.theme || 'dark', lang: this.props.lang || 'es', client: this.props.client || 'desktop', toasts: [] }, () => this.apply(this.props.screen || hs || 'W-01', this.props.state || ''));
+  }
+  clear() { this.timers.forEach(clearTimeout); this.timers = []; }
+  later(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
+  get L() { return this.state.lang === 'en' ? 1 : 0; }
+  t(k, v) {
+    const A = window.RAMAL.WAUTH, n = v && (v.count ?? v.minutes ?? v.seconds);
+    let e = A['auth.' + k]; if (!e && n != null) e = A['auth.' + k + (n === 1 ? '_one' : '_other')];
+    if (!e) e = LX[k] || window.RAMAL.D[k]; if (!e) return k;
+    return typeof e[this.L] === 'string' ? fill(e[this.L], v) : e[this.L];
+  }
+  toast(text, kind) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3600); }
+  go(st, extra) { this.setState({ st, ...(extra || {}) }); }
+  setF(k, v) { this.setState(s => ({ f: { ...s.f, [k]: v }, errs: { ...s.errs, [k]: '' }, box: null })); }
+
+  apply(screen, st) {
+    this.clear();
+    if (!SMAP[screen] && screen !== 'login' && screen !== 'signup') screen = 'W-01';
+    const list = SMAP[screen] || ['formulario'];
+    if (!list.includes(st)) st = list[0];
+    const f = F0(), n = { screen, st, f, errs: {}, box: null, modal: null, menu: null, sec: 0, bannerHidden: false, hasPw: true, verified: true, idents: ['github'], hl: false, toasts: [], busy: false, oauthBusy: null, raBusy: null, inUse: null, lcResult: null };
+    const T = this.t.bind(this);
+    if (screen === 'W-01') { if (st === 'email-no-valido') { f.email = 'marta@example'; n.errs.email = T('errEmail'); } if (st === 'reenviar-bloqueado') n.sec = 42; if (st === 'demasiadas') n.box = ['danger', T('fpTooMany')]; if (st === 'sin-conexion') n.box = ['danger', T('loginNoApi')]; }
+    if (screen === 'W-02') { if (st === 'no-coinciden') { f.pw = 'Navegante-42'; f.pw2 = 'Navegante-24'; n.errs.pw2 = T('rpMismatch'); } if (st === 'no-cumple') { f.pw = 'corta'; f.pw2 = 'corta'; n.errs.pw = T('rpRules'); } if (st === 'guardando') { f.pw = f.pw2 = 'Navegante-42'; } }
+    if (screen === 'W-03') { n.verified = false; if (st === 'banner') n.toasts = [{ id: 1, text: T('vToast') }]; if (st === 'reenviado') n.toasts = [{ id: 1, text: T('vResent', { email: f.email }) }]; if (st === 'demasiados') n.toasts = [{ id: 1, text: T('vTooMany'), kind: 'warn' }]; if (st === 'ya-verificado') { n.verified = true; n.toasts = [{ id: 1, text: T('vAlready') }]; } if (st === 'verificando') this.later(1400, () => this.go('verificado')); }
+    if (screen === 'W-03-cambio-email' && st === 'confirmando') this.later(1400, () => this.go('confirmado'));
+    if (screen === 'W-04-error') { const B = { cancelado: ['info', T('oaDenied')], fallo: ['danger', T('oaFailed')], 'cuenta-existente': ['danger', T('oaExists')], 'email-sin-verificar': ['danger', T('oaUnverified')] }; n.box = B[st] || null; if (st === 'conectando') n.oauthBusy = 'github'; }
+    if (screen === 'W-04-completar' && st === 'terminos') n.errs.terms = T('errTerms');
+    if (screen === 'W-05' || screen === 'W-06') { if (st === 'validando') this.later(1200, () => this.go('lista')); if (screen === 'W-06') { if (['encontrado', 'reautenticar', 'buscando', 'aprobado', 'rechazado'].includes(st)) f.code = 'WDJB-MJHT'; if (st === 'formato-no-valido') { f.code = 'WDJB-MJ'; n.errs.code = T('dcFormat'); } if (st === 'no-existe') { f.code = 'QXTR-PLMN'; n.box = ['danger', T('dcNotFound')]; } if (st === 'demasiados') { f.code = 'QXTR-PLMN'; n.box = ['danger', T('dcTooMany')]; } if (st === 'buscando') this.later(900, () => this.go('encontrado')); } }
+    if (screen === 'W-07') {
+      f.pw = 'secreto-de-marta';
+      const B = { credenciales: ['danger', T('errCreds')], 'email-en-uso': ['danger', T('errTaken'), T('errTakenLink')], demasiados: ['danger', T('errRate', { minutes: 5 })], 'error-servidor': ['danger', T('errServer')], 'sin-conexion': ['danger', T('loginNoApi')] };
+      n.box = B[st] || null; if (st === 'login-enviando' || st === 'registro-enviando') n.busy = true;
+      if (st === 'campos-422') { f.name = ''; f.email = 'marta@'; f.pw = 'corta'; f.terms = true; n.errs = { name: T('errName'), email: T('errEmail'), pw: T('rpRules') }; }
+      if (['registro-enviando', 'email-en-uso'].includes(st)) f.terms = true;
+    }
+    if (screen === 'W-33') {
+      if (st === 'sin-contrasena') n.hasPw = false; if (st === 'con-contrasena') { n.hl = true; this.later(2000, () => this.setState({ hl: false })); }
+      if (['modal', 'actual-incorrecta', 'no-cumple', 'guardando'].includes(st)) { n.modal = { kind: 'pw', mode: 'change', busy: st === 'guardando' }; if (st !== 'modal') { f.cur = 'contraseña-vieja'; f.pw = 'Navegante-42'; f.pw2 = 'Navegante-42'; } if (st === 'actual-incorrecta') n.errs.cur = T('pwWrong'); if (st === 'no-cumple') { f.pw = f.pw2 = 'corta'; n.errs.pw = T('rpRules'); } }
+      if (st === 'cambiada') n.toasts = [{ id: 1, text: T('pwChanged') }]; if (st === 'anadida') n.toasts = [{ id: 1, text: T('pwAdded') }];
+    }
+    if (screen === 'W-34') {
+      if (st === 'vinculada') { n.idents = ['github', 'google']; n.toasts = [{ id: 1, text: T('idLinked', { provider: 'Google' }) }]; }
+      if (st === 'ya-usada') n.inUse = 'GitLab'; if (st === 'email-sin-verificar') n.verified = false;
+      if (st === 'quitar') n.modal = { kind: 'rm', prov: 'github' }; if (st === 'unica-forma') n.hasPw = false;
+    }
+    if (screen === 'W-35' && !st.startsWith('pagina')) {
+      const strong = st === 'metodos-fuertes' || st === 'contrasena-incorrecta';
+      n.modal = { kind: 'ra', action: strong ? 'deleteAccount' : 'linkIdentity', strong, wait: st === 'esperando' || st === 'reenviar', notLinked: st === 'no-vinculado' ? 'GitHub' : '' };
+      if (st === 'contrasena-incorrecta') { f.raPw = 'secreto'; n.errs.raPw = T('raWrong'); } if (st === 'esperando') n.sec = 48;
+    }
+    if (n.toasts.length) setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== 1) })), 3600);
+    this.setState(n);
+  }
+
+  isPanel() { const { screen: sc, st } = this.state; return sc === 'W-33' || sc === 'W-34' || (sc === 'W-35' && !st.startsWith('pagina')) || (sc === 'W-03' && ['banner', 'reenviado', 'demasiados', 'ya-verificado'].includes(st)); }
+
+  // ---- block helpers
+  spin(sz) { return React.createElement('span', { 'aria-hidden': true, style: { width: sz || 14, height: sz || 14, flexShrink: 0, borderRadius: '50%', border: '2px solid currentColor', borderRightColor: 'transparent', display: 'inline-block', animation: 'spin .7s linear infinite' } }); }
+  head(title, sub, o = {}) { const c = o.color || 'var(--accent)'; return { isHead: 1, title, sub: sub || '', hasSub: !!sub, hasIcon: !!o.icon, icon: o.icon, iconColor: c, iconBg: tint(c, 16), hasLogo: !!o.logo, isVs: o.logo === 'vscode', isDesk: o.logo === 'desktop' }; }
+  box(kind, text, o = {}) { const c = { danger: 'var(--danger)', info: 'var(--info)', warn: 'var(--warn)', ok: 'var(--ok)' }[kind]; return { isBox: 1, role: kind === 'danger' ? 'alert' : 'status', text, hasText2: !!o.text2, text2: o.text2 || '', hasCode: !!o.code, code: o.code || '', hasLink: !!o.link, link: o.link || '', onLink: o.onLink, bg: tint(c, 10), color: kind === 'danger' ? 'var(--danger)' : 'var(--text)', iconColor: c, icon: kind === 'info' ? 'i' : kind === 'ok' ? '✓' : '!' }; }
+  field(label, k, o = {}) { const s = this.state, err = s.errs[k]; return { isField: 1, label, type: o.type || 'text', value: o.value != null ? o.value : s.f[k], ph: o.ph || '', onChange: e => this.setF(k, e.target.value), disabled: !!o.disabled, readonly: !!o.readonly, opacity: o.disabled ? 0.6 : 1, hasErr: !!err, err: err || '', border: err ? 'var(--danger)' : 'var(--border)', hasHint: !!o.hint && !err, hint: o.hint || '', hintColor: o.hintColor || 'var(--faint)', hasLink: !!o.link, link: o.link || '', onLink: o.onLink }; }
+  meter(p) { const lv = strength(p), c = ['var(--border)', 'var(--danger)', 'var(--warn)', 'var(--ok)'][lv]; return { isMeter: 1, segs: [0, 1, 2].map(i => ({ bg: i < lv ? c : 'var(--border)' })), color: c, label: lv ? [, this.t('pwWeak'), this.t('pwFair'), this.t('pwStrong')][lv] : '' }; }
+  btn(label, kind, onClick, o = {}) {
+    const K = { primary: ['var(--accent)', 'var(--accent-ink)', 'var(--accent)'], secondary: ['var(--bg)', 'var(--text)', 'var(--border)'], danger: ['var(--danger)', 'white', 'var(--danger)'], oauth: ['var(--bg)', 'var(--text)', 'var(--border)'] }[kind];
+    const p = o.prov && PROV[o.prov];
+    return { label, onClick: o.disabled || o.busy ? undefined : onClick, disabled: !!(o.disabled || o.busy), busy: !!o.busy, focus: !!o.focus, opacity: o.disabled && !o.busy ? 0.5 : 1, bg: K[0], color: K[1], border: K[2], h: kind === 'primary' || kind === 'danger' ? (o.h || 44) : (o.h || 42), weight: kind === 'primary' || kind === 'danger' ? 600 : 500, size: kind === 'primary' ? 15 : 14, hasSpin: !!o.busy, spin: o.busy ? this.spin() : null, hasBadge: !!p && !o.busy, abbr: p ? p.abbr : '', badgeColor: p ? p.color : '' };
+  }
+  btns(list, dir) { return { isBtns: 1, dir: dir || 'column', btns: list }; }
+  text(text, o = {}) { return { isText: 1, text, size: o.size || 14, color: o.color || 'var(--muted)', align: o.center ? 'center' : 'left' }; }
+  link(pre, link, onClick) { return { isLink: 1, pre, link, onClick }; }
+  sep(label) { return { isSep: 1, label }; }
+  note(text, o = {}) { return { isNote: 1, text, hasLink: !!o.link, link: o.link || '', href: o.href || '' }; }
+  row(label, value, o = {}) { const p = o.prov && PROV[o.prov]; return { isRow: 1, hasLabel: !!label, label: label || '', value, hasSub: !!o.sub, sub: o.sub || '', hasBadge: !!p, abbr: p ? p.abbr : '', color: p ? p.color : '', hasLink: !!o.link, link: o.link || '', onLink: o.onLink, hasNote: !!o.note, note: o.note || '' }; }
+  checkTerms(disabled) { const s = this.state, T = this.t('terms'), err = s.errs.terms, pv = e => e.preventDefault(); return { isCheck: 1, checked: s.f.terms, disabled: !!disabled, onChange: e => this.setF('terms', e.target.checked), pre: T[0], l1: T[1], mid: T[2], l2: T[3], post: T[4], onTerms: pv, onPrivacy: pv, hasErr: !!err, err: err || '' }; }
+  spinBlock(text) { return { isSpin: 1, spin: this.spin(28), text }; }
+  clientName() { return this.state.client === 'vscode' ? 'Ramal for VS Code' : 'Ramal Desktop'; }
+  device() { return this.state.client === 'vscode' ? 'ubuntu-dev (Codespaces)' : 'MacBook Pro de Marta'; }
+
+  loginBlocks(o = {}) {
+    const s = this.state, T = this.t.bind(this), busy = !!s.busy, ob = s.oauthBusy, lock = busy || !!ob;
+    const out = [this.head(T('loginTitle'), T('loginSub'))];
+    if (s.box) out.push(this.box(s.box[0], s.box[1], s.box[2] ? { link: s.box[2], onLink: () => this.apply('login') } : {}));
+    out.push(this.btns(['github', 'gitlab', 'google'].map(p => this.btn(ob === p ? T('oaConnecting', { provider: PROV[p].label }) : T('withP', { p: PROV[p].label }), 'oauth', () => this.oauth(p, o.after), { prov: p, busy: ob === p, disabled: lock && ob !== p }))));
+    out.push(this.sep(T('orEmail')));
+    out.push(this.field(T('email'), 'email', { type: 'email', ph: 'tu@example.com', disabled: lock }));
+    out.push(this.field(T('password'), 'pw', { type: 'password', ph: '••••••••', disabled: lock, link: T('forgot'), onLink: e => { e.preventDefault(); const em = s.f.email; this.apply('W-01'); this.setState(x => ({ f: { ...x.f, email: em } })); } }));
+    out.push(this.btns([this.btn(busy ? T('busyLogin') : T('login'), 'primary', () => this.submitLogin(o.after), { busy, disabled: !!ob })]));
+    out.push(this.link(T('noAccount'), T('signup'), () => this.apply('signup')));
+    return out;
+  }
+  signupBlocks() {
+    const s = this.state, T = this.t.bind(this), busy = !!s.busy, ok = s.f.pw.length >= 8;
+    const out = [this.head(T('signupTitle'), T('signupSub'))];
+    if (s.box) out.push(this.box(s.box[0], s.box[1], s.box[2] ? { link: s.box[2], onLink: () => this.apply('login') } : {}));
+    out.push(this.btns(['github', 'gitlab', 'google'].map(p => this.btn(T('withP', { p: PROV[p].label }), 'oauth', () => this.oauth(p, 'complete'), { prov: p, disabled: busy }))));
+    out.push(this.sep(T('orEmail')));
+    out.push(this.field(T('name'), 'name', { ph: 'Marta Ruiz', disabled: busy }), this.field(T('email'), 'email', { type: 'email', ph: 'tu@example.com', disabled: busy }));
+    out.push(this.field(T('password'), 'pw', { type: 'password', ph: '••••••••', disabled: busy, hint: T('pwHint'), hintColor: ok ? 'var(--ok)' : 'var(--faint)' }));
+    out.push(this.field(T('orgName'), 'org', { ph: 'ACME Studio', disabled: busy, hint: T('orgHint') }));
+    out.push(this.checkTerms(busy));
+    out.push(this.btns([this.btn(busy ? T('busySignup') : T('signup'), 'primary', () => this.submitSignup(), { busy })]));
+    out.push(this.link(T('haveAccount'), T('login'), () => this.apply('login')));
+    return out;
+  }
+  oauth(p, after) { this.setState({ oauthBusy: p, box: null }); this.later(1100, () => { this.setState({ oauthBusy: null }); if (after === 'complete') this.apply('W-04-completar'); else if (after) after(); else this.apply('W-33', 'con-contrasena'); }); }
+  submitLogin(after) {
+    const f = this.state.f, T = this.t.bind(this), errs = {};
+    if (!/^\S+@\S+\.\S+$/.test(f.email)) errs.email = T('errEmail'); if (!f.pw) errs.pw = T('pwRequired');
+    if (Object.keys(errs).length) { this.setState({ errs }); return; }
+    this.setState({ busy: true, box: null }); this.later(900, () => { this.setState({ busy: false }); if (after) after(); else this.apply('W-33', 'con-contrasena'); });
+  }
+  submitSignup() {
+    const f = this.state.f, T = this.t.bind(this), errs = {};
+    if (!f.name.trim() || f.name.length > 80) errs.name = T('errName'); if (!/^\S+@\S+\.\S+$/.test(f.email)) errs.email = T('errEmail'); if (f.pw.length < 8 || f.pw.length > 128) errs.pw = T('rpRules'); if (!f.terms) errs.terms = T('errTerms');
+    if (Object.keys(errs).length) { this.setState({ errs }); return; }
+    this.setState({ busy: true, box: null }); this.later(900, () => this.apply('W-03', 'banner'));
+  }
+  raInline(next) {
+    const s = this.state, T = this.t.bind(this), busy = s.raBusy;
+    const ok = () => { if (!s.f.raPw) { this.setState(x => ({ errs: { ...x.errs, raPw: T('pwRequired') } })); return; } this.setState({ raBusy: 'pw' }); this.later(800, () => { this.setState({ raBusy: null }); next(); }); };
+    return [this.head(T('raTitle'), T('raFor', { action: T('action.authorizeDevice') }), { logo: s.client }),
+      this.field(T('password'), 'raPw', { type: 'password', ph: '••••••••', disabled: !!busy }),
+      this.btns([this.btn(T('raConfirm'), 'primary', ok, { busy: busy === 'pw', disabled: !!busy })]),
+      this.sep(T('or')),
+      this.btns(['google', 'github'].map(p => this.btn(T('withP', { p: PROV[p].label }), 'oauth', () => { this.setState({ raBusy: p }); this.later(900, () => { this.setState({ raBusy: null }); next(); }); }, { prov: p, busy: busy === p, disabled: !!busy && busy !== p })).concat([this.btn(T('raEmail'), 'secondary', () => this.toast(T('raWaiting', { maskedEmail: 'm•••@example.com' })), { disabled: !!busy })]))];
+  }
+
+  publicView() {
+    const s = this.state, sc = s.screen, st = s.st, T = this.t.bind(this), f = s.f, b = [], banners = [];
+    const info = text => banners.push({ text, bg: tint('var(--info)', 10), border: tint('var(--info)', 30), color: 'var(--text)', iconColor: 'var(--info)', icon: 'i' });
+    const ok = (title, text) => [this.head(title, text, { icon: '✓', color: 'var(--ok)' })];
+    const bad = (title, text) => [this.head(title, text, { icon: '!', color: 'var(--danger)' })];
+    const toLogin = () => this.apply('login');
+    let loggedIn = false;
+    if (sc === 'login') b.push(...this.loginBlocks());
+    if (sc === 'signup') b.push(...this.signupBlocks());
+    if (sc === 'W-01') {
+      if (st === 'enviado' || st === 'reenviar-bloqueado') {
+        b.push(this.head(T('fpSentTitle'), '', { icon: '@' }), this.text(T('fpSent', { email: f.email })), this.text(T('fpSpam'), { size: 13 }));
+        b.push(this.btns([this.btn(s.sec > 0 ? T('fpResendWait', { time: mmss(s.sec) }) : T('fpResend'), 'secondary', () => { this.toast(T('fpSent', { email: f.email }).split('.')[0] + '.'); this.setState({ sec: 60 }); }, { disabled: s.sec > 0 })]));
+        b.push(this.link('', T('fpBack'), toLogin));
+      } else {
+        const busy = st === 'enviando';
+        b.push(this.head(T('fpTitle'), T('fpSub')));
+        if (s.box) b.push(this.box(s.box[0], s.box[1]));
+        b.push(this.field(T('email'), 'email', { type: 'email', ph: 'tu@example.com', disabled: busy }));
+        b.push(this.btns([this.btn(busy ? T('fpBusy') : T('fpSubmit'), 'primary', () => { if (!/^\S+@\S+\.\S+$/.test(f.email)) { this.setState({ errs: { email: T('errEmail') } }); return; } this.go('enviando', { box: null }); this.later(900, () => this.go('enviado', { sec: 60 })); }, { busy })]));
+        b.push(this.link('', T('fpBack'), toLogin));
+      }
+    }
+    if (sc === 'W-02') {
+      if (st === 'guardada') b.push(...ok(T('rpDoneTitle'), T('rpDone')), this.btns([this.btn(T('login'), 'primary', toLogin)]));
+      else if (st === 'enlace-no-valido') b.push(...bad(T('linkDeadT'), T('rpDead')), this.btns([this.btn(T('rpAskAgain'), 'primary', () => this.apply('W-01'))]));
+      else {
+        const busy = st === 'guardando';
+        b.push(this.head(T('rpTitle')), this.field(T('rpNew'), 'pw', { type: 'password', ph: '••••••••', disabled: busy, hint: T('pwHint') }));
+        if (f.pw) b.push(this.meter(f.pw));
+        b.push(this.field(T('rpRepeat'), 'pw2', { type: 'password', ph: '••••••••', disabled: busy }));
+        b.push(this.box('info', T('rpVault'), { text2: T('rpSessions') }));
+        b.push(this.btns([this.btn(busy ? T('rpBusy') : T('rpSubmit'), 'primary', () => { const errs = {}; if (f.pw.length < 8 || f.pw.length > 128) errs.pw = T('rpRules'); else if (f.pw !== f.pw2) errs.pw2 = T('rpMismatch'); if (Object.keys(errs).length) { this.setState({ errs }); return; } this.go('guardando'); this.later(900, () => this.go('guardada')); }, { busy })]));
+      }
+    }
+    if (sc === 'W-03') {
+      const sess = !st.endsWith('sin-sesion'); loggedIn = sess;
+      if (st === 'verificando') b.push(this.spinBlock(T('vChecking')));
+      else if (st.startsWith('verificado')) b.push(...ok(T('vDoneTitle'), T('vDone')), this.btns([sess ? this.btn(T('goDash'), 'primary', () => this.apply('W-33')) : this.btn(T('login'), 'primary', toLogin)]));
+      else b.push(...bad(T('linkDeadT'), T('vDead')), ...(sess ? [this.btns([this.btn(T('vResend'), 'primary', () => this.toast(T('vResent', { email: f.email })))])] : [this.text(T('vDeadNoSess')), this.btns([this.btn(T('login'), 'primary', toLogin)])]));
+    }
+    if (sc === 'W-03-cambio-email') {
+      loggedIn = true;
+      if (st === 'confirmando') b.push(this.spinBlock(T('vChangeEmailTitle')));
+      if (st === 'confirmado') b.push(...ok(T('ecDoneTitle'), T('ecDone')), this.btns([this.btn(T('goDash'), 'primary', () => this.apply('W-33'))]));
+      if (st === 'direccion-usada') b.push(this.head(T('ecTaken'), '', { icon: '!', color: 'var(--danger)' }), this.btns([this.btn(T('goDash'), 'secondary', () => this.apply('W-33'))]));
+      if (st === 'enlace-no-valido') b.push(...bad(T('linkDeadT'), T('vDead')), this.btns([this.btn(T('ceHome'), 'secondary', toLogin)]));
+    }
+    if (sc === 'W-03-deshacer-email') {
+      if (st === 'confirmar' || st === 'deshaciendo') { const busy = st === 'deshaciendo'; b.push(this.head(T('erTitle'), 'marta@example.com'), this.box('danger', T('erText')), this.btns([this.btn(T('cancel'), 'secondary', () => this.apply('W-08', 'desconocido'), { focus: true, disabled: busy, h: 44 }), this.btn(busy ? T('erBusy') : T('erSubmit'), 'danger', () => { this.go('deshaciendo'); this.later(900, () => this.go('hecho')); }, { busy })], 'row')); }
+      if (st === 'hecho') b.push(this.head(T('erDone'), '', { icon: '✓', color: 'var(--ok)' }), this.btns([this.btn(T('login'), 'primary', toLogin)]));
+      if (st === 'enlace-no-valido') b.push(...bad(T('linkDeadT'), ''), this.btns([this.btn(T('ceHome'), 'secondary', toLogin)]));
+    }
+    if (sc === 'W-04-error') b.push(...this.loginBlocks());
+    if (sc === 'W-04-completar') {
+      if (st === 'caducado') b.push(...bad(T('scExpiredT'), T('scExpired')), this.btns([this.btn(T('scRestart'), 'primary', () => this.apply('signup'))]));
+      else {
+        const busy = st === 'creando';
+        b.push(this.head(T('scTitle')), this.row('', f.email, { prov: 'github', sub: T('scWith', { provider: 'GitHub', email: f.email }) }));
+        b.push(this.field(T('name'), 'name', { disabled: busy }), this.field(T('orgName'), 'org', { ph: 'ACME Studio', disabled: busy, hint: T('orgHint') }), this.checkTerms(busy));
+        b.push(this.btns([this.btn(busy ? T('scBusy') : T('scSubmit'), 'primary', () => { const errs = {}; if (!f.name.trim()) errs.name = T('errName'); if (!f.terms) errs.terms = T('errTerms'); if (Object.keys(errs).length) { this.setState({ errs }); return; } this.go('creando'); this.later(900, () => this.apply('W-03', 'banner')); }, { busy }), this.btn(T('cancel'), 'secondary', () => this.apply('signup'), { disabled: busy })]));
+      }
+    }
+    if (sc === 'W-05') {
+      const cl = this.clientName(); loggedIn = st !== 'sin-sesion';
+      if (st === 'sin-sesion') { info(T('azNeedLogin', { client: cl })); b.push(...this.loginBlocks({ after: () => this.go('validando') || this.later(1000, () => this.go('lista')) })); }
+      if (st === 'reautenticar') b.push(...this.raInline(() => this.go('lista')));
+      if (st === 'validando') b.push({ isSkel: 1, lines: [{ h: 22, w: '70%' }, { h: 12, w: '92%' }, { h: 64, w: '100%' }, { h: 64, w: '100%' }, { h: 44, w: '100%' }] });
+      if (st === 'lista' || st === 'autorizando') {
+        const busy = st === 'autorizando';
+        b.push(this.head(T('azTitle', { client: cl }), T('azText', { client: cl }), { logo: s.client }));
+        b.push(this.row(T('azAccount'), 'Marta Ruiz', { sub: f.email, link: T('azNotYou'), onLink: () => this.apply('W-05', 'sin-sesion') }));
+        b.push(this.row(T('azDevice'), this.device(), { note: T('azDeviceNote') }));
+        b.push(this.text(T('azCan'), { size: 13 }));
+        b.push(this.btns([this.btn(T('cancel'), 'secondary', () => s.client === 'vscode' ? this.go('vscode-cancelado') : this.go('escritorio', { lcResult: 'cancelled' }), { disabled: busy, h: 44 }), this.btn(busy ? T('azBusy') : T('azApprove'), 'primary', () => { this.go('autorizando'); this.later(900, () => s.client === 'vscode' ? this.go('vscode-vuelve') : this.go('escritorio', { lcResult: 'success' })); }, { busy })], 'row'));
+        b.push(this.text(T('azFoot'), { size: 12, color: 'var(--faint)' }));
+      }
+      if (st === 'peticion-no-valida') b.push(...bad(T('azBadTitle'), T('azBad')), this.box('danger', 'redirect_uri', { code: 'invalid_redirect_uri' }));
+      if (st === 'vscode-vuelve') b.push(this.head(T('azBackVs'), T('azBackVsText'), { logo: 'vscode' }), this.note('window.location = "vscode://ramal.ramal/auth?code=…&state=…"'));
+      if (st === 'vscode-cancelado') b.push(this.head(T('azCancelled'), '', { logo: 'vscode' }), this.note('window.location = "vscode://ramal.ramal/auth?error=access_denied&state=…"'));
+      if (st === 'escritorio') b.push(this.head(T(s.lcResult === 'success' ? 'lcOkTitle' : 'lcCancelTitle', { client: cl }), '', { logo: 'desktop' }), this.note('302 → http://127.0.0.1:53682/callback?' + (s.lcResult === 'success' ? 'code=…&state=…' : 'error=access_denied'), { link: 'Ramal Local Callback.dc.html →', href: './Ramal Local Callback.dc.html' }));
+    }
+    if (sc === 'W-06') {
+      loggedIn = st !== 'sin-sesion';
+      const cl = s.client === 'desktop' ? 'Ramal Desktop' : 'Ramal for VS Code';
+      if (st === 'sin-sesion') { info(T('dcNeedLogin')); b.push(...this.loginBlocks({ after: () => this.go('codigo') })); }
+      if (['codigo', 'formato-no-valido', 'buscando', 'no-existe', 'demasiados'].includes(st)) {
+        const busy = st === 'buscando', locked = st === 'demasiados', err = s.errs.code;
+        b.push(this.head(T('dcTitle'), T('dcText'), { logo: s.client === 'desktop' ? 'desktop' : 'vscode' }));
+        if (s.box) b.push(this.box(s.box[0], s.box[1]));
+        b.push({ isCode: 1, value: f.code, onChange: e => this.setF('code', fmtCode(e.target.value)), disabled: busy || locked, opacity: busy || locked ? 0.6 : 1, hasErr: !!err, err: err || '', border: err ? 'var(--danger)' : 'var(--border)' });
+        b.push(this.btns([this.btn(busy ? T('dcSearching') : T('dcContinue'), 'primary', () => { if (!/^[A-Z]{4}-[A-Z]{4}$/.test(f.code)) { this.setState({ errs: { code: T('dcFormat') } }); return; } this.go('buscando', { box: null }); this.later(800, () => f.code === 'QXTR-PLMN' ? this.go('no-existe', { box: ['danger', T('dcNotFound')] }) : this.go('encontrado')); }, { busy, disabled: locked })]));
+      }
+      if (st === 'reautenticar') b.push(...this.raInline(() => this.go('encontrado')));
+      if (st === 'encontrado') {
+        b.push(this.head(T('dcAsks', { client: cl }), '', { logo: s.client === 'desktop' ? 'desktop' : 'vscode' }));
+        b.push(this.row(T('azDevice'), this.device(), { sub: T('dcAgo', { seconds: 42 }), note: T('azDeviceNote') }));
+        b.push(this.box('warn', T('dcWarn')));
+        b.push(this.btns([this.btn(T('dcReject'), 'secondary', () => this.go('rechazado'), { h: 44 }), this.btn(T('dcApprove'), 'primary', () => this.go('aprobado'))], 'row'));
+      }
+      if (st === 'aprobado') b.push(this.head(T('dcApproved'), '', { icon: '✓', color: 'var(--ok)' }));
+      if (st === 'rechazado') b.push(this.head(T('dcRejected'), '', { icon: '×', color: 'var(--faint)' }));
+    }
+    if (sc === 'W-07') b.push(...(st.startsWith('registro') || st === 'email-en-uso' || st === 'campos-422' ? this.signupBlocks() : this.loginBlocks()));
+    if (sc === 'W-08') b.push(...bad(T('ceTitle'), st === 'caducado' ? T('ceExpired') : T('ceUnknown')), this.btns([this.btn(T('ceHome'), 'primary', toLogin)]));
+    if (sc === 'W-09') {
+      if (st === 'con-sesion') { loggedIn = true; b.push(this.note('GET /login · /signup · /forgot-password → 302 /dashboard')); }
+      else { info(st === 'caducada' ? T('webExpired') : T('webRevoked')); b.push(...this.loginBlocks()); }
+    }
+    if (sc === 'W-35') {
+      if (st === 'pagina-confirmada') b.push(...ok(T('raTitle'), T('raLinkOk')));
+      else b.push(...bad(T('linkDeadT'), T('raLinkDead')));
+    }
+    return { blocks: b, banners, loggedIn };
+  }
+
+  panelView() {
+    const s = this.state, sc = s.screen, T = this.t.bind(this), out = { pBanners: [], cards: [], ph: { title: '', sub: '', actions: [] } };
+    const banner = (kind, text, o = {}) => { const c = kind === 'danger' ? 'var(--danger)' : 'var(--info)'; out.pBanners.push({ text, bg: tint(c, 10), border: tint(c, 30), color: kind === 'danger' ? 'var(--danger)' : 'var(--text)', iconColor: c, icon: kind === 'danger' ? '!' : 'i', hasActions: !!o.a, a: o.a || '', b: o.b || '', onA: o.onA, onB: o.onB }); };
+    if (!s.verified && !s.bannerHidden) banner('info', T('vBanner', { email: s.f.email }), { a: T('vResend'), b: T('vHide'), onA: () => this.toast(T('vResent', { email: s.f.email })), onB: () => this.setState({ bannerHidden: true }) });
+    if (s.inUse) banner('danger', T('idInUse', { provider: s.inUse }));
+    out.nav = sc === 'W-03' ? 'dOverview' : 'dAccount';
+    if (sc === 'W-03') {
+      out.ph = { title: T('hello', { n: 'Marta' }), sub: T('ovSub'), actions: [T('newOrg'), T('invite')].map((label, i) => ({ label, tip: s.verified ? '' : T('vNeedTip'), disabled: !s.verified, opacity: s.verified ? 1 : 0.5, bg: i ? 'var(--accent)' : 'var(--surface)', color: i ? 'var(--accent-ink)' : 'var(--text)', border: i ? 'var(--accent)' : 'var(--border)' })) };
+      return out;
+    }
+    out.ph = { title: T('dAccount'), sub: T('accSub'), actions: [] };
+    const R0 = { hasBadge: false, hasDesc: false, hasBtn: false, hasMenu: false, meta: '', desc: '', opacity: 1, tip: '' };
+    const pwRow = s.hasPw ? { ...R0, label: T('pwCard'), desc: T('pwHasD'), hasDesc: true, hasBtn: true, btn: T('pwChange'), onBtn: () => this.openPw('change') }
+      : { ...R0, label: T('pwCard'), desc: T('pwNoneD', { provider: 'GitHub' }), hasDesc: true, hasBtn: true, btn: T('pwAdd'), onBtn: () => this.reauth('addPassword', false, () => this.openPw('add')) };
+    out.cards.push({ id: 'password', title: T('pwCard'), hasSub: false, sub: '', border: s.hl ? 'var(--accent)' : 'var(--border)', ring: s.hl ? '0 0 0 3px ' + tint('var(--accent)', 25) : 'none', rows: [pwRow] });
+    const linked = s.idents, only = linked.length + (s.hasPw ? 1 : 0) <= 1;
+    const rows = [];
+    if (s.hasPw) rows.push({ ...R0, hasBadge: true, abbr: '@', color: 'var(--surface2)', badgeInk: 'var(--text)', label: T('idEmailPw'), meta: '· ' + s.f.email });
+    const dates = { github: ['1 sep 2026', '1 Sep 2026', 2], google: ['2 oct 2026', 'Oct 2, 2026', 0], gitlab: ['14 jun 2026', 'Jun 14, 2026', 40] };
+    ['github', 'google', 'gitlab'].forEach(p => {
+      const P = PROV[p], d = dates[p], ago = d[2] === 0 ? (this.L ? 'just now' : 'ahora') : this.L ? `${d[2]} days ago` : `hace ${d[2]} días`;
+      if (linked.includes(p)) rows.push({ ...R0, hasBadge: true, abbr: P.abbr, color: P.color, badgeInk: 'white', label: P.label, meta: '· marta@example.com', hasDesc: true, desc: T('idMeta', { date: d[this.L], ago }), hasMenu: true, menuLabel: T('idRemove'),
+        onMenu: e => this.openMenu(e, [{ label: T('idRemove'), danger: true, disabled: only, tip: only ? T('idLast') : '', run: () => this.setState({ modal: { kind: 'rm', prov: p } }) }]) });
+      else rows.push({ ...R0, hasBadge: true, abbr: P.abbr, color: P.color, badgeInk: 'white', label: P.label, hasBtn: true, btn: T('idLink'), disabled: !s.verified, opacity: s.verified ? 1 : 0.5, tip: s.verified ? '' : T('idNeedVerify'),
+        onBtn: () => this.reauth('linkIdentity', false, () => { this.setState(x => ({ idents: [...x.idents, p], inUse: null })); this.toast(T('idLinked', { provider: P.label })); }) });
+    });
+    out.cards.push({ id: 'sign-in', title: T('idCard'), hasSub: true, sub: T('idSub'), border: 'var(--border)', ring: 'none', rows });
+    return out;
+  }
+  openPw(mode) { this.setState(s => ({ modal: { kind: 'pw', mode }, f: { ...s.f, cur: '', pw: '', pw2: '' }, errs: {} })); }
+  reauth(action, strong, next) { this.setState(s => ({ modal: { kind: 'ra', action, strong, next }, f: { ...s.f, raPw: '' }, errs: {} })); }
+  openMenu(e, items) { e.preventDefault(); e.stopPropagation(); this.setState({ menu: { x: Math.max(8, Math.min(e.clientX - 180, window.innerWidth - 220)), y: Math.min(e.clientY + 8, window.innerHeight - 60), items } }); }
+
+  modalView() {
+    const s = this.state, m = s.modal, T = this.t.bind(this), f = s.f; if (!m) return null;
+    const base = { blocks: [], hasSubmit: false, submit: '', busy: !!m.busy, spin: this.spin(), btnBg: 'var(--accent)', btnColor: 'var(--accent-ink)', focusCancel: false, onSubmit: null };
+    if (m.kind === 'pw') {
+      const add = m.mode === 'add', busy = !!m.busy;
+      base.title = add ? T('pwAdd').replace('…', '') : T('pwChange').replace('…', '');
+      if (!add) base.blocks.push(this.field(T('pwCurrent'), 'cur', { type: 'password', disabled: busy }));
+      base.blocks.push(this.field(T('rpNew'), 'pw', { type: 'password', disabled: busy, hint: T('pwHint') }));
+      if (f.pw) base.blocks.push(this.meter(f.pw));
+      base.blocks.push(this.field(T('pwRepeatNew'), 'pw2', { type: 'password', disabled: busy }), this.text(T('pwModalNote'), { size: 13 }));
+      Object.assign(base, { hasSubmit: true, submit: busy ? T('rpBusy') : (add ? T('pwAdd').replace('…', '') : T('pwChange').replace('…', '')), onSubmit: () => {
+        const errs = {}; if (!add && !f.cur) errs.cur = T('pwRequired'); if (f.pw.length < 8 || f.pw.length > 128) errs.pw = T('rpRules'); else if (f.pw !== f.pw2) errs.pw2 = T('rpMismatch');
+        if (Object.keys(errs).length) { this.setState({ errs }); return; }
+        this.setState({ modal: { ...m, busy: true } }); this.later(900, () => { this.setState({ modal: null, hasPw: true }); this.toast(add ? T('pwAdded') : T('pwChanged')); }); } });
+    }
+    if (m.kind === 'rm') {
+      const P = PROV[m.prov];
+      base.title = T('idRmTitle', { provider: P.label });
+      base.blocks.push(this.box('danger', T('idRmText', { provider: P.label })));
+      Object.assign(base, { hasSubmit: true, submit: T('idRmBtn'), btnBg: 'var(--danger)', btnColor: 'white', focusCancel: true, onSubmit: () => this.reauth('removeIdentity', false, () => this.setState(x => ({ idents: x.idents.filter(i => i !== m.prov) }))) });
+    }
+    if (m.kind === 'ra') {
+      base.title = T('raTitle');
+      const done = () => { this.setState({ modal: null }); if (m.next) m.next(); }, busy = m.busy;
+      if (m.wait) {
+        base.blocks.push(this.text(T('raFor', { action: T('action.' + m.action) })), { isSpin: 1, spin: this.spin(18), text: T('raWaiting', { maskedEmail: 'm•••@example.com' }) });
+        base.blocks.push(this.btns([this.btn(s.sec > 0 ? T('raResendWait', { time: mmss(s.sec) }) : T('raResend'), 'secondary', () => this.setState({ sec: 60 }), { disabled: s.sec > 0, h: 38 })]));
+        base.blocks.push(this.link('', T('raOther'), () => this.setState({ modal: { ...m, wait: false } })));
+      } else {
+        base.blocks.push(this.text(T('raFor', { action: T('action.' + m.action) })));
+        if (m.notLinked) base.blocks.push(this.box('danger', T('raNotLinked', { provider: m.notLinked })));
+        base.blocks.push(this.field(T('password'), 'raPw', { type: 'password', ph: '••••••••', disabled: !!busy }));
+        base.blocks.push(this.btns([this.btn(T('raConfirm'), 'primary', () => { if (!f.raPw) { this.setState(x => ({ errs: { ...x.errs, raPw: T('pwRequired') } })); return; } this.setState({ modal: { ...m, busy: 'pw' } }); this.later(800, done); }, { busy: busy === 'pw', disabled: !!busy, h: 38 })]));
+        base.blocks.push(this.sep(T('or')));
+        const provs = m.strong ? ['google'] : ['google', 'github', 'gitlab'];
+        base.blocks.push(this.btns(provs.map(p => this.btn(T('withP', { p: PROV[p].label }), 'oauth', () => { this.setState({ modal: { ...m, busy: p, notLinked: '' } }); this.later(900, () => p === 'gitlab' ? this.setState({ modal: { ...m, busy: null, notLinked: 'GitLab' } }) : done()); }, { prov: p, busy: busy === p, disabled: !!busy && busy !== p, h: 38 })).concat([this.btn(T('raEmail'), 'secondary', () => { this.setState({ modal: { ...m, wait: true }, sec: 60 }); this.later(6000, () => { if (this.state.modal && this.state.modal.wait) done(); }); }, { disabled: !!busy, h: 38 })])));
+        if (m.strong) base.blocks.push(this.text(T('raStrong'), { size: 12, color: 'var(--faint)' }));
+      }
+    }
+    return base;
+  }
+
+  renderVals() {
+    const s = this.state;
+    if (!s.ready || !window.RAMAL || !window.RAMAL.WAUTH) return { x: {}, isPublic: true, hasCard: true, blocks: [], banners: [], route: '' };
+    const T = this.t.bind(this), L = this.L, wide = (s.vw || 1280) >= 760;
+    const x = {}; for (const k of ['login', 'signup', 'openDash', 'cancel']) x[k] = T(k);
+    const chip = (id, on, onClick) => ({ id, onClick, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', border: on ? 'var(--accent)' : 'var(--border)' });
+    const base = { x, wide, navPad: wide ? 28 : 16, cardPad: wide ? 32 : 22, panelPad: wide ? 34 : 16, route: ROUTES[s.screen] || '',
+      scrChips: SCREENS.map(([id]) => chip(id, s.screen === id, () => this.apply(id, ''))),
+      stChips: (SMAP[s.screen] || []).map(id => chip(id, s.st === id, () => this.apply(s.screen, id))),
+      hasClient: s.screen === 'W-05' || s.screen === 'W-06', clChips: ['desktop', 'vscode'].map(id => chip(id, s.client === id, () => this.setState({ client: id }))),
+      langOpts: [['es', 'ES'], ['en', 'EN']].map(([k, l]) => ({ label: l, bg: s.lang === k ? 'var(--accent)' : 'transparent', color: s.lang === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ lang: k }, () => this.apply(s.screen, s.st)) })),
+      themeOpts: [['light', '☀︎'], ['dark', '☾']].map(([k, l]) => ({ label: l, title: k, bg: s.theme === k ? 'var(--accent)' : 'transparent', color: s.theme === k ? 'var(--accent-ink)' : 'var(--muted)', onClick: () => this.setState({ theme: k }) })),
+      goLogin: () => this.apply('login'), goSignup: () => this.apply('signup'), goPanel: () => this.apply('W-33'),
+      closeModal: () => this.setState({ modal: null }), stop: e => e.stopPropagation(), closeMenu: () => this.setState({ menu: null }),
+      toasts: s.toasts.map(t => ({ text: t.text, color: t.kind === 'warn' ? 'var(--warn)' : 'var(--ok)' })) };
+    const panel = this.isPanel();
+    base.isPanel = panel; base.isPublic = !panel;
+    if (panel) {
+      const pv = this.panelView();
+      Object.assign(base, pv, { orgName: 'ACME Studio', orgIni: 'AS', dNav: ['dOverview', 'dWorkspaces', 'dRepos', 'dAccounts', 'dTeam', 'dSync', 'dAccount'].map(k => ({ label: T(k), bg: pv.nav === k ? 'var(--accent-soft)' : 'transparent', color: pv.nav === k ? 'var(--accent)' : 'var(--text)' })) });
+    } else {
+      const pv = this.publicView();
+      Object.assign(base, { blocks: pv.blocks, banners: pv.banners, hasCard: pv.blocks.length > 0, navIn: pv.loggedIn, navOut: !pv.loggedIn });
+    }
+    const mv = this.modalView(); base.hasModal = !!mv; base.modal = mv || {};
+    base.hasMenu = !!s.menu;
+    if (s.menu) base.menu = { x: s.menu.x, y: s.menu.y, items: s.menu.items.map(it => ({ label: it.label, tip: it.tip || '', color: it.danger ? 'var(--danger)' : 'var(--text)', opacity: it.disabled ? 0.45 : 1, cursor: it.disabled ? 'not-allowed' : 'pointer', onClick: () => { if (it.disabled) return; this.setState({ menu: null }); it.run(); } })) };
+    return base;
+  }
+}
+</script>
+</body>
+</html>
