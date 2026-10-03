@@ -1,12 +1,12 @@
-//! Binario de la API de Ramal.
+//! Binario de la API de Git Rudder.
 //!
 //! Aqui, y solo aqui, se eligen los adaptadores concretos: PostgreSQL para las
 //! sondas, el reloj del sistema, Salvo para el transporte y figment para el
 //! entorno. Los casos de uso no saben nada de esa eleccion.
 //!
 //! ```text
-//! ramal-api                     arranca el servidor
-//! ramal-api --openapi <ruta>    escribe el documento OpenAPI y sale, sin tocar la base
+//! git-rudder-api                     arranca el servidor
+//! git-rudder-api --openapi <ruta>    escribe el documento OpenAPI y sale, sin tocar la base
 //! ```
 
 mod bootstrap;
@@ -18,7 +18,7 @@ use std::future::Future;
 use std::io::Write;
 use std::process::ExitCode;
 
-use ramal_api_infrastructure::{AppConfig, TelemetryConfig, init_tracing};
+use git_rudder_api_infrastructure::{AppConfig, TelemetryConfig, init_tracing};
 
 use crate::cli::Command;
 use crate::error::StartupError;
@@ -91,7 +91,7 @@ fn finish(outcome: Result<(), StartupError>) -> ExitCode {
     match outcome {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            tracing::error!(%error, "ramal api failed");
+            tracing::error!(%error, "git-rudder api failed");
             ExitCode::FAILURE
         }
     }

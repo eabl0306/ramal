@@ -6,7 +6,7 @@ import {
   type RpcResponse,
   type Transport,
   type Unsubscribe,
-} from '@ramal/bridge';
+} from '@git-rudder/bridge';
 
 import type { HostToWebviewMessage, RpcRequestMessage } from '../../shared/messages';
 
@@ -19,7 +19,7 @@ interface Pending {
 }
 
 /**
- * El `Transport` de @ramal/bridge en un webview de VS Code: cada peticion sale
+ * El `Transport` de @git-rudder/bridge en un webview de VS Code: cada peticion sale
  * por `postMessage` como `rpc/request` y vuelve como `rpc/response` con el
  * mismo id (el host lo cambia hacia el motor y lo restaura a la vuelta). Si el
  * motor no esta, el host contesta `engine_unavailable` y aqui se convierte en

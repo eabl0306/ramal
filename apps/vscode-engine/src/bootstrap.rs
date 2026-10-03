@@ -3,7 +3,7 @@
 //! Aqui entraran los adaptadores que solo este host sabe construir, como el
 //! `SecretStore` sobre peticiones inversas al extension host (planificado).
 
-use ramal_engine::{Engine, EngineBuilder, EngineConfig};
+use git_rudder_engine::{Engine, EngineBuilder, EngineConfig};
 
 use crate::args::Args;
 

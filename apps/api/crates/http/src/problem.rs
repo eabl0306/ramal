@@ -11,13 +11,13 @@
 //! ```
 //!
 //! Todo problema lleva `title` y `detail` en castellano y un `code` estable, que
-//! es lo que traducen los clientes con `@ramal/i18n` cuando la interfaz esta en
+//! es lo que traducen los clientes con `@git-rudder/i18n` cuando la interfaz esta en
 //! ingles.
 
 mod from_error;
 mod from_status;
 
-use ramal_api_application::AppError;
+use git_rudder_api_application::AppError;
 use salvo::http::header::{CONTENT_TYPE, HeaderValue};
 use salvo::oapi::ToSchema;
 use salvo::prelude::{Response, StatusCode};
@@ -31,10 +31,10 @@ pub const PROBLEM_CONTENT_TYPE: &str = "application/problem+json";
 
 /// Prefijo de los `type` del contrato. Si el producto cambia de dominio, cambia
 /// esto y nada mas.
-pub const TYPE_PREFIX: &str = "https://ramal.bahoque.com/problems/";
+pub const TYPE_PREFIX: &str = "https://git-rudder.com/problems/";
 
 /// Cuerpo de respaldo si un problema no se pudiera serializar.
-const FALLBACK_BODY: &[u8] = br#"{"type":"https://ramal.bahoque.com/problems/internal-error","title":"Error interno","status":500,"detail":"No hemos podido completar la operacion. Intentalo de nuevo.","code":"internal_error"}"#;
+const FALLBACK_BODY: &[u8] = br#"{"type":"https://git-rudder.com/problems/internal-error","title":"Error interno","status":500,"detail":"No hemos podido completar la operacion. Intentalo de nuevo.","code":"internal_error"}"#;
 
 /// Error de un campo concreto del cuerpo.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
@@ -57,10 +57,7 @@ pub struct FieldProblem {
 pub struct Problem {
     /// URI que identifica el tipo de problema.
     #[serde(rename = "type")]
-    #[salvo(schema(
-        rename = "type",
-        example = "https://ramal.bahoque.com/problems/not-found"
-    ))]
+    #[salvo(schema(rename = "type", example = "https://git-rudder.com/problems/not-found"))]
     pub kind: String,
     /// Resumen en castellano, siempre el mismo para un `type`.
     #[salvo(schema(example = "No encontrado"))]

@@ -5,7 +5,7 @@
 
 ## Contexto
 
-Ramal es un producto comercial: el diseno trae un plan Ramal Pro, asientos de equipo y una
+Git Rudder es un producto comercial: el diseno trae un plan Git Rudder Pro, asientos de equipo y una
 suscripcion. A la vez promete que los secretos de las cuentas Git van cifrados de extremo a extremo
 (ADR 0012), y esa promesa solo se puede comprobar si el codigo del cliente se puede leer.
 
@@ -21,7 +21,7 @@ aviso a nombre de Ezequiel Bahoque Lopez.
 Lo que significa, en corto:
 
 - Cualquiera puede leer, usar, modificar y redistribuir el codigo, salvo para un producto o
-  servicio comercial que compita con Ramal.
+  servicio comercial que compita con Git Rudder.
 - Cada version pasa sola a Apache 2.0 dos anos despues de publicarse.
 - Apache 2.0 y no MIT como licencia futura porque trae concesion de patentes.
 
@@ -41,7 +41,7 @@ entra de fuera, y los crates propios quedan fuera por `[licenses.private]` porqu
 
 - El codigo se puede publicar cuando se quiera sin cambiar de licencia, y el cifrado de extremo a
   extremo se puede auditar. Desde el 2026-10-01 esta decidido cuando: el repositorio
-  `eabl0306/ramal` se hace publico al abrir la beta ([ADR 0016](0016-actualizaciones-y-descargas.md)).
+  `eabl0306/git-rudder` se hace publico al abrir la beta ([ADR 0016](0016-actualizaciones-y-descargas.md)).
 - Nadie puede montar un clon comercial durante los dos primeros anos de cada version.
 - La FSL no es una licencia de codigo abierto segun la OSI. Algun canal o comunidad puede
   tratarla como propietaria; Marketplace, Open VSX y Flathub la aceptan.

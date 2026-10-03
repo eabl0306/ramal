@@ -1,6 +1,6 @@
 import type { Buffer } from 'node:buffer';
 
-import type { RpcNotification, RpcResponse } from '@ramal/bridge';
+import type { RpcNotification, RpcResponse } from '@git-rudder/bridge';
 
 import type { IdentifiedRpcRequest } from '../../../shared/messages';
 import { EngineUnavailableError } from '../../application/engine-errors';

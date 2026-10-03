@@ -2,7 +2,7 @@ import createClient, { type Client } from 'openapi-fetch';
 
 import type { paths } from './generated/schema';
 
-/** Cliente tipado de la Ramal API: cada ruta y cada respuesta salen de openapi.json. */
+/** Cliente tipado de la Git Rudder API: cada ruta y cada respuesta salen de openapi.json. */
 export type ApiClient = Client<paths>;
 
 export interface ApiClientOptions {

@@ -1,20 +1,20 @@
-# @ramal/repo-view
+# @git-rudder/repo-view
 
-La vista de repositorio que comparten Ramal Desktop y los webviews de VS Code. El primer corte
+La vista de repositorio que comparten Git Rudder Desktop y los webviews de VS Code. El primer corte
 trae el grafo de commits: filas virtualizadas, carriles en SVG, pildoras de refs, seleccion con
 teclado y paginas de `graph/window` al bajar.
 
-Habla con el motor solo por el cliente de `@ramal/bridge`. No sabe si debajo hay Tauri o el
+Habla con el motor solo por el cliente de `@git-rudder/bridge`. No sabe si debajo hay Tauri o el
 extension host: el transporte lo pone cada app.
 
 ## Montarlo en un host
 
 ```tsx
-import { createBridgeClient } from '@ramal/bridge';
-import { GraphView, RepoViewProvider } from '@ramal/repo-view';
-import { I18nProvider, IconProvider } from '@ramal/ui';
-import { lucideIcons } from '@ramal/ui/icons/lucide'; // VS Code: codicons de '@ramal/ui/icons/codicons'
-import '@ramal/ui/themes/ramal.css'; // VS Code: '@ramal/ui/themes/vscode.css'
+import { createBridgeClient } from '@git-rudder/bridge';
+import { GraphView, RepoViewProvider } from '@git-rudder/repo-view';
+import { I18nProvider, IconProvider } from '@git-rudder/ui';
+import { lucideIcons } from '@git-rudder/ui/icons/lucide'; // VS Code: codicons de '@git-rudder/ui/icons/codicons'
+import '@git-rudder/ui/themes/git-rudder.css'; // VS Code: '@git-rudder/ui/themes/vscode.css'
 
 const client = createBridgeClient(transport); // TauriTransport o VsCodeTransport
 
@@ -40,7 +40,7 @@ const client = createBridgeClient(transport); // TauriTransport o VsCodeTranspor
 - `useGraphWindow(client, repoId, { pageSize })` da las filas sin la tabla, para otra vista.
 - `graphWindowKey(repoId, pageSize)` sirve para invalidar la cache cuando el motor avise de
   cambios. Todas las claves del paquete empiezan por `'repo-view'`.
-- `ENGINE_ERROR_KEYS` traduce cada `BridgeErrorKind` a su clave de `@ramal/i18n`.
+- `ENGINE_ERROR_KEYS` traduce cada `BridgeErrorKind` a su clave de `@git-rudder/i18n`.
 
 ## Como dibuja
 
@@ -63,9 +63,9 @@ Av Pag, Inicio y Fin mueven la seleccion; Intro activa. La fila activa va por
 ## Comprobaciones
 
 ```sh
-corepack pnpm --filter @ramal/repo-view lint
-corepack pnpm --filter @ramal/repo-view typecheck
-corepack pnpm --filter @ramal/repo-view test:coverage   # 60% minimo
+corepack pnpm --filter @git-rudder/repo-view lint
+corepack pnpm --filter @git-rudder/repo-view typecheck
+corepack pnpm --filter @git-rudder/repo-view test:coverage   # 60% minimo
 ```
 
 Las funciones puras (`src/graph`) tienen sus tests sin React. Los componentes se prueban con un

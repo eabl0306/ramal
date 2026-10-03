@@ -1,8 +1,8 @@
 //! `Engine`: la puerta de los dos hosts. `handle` para un `RpcRequest` entero,
 //! `dispatch` para un metodo con sus parametros.
 
-use ramal_core_application::{DescribeEngine, LoadGraphWindow, OpenRepository};
-use ramal_protocol::{RpcError, RpcRequest, RpcResponse};
+use git_rudder_core_application::{DescribeEngine, LoadGraphWindow, OpenRepository};
+use git_rudder_protocol::{RpcError, RpcRequest, RpcResponse};
 
 use crate::dispatch;
 

@@ -1,8 +1,8 @@
-// Codigo de produccion de @ramal/ui. Solo referencia @ramal/i18n, el unico
+// Codigo de produccion de @git-rudder/ui. Solo referencia @git-rudder/i18n, el unico
 // paquete del workspace que puede importar (architecture.md 5.2): importar otro
 // rompe `tsc -b` con TS6307 aunque ESLint no estuviera bien configurado.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

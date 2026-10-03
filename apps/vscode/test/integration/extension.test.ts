@@ -1,13 +1,13 @@
 import * as assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-import { PROTOCOL_VERSION } from '@ramal/bridge';
+import { PROTOCOL_VERSION } from '@git-rudder/bridge';
 import * as vscode from 'vscode';
 
 import type { HostProbe } from '../../src/extension/application/use-cases/host-probe';
 
-const EXTENSION_ID = 'ramal.ramal';
-const OPEN_GRAPH = 'ramal.openGraph';
+const EXTENSION_ID = 'git-rudder.git-rudder';
+const OPEN_GRAPH = 'gitRudder.openGraph';
 /** Los commits del repositorio de prueba (scripts/fixture-repo.mjs), del mas nuevo al mas viejo. */
 const SUMMARIES = ['Tercer commit', 'Segundo commit', 'Primer commit'];
 
@@ -68,7 +68,7 @@ async function whenAvailable<T>(call: () => Promise<T>, timeoutMs = 30_000): Pro
 
 /** Mata con SIGKILL los sidecars que cuelgan de este extension host, como una caida. */
 function killSidecar(): void {
-  const output = execFileSync('pgrep', ['-P', String(process.pid), 'ramal-vscode'], {
+  const output = execFileSync('pgrep', ['-P', String(process.pid), 'git-rudder-vscode'], {
     encoding: 'utf8',
   });
   const pids = output.split('\n').filter((line) => line.trim() !== '');
@@ -81,12 +81,13 @@ function graphTabOpen(): boolean {
     .flatMap((group) => group.tabs)
     .some(
       (tab) =>
-        tab.input instanceof vscode.TabInputWebview && tab.input.viewType.endsWith('ramal.graph'),
+        tab.input instanceof vscode.TabInputWebview &&
+        tab.input.viewType.endsWith('gitRudder.graph'),
     );
 }
 
-suite('Ramal dentro de un VS Code de verdad', () => {
-  test('se activa y registra el comando Ramal: Open Graph', async () => {
+suite('Git Rudder dentro de un VS Code de verdad', () => {
+  test('se activa y registra el comando Git Rudder: Open Graph', async () => {
     await probe();
     const commands = await vscode.commands.getCommands(true);
     assert.ok(commands.includes(OPEN_GRAPH));
@@ -103,7 +104,7 @@ suite('Ramal dentro de un VS Code de verdad', () => {
     const expected = await vscodeGitPath();
     // .vscode-test.mjs configura un git.path que no es el del PATH (salvo en
     // Windows): si VS Code lo respeta, el sidecar solo lo ve si el host se lo pasa.
-    const configured = process.env['RAMAL_IT_GIT_PATH'] ?? '';
+    const configured = process.env['GIT_RUDDER_IT_GIT_PATH'] ?? '';
     if (configured !== '') assert.equal(expected, configured);
     assert.equal(info.git.path, expected);
   });
@@ -122,10 +123,10 @@ suite('Ramal dentro de un VS Code de verdad', () => {
     assert.deepEqual(labels.sort(), ['feature/graph', 'main']);
   });
 
-  test('Ramal: Open Graph abre el panel y el webview pide el grafo al motor', async () => {
+  test('Git Rudder: Open Graph abre el panel y el webview pide el grafo al motor', async () => {
     const host = await probe();
     await vscode.commands.executeCommand(OPEN_GRAPH);
-    await waitFor(graphTabOpen, 'the Ramal Graph tab');
+    await waitFor(graphTabOpen, 'the Git Rudder Graph tab');
     await waitFor(
       () =>
         host

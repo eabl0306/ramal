@@ -1,6 +1,6 @@
 //! Traduccion de `AppError` a problema.
 
-use ramal_api_application::{AppError, ValidationErrors};
+use git_rudder_api_application::{AppError, ValidationErrors};
 use salvo::prelude::StatusCode;
 
 use super::{FieldProblem, Problem};

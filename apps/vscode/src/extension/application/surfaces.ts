@@ -1,10 +1,10 @@
-import { ENGINE_METHODS, type EngineMethod, HOST_METHODS } from '@ramal/bridge';
+import { ENGINE_METHODS, type EngineMethod, HOST_METHODS } from '@git-rudder/bridge';
 
 import type { Surface } from '../../shared/messages';
 
 /**
  * Metodos del motor que puede pedir cada superficie (architecture.md 6.7). Va
- * tipado contra `EngineMethod`, la lista generada desde `ramal-protocol`: un
+ * tipado contra `EngineMethod`, la lista generada desde `git-rudder-protocol`: un
  * metodo que desaparece del motor deja de compilar aqui.
  *
  * `repo/open` y `engine/info` no estan en ninguna: solo los llama el host. El

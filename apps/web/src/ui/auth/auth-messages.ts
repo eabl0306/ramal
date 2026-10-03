@@ -1,10 +1,10 @@
-import type { AuthFieldError } from '@ramal/domain';
-import type { PlainKey } from '@ramal/i18n';
+import type { AuthFieldError } from '@git-rudder/domain';
+import type { PlainKey } from '@git-rudder/i18n';
 
 import type { AuthFailure } from '../../application/ports/auth-gateway';
 
 /**
- * De codigo a texto. @ramal/domain y los adaptadores devuelven codigos estables;
+ * De codigo a texto. @git-rudder/domain y los adaptadores devuelven codigos estables;
  * el texto depende del idioma y lo pone la interfaz. Al ser Record, un codigo
  * nuevo sin traduccion no compila.
  */

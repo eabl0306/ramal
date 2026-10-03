@@ -5,9 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { type EngineBinaryInput, engineBinaryName, resolveEngineBinary } from './engine-binary';
 
 const EXTENSION = path.join('/repo', 'apps', 'vscode');
-const PACKAGED = path.join(EXTENSION, 'dist', 'bin', 'ramal-vscode-engine');
-const DEBUG = path.join('/repo', 'target', 'debug', 'ramal-vscode-engine');
-const RELEASE = path.join('/repo', 'target', 'release', 'ramal-vscode-engine');
+const PACKAGED = path.join(EXTENSION, 'dist', 'bin', 'git-rudder-vscode-engine');
+const DEBUG = path.join('/repo', 'target', 'debug', 'git-rudder-vscode-engine');
+const RELEASE = path.join('/repo', 'target', 'release', 'git-rudder-vscode-engine');
 
 function input(overrides: Partial<EngineBinaryInput>): EngineBinaryInput {
   return {
@@ -53,7 +53,7 @@ describe('binario del motor', () => {
   });
 
   it('en Windows el binario lleva .exe', () => {
-    expect(engineBinaryName('win32')).toBe('ramal-vscode-engine.exe');
-    expect(engineBinaryName('darwin')).toBe('ramal-vscode-engine');
+    expect(engineBinaryName('win32')).toBe('git-rudder-vscode-engine.exe');
+    expect(engineBinaryName('darwin')).toBe('git-rudder-vscode-engine');
   });
 });

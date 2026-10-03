@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
 /**
- * Componentes con Testing Library sobre jsdom. @ramal/ui no es nucleo: el umbral
+ * Componentes con Testing Library sobre jsdom. @git-rudder/ui no es nucleo: el umbral
  * es el global del monorepo, 60%. Los ficheros de solo tipos y el indice no
  * tienen logica que medir.
  */

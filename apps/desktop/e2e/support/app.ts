@@ -28,7 +28,7 @@ export async function openApp(page: Page, scenario: E2eScenario): Promise<Opened
     errors.push(error.message);
   });
   await page.addInitScript((value) => {
-    window.__RAMAL_E2E__ = value;
+    window.__GIT_RUDDER_E2E__ = value;
   }, scenario);
   await page.addInitScript({ path: path.join(IPC_MOCK_DIR, IPC_MOCK_FILE) });
   await page.goto('/');
@@ -37,5 +37,5 @@ export async function openApp(page: Page, scenario: E2eScenario): Promise<Opened
 
 /** Lo que el webview ha pedido al host hasta ahora. */
 export function hostCalls(page: Page): Promise<E2eCall[]> {
-  return page.evaluate(() => window.__RAMAL_E2E_CALLS__ ?? []);
+  return page.evaluate(() => window.__GIT_RUDDER_E2E_CALLS__ ?? []);
 }

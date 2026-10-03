@@ -1,4 +1,4 @@
-import type { GraphRow } from '@ramal/bridge';
+import type { GraphRow } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { COMFORTABLE, graphEdge, graphRow } from '../test/fixtures';

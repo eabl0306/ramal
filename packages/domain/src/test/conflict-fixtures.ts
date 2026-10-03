@@ -1,7 +1,7 @@
 import type { ConflictFile, ConflictLabels } from '../conflict/model';
 
 /**
- * Los dos ficheros en conflicto del prototipo (ramal-data.js, CF), con los que
+ * Los dos ficheros en conflicto del prototipo (git-rudder-data.js, CF), con los que
  * el analisis de datos verifico las salidas esperadas.
  */
 

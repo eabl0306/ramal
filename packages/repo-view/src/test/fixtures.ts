@@ -1,5 +1,5 @@
-import type { GraphEdge, GraphRow, GraphWindow, RefLabel } from '@ramal/bridge';
-import { DENSITIES } from '@ramal/ui';
+import type { GraphEdge, GraphRow, GraphWindow, RefLabel } from '@git-rudder/bridge';
+import { DENSITIES } from '@git-rudder/ui';
 
 import type { GraphMetrics } from '../graph/geometry';
 

@@ -12,7 +12,7 @@ pila del servidor con un comando, con recarga en caliente y con los puertos a ma
 produccion se quiere una imagen pequena, sin toolchain dentro, sin codigo montado, que no corra
 como root y que sepa decir si esta sana.
 
-Solo la API, la web y su base de datos se dockerizan. Ramal Desktop y la extension de VS Code
+Solo la API, la web y su base de datos se dockerizan. Git Rudder Desktop y la extension de VS Code
 se compilan con sus toolchains y se distribuyen como instaladores y VSIX
 ([ADR 0016](0016-actualizaciones-y-descargas.md)).
 
@@ -43,10 +43,10 @@ por su lado; nadie probaba la pila compuesta entrando por la puerta de verdad.
   workspace de Cargo con su `Cargo.lock` y el lockfile de pnpm
   ([ADR 0001](0001-monorepo-poliglota.md)).
 - Todos los puertos y credenciales salen de `.env`, con valores por defecto.
-- Los puertos se publican solo en `127.0.0.1` (`RAMAL_BIND_IP`). Docker abre los puertos
+- Los puertos se publican solo en `127.0.0.1` (`GIT_RUDDER_BIND_IP`). Docker abre los puertos
   publicados saltandose el cortafuegos de la maquina: sin IP, PostgreSQL con la contrasena por
   defecto quedaria abierto a toda la red local. Quien necesite entrar desde otra maquina pone
-  `RAMAL_BIND_IP=0.0.0.0` en su `.env`.
+  `GIT_RUDDER_BIND_IP=0.0.0.0` en su `.env`.
 
 ### El gateway enruta por prefijo, y el orden importa
 
@@ -88,8 +88,8 @@ pieza no puede ver. La senal de fallo que busca es `text/html` en una ruta de la
 | Una ruta profunda de la SPA                 | 200 con HTML (el fallback de la SPA)                                                                                              |
 
 `just stack-smoke` levanta una pila completa aparte, corre el script y la tira. Va en su propio
-proyecto de compose (`ramal-smoke`) y con los puertos que elige Docker, asi que no toca la pila
-de desarrollo (proyecto `ramal`): ni sus contenedores, ni sus puertos, ni sus volumenes. Cuando
+proyecto de compose (`git-rudder-smoke`) y con los puertos que elige Docker, asi que no toca la pila
+de desarrollo (proyecto `git-rudder`): ni sus contenedores, ni sus puertos, ni sus volumenes. Cuando
 compartia proyecto, su `down -v` borraba la base local en cada `just ci`. En la CI, `stack.yml`
 levanta la pila con credenciales efimeras, corre los e2e de Playwright por el gateway
 (`just e2e-stack`) y despues `just smoke` en cada PR que toca la pila
@@ -118,7 +118,7 @@ probar es la de produccion.
   `X-Frame-Options: DENY` en toda respuesta de la web y de la API para que ninguna pagina (la de
   autorizar una app, la de activar un codigo, el reinicio de la boveda o el borrado de la cuenta)
   se pueda cargar dentro de un marco ajeno; no reenvia `/swagger-ui` (la API ya la deja apagada
-  sin `RAMAL__SERVER__SWAGGER_UI=true`, asi que no depende de esto), y desactiva el
+  sin `GIT_RUDDER__SERVER__SWAGGER_UI=true`, asi que no depende de esto), y desactiva el
   buffer en la ruta del proxy de IA para que el streaming SSE llegue a medida que se genera (la
   API manda ademas `X-Accel-Buffering: no`). Su limite de cuerpo queda por encima del mayor de la
   API (2 MiB, la foto de perfil y la rotacion de la boveda); los limites exactos por endpoint los
@@ -128,7 +128,7 @@ probar es la de produccion.
 
 Este ADR fija las imagenes y la forma de la pila, no el destino. El destino lo decide
 [ADR 0023](0023-despliegue-en-apps-01-y-dominio.md): la instancia compartida `apps-01`, detras de su
-Caddy, con la web en `ramal.bahoque.com` y la API tambien en `api.ramal.bahoque.com` para los
+Caddy, con la web en `git-rudder.com` y la API tambien en `api.git-rudder.com` para los
 clientes nativos. La web sigue llamando a la API por su mismo origen, asi que nada de lo de arriba
 cambia.
 
@@ -146,7 +146,7 @@ A favor:
 En contra:
 
 - La primera compilacion de la imagen de desarrollo de la API tarda varios minutos: instala
-  `cargo-watch` y compila `ramal-api` con todas sus dependencias. Despues queda en la cache del
+  `cargo-watch` y compila `git-rudder-api` con todas sus dependencias. Despues queda en la cache del
   volumen.
 - El bind mount del codigo es rapido en Linux y lento en macOS y Windows. Quien desarrolle ahi
   seguramente prefiera `cargo run` en local contra `just db-up`.

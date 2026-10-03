@@ -1,5 +1,5 @@
 // Generado por scripts/generate-params.mjs desde src/locales/es. No editar a mano:
-// corepack pnpm --filter @ramal/i18n generate
+// corepack pnpm --filter @git-rudder/i18n generate
 export const PARAMS = {
   'conflict.count': ['count'],
   'conflict.duplicates': ['count'],

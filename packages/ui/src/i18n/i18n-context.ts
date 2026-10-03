@@ -1,8 +1,8 @@
-import type { Locale, Translate } from '@ramal/i18n';
+import type { Locale, Translate } from '@git-rudder/i18n';
 import { createContext, use } from 'react';
 
 /**
- * El enlace de @ramal/i18n con React. Vive en @ramal/ui, y no en @ramal/i18n,
+ * El enlace de @git-rudder/i18n con React. Vive en @git-rudder/ui, y no en @git-rudder/i18n,
  * para que el paquete de textos siga sin dependencias y lo pueda usar el
  * extension host de VS Code.
  */

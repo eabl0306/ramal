@@ -1,7 +1,7 @@
 // Opciones comunes de esbuild para el codigo que corre en el extension host.
 //
 // `vscode` queda fuera del bundle: lo pone VS Code en tiempo de ejecucion. Todo
-// lo demas (zod, @ramal/i18n, @ramal/bridge) va dentro, asi la VSIX no lleva
+// lo demas (zod, @git-rudder/i18n, @git-rudder/bridge) va dentro, asi la VSIX no lleva
 // node_modules (`vsce package --no-dependencies`).
 
 /** Node del Electron de VS Code 1.138. */

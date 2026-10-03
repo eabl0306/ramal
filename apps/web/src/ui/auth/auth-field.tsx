@@ -1,4 +1,4 @@
-import { TextField, type TextFieldProps } from '@ramal/ui';
+import { TextField, type TextFieldProps } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 /**

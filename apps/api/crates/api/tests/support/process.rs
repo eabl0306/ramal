@@ -1,16 +1,16 @@
-//! El binario `ramal-api` lanzado como proceso, como lo lanza un contenedor.
+//! El binario `git-rudder-api` lanzado como proceso, como lo lanza un contenedor.
 
 use std::net::{SocketAddr, TcpListener, TcpStream};
 use std::process::{Child, Command, ExitStatus, Output, Stdio};
 use std::time::{Duration, Instant};
 
 /// Ruta del binario que cargo compila para los tests de este paquete.
-const BINARY: &str = env!("CARGO_BIN_EXE_ramal-api");
+const BINARY: &str = env!("CARGO_BIN_EXE_git-rudder-api");
 
 /// Base de datos a la que nadie responde: el puerto 1 rechaza la conexion.
-pub const UNREACHABLE_DATABASE: &str = "postgres://ramal:ramal@127.0.0.1:1/ramal";
+pub const UNREACHABLE_DATABASE: &str = "postgres://git_rudder:git_rudder@127.0.0.1:1/git_rudder";
 
-/// Orden del binario sin las variables `RAMAL__` del entorno de los tests.
+/// Orden del binario sin las variables `GIT_RUDDER__` del entorno de los tests.
 ///
 /// `just` carga `.env` y la configuracion rechaza claves desconocidas, asi que
 /// heredar el entorno haria que el resultado dependiera de la maquina. El resto
@@ -19,7 +19,7 @@ pub const UNREACHABLE_DATABASE: &str = "postgres://ramal:ramal@127.0.0.1:1/ramal
 pub fn command() -> Command {
     let mut command = Command::new(BINARY);
     for (key, _) in std::env::vars_os() {
-        if key.to_string_lossy().starts_with("RAMAL__") {
+        if key.to_string_lossy().starts_with("GIT_RUDDER__") {
             command.env_remove(key);
         }
     }
@@ -56,16 +56,16 @@ impl ApiProcess {
         Self::start_with(database_url, &[])
     }
 
-    /// Como [`Self::start`], con variables `RAMAL__` extra.
+    /// Como [`Self::start`], con variables `GIT_RUDDER__` extra.
     pub fn start_with(database_url: &str, extra: &[(&str, &str)]) -> Self {
         let port = free_port();
         let child = command()
             .envs(extra.iter().copied())
-            .env("RAMAL__SERVER__HOST", "127.0.0.1")
-            .env("RAMAL__SERVER__PORT", port.to_string())
-            .env("RAMAL__DATABASE__URL", database_url)
-            .env("RAMAL__DATABASE__ACQUIRE_TIMEOUT_MS", "500")
-            .env("RAMAL__TELEMETRY__LOG_LEVEL", "warn")
+            .env("GIT_RUDDER__SERVER__HOST", "127.0.0.1")
+            .env("GIT_RUDDER__SERVER__PORT", port.to_string())
+            .env("GIT_RUDDER__DATABASE__URL", database_url)
+            .env("GIT_RUDDER__DATABASE__ACQUIRE_TIMEOUT_MS", "500")
+            .env("GIT_RUDDER__TELEMETRY__LOG_LEVEL", "warn")
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
@@ -86,7 +86,7 @@ impl ApiProcess {
         while TcpStream::connect_timeout(&address, Duration::from_millis(200)).is_err() {
             assert!(
                 Instant::now() < deadline,
-                "ramal-api did not listen on {address} within 30s"
+                "git-rudder-api did not listen on {address} within 30s"
             );
             std::thread::sleep(Duration::from_millis(100));
         }
@@ -106,7 +106,7 @@ impl ApiProcess {
             }
             assert!(
                 Instant::now() < deadline,
-                "ramal-api did not stop within 20s of SIGTERM"
+                "git-rudder-api did not stop within 20s of SIGTERM"
             );
             std::thread::sleep(Duration::from_millis(50));
         }

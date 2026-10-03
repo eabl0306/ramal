@@ -2,7 +2,7 @@
 // incluirlo, asi cada fichero de src se comprueba una sola vez y con las reglas
 // de pureza de tsconfig.lib.json.
 {
-  "extends": "@ramal/tsconfig/node.json",
+  "extends": "@git-rudder/tsconfig/node.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

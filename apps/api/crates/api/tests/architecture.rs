@@ -4,7 +4,7 @@
 //! grafo de dependencias y comprueba las reglas de la seccion 5.1 de
 //! docs/architecture.md: lista blanca directa en el nucleo, lista negra
 //! transitiva en todos y ningun cruce entre la familia del servidor y la del
-//! cliente salvo `ramal-ai`. `Cargo.lock` incluye las dev-dependencies, asi que
+//! cliente salvo `git-rudder-ai`. `Cargo.lock` incluye las dev-dependencies, asi que
 //! las reglas cubren tambien los tests.
 
 #![allow(
@@ -26,15 +26,15 @@ use support::lockfile::{Graph, graph, parse, transitive_closure};
 
 /// Crates del servidor.
 const SERVER_CRATES: &[&str] = &[
-    "ramal-api-domain",
-    "ramal-api-application",
-    "ramal-api-infrastructure",
-    "ramal-api-http",
-    "ramal-api",
+    "git-rudder-api-domain",
+    "git-rudder-api-application",
+    "git-rudder-api-infrastructure",
+    "git-rudder-api-http",
+    "git-rudder-api",
 ];
 
 /// Biblioteca neutral: la unica arista permitida entre familias.
-const NEUTRAL_CRATES: &[&str] = &["ramal-ai"];
+const NEUTRAL_CRATES: &[&str] = &["git-rudder-ai"];
 
 /// Infraestructura que el nucleo no puede alcanzar ni de forma transitiva.
 ///
@@ -66,17 +66,17 @@ const DOMAIN_ALLOWED: &[&str] = &["chrono", "thiserror", "uuid"];
 const APPLICATION_ALLOWED: &[&str] = &[
     "async-trait",
     "chrono",
-    "ramal-api-domain",
+    "git-rudder-api-domain",
     "thiserror",
     "uuid",
 ];
 
 fn is_server_crate(name: &str) -> bool {
-    name == "ramal-api" || name.starts_with("ramal-api-")
+    name == "git-rudder-api" || name.starts_with("git-rudder-api-")
 }
 
 fn is_client_crate(name: &str) -> bool {
-    name.starts_with("ramal-") && !is_server_crate(name) && !NEUTRAL_CRATES.contains(&name)
+    name.starts_with("git-rudder-") && !is_server_crate(name) && !NEUTRAL_CRATES.contains(&name)
 }
 
 fn assert_never_reaches(graph: &Graph, owner: &str, forbidden: &[&str]) {
@@ -115,37 +115,41 @@ fn the_lock_file_describes_every_server_crate() {
 #[test]
 fn the_parser_sees_real_edges() {
     let graph = graph();
-    let http = transitive_closure(&graph, "ramal-api-http");
+    let http = transitive_closure(&graph, "git-rudder-api-http");
     assert!(
         http.contains("salvo"),
         "the http adapter should reach salvo"
     );
-    let infrastructure = transitive_closure(&graph, "ramal-api-infrastructure");
+    let infrastructure = transitive_closure(&graph, "git-rudder-api-infrastructure");
     assert!(
         infrastructure.contains("sqlx"),
         "the persistence adapter should reach sqlx"
     );
-    let binary = transitive_closure(&graph, "ramal-api");
+    let binary = transitive_closure(&graph, "git-rudder-api");
     assert!(
-        binary.contains("ramal-api-domain"),
+        binary.contains("git-rudder-api-domain"),
         "the binary should reach the domain"
     );
 }
 
 #[test]
 fn the_domain_only_declares_pure_libraries() {
-    assert_direct_dependencies_are_allowed(&graph(), "ramal-api-domain", DOMAIN_ALLOWED);
+    assert_direct_dependencies_are_allowed(&graph(), "git-rudder-api-domain", DOMAIN_ALLOWED);
 }
 
 #[test]
 fn the_application_only_declares_the_domain_and_pure_libraries() {
-    assert_direct_dependencies_are_allowed(&graph(), "ramal-api-application", APPLICATION_ALLOWED);
+    assert_direct_dependencies_are_allowed(
+        &graph(),
+        "git-rudder-api-application",
+        APPLICATION_ALLOWED,
+    );
 }
 
 #[test]
 fn the_core_never_reaches_infrastructure() {
     let graph = graph();
-    for core in ["ramal-api-domain", "ramal-api-application"] {
+    for core in ["git-rudder-api-domain", "git-rudder-api-application"] {
         assert_never_reaches(&graph, core, CORE_FORBIDDEN);
     }
 }
@@ -154,8 +158,8 @@ fn the_core_never_reaches_infrastructure() {
 fn the_persistence_adapter_never_reaches_http() {
     assert_never_reaches(
         &graph(),
-        "ramal-api-infrastructure",
-        &["salvo", "salvo_core", "salvo-oapi", "ramal-api-http"],
+        "git-rudder-api-infrastructure",
+        &["salvo", "salvo_core", "salvo-oapi", "git-rudder-api-http"],
     );
 }
 
@@ -163,12 +167,12 @@ fn the_persistence_adapter_never_reaches_http() {
 fn the_http_adapter_never_reaches_sql() {
     assert_never_reaches(
         &graph(),
-        "ramal-api-http",
+        "git-rudder-api-http",
         &[
             "sqlx",
             "sqlx-core",
             "sqlx-postgres",
-            "ramal-api-infrastructure",
+            "git-rudder-api-infrastructure",
         ],
     );
 }
@@ -185,7 +189,7 @@ fn no_server_crate_reaches_the_client_family() {
         assert!(
             leaked.is_empty(),
             "`{owner}` reaches the client crates {leaked:?}. The hexagon leaks: only \
-             `ramal-ai` may be shared, and the HTTP contract is modelled on each side."
+             `git-rudder-ai` may be shared, and the HTTP contract is modelled on each side."
         );
     }
 }
@@ -208,7 +212,7 @@ fn no_client_crate_reaches_the_server_family() {
 }
 
 #[test]
-fn the_neutral_library_depends_on_no_ramal_crate() {
+fn the_neutral_library_depends_on_no_git_rudder_crate() {
     let graph = graph();
     for neutral in NEUTRAL_CRATES
         .iter()
@@ -216,8 +220,10 @@ fn the_neutral_library_depends_on_no_ramal_crate() {
     {
         let reachable = transitive_closure(&graph, neutral);
         assert!(
-            reachable.iter().all(|name| !name.starts_with("ramal-")),
-            "`{neutral}` must not depend on any ramal crate: it is shared by both hexagons"
+            reachable
+                .iter()
+                .all(|name| !name.starts_with("git-rudder-")),
+            "`{neutral}` must not depend on any git-rudder crate: it is shared by both hexagons"
         );
     }
 }

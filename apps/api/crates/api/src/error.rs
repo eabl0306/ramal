@@ -2,9 +2,9 @@
 
 use std::path::PathBuf;
 
-use ramal_api_domain::ServiceVersionError;
-use ramal_api_http::ServeError;
-use ramal_api_infrastructure::{ConfigError, PersistenceError};
+use git_rudder_api_domain::ServiceVersionError;
+use git_rudder_api_http::ServeError;
+use git_rudder_api_infrastructure::{ConfigError, PersistenceError};
 use thiserror::Error;
 
 /// Motivos por los que el binario no llega a hacer su trabajo.

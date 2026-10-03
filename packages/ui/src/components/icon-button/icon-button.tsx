@@ -19,7 +19,7 @@ export interface IconButtonProps extends Omit<
   'className' | 'style' | 'children' | 'aria-label'
 > {
   readonly icon: IconName;
-  /** Obligatorio: un boton sin texto necesita nombre accesible. Viene de @ramal/i18n. */
+  /** Obligatorio: un boton sin texto necesita nombre accesible. Viene de @git-rudder/i18n. */
   readonly label: string;
   readonly variant?: IconButtonVariant;
   readonly size?: IconButtonSize;

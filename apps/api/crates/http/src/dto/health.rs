@@ -1,6 +1,6 @@
 //! DTO de respuesta de `/health/live` y `/health/ready`.
 
-use ramal_api_domain::{ComponentHealth, ComponentStatus, HealthReport, HealthStatus};
+use git_rudder_api_domain::{ComponentHealth, ComponentStatus, HealthReport, HealthStatus};
 use salvo::oapi::ToSchema;
 use serde::Serialize;
 

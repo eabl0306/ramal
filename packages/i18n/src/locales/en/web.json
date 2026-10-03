@@ -10,7 +10,7 @@
   "hero": {
     "tag": "Line-by-line conflict resolution",
     "title": "A Git client for all your repositories and all your accounts",
-    "subtitle": "Ramal shows the history of every branch, resolves conflicts line by line and works with GitHub, GitLab, Bitbucket, Gitea and Azure DevOps at once, with several accounts on each platform.",
+    "subtitle": "Git Rudder shows the history of every branch, resolves conflicts line by line and works with GitHub, GitLab, Bitbucket, Gitea and Azure DevOps at once, with several accounts on each platform.",
     "downloadFor": "Download for {platform}",
     "allPlatforms": "All platforms",
     "vscodeLink": "Also available as a VS Code extension"
@@ -47,8 +47,8 @@
   },
   "vscode": {
     "kicker": "EXTENSION",
-    "title": "Ramal inside VS Code",
-    "text": "The graph, pending changes, the conflict resolver and AI, for the repository you have open. It uses your editor theme and language and the same Ramal account.",
+    "title": "Git Rudder inside VS Code",
+    "text": "The graph, pending changes, the conflict resolver and AI, for the repository you have open. It uses your editor theme and language and the same Git Rudder account.",
     "install": "Install extension",
     "requirement": "VS Code 1.138 or later. Not available on vscode.dev",
     "marketplace": "VS Code Marketplace",
@@ -56,7 +56,7 @@
   },
   "download": {
     "kicker": "DOWNLOAD",
-    "title": "Download Ramal",
+    "title": "Download Git Rudder",
     "version": "v{version} · {date}",
     "yourSystem": "Your system",
     "requirement": {
@@ -71,7 +71,7 @@
       "linux": "Linux"
     },
     "size": "{size} MB",
-    "mobile": "Ramal is a desktop app. Open this page on your computer to download it.",
+    "mobile": "Git Rudder is a desktop app. Open this page on your computer to download it.",
     "artifact": {
       "appleSiliconDmg": "Apple Silicon (.dmg)",
       "intelDmg": "Intel (.dmg)",
@@ -96,7 +96,7 @@
     }
   },
   "cta": {
-    "title": "Create your Ramal account",
+    "title": "Create your Git Rudder account",
     "text": "With an account your workspaces, linked accounts and preferences sync between the desktop app and VS Code, and you can manage your team from the web."
   },
   "footer": {
@@ -109,7 +109,7 @@
     "loginTitle": "Log in",
     "loginSubtitle": "Access your settings and your team.",
     "signupTitle": "Create account",
-    "signupSubtitle": "Sync Ramal across your machines and work as a team.",
+    "signupSubtitle": "Sync Git Rudder across your machines and work as a team.",
     "continueWith": "Continue with {provider}",
     "orEmail": "or with email",
     "email": "Email",
@@ -167,7 +167,7 @@
     "localOn": "Local · {device}"
   },
   "accounts": {
-    "subtitle": "Git platform accounts connected to Ramal. Tokens are stored encrypted.",
+    "subtitle": "Git platform accounts connected to Git Rudder. Tokens are stored encrypted.",
     "connect": "Connect",
     "usedIn_one": "{count} repo",
     "usedIn_other": "{count} repos",
@@ -235,7 +235,7 @@
   },
   "status": {
     "title": "Service status",
-    "subtitle": "What the Ramal API is answering right now.",
+    "subtitle": "What the Git Rudder API is answering right now.",
     "loading": "Checking the service…",
     "ok": "Operational",
     "degraded": "Degraded",
@@ -254,6 +254,6 @@
   },
   "notFound": {
     "title": "Page not found",
-    "text": "This address does not exist in Ramal."
+    "text": "This address does not exist in Git Rudder."
   }
 }

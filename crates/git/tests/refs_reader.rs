@@ -11,10 +11,10 @@
 
 mod support;
 
+use git_rudder_core_application::{GitReadError, GitReader};
+use git_rudder_core_domain::{Head, RefName, RefSnapshot, RepoRoot, Sha};
+use git_rudder_git::{GitCliConfig, GitCliReader};
 use pretty_assertions::assert_eq;
-use ramal_core_application::{GitReadError, GitReader};
-use ramal_core_domain::{Head, RefName, RefSnapshot, RepoRoot, Sha};
-use ramal_git::{GitCliConfig, GitCliReader};
 use support::FixtureRepo;
 
 async fn read(repo: &FixtureRepo) -> RefSnapshot {

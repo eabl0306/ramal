@@ -6,8 +6,8 @@
 
 use std::sync::Arc;
 
-use ramal_core_domain::graph::WindowError;
-use ramal_core_domain::{GitRef, Head, RefName, RefSnapshot, RepoId, RepoRoot};
+use git_rudder_core_domain::graph::WindowError;
+use git_rudder_core_domain::{GitRef, Head, RefName, RefSnapshot, RepoId, RepoRoot};
 
 use super::LoadGraphWindow;
 use crate::error::EngineError;
@@ -30,7 +30,7 @@ fn on_main(target: u32) -> RefSnapshot {
     )
 }
 
-fn linear(count: u32) -> Vec<ramal_core_domain::CommitRecord> {
+fn linear(count: u32) -> Vec<git_rudder_core_domain::CommitRecord> {
     (1..=count)
         .map(|id| {
             if id == count {
@@ -51,7 +51,7 @@ struct Setup {
 fn setup(git: FakeGitReader) -> Setup {
     let git = Arc::new(git);
     let registry = Arc::new(OpenRepositories::new());
-    let id = registry.register(RepoRoot::new("/work/ramal"));
+    let id = registry.register(RepoRoot::new("/work/git-rudder"));
     let use_case = LoadGraphWindow::new(git.clone(), registry);
     Setup { git, use_case, id }
 }

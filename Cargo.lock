@@ -1559,6 +1559,169 @@ dependencies = [
 ]
 
 [[package]]
+name = "git-rudder-api"
+version = "0.1.0"
+dependencies = [
+ "git-rudder-api-application",
+ "git-rudder-api-domain",
+ "git-rudder-api-http",
+ "git-rudder-api-infrastructure",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "git-rudder-api-application"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "git-rudder-api-domain",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "git-rudder-api-domain"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "git-rudder-api-http"
+version = "0.1.0"
+dependencies = [
+ "git-rudder-api-application",
+ "git-rudder-api-domain",
+ "salvo",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tokio",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "git-rudder-api-infrastructure"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "figment",
+ "git-rudder-api-application",
+ "git-rudder-api-domain",
+ "serde",
+ "sqlx",
+ "thiserror 2.0.21",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "git-rudder-core-application"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "git-rudder-core-domain",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "git-rudder-core-domain"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "git-rudder-desktop"
+version = "0.1.0"
+dependencies = [
+ "git-rudder-engine",
+ "git-rudder-protocol",
+ "pretty_assertions",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-wdio-webdriver",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "git-rudder-engine"
+version = "0.1.0"
+dependencies = [
+ "git-rudder-core-application",
+ "git-rudder-core-domain",
+ "git-rudder-git",
+ "git-rudder-protocol",
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "git-rudder-git"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "git-rudder-core-application",
+ "git-rudder-core-domain",
+ "pretty_assertions",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "git-rudder-protocol"
+version = "0.1.0"
+dependencies = [
+ "pretty_assertions",
+ "serde",
+ "serde_json",
+ "ts-rs",
+]
+
+[[package]]
+name = "git-rudder-rust-complexity"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "syn 3.0.6",
+ "tempfile",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "git-rudder-vscode-engine"
+version = "0.1.0"
+dependencies = [
+ "git-rudder-engine",
+ "git-rudder-protocol",
+ "pretty_assertions",
+ "serde_json",
+ "tempfile",
+ "thiserror 2.0.21",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "glib"
 version = "0.18.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3324,169 +3487,6 @@ name = "r-efi"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
-
-[[package]]
-name = "ramal-api"
-version = "0.1.0"
-dependencies = [
- "ramal-api-application",
- "ramal-api-domain",
- "ramal-api-http",
- "ramal-api-infrastructure",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "ramal-api-application"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "ramal-api-domain",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "ramal-api-domain"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "ramal-api-http"
-version = "0.1.0"
-dependencies = [
- "ramal-api-application",
- "ramal-api-domain",
- "salvo",
- "serde",
- "serde_json",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "ramal-api-infrastructure"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "figment",
- "ramal-api-application",
- "ramal-api-domain",
- "serde",
- "sqlx",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "ramal-core-application"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "ramal-core-domain",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "ramal-core-domain"
-version = "0.1.0"
-dependencies = [
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "ramal-desktop"
-version = "0.1.0"
-dependencies = [
- "pretty_assertions",
- "ramal-engine",
- "ramal-protocol",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-wdio-webdriver",
- "tempfile",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "ramal-engine"
-version = "0.1.0"
-dependencies = [
- "pretty_assertions",
- "ramal-core-application",
- "ramal-core-domain",
- "ramal-git",
- "ramal-protocol",
- "serde",
- "serde_json",
- "tempfile",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "ramal-git"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "pretty_assertions",
- "ramal-core-application",
- "ramal-core-domain",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "ramal-protocol"
-version = "0.1.0"
-dependencies = [
- "pretty_assertions",
- "serde",
- "serde_json",
- "ts-rs",
-]
-
-[[package]]
-name = "ramal-rust-complexity"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "syn 3.0.6",
- "tempfile",
- "thiserror 2.0.21",
-]
-
-[[package]]
-name = "ramal-vscode-engine"
-version = "0.1.0"
-dependencies = [
- "pretty_assertions",
- "ramal-engine",
- "ramal-protocol",
- "serde_json",
- "tempfile",
- "thiserror 2.0.21",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
 
 [[package]]
 name = "rand"

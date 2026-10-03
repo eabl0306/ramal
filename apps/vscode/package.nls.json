@@ -1,8 +1,8 @@
 {
   "extension.description": "The commit graph of your repository, with your editor's theme and language.",
   "command.openGraph.title": "Open Graph",
-  "view.welcome.name": "Ramal",
-  "view.welcome.contents": "See the commit graph of the repository you have open.\n[Open Graph](command:ramal.openGraph)",
-  "config.engine.path": "Path to a `ramal-vscode-engine` binary. Only used when developing the extension (Extension Development Host); installed extensions always run the engine they ship with.",
-  "config.engine.logLevel": "How much the Ramal engine writes to the \"Ramal Engine\" output channel."
+  "view.welcome.name": "Git Rudder",
+  "view.welcome.contents": "See the commit graph of the repository you have open.\n[Open Graph](command:gitRudder.openGraph)",
+  "config.engine.path": "Path to a `git-rudder-vscode-engine` binary. Only used when developing the extension (Extension Development Host); installed extensions always run the engine they ship with.",
+  "config.engine.logLevel": "How much the Git Rudder engine writes to the \"Git Rudder Engine\" output channel."
 }

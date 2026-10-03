@@ -1,7 +1,7 @@
-# Ramal
+# Git Rudder
 
-Cliente de Git con tres productos que comparten cuenta: Ramal Desktop (Tauri), Ramal for
-VS Code y Ramal Web. Por debajo hay una API en Rust y un solo motor de Git, tambien en Rust, que
+Cliente de Git con tres productos que comparten cuenta: Git Rudder Desktop (Tauri), Git Rudder for
+VS Code y Git Rudder Web. Por debajo hay una API en Rust y un solo motor de Git, tambien en Rust, que
 usan escritorio y VS Code.
 
 El primer corte esta hecho: abrir un repositorio y ver su grafo funciona en escritorio y en
@@ -56,8 +56,8 @@ en [su README](apps/vscode/README.md).
 ```
 apps/api            API en Rust (Salvo + SQLx). Cinco crates, uno por capa.
 apps/web            Web en React Router 8: landing prerenderizada y SPA.
-apps/desktop        Ramal Desktop: Tauri 2 con el motor en el mismo proceso.
-apps/vscode         Ramal for VS Code: extension host y webviews.
+apps/desktop        Git Rudder Desktop: Tauri 2 con el motor en el mismo proceso.
+apps/vscode         Git Rudder for VS Code: extension host y webviews.
 apps/vscode-engine  El motor como proceso hijo de la extension (JSON-RPC por stdio).
 crates/             El motor de Git, compartido por escritorio y VS Code.
 packages/           TypeScript compartido: dominio de interfaz, textos, UI, vista del
@@ -125,5 +125,5 @@ El detalle esta en el [ADR 0005](docs/adr/0005-enforcement-automatizado.md).
 ## Licencia
 
 [FSL-1.1-ALv2](LICENSE.md): el codigo se puede leer, usar y modificar salvo para un producto que
-compita con Ramal, y cada version pasa a Apache 2.0 a los dos anos. El porque esta en el
+compita con Git Rudder, y cada version pasa a Apache 2.0 a los dos anos. El porque esta en el
 [ADR 0021](docs/adr/0021-licencia-fsl.md).

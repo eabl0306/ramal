@@ -1,5 +1,5 @@
-import { BRIDGE_ERROR_KINDS, BridgeError } from '@ramal/bridge';
-import { createTranslator } from '@ramal/i18n';
+import { BRIDGE_ERROR_KINDS, BridgeError } from '@git-rudder/bridge';
+import { createTranslator } from '@git-rudder/i18n';
 import { describe, expect, it } from 'vitest';
 
 import { graphWindow, linearRows } from '../test/fixtures';

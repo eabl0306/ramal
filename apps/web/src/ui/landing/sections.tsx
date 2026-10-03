@@ -1,5 +1,5 @@
-import type { PlainKey } from '@ramal/i18n';
-import { useT } from '@ramal/ui';
+import type { PlainKey } from '@git-rudder/i18n';
+import { useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 import { Link } from 'react-router';
 

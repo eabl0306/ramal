@@ -119,11 +119,11 @@ jobs:
           file: apps/web/Dockerfile
           push: false
           load: true
-          tags: ramal-web:ci
+          tags: git-rudder-web:ci
           cache-from: type=gha,scope=web
           cache-to: type=gha,scope=web,mode=max
 
       # Construir no prueba nada: un nginx.conf roto compila igual de bien. Se
       # arranca y se comprueba lo que sirve (just web-docker-smoke en local).
       - name: Prueba de humo de la imagen
-        run: bash apps/web/scripts/smoke-image.sh ramal-web:ci
+        run: bash apps/web/scripts/smoke-image.sh git-rudder-web:ci

@@ -1,14 +1,14 @@
 {
-  "name": "ramal",
-  "displayName": "Ramal",
+  "name": "git-rudder",
+  "displayName": "Git Rudder",
   "description": "%extension.description%",
   "version": "0.1.0",
   "license": "FSL-1.1-ALv2",
-  "publisher": "ramal",
+  "publisher": "git-rudder",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/eabl0306/ramal",
+    "url": "https://github.com/eabl0306/git-rudder",
     "directory": "apps/vscode"
   },
   "type": "module",
@@ -37,55 +37,55 @@
   "contributes": {
     "commands": [
       {
-        "command": "ramal.openGraph",
+        "command": "gitRudder.openGraph",
         "title": "%command.openGraph.title%",
-        "category": "Ramal",
+        "category": "Git Rudder",
         "icon": "$(git-commit)"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "ramal",
-          "title": "Ramal",
-          "icon": "media/ramal.svg"
+          "id": "git-rudder",
+          "title": "Git Rudder",
+          "icon": "media/git-rudder.svg"
         }
       ]
     },
     "views": {
-      "ramal": [
+      "git-rudder": [
         {
-          "id": "ramal.welcome",
+          "id": "gitRudder.welcome",
           "name": "%view.welcome.name%",
-          "contextualTitle": "Ramal"
+          "contextualTitle": "Git Rudder"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "ramal.welcome",
+        "view": "gitRudder.welcome",
         "contents": "%view.welcome.contents%"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "ramal.openGraph",
-          "when": "view == ramal.welcome",
+          "command": "gitRudder.openGraph",
+          "when": "view == gitRudder.welcome",
           "group": "navigation"
         }
       ]
     },
     "configuration": {
-      "title": "Ramal",
+      "title": "Git Rudder",
       "properties": {
-        "ramal.engine.path": {
+        "gitRudder.engine.path": {
           "type": "string",
           "default": "",
           "scope": "application",
           "markdownDescription": "%config.engine.path%"
         },
-        "ramal.engine.logLevel": {
+        "gitRudder.engine.logLevel": {
           "type": "string",
           "enum": [
             "error",
@@ -115,10 +115,10 @@
     "package": "node scripts/copy-license.mjs && vsce package --no-dependencies"
   },
   "dependencies": {
-    "@ramal/bridge": "workspace:*",
-    "@ramal/i18n": "workspace:*",
-    "@ramal/repo-view": "workspace:*",
-    "@ramal/ui": "workspace:*",
+    "@git-rudder/bridge": "workspace:*",
+    "@git-rudder/i18n": "workspace:*",
+    "@git-rudder/repo-view": "workspace:*",
+    "@git-rudder/ui": "workspace:*",
     "@tanstack/react-query": "5.104.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -126,8 +126,8 @@
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
-    "@ramal/eslint-config": "workspace:*",
-    "@ramal/tsconfig": "workspace:*",
+    "@git-rudder/eslint-config": "workspace:*",
+    "@git-rudder/tsconfig": "workspace:*",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",

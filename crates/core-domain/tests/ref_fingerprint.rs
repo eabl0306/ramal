@@ -12,7 +12,7 @@
 
 mod support;
 
-use ramal_core_domain::{GitRef, Head, RefName, RefSnapshot};
+use git_rudder_core_domain::{GitRef, Head, RefName, RefSnapshot};
 use support::{git_ref, sha, snapshot_on_branch};
 
 fn main_branch() -> RefName {

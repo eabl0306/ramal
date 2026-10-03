@@ -10,14 +10,14 @@
 prueba en cada nivel, con que herramienta y con que umbral, y que ese umbral rompa el build
 cuando baja.
 
-Ramal lo pone mas dificil que Gastonomo por tres motivos:
+Git Rudder lo pone mas dificil que Gastonomo por tres motivos:
 
 - Un cliente Git se equivoca de formas que solo aparecen con repositorios reales: nombres de
   rama con comas, merges octopus, rebases a medias, finales de linea CRLF, submodulos, punteros
   de LFS. Un fake del puerto no ve nada de eso.
 - Hay dos hosts de escritorio que no son un navegador. Un webview de Tauri y un webview de VS
   Code necesitan su host para funcionar, y los E2E reales sobre ellos son lentos y fragiles.
-- La misma vista (`@ramal/repo-view`) se pinta en dos temas, dos densidades y dos juegos de
+- La misma vista (`@git-rudder/repo-view`) se pinta en dos temas, dos densidades y dos juegos de
   iconos.
 
 La arquitectura hexagonal ayuda como en Gastonomo: los nucleos no tienen dependencias, asi que se
@@ -35,7 +35,7 @@ builds de Vite con el host simulado, y una capa fina de E2E reales.
 | Nivel                  | Herramienta                                                                        | Que                                                                                                                                                              |
 | ---------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Dominio y casos de uso | `cargo test` con fakes del modulo `testing` y `block_on` sin runtime               | Disposicion del grafo (carriles, aristas, ventana), parseo de marcadores de conflicto, validacion del plan de rebase, cada caso de uso contra sus puertos falsos |
-| Adaptador de git       | `cargo test` contra repositorios de prueba creados con el propio git en un tempdir | Cada lectura y escritura de `ramal-git` sobre repos reales, con snapshots de `insta`                                                                             |
+| Adaptador de git       | `cargo test` contra repositorios de prueba creados con el propio git en un tempdir | Cada lectura y escritura de `git-rudder-git` sobre repos reales, con snapshots de `insta`                                                                        |
 | Contrato del motor     | `cargo test` de `dispatch` de punta a punta                                        | Metodo, parametros y resultado serializado contra repos de prueba                                                                                                |
 | Framing del sidecar    | `cargo test` en `apps/vscode-engine`                                               | Marcos `Content-Length`, marcos de mas de 32 MiB, peticiones en paralelo, cierre de stdin                                                                        |
 | Comandos de Tauri      | `tauri::test` (feature `test`)                                                     | Que los comandos estan registrados y serializan. Son de una linea; no hay mas que probar                                                                         |
@@ -55,7 +55,7 @@ deteccion de capacidades se pruebe de verdad.
 
 | Nivel                           | Herramienta                                                                 | Que                                                                                                                                          |
 | ------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Paquetes y componentes          | Vitest con Testing Library                                                  | `@ramal/domain`, `@ramal/repo-view`, pantallas propias                                                                                       |
+| Paquetes y componentes          | Vitest con Testing Library                                                  | `@git-rudder/domain`, `@git-rudder/repo-view`, pantallas propias                                                                             |
 | Flujos de interfaz (la mayoria) | Playwright contra el build de Vite con `mockIPC` de `@tauri-apps/api/mocks` | Grafo y seleccion, staging, reglas de la caja de commit, resolver de conflictos, rebase, menus contextuales, los dos idiomas y los dos temas |
 | E2E real (pocos)                | WebdriverIO con `@wdio/tauri-service`                                       | El binario real sobre repos de prueba: abrir, preparar, hacer commit, merge con conflicto, resolver y push a un remoto desnudo local         |
 
@@ -84,7 +84,7 @@ Los tests de integracion esperan a eventos que expone la extension para los test
 | Dominio, aplicacion y componentes web | Vitest                                                                                                    | Validacion de formularios, casos de uso con puertos escritos a mano, pantallas con adaptadores en memoria                       |
 | Nucleo de la API                      | `cargo test` con fakes y `block_on`                                                                       | Reglas de sesiones, rotacion de refresh tokens, roles, cuotas de IA, idempotencia                                               |
 | Adaptadores de la API                 | `cargo test` contra PostgreSQL real ([ADR 0004](0004-postgresql-con-sqlx.md)) y `salvo::test::TestClient` | Repositorios, disparadores del registro de cambios, endpoints de punta a punta, cifrado de sobre y rotacion de la llave maestra |
-| Contrato                              | Test del documento OpenAPI versionado y tipos generados sin diff                                          | Que `@ramal/api-client` y los tests de contrato de `ramal-cloud-client` ven la API real                                         |
+| Contrato                              | Test del documento OpenAPI versionado y tipos generados sin diff                                          | Que `@git-rudder/api-client` y los tests de contrato de `git-rudder-cloud-client` ven la API real                               |
 | Flujos de interfaz                    | Playwright con la red simulada (`page.route`)                                                             | Landing con deteccion de SO y descargas, pantallas de auth, panel                                                               |
 | Pila compuesta                        | `just stack-smoke` y Playwright contra la pila de Docker                                                  | La web, el gateway, la API y PostgreSQL juntos, sin simular nada                                                                |
 
@@ -103,11 +103,11 @@ verdad y fallan como los demas.
 
 ### Que corre y cuando
 
-| Momento                                      | Que                                                                                                                                                                                                                                                                                                                                             |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `just check` y `pre-push`                    | Unitarios de Rust y de Vitest, tests de `tools/checks`, cobertura                                                                                                                                                                                                                                                                               |
-| Cada PR (CI)                                 | Todo lo anterior, tests de PostgreSQL con `RAMAL_TEST_REQUIRE_DATABASE=1`, suite del motor con git 2.34 y con la ultima, Playwright de las tres apps con el host simulado, integracion de VS Code bajo xvfb, E2E real de escritorio en Linux si cambia escritorio o el motor, tipos generados sin diff y la pila compuesta con `smoke-stack.sh` |
-| Cada noche y antes de publicar (planificado) | E2E real de escritorio en Windows y macOS, y Playwright de flujos completos contra la pila de Docker (registro, login, workspaces, cuentas ligadas con un proveedor falso, invitaciones)                                                                                                                                                        |
+| Momento                                      | Que                                                                                                                                                                                                                                                                                                                                                  |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `just check` y `pre-push`                    | Unitarios de Rust y de Vitest, tests de `tools/checks`, cobertura                                                                                                                                                                                                                                                                                    |
+| Cada PR (CI)                                 | Todo lo anterior, tests de PostgreSQL con `GIT_RUDDER_TEST_REQUIRE_DATABASE=1`, suite del motor con git 2.34 y con la ultima, Playwright de las tres apps con el host simulado, integracion de VS Code bajo xvfb, E2E real de escritorio en Linux si cambia escritorio o el motor, tipos generados sin diff y la pila compuesta con `smoke-stack.sh` |
+| Cada noche y antes de publicar (planificado) | E2E real de escritorio en Windows y macOS, y Playwright de flujos completos contra la pila de Docker (registro, login, workspaces, cuentas ligadas con un proveedor falso, invitaciones)                                                                                                                                                             |
 
 La pila compuesta va en cada PR, no a mano como acabo en Gastonomo: su ADR 0006 la dejo fuera de
 la CI por lo que tardaba, y fue el unico test que habria cazado un prefijo del gateway olvidado
@@ -115,18 +115,18 @@ la CI por lo que tardaba, y fue el unico test que habria cazado un prefijo del g
 
 ### Umbrales
 
-| Ambito                                                                                                                                                         | Minimo        |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| Nucleos de Rust (`ramal-core-domain`, `ramal-core-application`, `ramal-api-domain`, `ramal-api-application`)                                                   | 80% de lineas |
-| Nucleos de TypeScript (`@ramal/domain`, `@ramal/i18n`, `@ramal/bridge`, `domain` y `application` de la web, `application` del escritorio y del extension host) | 80% de lineas |
-| Global de cada pieza                                                                                                                                           | 60% de lineas |
+| Ambito                                                                                                                                                                        | Minimo        |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| Nucleos de Rust (`git-rudder-core-domain`, `git-rudder-core-application`, `git-rudder-api-domain`, `git-rudder-api-application`)                                              | 80% de lineas |
+| Nucleos de TypeScript (`@git-rudder/domain`, `@git-rudder/i18n`, `@git-rudder/bridge`, `domain` y `application` de la web, `application` del escritorio y del extension host) | 80% de lineas |
+| Global de cada pieza                                                                                                                                                          | 60% de lineas |
 
 Herramientas: `cargo-llvm-cov` y la cobertura v8 de Vitest con umbrales por glob. Bajar del
 umbral rompe la CI.
 
 **Los composition root tambien se cubren.** Gastonomo no podia medir su crate binario porque
-`cargo-llvm-cov` no genera datos para un binario que ningun test enlaza. En Ramal el bootstrap de
-`ramal-api`, `ramal-vscode-engine` y `ramal-desktop` es una funcion de biblioteca y `main.rs` es
+`cargo-llvm-cov` no genera datos para un binario que ningun test enlaza. En Git Rudder el bootstrap de
+`git-rudder-api`, `git-rudder-vscode-engine` y `git-rudder-desktop` es una funcion de biblioteca y `main.rs` es
 una llamada; un test de arranque en `tests/` la ejecuta con configuracion de prueba.
 
 ### Reglas

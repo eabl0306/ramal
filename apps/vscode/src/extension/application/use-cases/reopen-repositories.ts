@@ -1,4 +1,4 @@
-import type { Translate } from '@ramal/i18n';
+import type { Translate } from '@git-rudder/i18n';
 
 import { callEngine } from '../call-engine';
 import { EngineCallError, describeError, errorKey } from '../engine-errors';

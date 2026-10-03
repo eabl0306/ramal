@@ -11,7 +11,7 @@
 
 mod support;
 
-use ramal_core_domain::graph::layout;
+use git_rudder_core_domain::graph::layout;
 use support::{lanes, node, nodes, sha};
 
 #[test]
@@ -157,7 +157,7 @@ fn the_first_parent_never_lands_to_the_right_of_its_child() {
 
     for row in &result.rows {
         for edge in row.edges.iter().filter(|edge| edge.parent_row.is_some()) {
-            if edge.kind == ramal_core_domain::graph::EdgeKind::FirstParent {
+            if edge.kind == git_rudder_core_domain::graph::EdgeKind::FirstParent {
                 assert!(edge.to_lane <= edge.from_lane, "edge {edge:?}");
             }
         }

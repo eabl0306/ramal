@@ -13,7 +13,7 @@ export interface RepoViewProviderProps {
 }
 
 /**
- * Lo que necesitan los hooks de datos de @ramal/repo-view: un QueryClient. Lo
+ * Lo que necesitan los hooks de datos de @git-rudder/repo-view: un QueryClient. Lo
  * pone cada host en su composition root, junto a I18nProvider e IconProvider.
  */
 export function RepoViewProvider({ queryClient, children }: RepoViewProviderProps): ReactElement {

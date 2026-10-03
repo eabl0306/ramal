@@ -1,7 +1,7 @@
 //! Migraciones y sonda de salud contra un PostgreSQL de verdad.
 //!
-//! Se saltan sin `RAMAL_TEST_DATABASE_URL` y fallan sin ella si
-//! `RAMAL_TEST_REQUIRE_DATABASE=1`. Para lanzarlos: `just api-test-db`.
+//! Se saltan sin `GIT_RUDDER_TEST_DATABASE_URL` y fallan sin ella si
+//! `GIT_RUDDER_TEST_REQUIRE_DATABASE=1`. Para lanzarlos: `just api-test-db`.
 
 #![allow(
     clippy::unwrap_used,
@@ -18,8 +18,8 @@ mod support;
 
 use std::time::Duration;
 
-use ramal_api_application::HealthProbe;
-use ramal_api_infrastructure::{
+use git_rudder_api_application::HealthProbe;
+use git_rudder_api_infrastructure::{
     PostgresHealthProbe, connect_pool, latest_migration_version, run_migrations,
 };
 use sqlx::{AssertSqlSafe, Executor};

@@ -13,24 +13,24 @@
     "commitAmend": "Commit (Amend)"
   },
   "tab": {
-    "graph": "Ramal Graph",
-    "settings": "Ramal Settings"
+    "graph": "Git Rudder Graph",
+    "settings": "Git Rudder Settings"
   },
   "diff": {
     "workingTree": "{file} (Working Tree)",
     "index": "{file} (Index)",
     "commit": "{file} ({sha})"
   },
-  "commandPlaceholder": "Type a Ramal command",
-  "sourceRamal": "Source: Ramal",
+  "commandPlaceholder": "Type a Git Rudder command",
+  "sourceGitRudder": "Source: Git Rudder",
   "settings": {
     "followsVsCode": "Theme and language follow your VS Code settings.",
     "sync": "Sync settings from the cloud",
-    "syncDescription": "Use the linked accounts, AI keys and preferences from your Ramal account.",
+    "syncDescription": "Use the linked accounts, AI keys and preferences from your Git Rudder account.",
     "openDashboard": "Open web dashboard",
-    "openDesktop": "Open in Ramal Desktop",
+    "openDesktop": "Open in Git Rudder Desktop",
     "section": {
-      "account": "Ramal Account",
+      "account": "Git Rudder Account",
       "platforms": "Git Platforms",
       "ai": "AI",
       "git": "Git"
@@ -44,8 +44,8 @@
   "host": {
     "noFolder": "Open a folder with a Git repository to see its graph.",
     "pickRepository": "Choose the repository to open",
-    "engineStopped": "The Ramal engine stopped after crashing several times.",
+    "engineStopped": "The Git Rudder engine stopped after crashing several times.",
     "retry": "Retry",
-    "protocolMismatch": "This Ramal installation is damaged: the engine uses protocol version {engine} and the extension expects {expected}. Reinstall the extension."
+    "protocolMismatch": "This Git Rudder installation is damaged: the engine uses protocol version {engine} and the extension expects {expected}. Reinstall the extension."
   }
 }

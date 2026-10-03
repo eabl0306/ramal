@@ -2,7 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
-/// Configuracion de PostgreSQL (`RAMAL__DATABASE__*`).
+/// Configuracion de PostgreSQL (`GIT_RUDDER__DATABASE__*`).
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct DatabaseConfig {
@@ -17,7 +17,7 @@ pub struct DatabaseConfig {
 impl Default for DatabaseConfig {
     fn default() -> Self {
         Self {
-            url: "postgres://ramal:ramal@localhost:5432/ramal".to_owned(),
+            url: "postgres://git_rudder:git_rudder@localhost:5432/git_rudder".to_owned(),
             max_connections: 5,
             acquire_timeout_ms: 3_000,
         }

@@ -3,10 +3,10 @@
 //! Cada handler con `#[endpoint]` registra su operacion, y el documento sale de
 //! recorrer el arbol de rutas: una ruta sin documentar no puede existir. El
 //! documento versionado en `apps/api/openapi.json` es la fuente de
-//! `@ramal/api-client`; un test de este crate falla si se queda atras, y
+//! `@git-rudder/api-client`; un test de este crate falla si se queda atras, y
 //! `just api-openapi` lo reescribe.
 
-use ramal_api_domain::ServiceVersion;
+use git_rudder_api_domain::ServiceVersion;
 use salvo::oapi::{Components, Info, OpenApi, ToSchema};
 use salvo::prelude::Router;
 
@@ -14,10 +14,10 @@ use crate::problem::Problem;
 use crate::router::{RouterDependencies, api_router};
 
 /// Titulo del documento.
-pub const API_TITLE: &str = "Ramal API";
+pub const API_TITLE: &str = "Git Rudder API";
 
 /// Descripcion del documento: las convenciones que valen para toda la API.
-const API_DESCRIPTION: &str = "API de Ramal. Todo lo de dominio va bajo /v1. Los errores \
+const API_DESCRIPTION: &str = "API de Git Rudder. Todo lo de dominio va bajo /v1. Los errores \
     salen en application/problem+json (RFC 9457) con title y detail en castellano y un \
     code estable, tambien en los 404 y 405 del transporte. Cada respuesta lleva \
     x-request-id.";

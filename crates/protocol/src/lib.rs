@@ -1,9 +1,9 @@
 //! Contrato entre las interfaces y el motor: nombres de metodo, DTOs de parametros
 //! y resultados, y el sobre JSON-RPC 2.0.
 //!
-//! No depende de ningun otro crate de Ramal a proposito: si importara el dominio,
+//! No depende de ningun otro crate de Git Rudder a proposito: si importara el dominio,
 //! cambiar un tipo interno cambiaria el contrato sin que nadie lo viera. El mapeo
-//! entre dominio y DTO vive en `ramal-engine`. Los tipos no llevan sufijo `Dto`:
+//! entre dominio y DTO vive en `git-rudder-engine`. Los tipos no llevan sufijo `Dto`:
 //! son exactamente los nombres que ve TypeScript, que los recibe generados con
 //! ts-rs en `packages/bridge/src/generated` (`just protocol-gen`).
 //!

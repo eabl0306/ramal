@@ -1,4 +1,4 @@
-import type { GraphRow, RepoHandle, RpcError } from '@ramal/bridge';
+import type { GraphRow, RepoHandle, RpcError } from '@git-rudder/bridge';
 
 /**
  * Lo que contesta el host simulado en una prueba: que pasa al pedir un
@@ -21,7 +21,7 @@ export interface E2eCall {
 
 declare global {
   interface Window {
-    __RAMAL_E2E__?: E2eScenario;
-    __RAMAL_E2E_CALLS__?: E2eCall[];
+    __GIT_RUDDER_E2E__?: E2eScenario;
+    __GIT_RUDDER_E2E_CALLS__?: E2eCall[];
   }
 }

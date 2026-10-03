@@ -92,7 +92,7 @@ expect "GET /openapi.json" 200 json \
   "$(request "${body}" GET /openapi.json)" || true
 
 expect "GET / (la web)" 200 text/html \
-  "$(request "${body}" GET /)" && expect_body "  / es la web de Ramal" "${body}" '<html lang='
+  "$(request "${body}" GET /)" && expect_body "  / es la web de Git Rudder" "${body}" '<html lang='
 
 expect "GET /en/ (la landing en ingles)" 200 text/html \
   "$(request "${body}" GET /en/)" || true

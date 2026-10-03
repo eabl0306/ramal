@@ -17,7 +17,7 @@
 
 mod support;
 
-use ramal_api_http::PROBLEM_CONTENT_TYPE;
+use git_rudder_api_http::PROBLEM_CONTENT_TYPE;
 use salvo::prelude::StatusCode;
 use salvo::test::{ResponseExt, TestClient};
 
@@ -30,7 +30,7 @@ async fn an_unknown_route_under_v1_answers_problem_json() {
     assert_eq!(response.status_code, Some(StatusCode::NOT_FOUND));
     assert_eq!(support::content_type(&response), PROBLEM_CONTENT_TYPE);
     let body: serde_json::Value = response.take_json().await.expect("json body");
-    assert_eq!(body["type"], "https://ramal.bahoque.com/problems/not-found");
+    assert_eq!(body["type"], "https://git-rudder.com/problems/not-found");
     assert_eq!(body["title"], "No encontrado");
     assert_eq!(body["status"], 404);
     assert_eq!(body["code"], "route_not_found");
@@ -61,7 +61,7 @@ async fn a_method_the_route_does_not_accept_answers_405_problem_json() {
     let body: serde_json::Value = response.take_json().await.expect("json body");
     assert_eq!(
         body["type"],
-        "https://ramal.bahoque.com/problems/method-not-allowed"
+        "https://git-rudder.com/problems/method-not-allowed"
     );
     assert_eq!(body["status"], 405);
     assert_eq!(body["code"], "method_not_allowed");

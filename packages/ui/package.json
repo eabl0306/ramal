@@ -1,9 +1,9 @@
 {
-  "name": "@ramal/ui",
+  "name": "@git-rudder/ui",
   "version": "0.1.0",
   "license": "FSL-1.1-ALv2",
   "private": true,
-  "description": "Tokens, temas, densidades, iconos, primitivas accesibles y el enlace React de @ramal/i18n.",
+  "description": "Tokens, temas, densidades, iconos, primitivas accesibles y el enlace React de @git-rudder/i18n.",
   "type": "module",
   "sideEffects": [
     "**/*.css",
@@ -13,7 +13,7 @@
     ".": "./src/index.ts",
     "./icons/lucide": "./src/icons/lucide/index.ts",
     "./icons/codicons": "./src/icons/codicons/index.ts",
-    "./themes/ramal.css": "./src/themes/ramal.css",
+    "./themes/git-rudder.css": "./src/themes/git-rudder.css",
     "./themes/vscode.css": "./src/themes/vscode.css",
     "./themes/fonts": "./src/themes/fonts.ts"
   },
@@ -27,7 +27,7 @@
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",
     "@fontsource/ibm-plex-sans": "5.3.0",
-    "@ramal/i18n": "workspace:*",
+    "@git-rudder/i18n": "workspace:*",
     "@vscode/codicons": "0.0.45",
     "lucide-react": "1.49.0",
     "react-aria-components": "1.21.1"
@@ -37,8 +37,8 @@
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@ramal/eslint-config": "workspace:*",
-    "@ramal/tsconfig": "workspace:*",
+    "@git-rudder/eslint-config": "workspace:*",
+    "@git-rudder/tsconfig": "workspace:*",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",

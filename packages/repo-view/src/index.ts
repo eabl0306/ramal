@@ -1,4 +1,4 @@
-// API publica de @ramal/repo-view: lo que montan escritorio y los webviews de
+// API publica de @git-rudder/repo-view: lo que montan escritorio y los webviews de
 // VS Code. El resto (geometria, caminos, columnas) es interno y puede cambiar.
 
 export { GraphView, type GraphViewProps } from './view/graph-view';

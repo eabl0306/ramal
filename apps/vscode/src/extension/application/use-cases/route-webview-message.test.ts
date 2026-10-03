@@ -1,4 +1,4 @@
-import type { RpcResponse } from '@ramal/bridge';
+import type { RpcResponse } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import type { IdentifiedRpcRequest } from '../../../shared/messages';

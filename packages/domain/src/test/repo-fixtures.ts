@@ -30,7 +30,7 @@ function repo(overrides: Partial<RepoSummary> & Pick<RepoSummary, 'id' | 'name'>
 }
 
 export const REPOS: readonly RepoSummary[] = [
-  repo({ id: 'r1', name: 'ramal-desktop', accountId: 'a1', workspaceIds: ['w1', 'w2'] }),
+  repo({ id: 'r1', name: 'git-rudder-desktop', accountId: 'a1', workspaceIds: ['w1', 'w2'] }),
   repo({ id: 'r2', name: 'api-gateway', accountId: 'a2', workspaceIds: ['w2'], branch: 'develop' }),
   repo({ id: 'r3', name: 'notas', hasRemote: false, workspaceIds: ['w-borrado'] }),
   repo({ id: 'r4', name: 'dotfiles', accountId: 'a3', alias: 'config', branch: 'master' }),

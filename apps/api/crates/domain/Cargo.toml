@@ -1,5 +1,5 @@
 [package]
-name = "ramal-api-domain"
+name = "git-rudder-api-domain"
 description = "Dominio de la API: reglas puras, sin framework, sin HTTP y sin SQL."
 version.workspace = true
 edition.workspace = true

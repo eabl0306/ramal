@@ -43,7 +43,7 @@ function launch(): {
   const engineLog: string[] = [];
   const spawned: { binary: string; args: readonly string[] }[] = [];
   const launcher = createSidecarLauncher({
-    binaryPath: '/ext/dist/bin/ramal-vscode-engine',
+    binaryPath: '/ext/dist/bin/git-rudder-vscode-engine',
     args: ['--log-level', 'debug'],
     logger,
     onEngineLog: (line) => engineLog.push(line),
@@ -63,7 +63,7 @@ describe('proceso del sidecar', () => {
   it('lanza el binario con sus argumentos y habla en marcos por stdin y stdout', async () => {
     const { child, process, spawned } = launch();
     expect(spawned).toEqual([
-      { binary: '/ext/dist/bin/ramal-vscode-engine', args: ['--log-level', 'debug'] },
+      { binary: '/ext/dist/bin/git-rudder-vscode-engine', args: ['--log-level', 'debug'] },
     ]);
     const written: string[] = [];
     const decoder = new FrameDecoder();

@@ -7,5 +7,5 @@
 )]
 
 fn main() -> std::process::ExitCode {
-    ramal_vscode_engine::run(std::env::args_os())
+    git_rudder_vscode_engine::run(std::env::args_os())
 }

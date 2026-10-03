@@ -5,9 +5,11 @@
     reason = "tests fail loudly on purpose; a panic here is the assertion"
 )]
 
-use ramal_api_application::Clock;
-use ramal_api_application::testing::FixedClock;
-use ramal_api_domain::{ComponentHealth, ComponentName, HealthReport, Latency, ServiceVersion};
+use git_rudder_api_application::Clock;
+use git_rudder_api_application::testing::FixedClock;
+use git_rudder_api_domain::{
+    ComponentHealth, ComponentName, HealthReport, Latency, ServiceVersion,
+};
 
 use super::HealthResponse;
 
@@ -46,7 +48,7 @@ fn a_degraded_report_never_publishes_the_failure_detail() {
         vec![ComponentHealth::failed(
             name("database"),
             Latency::from_millis(120),
-            "password authentication failed for user ramal",
+            "password authentication failed for user git-rudder",
         )],
     );
     let body = json(&report);

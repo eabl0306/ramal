@@ -24,7 +24,7 @@ pub enum PersistenceError {
 /// El pool es perezoso: no abre ninguna conexion hasta que alguien la pide. Asi
 /// el proceso arranca aunque la base todavia no acepte conexiones, y la sonda de
 /// readiness refleja esa situacion en vez de matar el contenedor. Tambien es lo
-/// que deja a `ramal-api --openapi` cablear el router sin tocar la base.
+/// que deja a `git-rudder-api --openapi` cablear el router sin tocar la base.
 ///
 /// # Errors
 ///

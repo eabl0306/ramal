@@ -1,4 +1,4 @@
-# Paquetes TypeScript compartidos (@ramal/domain, i18n, ui, repo-view, bridge y
+# Paquetes TypeScript compartidos (@git-rudder/domain, i18n, ui, repo-view, bridge y
 # api-client): lint con las reglas de arquitectura, tipos estrictos y tests con
 # sus umbrales de cobertura (80% en domain e i18n, 60% en el resto).
 #

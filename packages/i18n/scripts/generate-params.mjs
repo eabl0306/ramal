@@ -5,7 +5,7 @@
 // no puede ver los marcadores {nombre} que llevan dentro. El test de paridad
 // recalcula esta tabla y falla si el fichero no esta al dia.
 //
-//   corepack pnpm --filter @ramal/i18n generate
+//   corepack pnpm --filter @git-rudder/i18n generate
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -59,7 +59,7 @@ function render(entries) {
   );
   return [
     '// Generado por scripts/generate-params.mjs desde src/locales/es. No editar a mano:',
-    '// corepack pnpm --filter @ramal/i18n generate',
+    '// corepack pnpm --filter @git-rudder/i18n generate',
     'export const PARAMS = {',
     ...lines,
     '} as const;',

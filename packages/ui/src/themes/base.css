@@ -1,11 +1,11 @@
 /*
- * Tokens que no dependen del tema y que comparten ramal.css y vscode.css:
+ * Tokens que no dependen del tema y que comparten git-rudder.css y vscode.css:
  * carriles del grafo, colores de plataforma, densidades y la base del documento.
  *
  * Los carriles son los mismos en todos los temas y tambien en VS Code, como pide
  * el diseno. Los colores de plataforma son colores de marca, tampoco cambian.
  * Este es uno de los pocos sitios donde se escriben colores: fuera de
- * src/themes stylelint y ramal/no-raw-colors lo prohiben.
+ * src/themes stylelint y git-rudder/no-raw-colors lo prohiben.
  */
 
 :root {

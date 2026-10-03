@@ -80,7 +80,7 @@ describe('paridad de los diccionarios', () => {
     }
   });
 
-  it('la tabla generada de parametros esta al dia (corepack pnpm --filter @ramal/i18n generate)', () => {
+  it('la tabla generada de parametros esta al dia (corepack pnpm --filter @git-rudder/i18n generate)', () => {
     const generated = Object.fromEntries(
       Object.entries(PARAMS).map(([key, names]) => [key, [...names]]),
     );

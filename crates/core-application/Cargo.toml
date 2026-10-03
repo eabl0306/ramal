@@ -1,5 +1,5 @@
 [package]
-name = "ramal-core-application"
+name = "git-rudder-core-application"
 description = "Casos de uso y puertos del motor de Git, independientes de la plataforma."
 version.workspace = true
 edition.workspace = true
@@ -17,7 +17,7 @@ testing = []
 # dev-dependencies, porque Cargo.lock las cuenta como dependencias directas.
 [dependencies]
 async-trait = { workspace = true }
-ramal-core-domain = { workspace = true }
+git-rudder-core-domain = { workspace = true }
 thiserror = { workspace = true }
 
 [lints]

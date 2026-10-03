@@ -1,7 +1,7 @@
 //! `engine/info`.
 
-use ramal_protocol::RpcError;
-use ramal_protocol::methods::EngineInfoMethod;
+use git_rudder_protocol::RpcError;
+use git_rudder_protocol::methods::EngineInfoMethod;
 
 use super::{parse_params, to_result};
 use crate::engine::UseCases;

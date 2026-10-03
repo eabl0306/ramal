@@ -11,7 +11,7 @@
 <meta name="design_doc_mode" content="canvas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;
 --canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -32,7 +32,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
 <div style="min-height:100vh;padding:32px 40px 72px;display:flex;flex-direction:column;gap:18px;background:var(--canvas);color:var(--text)">
 
   <header style="display:flex;flex-direction:column;gap:12px;max-width:1280px">
-    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Ramal Desktop</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">#64 · D-01 – D-11</span></div>
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Git Rudder Desktop</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">#64 · D-01 – D-11</span></div>
     <div><h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.02em">{{ ch.title }}</h1><p style="margin:6px 0 0;max-width:820px;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ ch.sub }}</p></div>
     <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
       <sc-for list="{{ segs }}" as="g" hint-placeholder-count="4">
@@ -53,7 +53,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
   <div style="width:{{ frameW }}px;height:780px;position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;box-shadow:var(--shadow)">
     <div style="height:46px;flex-shrink:0;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
       <sc-if value="{{ win.mac }}"><div style="display:flex;align-items:center;gap:8px;padding-right:12px"><span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span></div></sc-if>
-      <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Ramal</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Git Rudder</span></div>
       <sc-if value="{{ win.tabs }}">
         <div style="display:flex;align-items:center;padding:0 16px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:{{ win.homeBg }};color:{{ win.homeColor }};box-shadow:{{ win.homeShadow }}">{{ t.e_home }}</div>
         <sc-if value="{{ win.hasRepoTab }}"><div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:var(--bg);box-shadow:inset 0 2px 0 var(--accent)"><span style="width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;background:{{ win.tabBadge }};color:white">{{ win.tabAbbr }}</span>{{ win.repoTab }}<span style="color:var(--faint);font-size:15px">×</span></div></sc-if>
@@ -300,12 +300,12 @@ class Component extends DCLogic {
   state = { ready: false, theme: 'dark', lang: 'es', os: 'macos', session: 'signedOut', screen: 'd01-cuenta', v: 'base', toasts: [], gitName: 'Marta Ruiz', gitEmail: 'marta@example.com', emailErr: '', folders: ['~/code', '~/work'], searching: false, found: 0, picked: {}, plats: {}, keyAdded: false, checks: 0, gitState: 'idle', remain: 600, url: 'acme/web-app', acc: 'a1', proto: 'https', subs: true, ws: '', pct: 0, phase: 0, menu: null, typeMenu: false, typeVal: 'all', initBranch: 'main', pub: { owner: 'marta-dev', name: 'nuevo-proyecto', vis: 'private', readme: true }, pubStep: 0, copied: false, cloneState: null };
   componentDidMount() {
     const p = this.props; const up = {}; ['theme', 'lang', 'os', 'session'].forEach(k => { if (p[k]) up[k] = p[k]; }); if (p.screen) Object.assign(up, this.screenState(p.screen)); this.setState(up);
-    const go = () => window.RAMAL && window.RAMAL.D.e_welcome ? this.setState({ ready: true }) : setTimeout(go, 30); go();
+    const go = () => window.GIT_RUDDER && window.GIT_RUDDER.D.e_welcome ? this.setState({ ready: true }) : setTimeout(go, 30); go();
     this._k = e => { if (e.key === 'Escape') this.closePanel(); }; window.addEventListener('keydown', this._k);
   }
   componentWillUnmount() { clearInterval(this._iv); clearTimeout(this._t); window.removeEventListener('keydown', this._k); }
   componentDidUpdate(pp) { const p = this.props, up = {}; ['theme', 'lang', 'os', 'session'].forEach(k => { if (pp[k] !== p[k] && p[k]) up[k] = p[k]; }); if (pp.screen !== p.screen && p.screen) Object.assign(up, this.screenState(p.screen)); if (Object.keys(up).length) this.setState(up); document.body.dataset.theme = this.state.theme; }
-  T(k, v) { const e = window.RAMAL.D[k] || (window.RAMAL.STATES || {})[k] || (window.RAMAL.VAULT || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  T(k, v) { const e = window.GIT_RUDDER.D[k] || (window.GIT_RUDDER.STATES || {})[k] || (window.GIT_RUDDER.VAULT || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
   P(base, n) { return this.T(base + (n === 1 ? '_one' : '_other'), { count: n }); }
   toast(text, kind = 'ok') { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }].slice(-3) })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
   screenState(id) { const sc = SCR.find(x => x[0] === id); const v = sc && sc[3][0] ? sc[3][0][0] : 'base'; return this.variantState(id, v); }
@@ -330,7 +330,7 @@ class Component extends DCLogic {
   searchRepos() { this.setState({ searching: true, found: 0 }); clearInterval(this._iv); this._iv = setInterval(() => { const n = this.state.found + 1; if (n >= FOUND.length) { clearInterval(this._iv); this.setState({ found: FOUND.length, searching: false, v: 'results' }); } else this.setState({ found: n }); }, 380); }
 
   renderVals() {
-    const s = this.state, R = window.RAMAL;
+    const s = this.state, R = window.GIT_RUDDER;
     if (!s.ready || !R) return { ch: {}, t: {}, segs: [], nav: [], vars: [], cur: {}, win: {}, pg: {}, hm: { btns: [], tiles: [], cards: [], ws: [], skel: [], fakeFilters: [], typeOpts: [] }, rp: { tools: [], side: [], rows: [], files: [] }, st: { nav: [], cards: [] }, pn: { blocks: [], btns: [] }, act: {}, toasts: [] };
     const L = s.lang === 'en' ? 1 : 0, T = this.T.bind(this), P = R.PLAT;
     const t = {}; for (const k in (R.STATES || {})) t[k] = R.STATES[k][L]; for (const k in R.D) t[k] = R.D[k][L];
@@ -431,12 +431,12 @@ class Component extends DCLogic {
     const ROWS = rows => ({ isRows: true, rows: rows.map(([icon, title, sub, ic, font]) => ({ icon, title, sub: sub || '', ic: ic || 'var(--ok)', font: font || 'inherit' })) });
     let pn = null;
     const modal = (w, title, blocks, btns, o) => ({ w, title, hasTitle: true, canClose: true, blocks, btns, hasFoot: !!btns.length, pad: '12px 22px 6px', scrim: 'var(--scrim)', hasGit: false, ...(o || {}) });
-    const gitLine = s.os === 'windows' ? '✓ Git 2.56.0 · C:\\Program Files\\Ramal\\resources\\mingit\\cmd\\git.exe' : s.os === 'linux' ? '✓ Git 2.56.0 · /usr/bin/git' : '✓ Git 2.56.0 · /usr/bin/git';
+    const gitLine = s.os === 'windows' ? '✓ Git 2.56.0 · C:\\Program Files\\Git Rudder\\resources\\mingit\\cmd\\git.exe' : s.os === 'linux' ? '✓ Git 2.56.0 · /usr/bin/git' : '✓ Git 2.56.0 · /usr/bin/git';
     if (!s.panelOff) {
       if (id.startsWith('d01')) {
         const order = ['d01-cuenta', 'd01-identidad', 'd01-repos', 'd01-plataformas', 'd01-ia'], idx = order.indexOf(id);
         const stepper = { isStepper: true, steps: [t.e_s1, t.e_s2, t.e_s3, t.e_s4, t.e_s5].map((l, i) => ({ label: l, bar: i <= idx ? 'var(--accent)' : 'var(--surface2)', color: i === idx ? 'var(--text)' : i < idx ? 'var(--muted)' : 'var(--faint)' })) };
-        const next = () => idx < 4 ? this.go(order[idx + 1]) : (this.toast(L ? 'Welcome to Ramal' : 'Bienvenida a Ramal'), this.go('d05-vacio'));
+        const next = () => idx < 4 ? this.go(order[idx + 1]) : (this.toast(L ? 'Welcome to Git Rudder' : 'Bienvenida a Git Rudder'), this.go('d05-vacio'));
         const foot = [btnS(t.e_back, () => idx > 0 && this.go(order[idx - 1]), null, { off: idx === 0, op: idx === 0 ? 0.4 : 1, mr: 'auto' }), ...(idx > 0 ? [btnS(t.e_skip, next)] : []), btnS(idx === 4 ? t.e_start : t.e_continue, next, 'p')];
         let blocks = [];
         if (id === 'd01-cuenta') {
@@ -485,7 +485,7 @@ class Component extends DCLogic {
       }
       if (id.startsWith('d03')) {
         let blocks = [], btns = [];
-        if (id === 'd03-navegador') { blocks = [{ isSpin: true, text: t.e_siWait }]; btns = [btnS(t.e_useCode, () => this.go('d03-codigo'), null, { mr: 'auto' }), btnS(t.e_copyLink, () => this.toast(T('copied', { x: 'ramal.bahoque.com/authorize' }), 'info')), btnS(t.e_cancel, () => this.setState({ panelOff: true })), btnS(t.e_openAgain, () => this.toast('ramal.bahoque.com', 'info'), 'p')]; }
+        if (id === 'd03-navegador') { blocks = [{ isSpin: true, text: t.e_siWait }]; btns = [btnS(t.e_useCode, () => this.go('d03-codigo'), null, { mr: 'auto' }), btnS(t.e_copyLink, () => this.toast(T('copied', { x: 'git-rudder.com/authorize' }), 'info')), btnS(t.e_cancel, () => this.setState({ panelOff: true })), btnS(t.e_openAgain, () => this.toast('git-rudder.com', 'info'), 'p')]; }
         if (id === 'd03-codigo') {
           if (v === 'success') { blocks = [{ isDone: true, text: T('e_success', { email: 'marta@example.com' }), hasSub: true, sub: t.e_applying }]; }
           else { const m = Math.floor(s.remain / 60), sec = String(s.remain % 60).padStart(2, '0');

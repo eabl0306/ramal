@@ -3,7 +3,7 @@ import {
   type GraphWindow,
   type GraphWindowParams,
   isBridgeError,
-} from '@ramal/bridge';
+} from '@git-rudder/bridge';
 
 /**
  * Lo puro de la consulta `graph/window`: claves, paginas y reintentos. El hook

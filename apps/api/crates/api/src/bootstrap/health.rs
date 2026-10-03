@@ -3,9 +3,9 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use ramal_api_application::{CheckLiveness, CheckReadiness, HealthProbe};
-use ramal_api_http::HealthDependencies;
-use ramal_api_infrastructure::{PostgresHealthProbe, latest_migration_version};
+use git_rudder_api_application::{CheckLiveness, CheckReadiness, HealthProbe};
+use git_rudder_api_http::HealthDependencies;
+use git_rudder_api_infrastructure::{PostgresHealthProbe, latest_migration_version};
 
 use super::wiring::Wiring;
 

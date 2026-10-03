@@ -1,5 +1,5 @@
 {
-  "name": "@ramal/i18n",
+  "name": "@git-rudder/i18n",
   "version": "0.1.0",
   "license": "FSL-1.1-ALv2",
   "private": true,
@@ -18,8 +18,8 @@
     "generate": "node scripts/generate-params.mjs"
   },
   "devDependencies": {
-    "@ramal/eslint-config": "workspace:*",
-    "@ramal/tsconfig": "workspace:*",
+    "@git-rudder/eslint-config": "workspace:*",
+    "@git-rudder/tsconfig": "workspace:*",
     "@types/node": "24.19.0",
     "@vitest/coverage-v8": "5.0.2",
     "eslint": "10.11.0",

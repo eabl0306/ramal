@@ -1,4 +1,4 @@
-import type { BridgeClient, GraphRow } from '@ramal/bridge';
+import type { BridgeClient, GraphRow } from '@git-rudder/bridge';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 

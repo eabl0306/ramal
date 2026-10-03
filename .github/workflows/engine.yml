@@ -1,9 +1,9 @@
 # Motor de Git del cliente (crates/*), sidecar de VS Code (apps/vscode-engine) y
-# @ramal/bridge: clippy, tests contra repos reales, cobertura con umbral, tipos
+# @git-rudder/bridge: clippy, tests contra repos reales, cobertura con umbral, tipos
 # generados sin diff y los checks del paquete. Las mismas recetas que en local.
 #
 # La suite del motor corre dos veces: con el git del runner (el mas reciente) y
-# con git 2.34, la minima que admite Ramal (ADR 0009). Es la unica forma de que la
+# con git 2.34, la minima que admite Git Rudder (ADR 0009). Es la unica forma de que la
 # deteccion de capacidades y los formatos de salida se prueben de verdad.
 name: engine
 
@@ -95,7 +95,7 @@ jobs:
         run: just engine-test
 
   bridge:
-    name: '@ramal/bridge'
+    name: '@git-rudder/bridge'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -114,10 +114,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: pnpm --fail-if-no-match --filter @ramal/bridge run lint
+        run: pnpm --fail-if-no-match --filter @git-rudder/bridge run lint
 
       - name: Tipos
-        run: pnpm --fail-if-no-match --filter @ramal/bridge run typecheck
+        run: pnpm --fail-if-no-match --filter @git-rudder/bridge run typecheck
 
       - name: Tests y cobertura (minimo 80%)
-        run: pnpm --fail-if-no-match --filter @ramal/bridge run test:coverage
+        run: pnpm --fail-if-no-match --filter @git-rudder/bridge run test:coverage

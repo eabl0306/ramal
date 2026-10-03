@@ -1,4 +1,4 @@
-import { useLocale, useT } from '@ramal/ui';
+import { useLocale, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 import { Link } from 'react-router';
 

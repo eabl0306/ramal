@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Ramal API",
-    "description": "API de Ramal. Todo lo de dominio va bajo /v1. Los errores salen en application/problem+json (RFC 9457) con title y detail en castellano y un code estable, tambien en los 404 y 405 del transporte. Cada respuesta lleva x-request-id.",
+    "title": "Git Rudder API",
+    "description": "API de Git Rudder. Todo lo de dominio va bajo /v1. Los errores salen en application/problem+json (RFC 9457) con title y detail en castellano y un code estable, tambien en los 404 y 405 del transporte. Cada respuesta lleva x-request-id.",
     "version": "0.1.0"
   },
   "paths": {
@@ -244,7 +244,7 @@
             "type": "string",
             "description": "URI que identifica el tipo de problema.",
             "examples": [
-              "https://ramal.bahoque.com/problems/not-found"
+              "https://git-rudder.com/problems/not-found"
             ]
           }
         }

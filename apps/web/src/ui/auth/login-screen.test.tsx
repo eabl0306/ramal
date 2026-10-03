@@ -76,7 +76,7 @@ describe('LoginScreen', () => {
     renderScreen(<LoginScreen />, { ports: testPorts({ auth }) });
 
     await user.click(screen.getByRole('button', { name: 'Continuar con GitLab' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('No hay conexión con Ramal.');
+    expect(await screen.findByRole('alert')).toHaveTextContent('No hay conexión con Git Rudder.');
 
     await user.type(screen.getByLabelText('Email'), 'marta@example.com');
     await user.type(screen.getByLabelText('Contraseña'), 'x');

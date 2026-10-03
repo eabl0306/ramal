@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use super::app_config::ConfigError;
 
-/// Configuracion del servidor HTTP (`RAMAL__SERVER__*`).
+/// Configuracion del servidor HTTP (`GIT_RUDDER__SERVER__*`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, default)]
 pub struct ServerConfig {

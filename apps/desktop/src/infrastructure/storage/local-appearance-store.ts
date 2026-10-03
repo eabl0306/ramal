@@ -5,7 +5,7 @@ import {
 } from '../../application/ports/appearance-store';
 
 /** Clave en `localStorage`. Lleva version para poder cambiar la forma sin leer basura. */
-export const APPEARANCE_KEY = 'ramal.appearance.v1';
+export const APPEARANCE_KEY = 'gitRudder.appearance.v1';
 
 /** Lo que se usa de `Storage`; `localStorage` encaja. */
 export type KeyValueStorage = Pick<Storage, 'getItem' | 'setItem'>;

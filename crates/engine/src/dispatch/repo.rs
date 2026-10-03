@@ -2,8 +2,8 @@
 
 use std::path::Path;
 
-use ramal_protocol::RpcError;
-use ramal_protocol::methods::RepoOpenMethod;
+use git_rudder_protocol::RpcError;
+use git_rudder_protocol::methods::RepoOpenMethod;
 
 use super::{parse_params, to_result};
 use crate::engine::UseCases;

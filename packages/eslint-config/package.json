@@ -1,9 +1,9 @@
 {
-  "name": "@ramal/eslint-config",
+  "name": "@git-rudder/eslint-config",
   "version": "0.1.0",
   "license": "FSL-1.1-ALv2",
   "private": true,
-  "description": "Configuracion plana de ESLint compartida: TypeScript type-aware, limites de tamano y complejidad, React, Node, arquitectura y reglas propias de Ramal.",
+  "description": "Configuracion plana de ESLint compartida: TypeScript type-aware, limites de tamano y complejidad, React, Node, arquitectura y reglas propias de Git Rudder.",
   "type": "module",
   "main": "./index.js",
   "exports": {

@@ -14,7 +14,7 @@ function invalid(code, count = 1) {
 
 typescriptRuleTester().run('no-raw-colors', noRawColors, {
   valid: [
-    valid('const color = "var(--ramal-accent)";'),
+    valid('const color = "var(--git-rudder-accent)";'),
     valid('const title = "Fix #123";'),
     valid('const title = `Merge pull request #4567 from org/rama`;'),
     valid('const url = "https://github.com/org/repo#readme";'),

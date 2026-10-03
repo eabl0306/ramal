@@ -15,7 +15,7 @@ yanked = "deny"
 ignore = [
   # Excepcion de Tauri. proc-macro-error es una macro de compilacion sin
   # mantenimiento que llega solo por glib-macros 0.18, la de los bindings de GTK3
-  # con los que Tauri 2 dibuja en Linux (ramal-desktop). No acaba en el binario y
+  # con los que Tauri 2 dibuja en Linux (git-rudder-desktop). No acaba en el binario y
   # no tiene version arreglada: se quita cuando Tauri pase a GTK4.
   { id = "RUSTSEC-2024-0370", reason = "proc-macro-error solo llega por los bindings GTK3 de Tauri 2 en Linux; macro de compilacion sin version arreglada" },
 ]
@@ -63,7 +63,7 @@ deny = [
   { name = "openssl-sys" },
   { name = "actix-web" },
   # Excepcion de Tauri: el servidor WebDriver embebido del E2E nativo
-  # (tauri-plugin-wdio-webdriver, solo con la feature `e2e` de ramal-desktop) se
+  # (tauri-plugin-wdio-webdriver, solo con la feature `e2e` de git-rudder-desktop) se
   # apoya en axum. Fuera de ese plugin sigue vetado: la API usa Salvo.
   { name = "axum", wrappers = ["tauri-plugin-wdio-webdriver"] },
   { name = "rocket" },

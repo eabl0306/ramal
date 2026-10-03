@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use ramal_api_domain::{HealthStatus, ServiceVersion};
+use git_rudder_api_domain::{HealthStatus, ServiceVersion};
 
 use super::CheckLiveness;
 use crate::testing::FixedClock;

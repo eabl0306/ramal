@@ -5,7 +5,7 @@
 
 ## Contexto
 
-Ramal genera con IA tres cosas: el mensaje de commit, el titulo y la descripcion de un pull
+Git Rudder genera con IA tres cosas: el mensaje de commit, el titulo y la descripcion de un pull
 request y el resumen de un commit ([ADR 0013](0013-proxy-de-ia-de-organizacion.md)). El usuario
 elige proveedor, llave y modelo. La pregunta es que modelo se le recomienda, sin escribir nombres
 de modelos en el binario.
@@ -22,8 +22,8 @@ Lo que obliga a decidirlo con cuidado:
   costar diez veces el de otro.
 - **Hoy el modelo va en la llave.** Para usar un modelo barato en los commits y otro mejor en los
   PRs con el mismo proveedor habria que crear dos llaves con el mismo secreto.
-- **La IA con llave personal funciona sin cuenta de Ramal**
-  ([ADR 0014](0014-usar-ramal-sin-cuenta.md)). Lo que se use para recomendar no puede pedir sesion.
+- **La IA con llave personal funciona sin cuenta de Git Rudder**
+  ([ADR 0014](0014-usar-git-rudder-sin-cuenta.md)). Lo que se use para recomendar no puede pedir sesion.
 - Cada proveedor publica la lista de sus modelos por API (Anthropic, OpenAI, Gemini, Mistral, Groq
   y OpenRouter; Ollama lista los instalados), y el motor ya la pide despues de validar la llave.
 
@@ -80,7 +80,7 @@ Los ids del ejemplo son los de la primera revision; los que valen son los del fi
   frecuentes y con mas texto; el resumen es bajo demanda, asi que su coste pesa poco.
 - **Razonamiento al minimo** que admita cada proveedor, en los dos niveles. Los tokens de
   razonamiento ocultos pueden multiplicar varias veces el coste de un mensaje de commit. Lo aplican
-  los adaptadores de `ramal-ai`, por proveedor.
+  los adaptadores de `git-rudder-ai`, por proveedor.
 
 ### Un modelo por funcion
 
@@ -116,7 +116,7 @@ En contra:
 - **Alguien tiene que mantener el fichero.** Si nadie lo revisa, envejece igual que una constante,
   aunque sin llegar a recomendar algo retirado.
 - Es una peticion mas que sale del equipo sin cuenta. No lleva identificadores, y se dice en la
-  lista de [ADR 0014](0014-usar-ramal-sin-cuenta.md).
+  lista de [ADR 0014](0014-usar-git-rudder-sin-cuenta.md).
 - El documento `ai` crece un campo por funcion, y la regla de resolucion del motor tiene que saber
   que el modelo de una llave de organizacion manda sobre el del miembro.
 

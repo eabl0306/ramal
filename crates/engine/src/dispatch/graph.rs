@@ -1,8 +1,8 @@
 //! `graph/window`.
 
-use ramal_core_domain::RepoId;
-use ramal_protocol::RpcError;
-use ramal_protocol::methods::GraphWindowMethod;
+use git_rudder_core_domain::RepoId;
+use git_rudder_protocol::RpcError;
+use git_rudder_protocol::methods::GraphWindowMethod;
 
 use super::{parse_params, to_result};
 use crate::engine::UseCases;

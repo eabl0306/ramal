@@ -1,6 +1,6 @@
-import type { BridgeErrorKind } from '@ramal/bridge';
-import { ENGINE_ERROR_KEYS } from '@ramal/repo-view';
-import { Button, useT } from '@ramal/ui';
+import type { BridgeErrorKind } from '@git-rudder/bridge';
+import { ENGINE_ERROR_KEYS } from '@git-rudder/repo-view';
+import { Button, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import styles from './home-screen.module.css';

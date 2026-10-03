@@ -2,7 +2,7 @@
 # Prueba de humo de la imagen de produccion de la web. Construir no prueba nada:
 # la imagen se arranca y se comprueba lo que sirve.
 #
-#   bash apps/web/scripts/smoke-image.sh [imagen]      (por defecto ramal-web:local)
+#   bash apps/web/scripts/smoke-image.sh [imagen]      (por defecto git-rudder-web:local)
 #
 # - /healthz responde y el HEALTHCHECK de la imagen la marca sana.
 # - / y /en/ son las landings prerenderizadas, cada una en su idioma.
@@ -12,8 +12,8 @@
 #   salen tambien en las rutas que sirven contenido.
 set -euo pipefail
 
-image="${1:-ramal-web:local}"
-name="ramal-web-smoke-$$"
+image="${1:-git-rudder-web:local}"
+name="git-rudder-web-smoke-$$"
 port="${SMOKE_WEB_PORT:-18090}"
 base="http://127.0.0.1:${port}"
 headers="$(mktemp)"

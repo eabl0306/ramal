@@ -1,7 +1,7 @@
 # Configuracion de cargo comun a todo el workspace.
 
 [env]
-# Carpeta donde ts-rs escribe los tipos de TypeScript de ramal-protocol cuando
+# Carpeta donde ts-rs escribe los tipos de TypeScript de git-rudder-protocol cuando
 # corren sus tests (`just protocol-gen`). `relative = true` la resuelve desde la
 # raiz del repo, asi da igual desde que directorio se lance cargo. Un valor ya
 # presente en el entorno manda sobre este (la receta lo pasa explicito).

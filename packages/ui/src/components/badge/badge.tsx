@@ -33,7 +33,7 @@ export interface PlatformBadgeProps {
   readonly platform: BadgePlatform;
   /**
    * Las dos letras (GH, GL, BB, GT, AZ). Las da la tabla de plataformas de
-   * @ramal/domain, la unica fuente (gaps B-38); un repo local no las lleva.
+   * @git-rudder/domain, la unica fuente (gaps B-38); un repo local no las lleva.
    */
   readonly abbr?: string;
   /** Nombre accesible: la marca ("GitHub") o "Solo local". */
@@ -63,7 +63,7 @@ export function PlatformBadge({
 
 export type PrBadgeState = 'open' | 'draft' | 'approved' | 'changes' | 'merged' | 'closed';
 
-/** Estado de un PR: el color sobre su tono al 14%, con el texto de @ramal/i18n. */
+/** Estado de un PR: el color sobre su tono al 14%, con el texto de @git-rudder/i18n. */
 export function PrStateBadge({ state }: { readonly state: PrBadgeState }): ReactElement {
   const t = useT();
   return (

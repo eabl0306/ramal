@@ -8,7 +8,7 @@ import {
   qualityConfig,
   reactConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
@@ -42,7 +42,7 @@ function layer(type, types) {
 
 /**
  * Lo que cada capa puede importar de npm y del workspace (architecture.md 5.2).
- * Los paquetes @ramal/* llegan por node_modules, asi que boundaries los ve como
+ * Los paquetes @git-rudder/* llegan por node_modules, asi que boundaries los ve como
  * externos y se nombran aqui uno a uno.
  */
 function external(type, source) {
@@ -62,15 +62,21 @@ const policies = [
     'app',
     LOCAL_TYPES.filter((type) => type !== 'test-support'),
   ),
-  external('domain', ['@ramal/domain']),
-  external('application', ['@ramal/domain']),
-  external('infrastructure', ['@ramal/domain', '@ramal/api-client', 'zod']),
-  external('ui', ['@ramal/domain', '@ramal/ui', '@ramal/i18n', 'react', 'react-router']),
+  external('domain', ['@git-rudder/domain']),
+  external('application', ['@git-rudder/domain']),
+  external('infrastructure', ['@git-rudder/domain', '@git-rudder/api-client', 'zod']),
+  external('ui', [
+    '@git-rudder/domain',
+    '@git-rudder/ui',
+    '@git-rudder/i18n',
+    'react',
+    'react-router',
+  ]),
   external('app', [
-    '@ramal/domain',
-    '@ramal/ui',
-    '@ramal/ui/**',
-    '@ramal/i18n',
+    '@git-rudder/domain',
+    '@git-rudder/ui',
+    '@git-rudder/ui/**',
+    '@git-rudder/i18n',
     'react',
     'react-dom',
     'react-router',
@@ -87,7 +93,7 @@ const policies = [
       to: {
         module: {
           origin: 'external',
-          source: ['vitest', '@testing-library/**', 'react', 'react-router', '@ramal/**'],
+          source: ['vitest', '@testing-library/**', 'react', 'react-router', '@git-rudder/**'],
         },
       },
     },

@@ -10,9 +10,9 @@
 !dist/webview/assets/*.js
 !dist/webview/assets/*.css
 !dist/webview/assets/*.ttf
-!dist/bin/ramal-vscode-engine
-!dist/bin/ramal-vscode-engine.exe
-!media/ramal.svg
+!dist/bin/git-rudder-vscode-engine
+!dist/bin/git-rudder-vscode-engine.exe
+!media/git-rudder.svg
 !package.nls.json
 !package.nls.es.json
 !README.md

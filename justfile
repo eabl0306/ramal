@@ -11,8 +11,8 @@
 #   - Todo paquete y app de TypeScript tiene los scripts lint, typecheck,
 #     test (vitest run) y test:coverage. Las apps ademas dev, build y e2e; la
 #     extension de VS Code ademas test:integration y package.
-#   - Nombres: @ramal/domain, @ramal/i18n, @ramal/ui, @ramal/repo-view,
-#     @ramal/bridge, @ramal/api-client, @ramal/web, @ramal/desktop y "ramal"
+#   - Nombres: @git-rudder/domain, @git-rudder/i18n, @git-rudder/ui, @git-rudder/repo-view,
+#     @git-rudder/bridge, @git-rudder/api-client, @git-rudder/web, @git-rudder/desktop y "git-rudder"
 #     (la extension). Las recetas los llaman con `pnpm --filter <nombre> <script>`.
 #   - Rust: ninguna receta usa --workspace. Pisaria default-members, que deja
 #     fuera el crate de escritorio porque necesita webkit2gtk.
@@ -33,24 +33,24 @@ compose := "docker compose"
 # perfil, compose solo conoce la base de datos, y `just db-up` funciona aunque
 # las apps todavia no tengan Dockerfile.
 compose_full := "docker compose --profile full"
-pg_user := env_var_or_default("POSTGRES_USER", "ramal")
-pg_db := env_var_or_default("POSTGRES_DB", "ramal")
-database_url := "postgres://" + pg_user + ":${POSTGRES_PASSWORD:-ramal}@127.0.0.1:${POSTGRES_PORT:-5432}/" + pg_db
+pg_user := env_var_or_default("POSTGRES_USER", "git_rudder")
+pg_db := env_var_or_default("POSTGRES_DB", "git_rudder")
+database_url := "postgres://" + pg_user + ":${POSTGRES_PASSWORD:-git_rudder}@127.0.0.1:${POSTGRES_PORT:-5432}/" + pg_db
 
 # Crates de cada area, para pasarlos a cargo con -p.
-api_crates := "-p ramal-api-domain -p ramal-api-application -p ramal-api-infrastructure -p ramal-api-http -p ramal-api"
-engine_crates := "-p ramal-core-domain -p ramal-core-application -p ramal-protocol -p ramal-git -p ramal-engine -p ramal-vscode-engine"
+api_crates := "-p git-rudder-api-domain -p git-rudder-api-application -p git-rudder-api-infrastructure -p git-rudder-api-http -p git-rudder-api"
+engine_crates := "-p git-rudder-core-domain -p git-rudder-core-application -p git-rudder-protocol -p git-rudder-git -p git-rudder-engine -p git-rudder-vscode-engine"
 # Fakes y ayudas de test de los nucleos (src/testing/): se compilan con los
 # tests y se ejercitan solos, asi que contarlos como cubiertos inflaba la cifra.
 # Los tests.rs y tests/ ya los deja fuera cargo-llvm-cov por defecto.
 cov_ignore := "--ignore-filename-regex '/src/testing/'"
-# Carpetas de los paquetes de TypeScript compartidos; cada una es @ramal/<carpeta>.
+# Carpetas de los paquetes de TypeScript compartidos; cada una es @git-rudder/<carpeta>.
 # Tiene que nombrar todos los de packages/ salvo la configuracion (eslint-config,
 # tsconfig): tools/checks/package-graph.mjs falla si sobra o falta alguno.
 ts_package_dirs := "domain i18n ui repo-view bridge api-client"
 protocol_out := "packages/bridge/src/generated"
 # Imagen con los requisitos de Tauri en Linux (tools/docker/tauri-linux.Dockerfile).
-tauri_image := "ramal-tauri-linux:local"
+tauri_image := "git-rudder-tauri-linux:local"
 
 # Lista todas las recetas.
 default:
@@ -183,11 +183,11 @@ rust-lint:
 
 # clippy no mide ni la cognitiva al estilo Sonar ni la ciclomatica: su
 # cognitive_complexity es un conteo plano. tools/rust-complexity las mide con syn
-# sobre los fuentes, sin compilar, asi que cubre tambien ramal-desktop.
+# sobre los fuentes, sin compilar, asi que cubre tambien git-rudder-desktop.
 [group('rust')]
 [doc('Complejidad cognitiva (15) y ciclomatica (10) de cada funcion de Rust.')]
 rust-complexity:
-    cargo run --quiet -p ramal-rust-complexity -- crates apps tools
+    cargo run --quiet -p git-rudder-rust-complexity -- crates apps tools
 
 # Tests de Rust de default-members (todo menos el escritorio).
 [group('rust')]
@@ -218,23 +218,23 @@ api-check:
 api-test:
     cargo test {{api_crates}}
 
-# RAMAL_TEST_REQUIRE_DATABASE convierte el salto en fallo: si la base no esta,
+# GIT_RUDDER_TEST_REQUIRE_DATABASE convierte el salto en fallo: si la base no esta,
 # esto se pone en rojo en vez de pasar sin ejecutar nada. `--tests` y no una
 # lista de suites: en Gastonomo la lista se quedo vieja al partir un fichero en
 # dos y una bateria entera dejo de correr sin ponerse en rojo.
 #
-# Si RAMAL_TEST_DATABASE_URL ya viene puesta (la CI, con su servicio de
+# Si GIT_RUDDER_TEST_DATABASE_URL ya viene puesta (la CI, con su servicio de
 # postgres), se usa esa y no se levanta compose: dos Postgres en el 5432 chocan.
 [group('api')]
 [doc('Tests de la API contra el Postgres de docker compose, sin permitir que se salten.')]
 api-test-db:
     #!/usr/bin/env bash
     set -euo pipefail
-    if [ -z "${RAMAL_TEST_DATABASE_URL:-}" ]; then
+    if [ -z "${GIT_RUDDER_TEST_DATABASE_URL:-}" ]; then
       just db-up
-      export RAMAL_TEST_DATABASE_URL="{{database_url}}"
+      export GIT_RUDDER_TEST_DATABASE_URL="{{database_url}}"
     fi
-    RAMAL_TEST_REQUIRE_DATABASE=1 cargo test {{api_crates}} --tests -- --nocapture
+    GIT_RUDDER_TEST_REQUIRE_DATABASE=1 cargo test {{api_crates}} --tests -- --nocapture
 
 # El nucleo se mide con sus propios tests y cada crate por separado (`report -p`
 # reaprovecha esa ejecucion). Medir dominio y aplicacion juntos dejaba que el
@@ -244,9 +244,9 @@ api-test-db:
 [group('api')]
 [doc('Cobertura de la API: 80% en dominio y en aplicacion, cada uno, y 60% global.')]
 api-cov:
-    cargo llvm-cov -p ramal-api-domain -p ramal-api-application {{cov_ignore}} --summary-only
-    cargo llvm-cov report -p ramal-api-domain {{cov_ignore}} --summary-only --fail-under-lines 80
-    cargo llvm-cov report -p ramal-api-application {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov -p git-rudder-api-domain -p git-rudder-api-application {{cov_ignore}} --summary-only
+    cargo llvm-cov report -p git-rudder-api-domain {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov report -p git-rudder-api-application {{cov_ignore}} --summary-only --fail-under-lines 80
     cargo llvm-cov {{api_crates}} {{cov_ignore}} --summary-only --fail-under-lines 60
 
 # Swagger UI va encendida salvo que .env diga otra cosa: la API la deja apagada
@@ -254,33 +254,33 @@ api-cov:
 [group('api')]
 [doc('Arranca la API en local contra el Postgres de docker compose.')]
 api-run: db-up
-    RAMAL__DATABASE__URL="{{database_url}}" RAMAL__SERVER__SWAGGER_UI="${RAMAL__SERVER__SWAGGER_UI:-true}" cargo run --bin ramal-api
+    GIT_RUDDER__DATABASE__URL="{{database_url}}" GIT_RUDDER__SERVER__SWAGGER_UI="${GIT_RUDDER__SERVER__SWAGGER_UI:-true}" cargo run --bin git-rudder-api
 
 # Compila el binario de la API en modo release.
 [group('api')]
 api-build:
-    cargo build --release -p ramal-api
+    cargo build --release -p git-rudder-api
 
 # El contexto es la raiz porque el workspace de Cargo y el Cargo.lock viven aqui.
 # CARGO_BUILD_JOBS del entorno limita los hilos de cargo dentro de la imagen.
 [group('api')]
 [doc('Construye la imagen de produccion de la API.')]
 api-docker:
-    docker build -f apps/api/Dockerfile --build-arg CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-default}" -t ramal-api:local .
+    docker build -f apps/api/Dockerfile --build-arg CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-default}" -t git-rudder-api:local .
 
 # Contrato del binario: con `--openapi <ruta>` escribe el documento y sale sin
-# tocar la base de datos. Se versiona y @ramal/api-client genera su cliente de el.
+# tocar la base de datos. Se versiona y @git-rudder/api-client genera su cliente de el.
 [group('api')]
 [doc('Escribe el documento OpenAPI de la API en apps/api/openapi.json.')]
 api-openapi:
-    cargo run --quiet --bin ramal-api -- --openapi apps/api/openapi.json
+    cargo run --quiet --bin git-rudder-api -- --openapi apps/api/openapi.json
 
 # El cliente de la web se genera desde el documento versionado, nunca desde la
 # API en marcha: asi la CI puede comprobar que no hay diff sin levantar nada.
 [group('api')]
-[doc('Regenera los tipos de @ramal/api-client desde apps/api/openapi.json.')]
+[doc('Regenera los tipos de @git-rudder/api-client desde apps/api/openapi.json.')]
 api-client:
-    {{pnpm_filter}} @ramal/api-client generate
+    {{pnpm_filter}} @git-rudder/api-client generate
 
 # Falla si el cliente generado no coincide con el que esta en git.
 [group('api')]
@@ -315,9 +315,9 @@ engine-test:
 [group('engine')]
 [doc('Cobertura del motor: 80% en dominio y en aplicacion, cada uno, y 60% global.')]
 engine-cov:
-    cargo llvm-cov -p ramal-core-domain -p ramal-core-application {{cov_ignore}} --summary-only
-    cargo llvm-cov report -p ramal-core-domain {{cov_ignore}} --summary-only --fail-under-lines 80
-    cargo llvm-cov report -p ramal-core-application {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov -p git-rudder-core-domain -p git-rudder-core-application {{cov_ignore}} --summary-only
+    cargo llvm-cov report -p git-rudder-core-domain {{cov_ignore}} --summary-only --fail-under-lines 80
+    cargo llvm-cov report -p git-rudder-core-application {{cov_ignore}} --summary-only --fail-under-lines 80
     cargo llvm-cov {{engine_crates}} {{cov_ignore}} --summary-only --fail-under-lines 60
 
 # ts-rs escribe los tipos cuando corren sus tests `export_bindings_*`. La carpeta
@@ -326,7 +326,7 @@ engine-cov:
 [doc('Regenera los tipos de TypeScript del protocolo en packages/bridge.')]
 protocol-gen:
     rm -rf {{protocol_out}}
-    TS_RS_EXPORT_DIR="{{justfile_directory()}}/{{protocol_out}}" cargo test -p ramal-protocol export_bindings
+    TS_RS_EXPORT_DIR="{{justfile_directory()}}/{{protocol_out}}" cargo test -p git-rudder-protocol export_bindings
 
 # Falla si los tipos generados no coinciden con los que estan en git.
 [group('engine')]
@@ -345,7 +345,7 @@ protocol-check: protocol-gen
 # Compila el sidecar de la extension en modo release.
 [group('engine')]
 vscode-engine-build:
-    cargo build --release -p ramal-vscode-engine
+    cargo build --release -p git-rudder-vscode-engine
 
 # ---------------------------------------------------------------- packages ---
 
@@ -369,13 +369,13 @@ packages-test: (_packages-run "test")
 [group('packages')]
 packages-cov: (_packages-run "test:coverage")
 
-# Regenera los tipos de los parametros de @ramal/i18n desde el diccionario castellano.
+# Regenera los tipos de los parametros de @git-rudder/i18n desde el diccionario castellano.
 [group('packages')]
 i18n-gen:
-    {{pnpm_filter}} @ramal/i18n generate
+    {{pnpm_filter}} @git-rudder/i18n generate
 
 # Nada se salta en silencio: una carpeta de la lista que no existe (un paquete
-# renombrado o borrado) falla, cada paquete tiene que llamarse @ramal/<carpeta>
+# renombrado o borrado) falla, cada paquete tiene que llamarse @git-rudder/<carpeta>
 # y declarar el script del contrato (si no, pnpm lo saltaria sin avisar), y
 # cualquier fallo de su script pone la receta en rojo. Que la lista no se deje
 # ningun paquete lo vigila tools/checks/package-graph.mjs.
@@ -391,11 +391,11 @@ _packages-run script:
         exit 1
       fi
       info="$(node -p "const p = require('./${manifest}'); [p.name, Boolean(p.scripts && p.scripts['{{script}}'])].join(' ')")"
-      if [ "${info}" != "@ramal/${dir} true" ]; then
-        echo "packages: ${manifest} incumple el contrato (nombre @ramal/${dir} y script {{script}}): ${info}" >&2
+      if [ "${info}" != "@git-rudder/${dir} true" ]; then
+        echo "packages: ${manifest} incumple el contrato (nombre @git-rudder/${dir} y script {{script}}): ${info}" >&2
         exit 1
       fi
-      filters+=(--filter "@ramal/${dir}")
+      filters+=(--filter "@git-rudder/${dir}")
     done
     if [ "${#filters[@]}" -eq 0 ]; then
       echo "packages: no hay ningun paquete compartido que comprobar" >&2
@@ -412,42 +412,42 @@ web-check: web-lint web-typecheck web-cov web-build
 # Servidor de desarrollo con HMR.
 [group('web')]
 web-dev:
-    {{pnpm_filter}} @ramal/web dev
+    {{pnpm_filter}} @git-rudder/web dev
 
 # ESLint de la web (capas, complejidad, hooks, accesibilidad, textos visibles).
 [group('web')]
 web-lint:
-    {{pnpm_filter}} @ramal/web lint
+    {{pnpm_filter}} @git-rudder/web lint
 
 # TypeScript en modo estricto.
 [group('web')]
 web-typecheck:
-    {{pnpm_filter}} @ramal/web typecheck
+    {{pnpm_filter}} @git-rudder/web typecheck
 
 # Tests unitarios (vitest).
 [group('web')]
 web-test:
-    {{pnpm_filter}} @ramal/web test
+    {{pnpm_filter}} @git-rudder/web test
 
 # Cobertura de la web con sus umbrales.
 [group('web')]
 web-cov:
-    {{pnpm_filter}} @ramal/web test:coverage
+    {{pnpm_filter}} @git-rudder/web test:coverage
 
 # Build de produccion.
 [group('web')]
 web-build:
-    {{pnpm_filter}} @ramal/web build
+    {{pnpm_filter}} @git-rudder/web build
 
 # E2E de Playwright (levanta el servidor el solo).
 [group('web')]
 web-e2e:
-    {{pnpm_filter}} @ramal/web e2e
+    {{pnpm_filter}} @git-rudder/web e2e
 
 # Descarga el navegador que usa Playwright.
 [group('web')]
 web-e2e-install:
-    {{pnpm_filter}} @ramal/web exec playwright install --with-deps chromium
+    {{pnpm_filter}} @git-rudder/web exec playwright install --with-deps chromium
 
 # Sin tocar la red real: la pila se levanta y se deja arriba para seguir
 # probando a mano; `just down` la tumba. Las rutas que Playwright pide son las
@@ -457,17 +457,17 @@ web-e2e-install:
 e2e-stack:
     {{compose_full}} up -d --build --wait
     E2E_USE_REAL_API=1 E2E_BASE_URL="http://127.0.0.1:${GATEWAY_PORT:-8090}" \
-      {{pnpm_filter}} @ramal/web e2e
+      {{pnpm_filter}} @git-rudder/web e2e
 
 # Construye la imagen de produccion de la web (contexto en la raiz).
 [group('web')]
 web-docker:
-    docker build -f apps/web/Dockerfile -t ramal-web:local .
+    docker build -f apps/web/Dockerfile -t git-rudder-web:local .
 
 # Construir no prueba nada: arranca la imagen y comprueba lo que sirve.
 [group('web')]
 web-docker-smoke: web-docker
-    bash apps/web/scripts/smoke-image.sh ramal-web:local
+    bash apps/web/scripts/smoke-image.sh git-rudder-web:local
 
 # ----------------------------------------------------------------- desktop ---
 
@@ -478,57 +478,57 @@ desktop-check: desktop-lint desktop-typecheck desktop-cov desktop-web-build
 # App de escritorio en desarrollo (tauri dev). Necesita webkit2gtk.
 [group('desktop')]
 desktop-dev:
-    {{pnpm_filter}} @ramal/desktop exec tauri dev
+    {{pnpm_filter}} @git-rudder/desktop exec tauri dev
 
 # ESLint del frontend de escritorio.
 [group('desktop')]
 desktop-lint:
-    {{pnpm_filter}} @ramal/desktop lint
+    {{pnpm_filter}} @git-rudder/desktop lint
 
 # TypeScript en modo estricto.
 [group('desktop')]
 desktop-typecheck:
-    {{pnpm_filter}} @ramal/desktop typecheck
+    {{pnpm_filter}} @git-rudder/desktop typecheck
 
 # Tests unitarios del frontend (vitest).
 [group('desktop')]
 desktop-test:
-    {{pnpm_filter}} @ramal/desktop test
+    {{pnpm_filter}} @git-rudder/desktop test
 
 # Cobertura del frontend con sus umbrales.
 [group('desktop')]
 desktop-cov:
-    {{pnpm_filter}} @ramal/desktop test:coverage
+    {{pnpm_filter}} @git-rudder/desktop test:coverage
 
 # Build de Vite del frontend, sin empaquetar la app nativa.
 [group('desktop')]
 desktop-web-build:
-    {{pnpm_filter}} @ramal/desktop build
+    {{pnpm_filter}} @git-rudder/desktop build
 
 # E2E de Playwright contra el build de Vite, con el IPC de Tauri simulado.
 [group('desktop')]
 desktop-e2e:
-    {{pnpm_filter}} @ramal/desktop e2e
+    {{pnpm_filter}} @git-rudder/desktop e2e
 
 # Descarga el navegador que usa Playwright.
 [group('desktop')]
 desktop-e2e-install:
-    {{pnpm_filter}} @ramal/desktop exec playwright install --with-deps chromium
+    {{pnpm_filter}} @git-rudder/desktop exec playwright install --with-deps chromium
 
 # Clippy, tests y cobertura del lado nativo. Necesita webkit2gtk (libwebkit2gtk-4.1-dev).
 [group('desktop')]
 desktop-rust-check:
-    cargo clippy -p ramal-desktop --all-targets --all-features -- -D warnings
-    cargo test -p ramal-desktop
+    cargo clippy -p git-rudder-desktop --all-targets --all-features -- -D warnings
+    cargo test -p git-rudder-desktop
     @just desktop-rust-cov
 
 # No se llama desktop-cov: ese nombre es la cobertura de Vitest del frontend. No
 # entra en `just cov` porque necesita webkit2gtk; la corre desktop-rust-check, en
 # local, en la CI y en la imagen de Tauri.
 [group('desktop')]
-[doc('Cobertura del host de Tauri (ramal-desktop): 60% global (ADR 0006).')]
+[doc('Cobertura del host de Tauri (git-rudder-desktop): 60% global (ADR 0006).')]
 desktop-rust-cov:
-    cargo llvm-cov -p ramal-desktop --summary-only --fail-under-lines 60
+    cargo llvm-cov -p git-rudder-desktop --summary-only --fail-under-lines 60
 
 # El empaquetado (.deb, .AppImage, .dmg, instaladores) llega con el workflow de
 # release; hasta entonces el build compila el binario con el frontend embebido y
@@ -536,7 +536,7 @@ desktop-rust-cov:
 [group('desktop')]
 [doc('Compila la app de escritorio (tauri build sin empaquetar). Necesita webkit2gtk.')]
 desktop-build:
-    {{pnpm_filter}} @ramal/desktop exec tauri build --no-bundle
+    {{pnpm_filter}} @git-rudder/desktop exec tauri build --no-bundle
 
 # El binario del E2E se compila con la feature `e2e`, que mete el servidor
 # WebDriver embebido y deja elegir la carpeta por variable de entorno (el dialogo
@@ -548,11 +548,11 @@ desktop-build:
 desktop-e2e-native:
     #!/usr/bin/env bash
     set -euo pipefail
-    {{pnpm_filter}} @ramal/desktop exec tauri build --debug --no-bundle --features e2e
+    {{pnpm_filter}} @git-rudder/desktop exec tauri build --debug --no-bundle --features e2e
     if [ "$(uname -s)" != Linux ] || [ -n "${DISPLAY:-}" ]; then
-      {{pnpm_filter}} @ramal/desktop e2e:native
+      {{pnpm_filter}} @git-rudder/desktop e2e:native
     else
-      xvfb-run -a {{pnpm_filter}} @ramal/desktop e2e:native
+      xvfb-run -a {{pnpm_filter}} @git-rudder/desktop e2e:native
     fi
 
 # La imagen trae webkit2gtk y el resto de requisitos de Tauri en Ubuntu 22.04,
@@ -562,7 +562,7 @@ desktop-e2e-native:
 desktop-docker-image:
     docker build -f tools/docker/tauri-linux.Dockerfile -t {{tauri_image}} tools/docker
 
-# Clippy, tests y cobertura de ramal-desktop dentro de la imagen de Tauri.
+# Clippy, tests y cobertura de git-rudder-desktop dentro de la imagen de Tauri.
 [group('desktop')]
 desktop-docker-rust-check: desktop-docker-image
     @just _desktop-docker desktop-rust-check
@@ -588,8 +588,8 @@ _desktop-docker recipe:
       --user "$(id -u):$(id -g)" \
       -v "{{justfile_directory()}}:{{justfile_directory()}}" \
       -w "{{justfile_directory()}}" \
-      -v ramal-desktop-cargo:/cargo-home \
-      -v ramal-desktop-target:/cargo-target \
+      -v git-rudder-desktop-cargo:/cargo-home \
+      -v git-rudder-desktop-target:/cargo-target \
       -e CARGO_BUILD_JOBS \
       -e CI \
       {{tauri_image}} just {{recipe}}
@@ -603,32 +603,32 @@ vscode-check: vscode-lint vscode-typecheck vscode-cov vscode-build
 # ESLint del host de la extension y de los webviews.
 [group('vscode')]
 vscode-lint:
-    {{pnpm_filter}} ramal lint
+    {{pnpm_filter}} git-rudder lint
 
 # TypeScript en modo estricto.
 [group('vscode')]
 vscode-typecheck:
-    {{pnpm_filter}} ramal typecheck
+    {{pnpm_filter}} git-rudder typecheck
 
 # Tests unitarios (vitest).
 [group('vscode')]
 vscode-test:
-    {{pnpm_filter}} ramal test
+    {{pnpm_filter}} git-rudder test
 
 # Cobertura de la extension con sus umbrales.
 [group('vscode')]
 vscode-cov:
-    {{pnpm_filter}} ramal test:coverage
+    {{pnpm_filter}} git-rudder test:coverage
 
 # Build del host (esbuild) y de los webviews.
 [group('vscode')]
 vscode-build:
-    {{pnpm_filter}} ramal build
+    {{pnpm_filter}} git-rudder build
 
 # E2E de Playwright contra el bundle del webview, con acquireVsCodeApi falso (puerto 4175).
 [group('vscode')]
 vscode-e2e:
-    {{pnpm_filter}} ramal e2e
+    {{pnpm_filter}} git-rudder e2e
 
 # En Linux sin DISPLAY (CI, SSH) se arranca un servidor X virtual con xvfb-run;
 # en macOS y Windows VS Code abre su ventana sin mas. Necesita el sidecar
@@ -639,12 +639,12 @@ vscode-test-integration: vscode-engine-build vscode-build
     #!/usr/bin/env bash
     set -euo pipefail
     if [ "$(uname -s)" != Linux ] || [ -n "${DISPLAY:-}" ]; then
-      {{pnpm_filter}} ramal test:integration
+      {{pnpm_filter}} git-rudder test:integration
     else
-      xvfb-run -a {{pnpm_filter}} ramal test:integration
+      xvfb-run -a {{pnpm_filter}} git-rudder test:integration
     fi
 
-# Contrato: el sidecar se copia a apps/vscode/dist/bin/ (ramal-vscode-engine, con
+# Contrato: el sidecar se copia a apps/vscode/dist/bin/ (git-rudder-vscode-engine, con
 # .exe en Windows), la ruta fija que ejecuta la extension instalada
 # (architecture.md 4.4), y el script `package` de la extension recibe --target con
 # la plataforma de vsce. Un .vsix por plataforma, porque lleva un binario nativo.
@@ -664,11 +664,11 @@ vscode-package: vscode-engine-build vscode-build
       MINGW* | MSYS* | CYGWIN*) target=win32-x64 ;;
       *) echo "vscode-package: plataforma no soportada: $(uname -s)-$(uname -m)" >&2; exit 1 ;;
     esac
-    binary=ramal-vscode-engine
+    binary=git-rudder-vscode-engine
     case "${target}" in win32-*) binary="${binary}.exe" ;; esac
     mkdir -p apps/vscode/dist/bin
     cp "target/release/${binary}" "apps/vscode/dist/bin/${binary}"
-    {{pnpm_filter}} ramal run package --target "${target}"
+    {{pnpm_filter}} git-rudder run package --target "${target}"
 
 # ------------------------------------------------------------------ docker ---
 
@@ -700,9 +700,9 @@ ps:
 smoke url="":
     bash tools/scripts/smoke-stack.sh {{ if url == "" { "http://127.0.0.1:${GATEWAY_PORT:-8090}" } else { url } }}
 
-# Corre en su propio proyecto de compose (ramal-smoke) y con puertos que elige
+# Corre en su propio proyecto de compose (git-rudder-smoke) y con puertos que elige
 # Docker (el 0), asi que no toca la pila de desarrollo: ni sus contenedores, ni
-# sus puertos, ni sus volumenes. Antes compartia el proyecto `ramal`, y su
+# sus puertos, ni sus volumenes. Antes compartia el proyecto `git-rudder`, y su
 # `down -v` borraba la base local y la cache de cargo de la API en cada
 # `just ci`. El entorno del shell gana a .env y al `name:` de compose.yaml.
 [group('docker')]
@@ -710,7 +710,7 @@ smoke url="":
 stack-smoke:
     #!/usr/bin/env bash
     set -euo pipefail
-    export COMPOSE_PROJECT_NAME=ramal-smoke RAMAL_BIND_IP=127.0.0.1
+    export COMPOSE_PROJECT_NAME=git-rudder-smoke GIT_RUDDER_BIND_IP=127.0.0.1
     export POSTGRES_PORT=0 API_PORT=0 WEB_PORT=0 GATEWAY_PORT=0
     export MAILPIT_WEB_PORT=0 MAILPIT_SMTP_PORT=0
     trap '{{compose_full}} down -v >/dev/null 2>&1 || true' EXIT

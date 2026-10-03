@@ -4,7 +4,7 @@ import {
   type SignupForm,
   validateLogin,
   validateSignup,
-} from '@ramal/domain';
+} from '@git-rudder/domain';
 
 import type {
   AuthFailure,
@@ -15,7 +15,7 @@ import type {
 } from '../ports/auth-gateway';
 
 /**
- * Casos de uso de entrar y crear cuenta. Validan con @ramal/domain antes de
+ * Casos de uso de entrar y crear cuenta. Validan con @git-rudder/domain antes de
  * molestar a la API (la API vuelve a validar y es la que manda) y devuelven una
  * union de resultados: nunca lanzan, ni siquiera si el adaptador lo hace.
  */

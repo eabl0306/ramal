@@ -37,13 +37,13 @@ fn falls_back_to_defaults_when_the_environment_is_empty() {
 fn reads_nested_keys_from_double_underscore_variables() {
     Jail::expect_with(|jail| {
         jail.clear_env();
-        jail.set_env("RAMAL__SERVER__HOST", "0.0.0.0");
-        jail.set_env("RAMAL__SERVER__PORT", "9090");
-        jail.set_env("RAMAL__DATABASE__URL", "postgres://u:p@db:5432/x");
-        jail.set_env("RAMAL__DATABASE__MAX_CONNECTIONS", "9");
-        jail.set_env("RAMAL__DATABASE__ACQUIRE_TIMEOUT_MS", "1500");
-        jail.set_env("RAMAL__TELEMETRY__LOG_LEVEL", "debug");
-        jail.set_env("RAMAL__SERVER__SWAGGER_UI", "true");
+        jail.set_env("GIT_RUDDER__SERVER__HOST", "0.0.0.0");
+        jail.set_env("GIT_RUDDER__SERVER__PORT", "9090");
+        jail.set_env("GIT_RUDDER__DATABASE__URL", "postgres://u:p@db:5432/x");
+        jail.set_env("GIT_RUDDER__DATABASE__MAX_CONNECTIONS", "9");
+        jail.set_env("GIT_RUDDER__DATABASE__ACQUIRE_TIMEOUT_MS", "1500");
+        jail.set_env("GIT_RUDDER__TELEMETRY__LOG_LEVEL", "debug");
+        jail.set_env("GIT_RUDDER__SERVER__SWAGGER_UI", "true");
         let config = AppConfig::from_env().expect("environment should load");
         assert!(config.server.swagger_ui);
         assert_eq!(config.database.url, "postgres://u:p@db:5432/x");
@@ -62,7 +62,7 @@ fn reads_nested_keys_from_double_underscore_variables() {
 fn rejects_a_port_that_is_not_a_number() {
     Jail::expect_with(|jail| {
         jail.clear_env();
-        jail.set_env("RAMAL__SERVER__PORT", "not-a-port");
+        jail.set_env("GIT_RUDDER__SERVER__PORT", "not-a-port");
         assert!(matches!(
             AppConfig::from_env(),
             Err(ConfigError::Invalid(_))
@@ -75,7 +75,7 @@ fn rejects_a_port_that_is_not_a_number() {
 fn rejects_a_key_it_does_not_know() {
     Jail::expect_with(|jail| {
         jail.clear_env();
-        jail.set_env("RAMAL__DATABASE__PASSWORD", "secret");
+        jail.set_env("GIT_RUDDER__DATABASE__PASSWORD", "secret");
         let error = AppConfig::from_env().expect_err("unknown keys must fail");
         assert!(error.to_string().contains("invalid configuration"));
         Ok(())
@@ -87,7 +87,7 @@ fn ignores_variables_without_the_double_underscore_prefix() {
     Jail::expect_with(|jail| {
         jail.clear_env();
         // Las de los tests de PostgreSQL llevan un solo guion bajo a proposito.
-        jail.set_env("RAMAL_TEST_DATABASE_URL", "postgres://elsewhere");
+        jail.set_env("GIT_RUDDER_TEST_DATABASE_URL", "postgres://elsewhere");
         assert_eq!(
             AppConfig::from_env().expect("the variable is not ours"),
             AppConfig::default()

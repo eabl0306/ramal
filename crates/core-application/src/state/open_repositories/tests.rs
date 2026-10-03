@@ -3,7 +3,7 @@
     reason = "tests fail loudly on purpose; a panic here is a failed assertion"
 )]
 
-use ramal_core_domain::{RepoId, RepoRoot};
+use git_rudder_core_domain::{RepoId, RepoRoot};
 
 use super::OpenRepositories;
 

@@ -7,8 +7,8 @@ describe('createBrowserClipboard', () => {
     const writeText = vi.fn(() => Promise.resolve());
     const clipboard = createBrowserClipboard(() => ({ writeText }));
 
-    await expect(clipboard.copy('brew install --cask ramal')).resolves.toBe(true);
-    expect(writeText).toHaveBeenCalledWith('brew install --cask ramal');
+    await expect(clipboard.copy('brew install --cask git-rudder')).resolves.toBe(true);
+    expect(writeText).toHaveBeenCalledWith('brew install --cask git-rudder');
   });
 
   it('contesta false si el navegador lo niega', async () => {

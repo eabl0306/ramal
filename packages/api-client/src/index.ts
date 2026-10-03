@@ -1,4 +1,4 @@
-// API publica de @ramal/api-client. Solo la importa apps/web/src/infrastructure
+// API publica de @git-rudder/api-client. Solo la importa apps/web/src/infrastructure
 // (architecture.md 5.2): los adaptadores HTTP de la web hablan con la API a
 // traves de este cliente y validan lo que reciben antes de pasarlo al dominio.
 import type { components } from './generated/schema';

@@ -4,7 +4,7 @@
 //! Un nombre de ref no puede llevar caracteres de control (`check-ref-format`), asi
 //! que NUL separa los campos y el salto de linea separa las refs.
 
-use ramal_core_domain::{GitRef, RefName, Sha};
+use git_rudder_core_domain::{GitRef, RefName, Sha};
 
 use super::ParseError;
 

@@ -11,7 +11,7 @@ import { readLines } from './lib/text.mjs';
  * palabra corriente y no puede disparar la comprobacion.
  *
  * Un ticket es una issue de GitHub (#123) o una tarjeta del tablero (RAM-123).
- * Es el mismo criterio que la regla ramal/ticketed-todo de ESLint; este script
+ * Es el mismo criterio que la regla git-rudder/ticketed-todo de ESLint; este script
  * existe porque ESLint no ve Rust, ni el CSS, ni los scripts y la configuracion.
  */
 const WORDS = ['TO' + 'DO', 'FIX' + 'ME', 'XX' + 'X', 'HA' + 'CK'];

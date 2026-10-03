@@ -11,7 +11,7 @@
     reason = "tests fail loudly on purpose; a panic here is a failed assertion"
 )]
 
-use ramal_core_domain::{GitTime, TimeError};
+use git_rudder_core_domain::{GitTime, TimeError};
 
 #[test]
 fn git_time_reads_the_raw_format_of_git() {

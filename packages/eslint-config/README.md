@@ -1,4 +1,4 @@
-# @ramal/eslint-config
+# @git-rudder/eslint-config
 
 La configuracion de ESLint de todo el monorepo, por capas. Cada app y cada paquete tiene su
 `eslint.config.js` y compone estas piezas; la raiz solo linta `tools/` y este paquete.
@@ -14,9 +14,9 @@ La configuracion de ESLint de todo el monorepo, por capas. Cada app y cada paque
 
 Reglas propias, en `rules/`:
 
-- `ramal/no-raw-colors`: ningun color escrito a mano fuera de `packages/ui/src/themes`.
-- `ramal/no-jsx-literal-text`: ningun texto visible en el JSX; sale de `@ramal/i18n`.
-- `ramal/ticketed-todo`: un marcador de trabajo pendiente lleva ticket (`RAM-123` o `#123`).
+- `git-rudder/no-raw-colors`: ningun color escrito a mano fuera de `packages/ui/src/themes`.
+- `git-rudder/no-jsx-literal-text`: ningun texto visible en el JSX; sale de `@git-rudder/i18n`.
+- `git-rudder/ticketed-todo`: un marcador de trabajo pendiente lleva ticket (`RAM-123` o `#123`).
 
 Cambiar un limite es una decision de equipo y se hace aqui, nunca con un `eslint-disable`:
 `tools/checks/no-limit-suppressions.mjs` lo rechaza.

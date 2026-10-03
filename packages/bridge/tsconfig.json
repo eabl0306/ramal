@@ -2,7 +2,7 @@
 // puente. Solo emite declaraciones, y fuera del arbol de fuentes, para que las
 // project references funcionen sin un paso de build que orquestar.
 {
-  "extends": "@ramal/tsconfig/library.json",
+  "extends": "@git-rudder/tsconfig/library.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

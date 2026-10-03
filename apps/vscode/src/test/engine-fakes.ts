@@ -5,7 +5,7 @@ import {
   PROTOCOL_VERSION,
   type RpcNotification,
   type RpcResponse,
-} from '@ramal/bridge';
+} from '@git-rudder/bridge';
 
 import type {
   EngineConnection,

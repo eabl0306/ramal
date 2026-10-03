@@ -1,7 +1,7 @@
 //! Adaptador driven: el reloj del sistema.
 
 use chrono::{DateTime, Utc};
-use ramal_api_application::Clock;
+use git_rudder_api_application::Clock;
 
 /// Reloj que devuelve la hora real en UTC.
 #[derive(Debug, Clone, Copy, Default)]

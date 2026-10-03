@@ -1,6 +1,6 @@
-# La API de Ramal: el contrato
+# La API de Git Rudder: el contrato
 
-Este documento describe la superficie HTTP de la API en la nube de Ramal (`apps/api`),
+Este documento describe la superficie HTTP de la API en la nube de Git Rudder (`apps/api`),
 endpoint por endpoint, y por que cada cosa es como es. Sale del analisis del handoff de
 diseno (`docs/design/handoff`: el README y los tres prototipos `*.dc.html`, que mandan sobre
 el README cuando se contradicen) y de las decisiones que ya estan tomadas sobre el motor
@@ -18,9 +18,9 @@ documento se corrige.
 Es una **propuesta de contrato** salvo la fase F0: la salud, el documento OpenAPI y los
 errores en problem+json ya estan construidos (seccion [Salud y contrato](#salud-y-contrato)),
 y lo que dice este documento de ellos esta comprobado contra el codigo a fecha de 2026-10-01.
-Todo lo demas sigue sin construir. Cubre las tres superficies que hablan con la API (Ramal
-Desktop, Ramal para VS Code y Ramal Web) y cada accion que los inventarios del diseno
-clasificaron como `RAMAL_API`. El
+Todo lo demas sigue sin construir. Cubre las tres superficies que hablan con la API (Git Rudder
+Desktop, Git Rudder para VS Code y Git Rudder Web) y cada accion que los inventarios del diseno
+clasificaron como `GIT_RUDDER_API`. El
 [apendice A](#apendice-a-pantalla-o-accion-y-endpoint) cruza cada pantalla y cada accion
 con su endpoint; si una pantalla pinta un dato, algun endpoint lo sirve.
 
@@ -33,7 +33,7 @@ Cada grupo de endpoints lleva la fase del backlog en la que entra:
 | F2   | Sincronizacion personal: preferencias, workspaces, repositorios, cuentas de plataforma, boveda, llaves de IA personales, cambios incrementales, broker OAuth. |
 | F3   | Equipos: organizaciones, miembros, invitaciones, asientos, workspaces compartidos.                                                                            |
 | F4   | IA de organizacion: llaves del servidor con el modelo por funcion que fija el admin, politica, proxy y consumo.                                               |
-| F5   | Facturacion: Ramal Pro por asiento para organizaciones, cobrado con Paddle.                                                                                   |
+| F5   | Facturacion: Git Rudder Pro por asiento para organizaciones, cobrado con Paddle.                                                                              |
 
 **Las seis fases entran en la primera version publica.** El 2026-10-01 se decidio que equipos, IA
 de organizacion y facturacion salen en el MVP ([ADR 0026](adr/0026-planes-y-precios.md)); las
@@ -45,7 +45,7 @@ cambiar despues de la primera build publica**, asi que tiene que existir antes d
 
 ## Las decisiones que condicionan todo
 
-### 1. Ramal funciona sin cuenta de Ramal
+### 1. Git Rudder funciona sin cuenta de Git Rudder
 
 Todo lo que es Git local (abrir, clonar, hacer commit, ramas, merge, rebase, conflictos,
 push con las credenciales del sistema) funciona sin iniciar sesion. La API solo entra en
@@ -78,7 +78,7 @@ Esto tiene precio, y el usuario lo acepto a sabiendas:
   token se hace en Desktop o en VS Code, que tienen el motor de Rust.
 - **Olvidar la frase de sincronizacion y el codigo de recuperacion pierde las copias de la
   nube.** Los tokens se pueden volver a crear en cada plataforma; nadie, ni el soporte de
-  Ramal, puede recuperarlos.
+  Git Rudder, puede recuperarlos.
 
 El esquema criptografico esta en [La boveda de extremo a extremo](#la-boveda-de-extremo-a-extremo).
 
@@ -92,12 +92,12 @@ usarla, el cliente llama a `POST /v1/ai/generate` y la API hace de proxy.
 
 Las llaves personales van por el otro camino: el motor de Rust del dispositivo llama al
 proveedor directamente. Es la unica forma de que Ollama funcione (vive en `localhost` del
-usuario) y la unica forma de que el codigo no pase por Ramal cuando la llave es del usuario.
+usuario) y la unica forma de que el codigo no pase por Git Rudder cuando la llave es del usuario.
 
 ### 4. En Desktop y VS Code, a la API solo le habla el motor de Rust
 
-Ningun webview llama a la API. En Desktop la peticion sale del motor (`ramal-engine`) dentro
-del host de Tauri (`ramal-desktop`); en VS Code, del sidecar `ramal-vscode-engine`. Los tokens
+Ningun webview llama a la API. En Desktop la peticion sale del motor (`git-rudder-engine`) dentro
+del host de Tauri (`git-rudder-desktop`); en VS Code, del sidecar `git-rudder-vscode-engine`. Los tokens
 viven en el llavero del sistema operativo (Desktop) o en `SecretStorage` (VS Code) y nunca
 llegan a un webview. La web llega por el mismo origen a traves del gateway.
 
@@ -107,8 +107,8 @@ propio que tenga que hablarle. Que no exista la cabecera es una defensa, no un o
 Las rutas son las mismas dentro y fuera del gateway
 ([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). En produccion la API responde en dos
 nombres ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)): `/v1/...` en este documento es
-`https://api.ramal.bahoque.com/v1/...` para los motores de Desktop y VS Code, el actualizador, la CI
-y los webhooks, y `https://ramal.bahoque.com/v1/...` para la web, que llega por su mismo origen. No
+`https://api.git-rudder.com/v1/...` para los motores de Desktop y VS Code, el actualizador, la CI
+y los webhooks, y `https://git-rudder.com/v1/...` para la web, que llega por su mismo origen. No
 hay un prefijo `/api` que se quite por el camino. La vuelta del OAuth de identidad se registra en
 cada proveedor con el dominio de la web, porque pone cookies; la del broker de Bitbucket, con el de
 la API.
@@ -150,7 +150,7 @@ registra (ver [El proxy de IA](#el-proxy-de-ia)).
 ## Convenciones del contrato
 
 Prefijo `/v1`. Todo JSON. Errores con `application/problem+json` (RFC 9457). Son las mismas
-convenciones que Gastonomo, con cuatro anadidos que Ramal necesita: ids generados por el
+convenciones que Gastonomo, con cuatro anadidos que Git Rudder necesita: ids generados por el
 cliente, `code` en los errores de campo, concurrencia optimista y streaming en el proxy de IA.
 
 - **JSON en camelCase.** Las dos excepciones son externas y estan marcadas donde aparecen:
@@ -172,7 +172,7 @@ cliente, `code` en los errores de campo, concurrencia optimista y streaming en e
 
 ```json
 {
-  "type": "https://ramal.bahoque.com/problems/validation",
+  "type": "https://git-rudder.com/problems/validation",
   "title": "Datos invalidos",
   "status": 422,
   "detail": "Revisa los campos marcados.",
@@ -186,9 +186,9 @@ cliente, `code` en los errores de campo, concurrencia optimista y streaming en e
 - **Todo problema lleva `code`**, un texto estable en snake_case, y cada entrada de `errors`
   tambien. `errors` solo aparece en los errores de validacion. Es lo que el cliente usa para
   decidir; el `type` es la familia y el `code` el motivo concreto.
-- **Los mensajes vienen en castellano**, igual que en Gastonomo. Pero la interfaz de Ramal
+- **Los mensajes vienen en castellano**, igual que en Gastonomo. Pero la interfaz de Git Rudder
   es bilingue: por eso cada error de campo lleva un `code` estable y los clientes pintan el
-  texto desde `@ramal/i18n` en el idioma de la interfaz. El `message` es el texto de
+  texto desde `@git-rudder/i18n` en el idioma de la interfaz. El `message` es el texto de
   respaldo y el que se lee en los logs de un cliente.
 - El `detail` de **todos** los 401 es el mismo texto fijo, a proposito: distinguir un token
   que no existe de uno caducado o ya usado diria si se acerto con uno que existe. El motivo
@@ -216,7 +216,7 @@ Los `code` que ya existen en el primer corte:
 | Recurso que no existe o es ajeno | `not-found`              | 404      | `not_found`                |
 | Sin permiso, conflicto           | `forbidden`, `conflict`  | 403, 409 | el que fije el caso de uso |
 
-Los de transporte salen de `ramal-api-http/src/problem/from_status.rs` y los de los casos de uso
+Los de transporte salen de `git-rudder-api-http/src/problem/from_status.rs` y los de los casos de uso
 de `from_error.rs`; un endpoint nuevo anade los suyos.
 
 Los `type` del contrato completo (los del primer corte estan en la tabla de arriba): `validation`, `bad-request`, `invalid-credentials`, `unauthorized`,
@@ -225,10 +225,10 @@ Los `type` del contrato completo (los del primer corte estan en la tabla de arri
 `too-many-requests`, `internal-error`, `bad-gateway`, `gateway-timeout` y
 `service-unavailable`.
 
-El prefijo de `type` es `https://ramal.bahoque.com/problems/`
+El prefijo de `type` es `https://git-rudder.com/problems/`
 ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)), tambien en el codigo del primer corte
-(`TYPE_PREFIX` en `apps/api/crates/http/src/problem.rs`). Antes era `https://ramal.dev/problems/`,
-el dominio del diseno, que es de un tercero. Cambiar el dominio cambia el prefijo y nada mas.
+(`TYPE_PREFIX` en `apps/api/crates/http/src/problem.rs`). Antes era el dominio del diseno, que es
+de un tercero. Cambiar el dominio cambia el prefijo y nada mas.
 
 ### 404 y no 403, y cuando si hay 403
 
@@ -236,7 +236,7 @@ La regla de Gastonomo se mantiene: **un recurso de otra cuenta responde 404, nun
 Un 403 confirmaria que existe. Lo mismo cuando el identificador del camino no es un UUID, y
 lo mismo cuando la organizacion existe pero quien pregunta no es miembro.
 
-Ramal anade un caso que Gastonomo no tenia: **403 con `code` cuando el recurso es tuyo o de
+Git Rudder anade un caso que Gastonomo no tenia: **403 con `code` cuando el recurso es tuyo o de
 tu organizacion, lo puedes ver, y lo que falta es permiso**. Un miembro sabe que su organizacion
 existe; devolverle 404 al intentar invitar a alguien seria mentirle sobre algo que acaba de ver
 en pantalla. Lo que no puedes ver sigue siendo 404 en todos los verbos: el workspace privado de
@@ -261,13 +261,13 @@ Hay dos formas de presentar la identidad, y nunca se mezclan:
   hacer viajar.
 - **Cookie**: la usa solo la web. Tres cookies, todas `Secure`:
 
-| Cookie                | Contenido                                 | Atributos                                           |
-| --------------------- | ----------------------------------------- | --------------------------------------------------- |
-| `__Host-ramal_at`     | Access token (JWT)                        | `HttpOnly`, `SameSite=Lax`, `Path=/`, 15 minutos    |
-| `__Secure-ramal_rt`   | Refresh token opaco                       | `HttpOnly`, `SameSite=Strict`, `Path=/v1/auth`      |
-| `__Host-ramal_csrf`   | Token CSRF                                | Legible desde JS, `SameSite=Strict`, `Path=/`       |
-| `__Host-ramal_oauth`  | Valor que ata un flujo OAuth al navegador | `HttpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age=600` |
-| `__Host-ramal_signup` | Ticket de un alta por OAuth a medias      | `HttpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age=900` |
+| Cookie                     | Contenido                                 | Atributos                                           |
+| -------------------------- | ----------------------------------------- | --------------------------------------------------- |
+| `__Host-git_rudder_at`     | Access token (JWT)                        | `HttpOnly`, `SameSite=Lax`, `Path=/`, 15 minutos    |
+| `__Secure-git_rudder_rt`   | Refresh token opaco                       | `HttpOnly`, `SameSite=Strict`, `Path=/v1/auth`      |
+| `__Host-git_rudder_csrf`   | Token CSRF                                | Legible desde JS, `SameSite=Strict`, `Path=/`       |
+| `__Host-git_rudder_oauth`  | Valor que ata un flujo OAuth al navegador | `HttpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age=600` |
+| `__Host-git_rudder_signup` | Ticket de un alta por OAuth a medias      | `HttpOnly`, `SameSite=Lax`, `Path=/`, `Max-Age=900` |
 
 Las dos ultimas son `Lax` porque se leen en la vuelta desde el proveedor, que es una navegacion
 de otro sitio: con `Strict` el navegador no las mandaria.
@@ -282,7 +282,7 @@ peticion: solo viaja a los endpoints que lo usan.
 
 **El access token es un JWT de 15 minutos firmado con Ed25519** (`kid` y `typ: at+jwt` en la
 cabecera; solo se acepta `alg: EdDSA` con un `kid` conocido). Lleva `iss`
-(`https://api.ramal.bahoque.com`), `aud` (`ramal-api`), `sub` (usuario), `sid` (sesion), `cli` (`web`,
+(`https://api.git-rudder.com`), `aud` (`git-rudder-api`), `sub` (usuario), `sid` (sesion), `cli` (`web`,
 `desktop` o `vscode`), `auth_time` (ultimo inicio de sesion real), `iat` y `exp`. No lleva
 roles: los roles son por organizacion y cambian, y se leen de la base en cada peticion que
 los necesita.
@@ -400,7 +400,7 @@ de version se razona en una linea.
 
 Como en Gastonomo: ventana fija en memoria del proceso, el cliente se identifica por la
 **ultima** entrada de `X-Forwarded-For` (la que anade el proxy de confianza) o por la IP del
-par, y 429 con `Retry-After`. Las cifras son configurables con `RAMAL__RATE_LIMIT__*`.
+par, y 429 con `Retry-After`. Las cifras son configurables con `GIT_RUDDER__RATE_LIMIT__*`.
 
 | Grupo                                                                                                | Limite                                                                                                             | Clave                 |
 | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------- |
@@ -445,7 +445,7 @@ Salud y contrato                                                        F0
 GET    /health/live                              200  publico
 GET    /health/ready                             200 | 503  publico
 GET    /openapi.json                             200  publico
-GET    /swagger-ui/                              200  solo con RAMAL__SERVER__SWAGGER_UI=true (desarrollo)
+GET    /swagger-ui/                              200  solo con GIT_RUDDER__SERVER__SWAGGER_UI=true (desarrollo)
 
 Autenticacion web                                                       F1
 POST   /v1/auth/register                         201  publico, limitado
@@ -626,7 +626,7 @@ GET /health/ready   200 si status=ok, 503 si status=degraded (mismo JSON, no pro
 ```
 
 - `checkedAt` es el instante de la comprobacion, en RFC 3339 con `Z`. La hora sale del puerto
-  `Clock` de `ramal-api-application`: el nucleo no lee el reloj.
+  `Clock` de `git-rudder-api-application`: el nucleo no lee el reloj.
 - **El motivo de un fallo no viaja.** Un componente en `error` solo dice eso; el detalle
   (timeout, conexion rechazada, esquema atrasado) queda en el log del servidor.
 - `database` no es un `SELECT 1`: lee la ultima migracion aplicada y la compara con la mas nueva
@@ -639,20 +639,20 @@ organizacion) esta cargada y descifra un valor de prueba. Sin ella la API arranc
 recibir trafico del proxy de IA. Antes de F4 el check no existe.
 
 `GET /openapi.json` lo genera `salvo-oapi` desde el propio router (OpenAPI 3.1), y de ese JSON
-sale `@ramal/api-client` (`openapi-typescript` + `openapi-fetch`). Es publico. El documento se
-versiona en `apps/api/openapi.json`: un test de `ramal-api-http` falla si se queda atras y
+sale `@git-rudder/api-client` (`openapi-typescript` + `openapi-fetch`). Es publico. El documento se
+versiona en `apps/api/openapi.json`: un test de `git-rudder-api-http` falla si se queda atras y
 `just api-openapi` lo reescribe. El esquema `Problem` va en el documento aunque ningun endpoint
 lo declare todavia, porque cualquier ruta puede responderlo.
 
 `GET /swagger-ui/` es el visor, **solo en desarrollo**: la API solo lo monta con
-`RAMAL__SERVER__SWAGGER_UI=true`, que encienden `compose.yaml` y `just api-run`. Por defecto va
+`GIT_RUDDER__SERVER__SWAGGER_UI=true`, que encienden `compose.yaml` y `just api-run`. Por defecto va
 apagado y la ruta responde 404 como cualquier otra, asi que una imagen de produccion no lo sirve
 aunque el gateway reenviara la ruta (el de produccion tampoco la enrutara;
 [ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)). Swagger UI ha tenido fallos de XSS, y
-servido en `ramal.bahoque.com` correria con las cookies de sesion y la cookie CSRF a su alcance. Sus
+servido en `git-rudder.com` correria con las cookies de sesion y la cookie CSRF a su alcance. Sus
 assets van embebidos en el binario: funciona sin salida a internet.
 Los tipos del protocolo del motor (Desktop y VS Code) no salen de aqui: salen de
-`ramal-protocol` con `ts-rs`, porque el motor no es un cliente HTTP de la web.
+`git-rudder-protocol` con `ts-rs`, porque el motor no es un cliente HTTP de la web.
 
 ## Autenticacion web
 
@@ -764,7 +764,7 @@ Web: **200** con `{ "csrfToken": "..." }` y las cookies renovadas.
   las apps nativas (cada refresco la alarga), y un **maximo absoluto** de 365 dias. Pasado
   cualquiera de los dos, 401 y a iniciar sesion.
 - **El refresco con el token en el cuerpo es solo para los motores**: rechaza cualquier peticion
-  que traiga cabecera `Origin` o cookies de Ramal. Un script en una pagina no puede usarlo.
+  que traiga cabecera `Origin` o cookies de Git Rudder. Un script en una pagina no puede usarlo.
 - **Cuando la sesion termino, el 401 lo dice con un `code`**: `session_ended` si la sesion esta
   revocada o caducada, o si se detecto la reutilizacion (que ademas la revoca). Un token que la API
   no reconoce recibe `unauthorized`. El `detail` es el mismo texto fijo en los dos.
@@ -793,7 +793,7 @@ Lo que pasa con los secretos del dispositivo al cerrar sesion lo decide el clien
 contrato lo fija asi ([ADR 0012](adr/0012-boveda-de-extremo-a-extremo.md)): el motor borra la
 llave de la boveda cacheada y las copias de los tokens y las llaves que llegaron sincronizados de
 otros equipos; lo sabe por una marca local de origen que guarda junto a cada secreto. Lo que el
-usuario creo en ese equipo se queda en su llavero: sin cuenta, Ramal sigue siendo un cliente Git
+usuario creo en ese equipo se queda en su llavero: sin cuenta, Git Rudder sigue siendo un cliente Git
 que necesita esas credenciales para hacer push. El dialogo ofrece la casilla "Borrar también las
 añadidas en este equipo", apagada por defecto, para un ordenador compartido. La misma limpieza
 corre cuando un refresco recibe un 401 con `session_ended`: un dispositivo revocado desde otro
@@ -816,7 +816,7 @@ POST /v1/auth/reauthenticate
   obligar a volver a entrar, asi que su reautenticacion vale para **reauth** pero no para
   **reauth fuerte**.
 - **Enlace al correo**: `POST /v1/auth/reauthenticate/email-link` (sin cuerpo) manda al correo
-  verificado un enlace de 15 minutos y un solo uso, `https://ramal.bahoque.com/reauthenticate#token=...`.
+  verificado un enlace de 15 minutos y un solo uso, `https://git-rudder.com/reauthenticate#token=...`.
   `POST /v1/auth/reauthenticate/email-link/confirm { "token": "..." }` responde **204** y marca
   como reautenticada la sesion que lo pidio, aunque el enlace se abra en otro dispositivo: el
   token prueba el buzon y queda atado a esa sesion. El siguiente refresco de la pagina trae el
@@ -838,7 +838,7 @@ aprenderlo:
 - El correo sale de la peticion a una tarea de fondo, para que el tiempo de respuesta no
   delate la cuenta.
 
-El enlace es `https://ramal.bahoque.com/reset-password#token=...`. **El token va en el fragmento**,
+El enlace es `https://git-rudder.com/reset-password#token=...`. **El token va en el fragmento**,
 que el navegador no envia al servidor ni queda en los logs del gateway; la pagina lo lee y lo
 manda en el cuerpo de:
 
@@ -882,7 +882,7 @@ nueva no cumple.
 ### Verificar el correo
 
 - Al registrarse, y al pedir reenvio, se manda un enlace de 48 horas:
-  `https://ramal.bahoque.com/verify-email#token=...`.
+  `https://git-rudder.com/verify-email#token=...`.
 - `POST /v1/auth/email/verify { "token": "..." }` responde **204** y marca el correo. Es
   publico: el token es la prueba, y verificar desde el movil sin haber iniciado sesion ahi es
   el caso normal. **400** `invalid_token` si no vale.
@@ -918,7 +918,7 @@ recuperacion de contrasena deja de funcionar.
 
 ### OAuth de identidad: GitHub, GitLab y Google
 
-Sirve para **entrar en Ramal**, no para conectar una cuenta de plataforma para Git. Son dos
+Sirve para **entrar en Git Rudder**, no para conectar una cuenta de plataforma para Git. Son dos
 cosas distintas y el contrato no las mezcla:
 
 - El OAuth de identidad pide solo el perfil y el correo (`read:user user:email` en GitHub,
@@ -929,7 +929,7 @@ cosas distintas y el contrato no las mezcla:
   extremo (ver [Cuentas de plataformas Git](#cuentas-de-plataformas-git)).
 
 Solo GitLab.com, no instancias propias: cada instancia necesitaria su propia aplicacion
-OAuth registrada, y la identidad de Ramal no puede depender de un servidor de terceros.
+OAuth registrada, y la identidad de Git Rudder no puede depender de un servidor de terceros.
 
 **Inicio.** `POST /v1/auth/oauth/{provider}/start { "intent": "login", "returnTo": "/dashboard" }`
 
@@ -938,14 +938,14 @@ OAuth registrada, y la identidad de Ramal no puede depender de un servidor de te
   `reauth` exigen sesion web y la cabecera CSRF; `link` exige ademas **reauth** y el correo de la
   cuenta verificado (**403** `email_not_verified`), porque vincular otro metodo de entrada es dar
   una puerta nueva.
-- `returnTo` se resuelve contra `https://ramal.bahoque.com` con un analizador WHATWG (el crate `url`) y
+- `returnTo` se resuelve contra `https://git-rudder.com` con un analizador WHATWG (el crate `url`) y
   tiene que dar el mismo origen; se guarda solo la ruta y la query. Comprobar "empieza por `/` y no
   por `//`" no basta: `/\evil.example` o `/%09/evil.example` pasan esa regla y el navegador los
   convierte en `//evil.example`. Cualquier otra cosa se sustituye por `/dashboard`.
 
 Responde **200** con `{ "url": "https://github.com/login/oauth/authorize?..." }` y la pagina
 navega ahi. Empieza con un `POST` y no con un `GET` para que ninguna navegacion de otro sitio
-pueda lanzar una vinculacion con la cookie de sesion `Lax`. Pone una cookie `__Host-ramal_oauth`
+pueda lanzar una vinculacion con la cookie de sesion `Lax`. Pone una cookie `__Host-git_rudder_oauth`
 con un valor aleatorio cuyo hash queda en el flujo. **La cookie ata el flujo al navegador que lo
 empezo**: sin ella, un atacante podria empezar un flujo con su cuenta y hacer que la victima lo
 terminara (login CSRF), y la victima acabaria trabajando dentro de la cuenta del atacante.
@@ -954,17 +954,17 @@ terminara (login CSRF), y la victima acabaria trabajando dentro de la cuenta del
 
 Es una navegacion del navegador, asi que no responde `problem+json`: siempre redirige.
 
-| Situacion                                                                                                               | Resultado                                                                |
-| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| La identidad ya esta vinculada a una cuenta                                                                             | Sesion iniciada, 302 a `returnTo`.                                       |
-| No hay identidad, el correo del proveedor esta verificado y coincide con una cuenta cuyo correo tambien esta verificado | Se vincula y se inicia sesion. Los dos lados prueban control del buzon.  |
-| Coincide con una cuenta cuyo correo **no** esta verificado                                                              | No se vincula. 302 a `/login?error=account_exists`.                      |
-| El proveedor no da un correo verificado                                                                                 | 302 a `/login?error=email_unverified`.                                   |
-| No hay ninguna cuenta con ese correo                                                                                    | Alta pendiente: cookie `__Host-ramal_signup` y 302 a `/signup/complete`. |
-| `intent=link` y la identidad ya es de otra cuenta                                                                       | No se vincula. 302 a `returnTo` con `error=identity_in_use`.             |
-| `intent=link` o `reauth` y la sesion actual no es la que empezo el flujo                                                | No pasa nada. 302 a `/login?error=oauth_failed`.                         |
-| `intent=reauth` y la identidad no esta vinculada a ese usuario                                                          | No reautentica. 302 a `returnTo` con `error=reauth_failed`.              |
-| El usuario rechazo el permiso o el proveedor fallo                                                                      | 302 a `/login?error=oauth_denied` u `oauth_failed`.                      |
+| Situacion                                                                                                               | Resultado                                                                     |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| La identidad ya esta vinculada a una cuenta                                                                             | Sesion iniciada, 302 a `returnTo`.                                            |
+| No hay identidad, el correo del proveedor esta verificado y coincide con una cuenta cuyo correo tambien esta verificado | Se vincula y se inicia sesion. Los dos lados prueban control del buzon.       |
+| Coincide con una cuenta cuyo correo **no** esta verificado                                                              | No se vincula. 302 a `/login?error=account_exists`.                           |
+| El proveedor no da un correo verificado                                                                                 | 302 a `/login?error=email_unverified`.                                        |
+| No hay ninguna cuenta con ese correo                                                                                    | Alta pendiente: cookie `__Host-git_rudder_signup` y 302 a `/signup/complete`. |
+| `intent=link` y la identidad ya es de otra cuenta                                                                       | No se vincula. 302 a `returnTo` con `error=identity_in_use`.                  |
+| `intent=link` o `reauth` y la sesion actual no es la que empezo el flujo                                                | No pasa nada. 302 a `/login?error=oauth_failed`.                              |
+| `intent=reauth` y la identidad no esta vinculada a ese usuario                                                          | No reautentica. 302 a `returnTo` con `error=reauth_failed`.                   |
+| El usuario rechazo el permiso o el proveedor fallo                                                                      | 302 a `/login?error=oauth_denied` u `oauth_failed`.                           |
 
 **Por que no se vincula con una cuenta sin verificar.** Es el ataque de preapropiacion:
 alguien registra con contrasena el correo de la victima y espera. Si el primer "Continuar con
@@ -1014,15 +1014,15 @@ un aviso al correo de la cuenta.
 **F1.** Desktop y VS Code inician sesion a traves de la web, con Authorization Code + PKCE
 (RFC 7636, con las recomendaciones de RFC 8252 para apps nativas) y con el device flow
 (RFC 8628) como alternativa. Es el paso que el diseno no dibuja en ningun sitio y sin el que
-no hay sincronizacion: hacen falta la pagina "Autorizar Ramal Desktop en este equipo" y la
+no hay sincronizacion: hacen falta la pagina "Autorizar Git Rudder Desktop en este equipo" y la
 pagina para introducir el codigo del device flow.
 
 Los clientes estan registrados en configuracion, no en la base:
 
-| client_id       | Redirecciones aceptadas                                                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ramal-desktop` | Exactamente `http://127.0.0.1:{puerto}/callback` o `http://[::1]:{puerto}/callback`, con puerto entre 1024 y 65535 (RFC 8252 permite cualquier puerto en loopback). |
-| `ramal-vscode`  | Exactamente `{esquema}://ramal.ramal/auth-callback` con esquema `vscode`, `vscode-insiders`, `vscodium`, `cursor` o `windsurf`.                                     |
+| client_id            | Redirecciones aceptadas                                                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `git-rudder-desktop` | Exactamente `http://127.0.0.1:{puerto}/callback` o `http://[::1]:{puerto}/callback`, con puerto entre 1024 y 65535 (RFC 8252 permite cualquier puerto en loopback). |
+| `git-rudder-vscode`  | Exactamente `{esquema}://git-rudder.git-rudder/auth-callback` con esquema `vscode`, `vscode-insiders`, `vscodium`, `cursor` o `windsurf`.                           |
 
 **La redireccion se valida analizandola, nunca con un prefijo.** Con un prefijo,
 `http://127.0.0.1:1@evil.example/callback` pasaria la comprobacion y su host real seria
@@ -1035,13 +1035,13 @@ el [broker de plataformas](#el-flujo-con-broker), analiza la URL con el crate `u
 - ruta exactamente `/callback`, sin query ni fragmento;
 - que la URL vuelta a serializar sea identica a la recibida.
 
-Para VS Code: esquema de la lista, host `ramal.ramal`, ruta `/auth-callback` y nada mas. La
+Para VS Code: esquema de la lista, host `git-rudder.git-rudder`, ruta `/auth-callback` y nada mas. La
 redireccion final se construye desde la URL ya analizada, anadiendo `code` y `state` con la API
 de `url`, nunca concatenando texto.
 
-**Por que loopback en Desktop y no `ramal://`.** Los deep links de Tauri necesitan el plugin
+**Por que loopback en Desktop y no `git-rudder://`.** Los deep links de Tauri necesitan el plugin
 de instancia unica en Windows y Linux, solo funcionan con la app instalada y en macOS solo
-desde `/Applications`. Como canal de login son fragiles; `ramal://` queda para abrir un
+desde `/Applications`. Como canal de login son fragiles; `git-rudder://` queda para abrir un
 repositorio desde la web o desde VS Code.
 
 **Por que una lista de esquemas en VS Code y no la URL que devuelva `asExternalUri`.** En la
@@ -1054,7 +1054,7 @@ funciona y el editor lo reenvia a la extension remota.
 ### Authorization Code + PKCE
 
 1. El motor genera `code_verifier`, `code_challenge` (S256) y `state`, abre el navegador del
-   sistema en la pagina web `https://ramal.bahoque.com/authorize/app` con los parametros estandar de
+   sistema en la pagina web `https://git-rudder.com/authorize/app` con los parametros estandar de
    OAuth (`client_id`, `redirect_uri`, `code_challenge`, `code_challenge_method=S256`,
    `state`) mas `device_name` para ensenarlo. Estos parametros van en snake_case porque los
    produce cualquier libreria OAuth (el crate `oauth2` en el motor).
@@ -1065,14 +1065,14 @@ funciona y el editor lo reenvia a la extension remota.
    una sesion nativa sin esa confirmacion. Luego valida la peticion:
 
    ```
-   GET /v1/auth/app/authorize?client_id=ramal-desktop&redirect_uri=...&code_challenge=...&code_challenge_method=S256&state=...
+   GET /v1/auth/app/authorize?client_id=git-rudder-desktop&redirect_uri=...&code_challenge=...&code_challenge_method=S256&state=...
    ```
 
    **200** con lo que la pagina ensena:
 
    ```json
    {
-     "client": { "id": "ramal-desktop", "name": "Ramal Desktop" },
+     "client": { "id": "git-rudder-desktop", "name": "Git Rudder Desktop" },
      "deviceName": "MacBook Pro de Marta",
      "user": { "name": "Marta Ruiz", "email": "marta@example.com" }
    }
@@ -1091,7 +1091,7 @@ funciona y el editor lo reenvia a la extension remota.
    POST /v1/auth/app/authorize
    Content-Type: application/x-www-form-urlencoded
 
-   client_id=ramal-desktop&redirect_uri=http%3A%2F%2F127.0.0.1%3A53123%2Fcallback&code_challenge=...&state=...&approve=true&csrf_token=...
+   client_id=git-rudder-desktop&redirect_uri=http%3A%2F%2F127.0.0.1%3A53123%2Fcallback&code_challenge=...&state=...&approve=true&csrf_token=...
    ```
 
    **302** a `http://127.0.0.1:53123/callback?code=...&state=...`. Si `approve` es `false`, la
@@ -1106,7 +1106,7 @@ funciona y el editor lo reenvia a la extension remota.
    POST /v1/auth/app/token
    {
      "grantType": "authorization_code",
-     "clientId": "ramal-desktop",
+     "clientId": "git-rudder-desktop",
      "code": "...",
      "codeVerifier": "...",
      "redirectUri": "http://127.0.0.1:53123/callback",
@@ -1123,7 +1123,7 @@ funciona y el editor lo reenvia a la extension remota.
    }
    ```
 
-   El canje rechaza cualquier peticion con cabecera `Origin` o con cookies de Ramal: lo hace un
+   El canje rechaza cualquier peticion con cabecera `Origin` o con cookies de Git Rudder: lo hace un
    motor, nunca un navegador.
 
    **200**:
@@ -1165,7 +1165,7 @@ es la senal de que alguien intercepto el codigo.
 Para VS Code en el navegador, entornos sin navegador, o cuando un firewall bloquea el puerto
 de loopback.
 
-1. `POST /v1/auth/device/code { "clientId": "ramal-vscode", "device": { ...como arriba } }`,
+1. `POST /v1/auth/device/code { "clientId": "git-rudder-vscode", "device": { ...como arriba } }`,
    sin `Origin` ni cookies, como el canje. 10 por minuto e IP, y un tope global de flujos
    pendientes.
 
@@ -1173,7 +1173,7 @@ de loopback.
    {
      "deviceCode": "dc_7e21...",
      "userCode": "WDJB-MJHT",
-     "verificationUri": "https://ramal.bahoque.com/activate",
+     "verificationUri": "https://git-rudder.com/activate",
      "expiresIn": 600,
      "interval": 5
    }
@@ -1188,7 +1188,7 @@ de loopback.
    confundan (`BCDFGHJKLMNPQRSTVWXZ`), como recomienda RFC 8628. Sin vocales no se forman
    palabras, y sin `0/O` ni `1/I` no hay erratas al teclearlo.
 
-2. En `https://ramal.bahoque.com/activate` el usuario inicia sesion y escribe el codigo. La pagina
+2. En `https://git-rudder.com/activate` el usuario inicia sesion y escribe el codigo. La pagina
    pregunta que es:
 
    `POST /v1/auth/device/lookup { "userCode": "WDJB-MJHT" }` responde **200** con
@@ -1209,7 +1209,7 @@ de loopback.
 
 4. Mientras, el motor sondea cada `interval` segundos:
 
-   `POST /v1/auth/app/token { "grantType": "device_code", "clientId": "ramal-vscode", "deviceCode": "dc_7e21..." }`
+   `POST /v1/auth/app/token { "grantType": "device_code", "clientId": "git-rudder-vscode", "deviceCode": "dc_7e21..." }`
 
    Responde **200** con el mismo cuerpo que el canje de codigo cuando se aprobo, o **400** con
    los `code` de RFC 8628: `authorization_pending`, `slow_down` (sondeo mas rapido que el
@@ -1317,7 +1317,7 @@ GET /v1/me
   "pendingEmail": null,
   "timezone": "Europe/Madrid",
   "locale": "es",
-  "avatarUrl": "https://ramal.bahoque.com/v1/avatars/5b0c2e8a-...",
+  "avatarUrl": "https://git-rudder.com/v1/avatars/5b0c2e8a-...",
   "hasPassword": true,
   "vaultEnabled": true,
   "vaultCreatedAt": "2026-09-05T10:00:00Z",
@@ -1351,7 +1351,7 @@ PATCH /v1/me
 
 - `username`: de 3 a 39 caracteres, minusculas, cifras y guiones, sin guion al principio ni
   al final. Se guarda en minusculas. **409** `username_taken`. Hay una lista de nombres
-  reservados (`admin`, `api`, `ramal`, `support`...) que responde igual que uno cogido.
+  reservados (`admin`, `api`, `git-rudder`, `support`...) que responde igual que uno cogido.
 - `timezone`: un nombre IANA que exista en la base de zonas del servidor. La lista del
   prototipo (seis zonas) es un ejemplo, no un catalogo.
 - `locale`: `es` o `en`. Es el idioma de los correos y el de arranque de la web. El idioma de
@@ -1387,7 +1387,7 @@ tres clientes para proteger una foto que el usuario ya decidio ensenar a su equi
 
 ### Exportar los datos
 
-`GET /v1/me/export` responde **200** con `Content-Disposition: attachment; filename="ramal-export-2026-09-30.json"`:
+`GET /v1/me/export` responde **200** con `Content-Disposition: attachment; filename="git-rudder-export-2026-09-30.json"`:
 
 ```json
 {
@@ -1467,7 +1467,7 @@ interfaz decide si las suma; sumarlas en el dato impediria ensenarlas distinto.
 
 ## Dispositivos
 
-**F1.** Un dispositivo es una instalacion de Ramal Desktop o de la extension de VS Code con
+**F1.** Un dispositivo es una instalacion de Git Rudder Desktop o de la extension de VS Code con
 sesion iniciada. Es la tarjeta "Dispositivos sincronizados" del resumen web.
 
 ```
@@ -1535,7 +1535,7 @@ GET /v1/organizations
       "seats": { "total": 5, "used": 5, "activeMembers": 4, "pendingInvitations": 1 },
       "plan": {
         "id": "pro",
-        "name": "Ramal Pro",
+        "name": "Git Rudder Pro",
         "status": "trialing",
         "trialEndsAt": "2026-09-16T10:00:00Z",
         "renewsAt": null
@@ -1556,11 +1556,11 @@ GET /v1/organizations
 
 `POST /v1/organizations { "name": "ACME Studio" }` (acepta `Idempotency-Key`) crea la
 organizacion con quien llama como owner. **201** con la organizacion, que empieza
-una prueba de Ramal Pro de 14 dias sin tarjeta. **403** `email_not_verified` si el correo no esta
+una prueba de Git Rudder Pro de 14 dias sin tarjeta. **403** `email_not_verified` si el correo no esta
 verificado. **409** `limit_reached` si ya creo 5.
 Nombre de 1 a 60 caracteres, sin caracteres de control ni de direccion de texto: el nombre
 aparece en los correos de invitacion, que van como texto plano y nunca convierten el nombre en
-un enlace, para que una organizacion no sirva para mandar spam con la firma de Ramal.
+un enlace, para que una organizacion no sirva para mandar spam con la firma de Git Rudder.
 
 `GET /v1/organizations/{orgId}` devuelve una. **404** si no eres miembro.
 
@@ -1684,7 +1684,7 @@ POST /v1/organizations/{orgId}/invitations
 }
 ```
 
-Manda un correo con `https://ramal.bahoque.com/invitations#token=...`. El token son 256 bits
+Manda un correo con `https://git-rudder.com/invitations#token=...`. El token son 256 bits
 aleatorios y en la base solo esta su hash. Caduca a los 7 dias. El correo lleva el nombre de la
 organizacion y el de quien invita como texto plano, sin enlaces ni caracteres de control o de
 direccion de texto. Ademas del limite por organizacion, quien invita puede mandar como mucho 20
@@ -1780,7 +1780,7 @@ Es la tarjeta "5 de 5 asientos usados" con su barra. `used = activeMembers + pen
 El porcentaje de la barra lo calcula el cliente. Todo lo que ocupa o libera un asiento toma antes
 la fila de la organizacion con `FOR UPDATE` (ver [Invitaciones](#invitaciones)).
 
-Durante la prueba, el total sale de configuracion (`RAMAL__ORGANIZATIONS__DEFAULT_SEATS`, por
+Durante la prueba, el total sale de configuracion (`GIT_RUDDER__ORGANIZATIONS__DEFAULT_SEATS`, por
 defecto 5, que es lo que ensena el diseno; cuantos asientos trae la prueba es una propuesta). Con
 una suscripcion, el total es el que manda Paddle por el webhook. `purchasable` es `true` para la
 owner, y "Anadir asientos" lleva al checkout (en prueba) o al cambio de asientos (con
@@ -1788,7 +1788,7 @@ suscripcion); para el resto es `false` y la interfaz esconde el boton.
 
 ## Suscripcion y facturacion
 
-**F5, en el MVP.** Ramal Pro es **el plan de una organizacion, por asiento**
+**F5, en el MVP.** Git Rudder Pro es **el plan de una organizacion, por asiento**
 ([ADR 0026](adr/0026-planes-y-precios.md)): 8 USD por asiento al mes en pago anual (96 USD al ano) o
 10 USD en pago mensual, con un minimo de un asiento y 14 dias de prueba sin tarjeta al crear la
 organizacion. **No hay plan personal de pago**: todo lo de una persona (Git local, pull requests,
@@ -1811,7 +1811,7 @@ facturacion (E30-01); la propuesta es solo lectura y los datos conservados 30 di
 
   ```json
   {
-    "plan": { "id": "pro", "name": "Ramal Pro" },
+    "plan": { "id": "pro", "name": "Git Rudder Pro" },
     "status": "active",
     "interval": "year",
     "seatsTotal": 5,
@@ -1821,14 +1821,14 @@ facturacion (E30-01); la propuesta es solo lectura y los datos conservados 30 di
   }
   ```
 
-  `status`: `trialing` (la prueba de Ramal, que no existe en Paddle; `interval` y `renewsAt` son
+  `status`: `trialing` (la prueba de Git Rudder, que no existe en Paddle; `interval` y `renewsAt` son
   `null`), `active`, `past_due` o `canceled`. `interval`: `month` o `year`. **404** si la prueba
   acabo y no hay suscripcion.
 
 - `POST /v1/organizations/{orgId}/subscription/checkout { "planId": "pro", "interval": "year", "seats": 5 }`
   (owner, `Idempotency-Key`). La API crea en Paddle una transaccion con el precio del intervalo, la
   cantidad de asientos y el id de la organizacion en sus datos propios, y devuelve
-  `{ "url": "https://ramal.bahoque.com/billing/checkout?..." }`: la pagina de pago de la web con el
+  `{ "url": "https://git-rudder.com/billing/checkout?..." }`: la pagina de pago de la web con el
   identificador de esa transaccion. **La pagina carga Paddle.js y abre el checkout de Paddle; la CSP
   de la web se abre a los dominios de Paddle solo en esa pagina.** Desktop y VS Code abren la URL en
   el navegador del sistema. **409** `subscription_exists` si ya hay una activa. `seats` no puede
@@ -1895,7 +1895,7 @@ GET /v1/workspaces?organizationId=0192f3d0-...
 - `visibility`: `private` o `organization`. En el contexto personal siempre es `private`. En
   una organizacion, `private` es "Solo tu" y `organization` es "Compartido con {org}".
 - `color` es un **token de la paleta**, `lane-0` a `lane-5`, no un color. El color real lo
-  decide el tema: el de Ramal oscuro, el claro o el de VS Code no pintan igual el mismo
+  decide el tema: el de Git Rudder oscuro, el claro o el de VS Code no pintan igual el mismo
   carril. Guardar `oklch(...)` en la base congelaria un tema.
 - `canEdit` lo calcula la API con la matriz de roles, para que la interfaz no repita la regla.
 - `repositories` va embebido: las tarjetas pintan las chips de golpe y un workspace tiene
@@ -2006,7 +2006,7 @@ La ruta se pasa a minusculas **solo en los hosts que no distinguen mayusculas** 
 gitlab.com, bitbucket.org, dev.azure.com); en un Gitea propio `Equipo/API` y `equipo/api`
 pueden ser dos repositorios.
 
-La normalizacion vive en un solo sitio, `ramal-core-domain`, y la API la recalcula siempre a
+La normalizacion vive en un solo sitio, `git-rudder-core-domain`, y la API la recalcula siempre a
 partir de `remoteUrl`: **nunca acepta un `remoteKey` del cliente**. Dos versiones del cliente
 que normalizaran distinto partirian un repositorio en dos. Cambiar una regla de normalizacion
 en el futuro es una migracion de datos, no un cambio de codigo.
@@ -2302,9 +2302,9 @@ no cifra ni descifra nada, y por eso no tiene endpoints de escritura aqui salvo 
    nonce de 192 bits no hay que llevar la cuenta de cuantos mensajes cifra una misma llave, y
    la web no necesita soportarlo porque no cifra.
 5. **Subllaves y datos asociados (AAD) de cada secreto.** La VK no cifra directamente: de ella
-   salen con HKDF-SHA256 `K_seal` (`"ramal:vault:v1:seal"`) y `K_check`
-   (`"ramal:vault:v1:check"`). Los secretos se sellan con `K_seal` y AAD
-   `ramal:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}`, con `kind` `platform_credential`
+   salen con HKDF-SHA256 `K_seal` (`"git-rudder:vault:v1:seal"`) y `K_check`
+   (`"git-rudder:vault:v1:check"`). Los secretos se sellan con `K_seal` y AAD
+   `git-rudder:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}`, con `kind` `platform_credential`
    o `ai_key`. Un ciphertext copiado a otra fila, a otro usuario o a otra version de la llave
    no descifra. El servidor no puede comprobarlo (no tiene la llave); es un contrato entre
    clientes y esta aqui escrito para que cualquier implementacion lo cumpla igual.
@@ -2315,7 +2315,7 @@ no cifra ni descifra nada, y por eso no tiene endpoints de escritura aqui salvo 
    propio servidor, o guardar un blob antiguo de GitHub en una cuenta nueva con su host, y cada
    dispositivo le enviaria el secreto descifrado.
 7. **Comprobante de la llave:**
-   `keyCheck = HMAC-SHA256(K_check, "ramal:vault:key-check:v1:{userId}:{keyVersion}")`. El
+   `keyCheck = HMAC-SHA256(K_check, "git-rudder:vault:key-check:v1:{userId}:{keyVersion}")`. El
    dispositivo lo manda al crear la boveda y en cada cambio de envoltorio o rotacion; el
    servidor **guarda solo su SHA-256** y compara hashes en tiempo constante: **solo quien tiene
    la VK puede cambiar como se envuelve**. Sin esto, una sesion robada podria sustituir los
@@ -2497,7 +2497,7 @@ GET /v1/ai/keys
 - `provider`: `anthropic`, `openai`, `groq`, `google`, `mistral`, `openrouter`, `ollama`,
   `custom`. `baseUrl` obligatorio para `openrouter`, `ollama` y `custom` (el formulario del
   prototipo lo pedia y lo perdia al guardar).
-- `masked` lo calcula el cliente con la regla corregida de `@ramal/domain`: con menos de 12
+- `masked` lo calcula el cliente con la regla corregida de `@git-rudder/domain`: con menos de 12
   caracteres, solo puntos; si no, prefijo conocido mas cuatro ultimos. Guardar la mascara en
   claro deja ver como mucho el prefijo y cuatro caracteres, que es lo que ensena cualquier
   panel de proveedor, y permite pintar la lista en un dispositivo nuevo antes de desbloquear
@@ -2744,7 +2744,7 @@ cloud" de VS Code es otra cosa: decide si **esa instalacion** aplica lo que vien
 se guarda en el `settings.json` de VS Code con `scope: "machine"` (que Settings Sync no
 sincroniza) y no llama a la API. El texto del prototipo decia que tambien sincronizaba las llaves
 de IA; manda lo que diga la cuenta. En VS Code, las preferencias de Git e IA viven en la nube de
-Ramal igual que en Desktop y se editan en la pagina de ajustes de Ramal, no en `settings.json`:
+Git Rudder igual que en Desktop y se editan en la pagina de ajustes de Git Rudder, no en `settings.json`:
 asi Settings Sync y la nube nunca sincronizan la misma clave
 ([ADR 0010](adr/0010-un-motor-para-escritorio-y-vscode.md#ajustes-y-sincronizacion)).
 
@@ -2807,9 +2807,9 @@ cifra en el acto y el valor en claro no se escribe en ningun log ni traza (tipos
 
 - Cifrado de sobre ([ADR 0013](adr/0013-proxy-de-ia-de-organizacion.md)): una llave de datos
   aleatoria por secreto, AES-256-GCM con nonce de 96 bits y datos asociados
-  `ramal:org-ai-key:v1:{orgId}:{keyId}`; la llave de datos se envuelve con la llave maestra
-  activa (`RAMAL__SECRETS__KEKS` y `RAMAL__SECRETS__ACTIVE_KEK`) con datos asociados
-  `ramal:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`. Rotar la llave maestra solo reenvuelve las
+  `git-rudder:org-ai-key:v1:{orgId}:{keyId}`; la llave de datos se envuelve con la llave maestra
+  activa (`GIT_RUDDER__SECRETS__KEKS` y `GIT_RUDDER__SECRETS__ACTIVE_KEK`) con datos asociados
+  `git-rudder:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`. Rotar la llave maestra solo reenvuelve las
   llaves de datos, que son 32 bytes cada una; por eso el `kekId` va en la envoltura y no en los
   datos asociados del secreto, que no se tocan.
 - **`ollama` no se admite** (**422**): el servidor no puede llegar al `localhost` de nadie.
@@ -2817,7 +2817,7 @@ cifra en el acto y el valor en claro no se escribe en ningun log ni traza (tipos
   `mistral` y `openrouter` van a `api.openai.com`, `api.anthropic.com`, `api.groq.com`,
   `generativelanguage.googleapis.com`, `api.mistral.ai` y `openrouter.ai`; para ellos `baseUrl`
   tiene que ser `null` (**422** si no). Solo `custom` lleva `baseUrl`, y solo si
-  `RAMAL__AI__ALLOW_CUSTOM_BASE_URLS=true`. Sin esto, un admin podria apuntar la llave de otra
+  `GIT_RUDDER__AI__ALLOW_CUSTOM_BASE_URLS=true`. Sin esto, un admin podria apuntar la llave de otra
   persona a su propio servidor y recibirla en la cabecera `Authorization`.
 - **`baseUrl` es una puerta de SSRF** y se trata como tal: solo `https`, y la guarda actua **al
   conectar, en cada llamada** (alta, prueba y generacion), con un resolvedor propio que descarta
@@ -2976,7 +2976,7 @@ conexion (el usuario cancela), la API corta la llamada al proveedor. La respuest
 | 502    | `ai_provider_error`: el proveedor rechazo la llave, no tiene saldo o fallo. Lleva solo la categoria (`unauthorized`, `quota`, `unavailable`), nunca el mensaje del proveedor. |
 | 504    | El proveedor no respondio a tiempo (60 segundos).                                                                                                                             |
 
-El 502 y el 504 no son un 500 a proposito: el cliente tiene que distinguir "Ramal fallo" de
+El 502 y el 504 no son un 500 a proposito: el cliente tiene que distinguir "Git Rudder fallo" de
 "la llave de tu organizacion no tiene saldo", porque lo segundo lo arregla un admin.
 
 ### Que datos salen, a donde, y que se guarda
@@ -2988,7 +2988,7 @@ su maquina.
   estados, nombres de rama, mensajes de commit, las instrucciones extra y el idioma. Antes de
   enviar, el motor quita los ficheros sensibles, los binarios y los que casan con
   `excludePatterns`, y recorta cada parche y el total para caber en 256 KiB.
-- **A donde:** a la API de Ramal por TLS, y de ahi al proveedor de la llave con la llave de la
+- **A donde:** a la API de Git Rudder por TLS, y de ahi al proveedor de la llave con la llave de la
   organizacion.
 - **La API vuelve a pasar el filtro de ficheros sensibles** y quita lo que se hubiera colado.
   Lo que quita lo devuelve en `excludedPaths`. Es defensa en profundidad: un cliente viejo o
@@ -3006,7 +3006,7 @@ su maquina.
 
 **F2.** `GET /v1/sync/changes?since=<cursor>&limit=`, nativa y **viva**. Es lo que permite a
 un dispositivo ponerse al dia sin bajarse todo en cada arranque. La mecanica viene de
-Gastonomo (ADR 0023), con dos cosas que Ramal necesita y Gastonomo no: **borrados de verdad**
+Gastonomo (ADR 0023), con dos cosas que Git Rudder necesita y Gastonomo no: **borrados de verdad**
 y **datos compartidos entre usuarios**.
 
 ```json
@@ -3120,7 +3120,7 @@ GET /v1/releases/latest?product=desktop&channel=stable
   "version": "2.4.0",
   "channel": "stable",
   "releasedAt": "2026-09-30T08:00:00Z",
-  "notesUrl": "https://ramal.bahoque.com/releases/2.4.0",
+  "notesUrl": "https://git-rudder.com/releases/2.4.0",
   "minimumSupportedVersion": "2.0.0",
   "platforms": [
     {
@@ -3128,8 +3128,8 @@ GET /v1/releases/latest?product=desktop&channel=stable
       "requirements": { "es": "macOS 12 o posterior", "en": "macOS 12 or later" },
       "installMethod": "brew_cask",
       "artifacts": [
-        { "id": "0192f500-...", "kind": "dmg", "arch": "arm64", "primary": true, "url": "https://github.com/eabl0306/ramal/releases/download/v2.4.0/Ramal-2.4.0-arm64.dmg", "fileName": "Ramal-2.4.0-arm64.dmg", "sizeBytes": 112459776, "sha256": "base64url", "external": false },
-        { "id": "0192f501-...", "kind": "dmg", "arch": "x64", "primary": false, "url": "...", "fileName": "Ramal-2.4.0-x64.dmg", "sizeBytes": 123731968, "sha256": "...", "external": false }
+        { "id": "0192f500-...", "kind": "dmg", "arch": "arm64", "primary": true, "url": "https://github.com/eabl0306/git-rudder/releases/download/v2.4.0/Git-Rudder-2.4.0-arm64.dmg", "fileName": "Git-Rudder-2.4.0-arm64.dmg", "sizeBytes": 112459776, "sha256": "base64url", "external": false },
+        { "id": "0192f501-...", "kind": "dmg", "arch": "x64", "primary": false, "url": "...", "fileName": "Git-Rudder-2.4.0-x64.dmg", "sizeBytes": 123731968, "sha256": "...", "external": false }
       ]
     }
   ]
@@ -3144,13 +3144,13 @@ GET /v1/releases/latest?product=desktop&channel=stable
 - `kind`: `dmg`, `nsis`, `msi`, `deb`, `rpm`, `appimage`, `flathub`, `vsix`, `marketplace` y
   `openvsx`. `arch` puede ser `universal` en el `.dmg` que sirve para los dos procesadores de
   macOS. **Las etiquetas visibles** ("Apple Silicon (.dmg)", "Fedora / RHEL
-  (.rpm)") **las pone la web** desde `@ramal/i18n` con `kind` y `arch`; guardarlas en la base
+  (.rpm)") **las pone la web** desde `@git-rudder/i18n` con `kind` y `arch`; guardarlas en la base
   seria guardar texto de interfaz en dos idiomas en un sitio que no es el suyo.
 - `external: true` son enlaces a una tienda (Flathub, Marketplace, Open VSX): sin tamano ni
   sha256, y con URL fijas del codigo, no las que diga la CI. Coincide con el diseno, que no
   ensena tamano para Flathub.
 - `installMethod` es `brew_cask`, `winget`, `flatpak` o `null`, y la web escribe el comando que
-  se copia desde una tabla fija de `@ramal/domain`. No es texto libre porque la landing invita a
+  se copia desde una tabla fija de `@git-rudder/domain`. No es texto libre porque la landing invita a
   pegarlo en una terminal.
 - `sha256` y la firma del actualizador estan para quien quiera verificar la descarga; la
   pagina de "gracias por descargar" que el analisis proponia puede ensenarlos.
@@ -3164,7 +3164,7 @@ GET /v1/releases/latest?product=desktop&channel=stable
   decision; la tarjeta lo dice. El de actualizacion automatica en Windows es el NSIS, el unico que
   hay en arm64.
 - Los artefactos de Windows arm64 y Linux arm64 salen como beta hasta que su E2E pase en runners
-  arm. La etiqueta la pone la web desde `@ramal/i18n`.
+  arm. La etiqueta la pone la web desde `@git-rudder/i18n`.
 
 La landing se prerenderiza con esta respuesta en tiempo de build y la refresca en el cliente;
 el sistema operativo se detecta en el navegador. Respuesta con
@@ -3182,7 +3182,7 @@ GET /v1/desktop/updates/{target}/{arch}/{currentVersion}?channel=stable&bundle={
 Es la URL que va dentro de `tauri.conf.json` con las variables de Tauri: `{{target}}`
 (`darwin`, `windows`, `linux`), `{{arch}}` (`x86_64`, `aarch64`), `{{current_version}}` y
 `{{bundle_type}}` (`app`, `nsis`, `msi`, `appimage`, `deb` o `rpm`), en
-`https://api.ramal.bahoque.com`. **`bundle` va en la URL desde la primera build publica**: la URL
+`https://api.git-rudder.com`. **`bundle` va en la URL desde la primera build publica**: la URL
 no se puede cambiar despues, y es lo que deja a la API responder distinto a cada formato sin tocar
 las apps instaladas.
 
@@ -3197,7 +3197,7 @@ las apps instaladas.
   "version": "2.4.1",
   "notes": "Corrige el calculo de carriles con ramas muy largas.",
   "pub_date": "2026-10-05T08:00:00Z",
-  "url": "https://github.com/eabl0306/ramal/releases/download/v2.4.1/Ramal_2.4.1_aarch64.app.tar.gz",
+  "url": "https://github.com/eabl0306/git-rudder/releases/download/v2.4.1/Git-Rudder_2.4.1_aarch64.app.tar.gz",
   "signature": "dW50cnVzdGVkIGNvbW1lbnQ6..."
 }
 ```
@@ -3207,7 +3207,7 @@ las apps instaladas.
   administrador; quien los instalo no recibe actualizacion por aqui. Los `.deb` y `.rpm` ensenan
   "Hay una version nueva" con el enlace, a partir de `GET /v1/releases/latest`.
 - **Despliegue gradual:** cada publicacion tiene un porcentaje. La app manda la cabecera
-  `X-Ramal-Rollout-Bucket` con un numero de 0 a 99 que calcula una vez de una semilla aleatoria
+  `X-Git Rudder-Rollout-Bucket` con un numero de 0 a 99 que calcula una vez de una semilla aleatoria
   propia, y la API ofrece la version si ese numero cae por debajo del porcentaje. Sin cabecera,
   solo se ofrece al 100%. No se manda el `installationId`: seria un identificador estable de la
   instalacion en cada consulta, tambien sin cuenta.
@@ -3220,17 +3220,17 @@ las apps instaladas.
   firma de codigo de macOS y Windows. **Perder la llave privada deja todas las instalaciones
   sin poder actualizarse nunca mas**: copia fuera de linea obligatoria.
 - `tauri.conf.json` lleva como segundo endpoint el `latest.json` estatico de las publicaciones de
-  `eabl0306/ramal`, por si la API no responde. Solo lleva claves por formato
+  `eabl0306/git-rudder`, por si la API no responde. Solo lleva claves por formato
   (`darwin-aarch64-app`, `windows-x86_64-nsis`, `linux-x86_64-appimage`...) y ninguna generica,
   para que un MSI o un `.deb` no caigan en una entrada que no es la suya.
 
 ### Registro de publicaciones
 
 `POST /v1/admin/releases` y `PATCH /v1/admin/releases/{id}` los llama la CI, que se autentica
-con el token OIDC de GitHub Actions del workflow de publicacion: audiencia `ramal-api`,
-repositorio y workflow fijados en la configuracion (`RAMAL__RELEASES__OIDC_*`). Es un reino de
+con el token OIDC de GitHub Actions del workflow de publicacion: audiencia `git-rudder-api`,
+repositorio y workflow fijados en la configuracion (`GIT_RUDDER__RELEASES__OIDC_*`). Es un reino de
 autenticacion aparte: no es un usuario y no puede hacer nada mas. Hasta que exista, sirve un token
-de publicacion (`RAMAL__RELEASES__PUBLISH_TOKEN_HASH`) del que la API guarda solo el hash y que
+de publicacion (`GIT_RUDDER__RELEASES__PUBLISH_TOKEN_HASH`) del que la API guarda solo el hash y que
 compara en tiempo constante.
 
 ```json
@@ -3239,7 +3239,7 @@ compara en tiempo constante.
   "version": "2.4.1",
   "channel": "beta",
   "releasedAt": "2026-10-05T08:00:00Z",
-  "notesUrl": "https://ramal.bahoque.com/releases/2.4.1",
+  "notesUrl": "https://git-rudder.com/releases/2.4.1",
   "notes": { "es": "...", "en": "..." },
   "rolloutPercentage": 10,
   "minimumSupportedVersion": "2.0.0",
@@ -3282,7 +3282,7 @@ que los usuarios descargan y ejecutan:
 
 - Cada `url` tiene que empezar por
   `https://github.com/<propietario>/<repositorio>/releases/download/v{version}/`, con el
-  propietario y el repositorio de la configuracion (hoy `eabl0306/ramal`) y la version de la propia
+  propietario y el repositorio de la configuracion (hoy `eabl0306/git-rudder`) y la version de la propia
   publicacion (**422** si no). El repositorio es privado hasta la beta y publico desde entonces; la
   primera build publica sale con el ya publico.
 - `installMethod` es un valor de la lista, nunca un comando.
@@ -3345,8 +3345,8 @@ que poder conectar una cuenta aunque la API no responda.
    **no canjea todavia**: redirige al loopback del motor con
    `?code=...&flow=<id del flujo>&state=<state del cliente>`, construido con la API de `url`. El
    navegador aterriza en el receptor del motor, que sirve la pagina "Cuenta conectada, vuelve a
-   Ramal" (o el error del proveedor). Si el flujo no existe o caduco, la API no tiene a donde
-   redirigir y manda al navegador a `https://ramal.bahoque.com/connect/error?reason=expired`, una pagina
+   Git Rudder" (o el error del proveedor). Si el flujo no existe o caduco, la API no tiene a donde
+   redirigir y manda al navegador a `https://git-rudder.com/connect/error?reason=expired`, una pagina
    de la web que explica que hay que empezar otra vez desde la app.
 3. El motor canjea:
 
@@ -3383,7 +3383,7 @@ sin la query y nunca el cuerpo), y las dos respuestas llevan `Cache-Control: no-
 unico sitio de toda la API por donde pasa un token de plataforma, y por eso esta aislado en su
 propio modulo.
 
-**Sin cuenta de Ramal.** El broker es publico porque Ramal funciona sin cuenta y conectar
+**Sin cuenta de Git Rudder.** El broker es publico porque Git Rudder funciona sin cuenta y conectar
 Bitbucket es parte de trabajar con Git. Lo acota el limite por IP. El riesgo que se asume: el
 broker permite usar un refresh token robado de nuestro consumer; quien lo tiene ya tiene
 acceso a esa cuenta de Bitbucket hasta que caduque.
@@ -3391,7 +3391,7 @@ acceso a esa cuenta de Bitbucket hasta que caduque.
 ## Lo que el cliente deriva, y no pide
 
 Hay datos del diseno que parecen de la API y no lo son. Pedirlos al servidor seria repetir en
-Rust lo que `@ramal/domain` ya calcula igual para las tres superficies.
+Rust lo que `@git-rudder/domain` ya calcula igual para las tres superficies.
 
 - **Iniciales y colores de avatar** (personas, organizaciones y cuentas): del nombre, con la
   paleta de carriles.
@@ -3474,7 +3474,7 @@ Si un cambio en la API choca con alguna de estas reglas, el cambio esta mal, no 
   interruptores de sincronizacion; los endpoints ya lo permitirian si algun dia se dibuja.
 - **Foto de organizacion, reordenar workspaces, selector de color.** Los datos lo soportan
   (el color ya es un campo); falta el diseno.
-- **Plan personal de pago.** No existe y no esta previsto: Ramal Pro es solo de organizaciones
+- **Plan personal de pago.** No existe y no esta previsto: Git Rudder Pro es solo de organizaciones
   ([ADR 0026](adr/0026-planes-y-precios.md)).
 - **Ubicacion en las sesiones y en el device flow.** Sin GeoIP en la primera version.
 - **Coste aproximado por generacion de IA.** La v1 no lo ensena
@@ -3497,13 +3497,13 @@ Si un cambio en la API choca con alguna de estas reglas, el cambio esta mal, no 
 - **La API ve metadatos que dicen mucho**: nombres de repositorios privados, hosts internos,
   nombres de clientes en los alias. Es lo que el usuario acepta al sincronizar, y el panel de
   sincronizacion tiene que decirlo con esas palabras.
-- **El proxy de IA hace pasar codigo por Ramal.** Esta acotado (solo llaves de organizacion,
+- **El proxy de IA hace pasar codigo por Git Rudder.** Esta acotado (solo llaves de organizacion,
   entrada estructurada, filtro doble, nada guardado), pero cada organizacion tiene que saberlo
   antes de dar de alta una llave.
 - **Perder la llave maestra del servidor pierde todas las llaves de IA de organizacion.** Copia
   fuera de linea, igual que la llave del actualizador.
 - **La URL del actualizador es para siempre.** Va dentro de cada instalacion, con
-  `api.ramal.bahoque.com`: si el producto cambia algun dia de dominio, ese nombre tiene que seguir
+  `api.git-rudder.com`: si el producto cambia algun dia de dominio, ese nombre tiene que seguir
   respondiendo mientras queden instalaciones que lo tengan.
 - **La normalizacion de remotos es un contrato de datos.** Cambiarla parte repositorios en dos y
   exige migracion.
@@ -3517,14 +3517,14 @@ Si un cambio en la API choca con alguna de estas reglas, el cambio esta mal, no 
   con contrasena de una cuenta concreta. Se acepta: la ventana es corta, el OAuth sigue
   funcionando, y sin limite por cuenta se pueden probar contrasenas desde muchas IP.
 - **El broker publico** permite gastar el cupo de nuestro consumer de Bitbucket a cualquiera.
-  Si se abusa, pasa a exigir sesion de Ramal y el camino sin cuenta queda en el API token.
+  Si se abusa, pasa a exigir sesion de Git Rudder y el camino sin cuenta queda en el API token.
 
 ## Apendice A: pantalla o accion y endpoint
 
 "Motor" significa que lo resuelve el motor de Rust del dispositivo sin la API. "Sin endpoint"
 significa que la accion desaparece o es local, y dice por que.
 
-### Ramal Web
+### Git Rudder Web
 
 | Pantalla                                    | Accion o dato                                                                                       | Endpoint                                                                                                                                     | Fase |
 | ------------------------------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
@@ -3542,7 +3542,7 @@ significa que la accion desaparece o es local, y dice por que.
 | Login y registro                            | Continuar con GitHub, GitLab o Google                                                               | `POST /v1/auth/oauth/{provider}/start` y `GET .../callback`                                                                                  | F1   |
 | Nueva: completar alta                       | Terminos y organizacion tras OAuth                                                                  | `GET` y `POST /v1/auth/oauth/signup`                                                                                                         | F1   |
 | Nueva: verificar correo                     | Enlace, reenvio                                                                                     | `POST /v1/auth/email/verify`, `POST /v1/auth/email/verification`                                                                             | F1   |
-| Nueva: autorizar app                        | "Autorizar Ramal Desktop / VS Code"                                                                 | `GET` y `POST /v1/auth/app/authorize`                                                                                                        | F1   |
+| Nueva: autorizar app                        | "Autorizar Git Rudder Desktop / VS Code"                                                            | `GET` y `POST /v1/auth/app/authorize`                                                                                                        | F1   |
 | Nueva: activar                              | Codigo del device flow                                                                              | `POST /v1/auth/device/lookup`, `POST /v1/auth/device/decision`                                                                               | F1   |
 | Nueva: reautenticar                         | Confirmar contrasena, repetir el OAuth o pedir un enlace al correo antes de una accion sensible     | `POST /v1/auth/reauthenticate`, `POST /v1/auth/oauth/{provider}/start` (`reauth`), `POST /v1/auth/reauthenticate/email-link` y `.../confirm` | F1   |
 | Nueva: deshacer cambio de correo            | Enlace de la direccion anterior                                                                     | `POST /v1/auth/email-change/revert`                                                                                                          | F1   |
@@ -3588,8 +3588,8 @@ significa que la accion desaparece o es local, y dice por que.
 | Ajustes de la organizacion (nuevo)          | Salir                                                                                               | `POST /v1/organizations/{orgId}/leave`                                                                                                       | F3   |
 | Ajustes de la organizacion (nuevo)          | Transferir la propiedad (reauth)                                                                    | `POST /v1/organizations/{orgId}/transfer-ownership`                                                                                          | F3   |
 | Ajustes de la organizacion (nuevo)          | Plan, prueba, renovacion y asientos; "Gestionar suscripcion"                                        | `GET /v1/organizations/{orgId}/subscription`, `POST .../subscription/portal`                                                                 | F5   |
-| Nueva: pago                                 | Checkout de Ramal Pro (Paddle.js, con la CSP abierta solo aqui)                                     | La URL de `POST /v1/organizations/{orgId}/subscription/checkout`; el pago es de Paddle                                                       | F5   |
-| Landing (nuevo)                             | Precios: gratis para cada persona, Ramal Pro por asiento                                            | Sin endpoint: precios de ADR 0026 en `@ramal/i18n`                                                                                           | F5   |
+| Nueva: pago                                 | Checkout de Git Rudder Pro (Paddle.js, con la CSP abierta solo aqui)                                | La URL de `POST /v1/organizations/{orgId}/subscription/checkout`; el pago es de Paddle                                                       | F5   |
+| Landing (nuevo)                             | Precios: gratis para cada persona, Git Rudder Pro por asiento                                       | Sin endpoint: precios de ADR 0026 en `@git-rudder/i18n`                                                                                      | F5   |
 | IA de la organizacion (nuevo, admins)       | Lista, alta, rotar, quitar llaves                                                                   | `GET`, `POST`, `PATCH` y `DELETE /v1/organizations/{orgId}/ai-keys`                                                                          | F4   |
 | IA de la organizacion (nuevo, admins)       | Probar conexion                                                                                     | `POST /v1/organizations/{orgId}/ai-keys/{id}/test`                                                                                           | F4   |
 | IA de la organizacion (nuevo, admins)       | Politica: funciones, cuota diaria, presupuesto                                                      | `GET` y `PATCH /v1/organizations/{orgId}/ai-settings`                                                                                        | F4   |
@@ -3603,7 +3603,7 @@ significa que la accion desaparece o es local, y dice por que.
 | Configuracion en la nube (nuevo)            | Estado de la boveda (configurada, desde cuando) y reiniciarla                                       | `vaultEnabled` y `vaultCreatedAt` de `GET /v1/me`; `DELETE /v1/vault`                                                                        | F2   |
 | Configuracion en la nube (nuevo)            | Identidades vinculadas: listar, vincular, quitar                                                    | `GET /v1/me/identities`, `POST /v1/auth/oauth/{provider}/start` (`link`), `DELETE /v1/me/identities/{provider}`                              | F1   |
 
-### Ramal Desktop
+### Git Rudder Desktop
 
 | Pantalla                          | Accion o dato                                                                                                 | Endpoint                                                                                                                                               | Fase            |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
@@ -3661,23 +3661,23 @@ significa que la accion desaparece o es local, y dice por que.
 | Fondo                             | Version minima: "Actualiza para seguir sincronizando"                                                         | `minimumSupportedVersion` de `GET /v1/releases/latest`                                                                                                 | F1              |
 | Fondo                             | Cola de escrituras sin conexion                                                                               | Los endpoints de cada entidad, en orden y con el mismo id de cliente                                                                                   | F2              |
 
-### Ramal para VS Code
+### Git Rudder para VS Code
 
-| Pantalla                  | Accion o dato                                                   | Endpoint                                                                                   | Fase |
-| ------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---- |
-| Menu Accounts (nuevo)     | Iniciar sesion en Ramal                                         | Navegador + `UriHandler` + `POST /v1/auth/app/token`; device flow en entornos de navegador | F1   |
-| Ajustes > Cuenta de Ramal | Tarjeta: nombre, correo, organizacion, plan                     | `GET /v1/me`; plan de `GET /v1/organizations`                                              | F1   |
-| Ajustes > Cuenta de Ramal | Abrir panel web                                                 | Sin endpoint: `env.openExternal`                                                           | -    |
-| Ajustes > Cuenta de Ramal | Cambiar correo o contrasena, que se sincroniza                  | Sin endpoint: abre la pagina de la web                                                     | -    |
-| Ajustes > Cuenta de Ramal | Cerrar sesion                                                   | `POST /v1/auth/logout`                                                                     | F1   |
-| Ajustes > Cuenta de Ramal | "Sync settings from the cloud"                                  | Sin endpoint: ajuste local de la instalacion                                               | -    |
-| Ajustes > Plataformas Git | Anadir, predeterminada, desconectar                             | Los mismos que Desktop                                                                     | F2   |
-| Ajustes > IA              | Llaves, funciones, llave y modelo, idioma, Conventional Commits | Los mismos que Desktop, en la pagina de ajustes de Ramal (no en `settings.json`)           | F2   |
-| Ajustes > Git             | Fetch automatico, pull, firmar, podar                           | `PATCH /v1/me/preferences/git`, en la pagina de ajustes de Ramal                           | F2   |
-| Cambios, grafo, detalle   | Generar con llave de organizacion                               | `POST /v1/ai/generate`                                                                     | F4   |
-| Barra de estado           | "Ramal: @cuenta" y proveedor de IA                              | `profile` y `preferences` del feed                                                         | F2   |
-| Fondo                     | Registrar la instalacion como dispositivo                       | `POST /v1/auth/app/token` (bloque `device`)                                                | F1   |
-| Fondo                     | Cuenta de plataforma para el remoto del repositorio abierto     | Repositorios del feed: `remoteKey` a `linkedAccountId`                                     | F2   |
-| Fondo                     | Ponerse al dia                                                  | `GET /v1/sync/changes`                                                                     | F2   |
-| Pull Requests             | Lista y creacion                                                | Motor contra la plataforma                                                                 | -    |
-| Paleta                    | "Open in Ramal Desktop"                                         | Sin endpoint: deep link `ramal://`                                                         | -    |
+| Pantalla                       | Accion o dato                                                   | Endpoint                                                                                   | Fase |
+| ------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---- |
+| Menu Accounts (nuevo)          | Iniciar sesion en Git Rudder                                    | Navegador + `UriHandler` + `POST /v1/auth/app/token`; device flow en entornos de navegador | F1   |
+| Ajustes > Cuenta de Git Rudder | Tarjeta: nombre, correo, organizacion, plan                     | `GET /v1/me`; plan de `GET /v1/organizations`                                              | F1   |
+| Ajustes > Cuenta de Git Rudder | Abrir panel web                                                 | Sin endpoint: `env.openExternal`                                                           | -    |
+| Ajustes > Cuenta de Git Rudder | Cambiar correo o contrasena, que se sincroniza                  | Sin endpoint: abre la pagina de la web                                                     | -    |
+| Ajustes > Cuenta de Git Rudder | Cerrar sesion                                                   | `POST /v1/auth/logout`                                                                     | F1   |
+| Ajustes > Cuenta de Git Rudder | "Sync settings from the cloud"                                  | Sin endpoint: ajuste local de la instalacion                                               | -    |
+| Ajustes > Plataformas Git      | Anadir, predeterminada, desconectar                             | Los mismos que Desktop                                                                     | F2   |
+| Ajustes > IA                   | Llaves, funciones, llave y modelo, idioma, Conventional Commits | Los mismos que Desktop, en la pagina de ajustes de Git Rudder (no en `settings.json`)      | F2   |
+| Ajustes > Git                  | Fetch automatico, pull, firmar, podar                           | `PATCH /v1/me/preferences/git`, en la pagina de ajustes de Git Rudder                      | F2   |
+| Cambios, grafo, detalle        | Generar con llave de organizacion                               | `POST /v1/ai/generate`                                                                     | F4   |
+| Barra de estado                | "Git Rudder: @cuenta" y proveedor de IA                         | `profile` y `preferences` del feed                                                         | F2   |
+| Fondo                          | Registrar la instalacion como dispositivo                       | `POST /v1/auth/app/token` (bloque `device`)                                                | F1   |
+| Fondo                          | Cuenta de plataforma para el remoto del repositorio abierto     | Repositorios del feed: `remoteKey` a `linkedAccountId`                                     | F2   |
+| Fondo                          | Ponerse al dia                                                  | `GET /v1/sync/changes`                                                                     | F2   |
+| Pull Requests                  | Lista y creacion                                                | Motor contra la plataforma                                                                 | -    |
+| Paleta                         | "Open in Git Rudder Desktop"                                    | Sin endpoint: deep link `git-rudder://`                                                    | -    |

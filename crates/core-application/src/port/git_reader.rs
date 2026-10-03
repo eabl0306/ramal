@@ -8,7 +8,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 
 use async_trait::async_trait;
-use ramal_core_domain::{CommitRecord, RefSnapshot, RepoRoot};
+use git_rudder_core_domain::{CommitRecord, RefSnapshot, RepoRoot};
 use thiserror::Error;
 
 /// Version de git: mayor, menor y parche.
@@ -41,7 +41,7 @@ impl fmt::Display for GitVersion {
 }
 
 /// Git minimo: 2.34 es la primera con firma de commits por SSH y la que trae
-/// Ubuntu 22.04, el suelo de Linux de Ramal (ADR 0009).
+/// Ubuntu 22.04, el suelo de Linux de Git Rudder (ADR 0009).
 pub const MINIMUM_GIT_VERSION: GitVersion = GitVersion::new(2, 34, 0);
 
 /// Funciones de git que llegaron despues de la minima. Se detectan, no se suponen:

@@ -24,7 +24,7 @@ members = [
 # las maquinas ni en los runners de la CI que no son de escritorio: sin esta lista,
 # un `cargo test` a secas fallaria en cualquier sitio sin esas librerias.
 # Consecuencia: ninguna receta usa `--workspace`, porque pisa esta lista. El crate
-# de escritorio se compila con `-p ramal-desktop` (just desktop-rust-check).
+# de escritorio se compila con `-p git-rudder-desktop` (just desktop-rust-check).
 default-members = [
   "crates/core-domain",
   "crates/core-application",
@@ -49,18 +49,18 @@ license = "FSL-1.1-ALv2"
 
 [workspace.dependencies]
 # --- Crates del workspace ---
-ramal-core-domain = { path = "crates/core-domain", version = "0.1.0" }
-ramal-core-application = { path = "crates/core-application", version = "0.1.0" }
-ramal-protocol = { path = "crates/protocol", version = "0.1.0" }
-ramal-git = { path = "crates/git", version = "0.1.0" }
-ramal-engine = { path = "crates/engine", version = "0.1.0" }
-ramal-api-domain = { path = "apps/api/crates/domain", version = "0.1.0" }
-ramal-api-application = { path = "apps/api/crates/application", version = "0.1.0" }
-ramal-api-infrastructure = { path = "apps/api/crates/infrastructure", version = "0.1.0" }
-ramal-api-http = { path = "apps/api/crates/http", version = "0.1.0" }
-ramal-api = { path = "apps/api/crates/api", version = "0.1.0" }
-ramal-vscode-engine = { path = "apps/vscode-engine", version = "0.1.0" }
-ramal-desktop = { path = "apps/desktop/src-tauri", version = "0.1.0" }
+git-rudder-core-domain = { path = "crates/core-domain", version = "0.1.0" }
+git-rudder-core-application = { path = "crates/core-application", version = "0.1.0" }
+git-rudder-protocol = { path = "crates/protocol", version = "0.1.0" }
+git-rudder-git = { path = "crates/git", version = "0.1.0" }
+git-rudder-engine = { path = "crates/engine", version = "0.1.0" }
+git-rudder-api-domain = { path = "apps/api/crates/domain", version = "0.1.0" }
+git-rudder-api-application = { path = "apps/api/crates/application", version = "0.1.0" }
+git-rudder-api-infrastructure = { path = "apps/api/crates/infrastructure", version = "0.1.0" }
+git-rudder-api-http = { path = "apps/api/crates/http", version = "0.1.0" }
+git-rudder-api = { path = "apps/api/crates/api", version = "0.1.0" }
+git-rudder-vscode-engine = { path = "apps/vscode-engine", version = "0.1.0" }
+git-rudder-desktop = { path = "apps/desktop/src-tauri", version = "0.1.0" }
 
 # --- Externas ---
 async-trait = "0.1.92"
@@ -94,7 +94,7 @@ tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
 # Genera los tipos de TypeScript del protocolo (packages/bridge) desde los tipos
 # de Rust: `just protocol-gen` los escribe y `just protocol-check` vigila que esten al dia.
-# Solo lo usa ramal-protocol. `serde-json-impl` traduce el `params` del sobre
+# Solo lo usa git-rudder-protocol. `serde-json-impl` traduce el `params` del sobre
 # (serde_json::Value). Sin uuid ni chrono: el protocolo no lleva esos tipos (los
 # instantes viajan como texto ISO 8601) y no hace falta arrastrarlos al cierre.
 ts-rs = { version = "12.0.1", features = ["serde-compat", "serde-json-impl"] }
@@ -107,7 +107,7 @@ tauri-build = { version = "2.7.1", features = [] }
 tauri-plugin-dialog = "2.8.0"
 tauri-plugin-opener = "2.7.0"
 # Servidor WebDriver embebido para el E2E nativo con @wdio/tauri-service. Solo
-# entra con la feature `e2e` de ramal-desktop, nunca en el binario publicado.
+# entra con la feature `e2e` de git-rudder-desktop, nunca en el binario publicado.
 tauri-plugin-wdio-webdriver = "1.4.0"
 
 # Solo tools/rust-complexity: lee los fuentes de Rust para medir su complejidad.

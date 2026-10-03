@@ -18,7 +18,7 @@ mod support;
 
 use std::sync::Arc;
 
-use ramal_api_application::testing::FakeHealthProbe;
+use git_rudder_api_application::testing::FakeHealthProbe;
 use salvo::prelude::StatusCode;
 use salvo::test::{ResponseExt, TestClient};
 

@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION } from '@ramal/bridge';
+import { PROTOCOL_VERSION } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { FakeEngine, engineInfo, fail, ok } from '../../test/engine-fakes';

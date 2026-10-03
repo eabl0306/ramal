@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION } from '@ramal/bridge';
+import { PROTOCOL_VERSION } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { FakeLauncher, fail, infoResponder } from '../../../test/engine-fakes';
@@ -44,7 +44,7 @@ describe('arranque del host', () => {
     expect(boot('es-ES').runtime.locale).toBe('es');
     expect(boot('es-419').runtime.locale).toBe('es');
     expect(boot('fr').runtime.locale).toBe('en');
-    expect(boot('es').runtime.translate('vscode.tab.graph')).toBe('Grafo de Ramal');
+    expect(boot('es').runtime.translate('vscode.tab.graph')).toBe('Grafo de Git Rudder');
   });
 
   it('no lanza el motor al arrancar y compara el protocolo generado al lanzarlo', async () => {
@@ -78,7 +78,7 @@ describe('arranque del host', () => {
     await flush();
     expect(notifications.errors).toEqual([
       {
-        message: 'El motor de Ramal se ha detenido después de caerse varias veces.',
+        message: 'El motor de Git Rudder se ha detenido después de caerse varias veces.',
         actions: ['Reintentar'],
       },
     ]);
@@ -92,7 +92,7 @@ describe('arranque del host', () => {
     const result = await openGraph({
       engine: runtime.engine,
       ids: runtime.ids,
-      repositories: { list: () => [{ name: 'ramal', path: '/work/ramal' }] },
+      repositories: { list: () => [{ name: 'git-rudder', path: '/work/git-rudder' }] },
       dialogs: new FakeDialogs(),
       notifications,
       panels: new FakePanels(),

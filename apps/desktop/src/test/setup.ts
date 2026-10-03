@@ -6,7 +6,7 @@ import { afterEach, beforeEach } from 'vitest';
 /**
  * jsdom no maqueta: todo mide 0 px y el virtualizador del grafo no pintaria
  * ninguna fila. Se da un tamano fijo a los elementos, que es lo unico que lee
- * @tanstack/virtual-core, como hacen los tests de @ramal/repo-view.
+ * @tanstack/virtual-core, como hacen los tests de @git-rudder/repo-view.
  */
 const VIEWPORT = { height: 400, width: 1000 };
 

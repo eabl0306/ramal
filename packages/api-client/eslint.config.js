@@ -1,4 +1,4 @@
-// ESLint de @ramal/api-client: TypeScript estricto, calidad y fronteras. El
+// ESLint de @git-rudder/api-client: TypeScript estricto, calidad y fronteras. El
 // codigo solo puede importar openapi-fetch (architecture.md 5.2) y lo generado
 // por openapi-typescript, que queda fuera del lint (DEFAULT_IGNORES).
 import { fileURLToPath } from 'node:url';
@@ -10,7 +10,7 @@ import {
   nodeConfig,
   qualityConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 

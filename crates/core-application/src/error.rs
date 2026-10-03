@@ -1,12 +1,12 @@
 //! `EngineError`, el unico error que sale de un caso de uso.
 //!
-//! Las variantes son cerradas: `ramal-engine` traduce cada una a un `ErrorKind`
+//! Las variantes son cerradas: `git-rudder-engine` traduce cada una a un `ErrorKind`
 //! estable del protocolo, que es lo que la interfaz usa para decidir y traducir.
 
 use std::path::PathBuf;
 
-use ramal_core_domain::RepoId;
-use ramal_core_domain::graph::WindowError;
+use git_rudder_core_domain::RepoId;
+use git_rudder_core_domain::graph::WindowError;
 use thiserror::Error;
 
 use crate::port::git_reader::{GitReadError, GitVersion};

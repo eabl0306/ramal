@@ -13,7 +13,7 @@ fn parsed(text: &str) -> FilePath {
 
 #[test]
 fn a_chosen_path_is_the_folder() {
-    let folder = PathBuf::from("/home/ana/repos/ramal");
+    let folder = PathBuf::from("/home/ana/repos/git-rudder");
     assert_eq!(
         chosen_folder(Some(FilePath::Path(folder.clone()))),
         Some(folder)
@@ -23,8 +23,8 @@ fn a_chosen_path_is_the_folder() {
 #[test]
 fn a_file_url_becomes_its_path() {
     assert_eq!(
-        chosen_folder(Some(parsed("file:///home/ana/repos/ramal"))),
-        Some(PathBuf::from("/home/ana/repos/ramal"))
+        chosen_folder(Some(parsed("file:///home/ana/repos/git-rudder"))),
+        Some(PathBuf::from("/home/ana/repos/git-rudder"))
     );
 }
 

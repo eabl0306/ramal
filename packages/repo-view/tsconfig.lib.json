@@ -1,10 +1,10 @@
-// Codigo de produccion de @ramal/repo-view. Solo referencia los paquetes del
+// Codigo de produccion de @git-rudder/repo-view. Solo referencia los paquetes del
 // workspace que puede importar (architecture.md 5.2): ui, i18n y bridge.
 // Importar otro rompe `tsc -b` con TS6307 aunque ESLint no estuviera bien
-// configurado. @ramal/domain tambien esta permitido, pero el grafo del primer
+// configurado. @git-rudder/domain tambien esta permitido, pero el grafo del primer
 // corte no lo usa: su referencia llega con la primera pieza que lo necesite.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

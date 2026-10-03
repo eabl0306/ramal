@@ -1,5 +1,5 @@
 //! Casos de uso y puertos del motor de Git. Solo conoce el dominio: el acceso real
-//! al repositorio llega por los puertos que implementa `ramal-git`, y quien ejecuta
+//! al repositorio llega por los puertos que implementa `git-rudder-git`, y quien ejecuta
 //! los futuros es el runtime del host (aqui no hay tokio).
 
 pub mod error;

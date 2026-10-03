@@ -3,8 +3,8 @@
     reason = "tests fail loudly on purpose; a panic here is a failed assertion"
 )]
 
+use git_rudder_core_domain::{GitRef, RefName, Sha};
 use pretty_assertions::assert_eq;
-use ramal_core_domain::{GitRef, RefName, Sha};
 
 use super::parse_refs;
 

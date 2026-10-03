@@ -8,7 +8,7 @@
 
 ## Contexto
 
-Ramal es un cliente Git al estilo de GitKraken. El diseno pide el grafo de todas las ramas,
+Git Rudder es un cliente Git al estilo de GitKraken. El diseno pide el grafo de todas las ramas,
 estado y staging por fichero, commit con amend y firma (SSH o GPG, activada por defecto en los
 ajustes), fetch y pull con sus modos, push con upstream y `--force-with-lease`, ramas, tags,
 stash, merge en sus tres estrategias, resolucion de conflictos, rebase interactivo, cherry-pick,
@@ -18,12 +18,12 @@ fetch, push y pull requests.
 
 Lo que hacen los productos comparables deja la tendencia clara:
 
-| Producto                                          | Motor                                                                                                                                                                                                                                                        |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| GitKraken Desktop                                 | Paso de NodeGit y libgit2 al ejecutable de git para commit, fetch, push, pull, rebase, cherry-pick, stash, firma SSH y Git Credential Manager. Motivos publicados: libgit2 va muy por detras de git, rinde mal con LFS y soporta mal la configuracion de SSH |
-| GitHub Desktop                                    | Git empaquetado (dugite); todas las operaciones lanzan git                                                                                                                                                                                                   |
-| Tower                                             | Empaqueta el binario oficial de git, con opcion de elegir otro                                                                                                                                                                                               |
-| GitButler (Tauri y Rust, el mas parecido a Ramal) | Paso de `git2` a `gix` para lecturas y lanza git para fetch y push, para heredar la configuracion de SSH, el agente y los helpers de credenciales                                                                                                            |
+| Producto                                               | Motor                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GitKraken Desktop                                      | Paso de NodeGit y libgit2 al ejecutable de git para commit, fetch, push, pull, rebase, cherry-pick, stash, firma SSH y Git Credential Manager. Motivos publicados: libgit2 va muy por detras de git, rinde mal con LFS y soporta mal la configuracion de SSH |
+| GitHub Desktop                                         | Git empaquetado (dugite); todas las operaciones lanzan git                                                                                                                                                                                                   |
+| Tower                                                  | Empaqueta el binario oficial de git, con opcion de elegir otro                                                                                                                                                                                               |
+| GitButler (Tauri y Rust, el mas parecido a Git Rudder) | Paso de `git2` a `gix` para lecturas y lanza git para fetch y push, para heredar la configuracion de SSH, el agente y los helpers de credenciales                                                                                                            |
 
 Las opciones eran `git2` (libgit2), `gix` (gitoxide) solo, la CLI de git sola, o un hibrido. La
 decision de partida del usuario: **un hibrido que empieza con la CLI para todo**, `gix` mas tarde
@@ -34,13 +34,13 @@ minimo con deteccion de capacidades. Este ADR la desarrolla.
 
 ### Todo por la CLI de git, detras de dos puertos
 
-El motor habla con git a traves de dos puertos de `ramal-core-application`:
+El motor habla con git a traves de dos puertos de `git-rudder-core-application`:
 
 - **`GitReader`**: log y ventana del grafo, refs, estado, detalle de commit, diff, blame, etapas
   de un conflicto.
 - **`GitWriter`**: todo lo que modifica el repositorio o habla con un remoto.
 
-`ramal-git` implementa los dos lanzando el ejecutable de git. Escrituras, red, hooks, firma, LFS y
+`git-rudder-git` implementa los dos lanzando el ejecutable de git. Escrituras, red, hooks, firma, LFS y
 credenciales van siempre por la CLI y nunca dejaran de hacerlo: son justo las partes donde la
 semantica exacta de git importa y donde las bibliotecas van por detras.
 
@@ -93,7 +93,7 @@ Abrir una carpeta ya ejecuta codigo si su `.git/config` lo pide: `git status` la
 los `textconv`. Una carpeta extraida de un zip trae su propio `.git/config` y sus hooks. VS Code
 tiene Workspace Trust; escritorio necesita su propio equivalente:
 
-- Antes del primer comando de git en un repositorio que Ramal no clono, el motor lee
+- Antes del primer comando de git en un repositorio que Git Rudder no clono, el motor lee
   `git config --local --list --show-origin` (con `--local` no sigue `include`, asi que no ejecuta
   nada) y mira `.git/hooks`.
 - Si aparece cualquier clave que pueda lanzar un comando (`core.fsmonitor`, `core.hooksPath`,
@@ -111,7 +111,7 @@ tiene Workspace Trust; escritorio necesita su propio equivalente:
 ### Version minima 2.34 y deteccion de capacidades
 
 - Git 2.34 es la primera con firma de commits por SSH, y es la que trae Ubuntu 22.04, la base
-  minima de Linux de Ramal ([ADR 0016](0016-actualizaciones-y-descargas.md)).
+  minima de Linux de Git Rudder ([ADR 0016](0016-actualizaciones-y-descargas.md)).
 - El motor parsea `git --version` y calcula `GitCapabilities`. `engine/info` no falla con un git
   viejo: devuelve `supported: false` para que la interfaz explique que hacer. El minimo se aplica
   en `OpenRepository` (`repo/open`), que rechaza cualquier version inferior con el error
@@ -130,7 +130,7 @@ En este orden:
    `vscode.git` (el ajuste `git.path` del editor), que el extension host pasa al sidecar al
    arrancarlo: el usuario ya le dijo a su editor que git usar.
 2. El git del `PATH`, si cumple la version minima.
-3. Solo en Ramal Desktop para Windows, un MinGit empaquetado en el instalador, con la version
+3. Solo en Git Rudder Desktop para Windows, un MinGit empaquetado en el instalador, con la version
    fijada y actualizada con cada publicacion (reglas abajo).
 
 En macOS se usa el git del sistema, y si no existe se propone `xcode-select --install`. En Linux,
@@ -141,7 +141,7 @@ para su propia integracion.
 **Por que MinGit solo como respaldo en Windows y no siempre.** Un git del sistema ya trae la
 configuracion del usuario, su Git Credential Manager y sus hooks funcionando. Forzar el
 empaquetado siempre, como hace GitHub Desktop, garantiza la version a cambio de desentenderse de
-esa configuracion. Ramal prefiere respetar lo que el usuario tiene y solo trae git cuando no hay
+esa configuracion. Git Rudder prefiere respetar lo que el usuario tiene y solo trae git cuando no hay
 ninguno que valga, que es el caso normal en un Windows recien instalado.
 
 ### MinGit en el instalador de Windows
@@ -152,7 +152,7 @@ Ratificado el 2026-10-01, con estas reglas:
   (Git for Windows publica MinGit para arm64). Es el MinGit normal, no la variante busybox.
 - **Version y sha256 fijados en el repositorio.** El empaquetado comprueba el sha256 antes de
   meterlo en el instalador, y un job de la CI avisa cuando sale una version nueva.
-- **Ante una correccion de seguridad de Git for Windows, Ramal publica en pocos dias.** Es el precio
+- **Ante una correccion de seguridad de Git for Windows, Git Rudder publica en pocos dias.** Es el precio
   de empaquetar git.
 - **Pesa unos 30 MB mas en cada descarga y en cada actualizacion completa** (el zip de MinGit 2.56
   ronda los 37 MiB en x64 y 36 en arm64). El actualizador de Tauri baja el instalador NSIS entero,
@@ -161,10 +161,10 @@ Ratificado el 2026-10-01, con estas reglas:
 - **Obligaciones de la GPL** ([ADR 0021](0021-licencia-fsl.md)): git es GPLv2, asi que el
   instalador lleva su licencia y la oferta de su codigo fuente.
 - **El MSI no se actualiza solo** ([ADR 0016](0016-actualizaciones-y-descargas.md)), asi que su
-  MinGit envejece hasta que IT actualiza Ramal. La tarjeta y la documentacion del MSI lo dicen.
+  MinGit envejece hasta que IT actualiza Git Rudder. La tarjeta y la documentacion del MSI lo dicen.
 - Hay que comprobar si MinGit trae Git Credential Manager: los repositorios que no estan ligados a
-  una cuenta de Ramal dependen de el para HTTPS. Si no lo trae, el respaldo funciona para lo que
-  usa las cuentas de Ramal y la pantalla de git ausente explica como instalar Git for Windows
+  una cuenta de Git Rudder dependen de el para HTTPS. Si no lo trae, el respaldo funciona para lo que
+  usa las cuentas de Git Rudder y la pantalla de git ausente explica como instalar Git for Windows
   completo.
 - La pantalla de git ausente o antiguo (gaps D-02) solo sale en Windows si MinGit falta o esta roto.
 
@@ -173,9 +173,9 @@ Ratificado el 2026-10-01, con estas reglas:
 Es la parte dificil: con dos cuentas de GitHub, el push de un repositorio tiene que usar una y el
 de otro la otra. Un helper de credenciales global no sabe hacerlo.
 
-**HTTPS.** Solo en los repositorios ligados a una cuenta de Ramal, cada operacion de red se lanza
+**HTTPS.** Solo en los repositorios ligados a una cuenta de Git Rudder, cada operacion de red se lanza
 con `-c credential.helper=` (el valor vacio vacia la lista de helpers configurados) seguido de
-`-c credential.helper=<helper de Ramal>`. El helper habla el protocolo de credenciales de git:
+`-c credential.helper=<helper de Git Rudder>`. El helper habla el protocolo de credenciales de git:
 
 - Recibe protocolo, host y ruta y pide el token al motor que lanzo la operacion, por un canal
   local (socket de dominio Unix en un directorio privado, tuberia con nombre en Windows)
@@ -193,7 +193,7 @@ con `-c credential.helper=` (el valor vacio vacia la lista de helpers configurad
 El ejecutable del helper es el propio sidecar en modo helper en VS Code, y un binario pequeno que
 se empaqueta junto a la app en escritorio (Tauri lo lleva como binario externo): el binario de la
 app de escritorio en Windows es de subsistema grafico y no tiene un stdout donde hablar el
-protocolo. La logica vive en `ramal-git` (planificado, con el primer `GitWriter` de red).
+protocolo. La logica vive en `git-rudder-git` (planificado, con el primer `GitWriter` de red).
 
 **SSH.** Por cuenta, con `GIT_SSH` apuntando al mismo helper en modo ssh, que recibe los
 argumentos de git como lista y lanza `ssh -i <llave> -o IdentitiesOnly=yes` sin pasar por un
@@ -202,7 +202,7 @@ comillas se convertiria en un comando. Si el repositorio no tiene llave ligada, 
 `~/.ssh/config` del usuario. Las llaves SSH viven en el equipo y nunca se sincronizan.
 
 **Repositorios no ligados a ninguna cuenta.** Se ejecutan con la configuracion del usuario
-intacta: Git Credential Manager, `osxkeychain`, el agente de SSH. Ramal no pisa lo que no es
+intacta: Git Credential Manager, `osxkeychain`, el agente de SSH. Git Rudder no pisa lo que no es
 suyo.
 
 **Nunca** se escribe un token en `.git/config`, en la URL de un remoto ni en un argumento de
@@ -234,9 +234,9 @@ A favor:
   Credential Manager y cada funcion nueva de git, gratis.
 - Varias cuentas por plataforma funcionan de verdad, repositorio a repositorio, sin tocar la
   configuracion global del usuario.
-- Ningun codigo C que compilar en tres sistemas (OpenSSL, libssh2): Ramal no enlaza con nada de
+- Ningun codigo C que compilar en tres sistemas (OpenSSL, libssh2): Git Rudder no enlaza con nada de
   git.
-- Cambiar una lectura a `gix` es un cambio en `ramal-git` y en el `EngineBuilder`, reversible con
+- Cambiar una lectura a `gix` es un cambio en `git-rudder-git` y en el `EngineBuilder`, reversible con
   una opcion.
 
 En contra:
@@ -248,7 +248,7 @@ En contra:
 - Depende de un git instalado de una version conocida. Un usuario con git 2.30 ve un error claro
   y tiene que actualizar; en Windows con MinGit no le pasa.
 - MinGit en el instalador de Windows suma unos 30 MB a cada descarga y a cada actualizacion
-  completa, obliga a vigilar sus avisos de seguridad, a publicar Ramal en pocos dias cuando Git for
+  completa, obliga a vigilar sus avisos de seguridad, a publicar Git Rudder en pocos dias cuando Git for
   Windows corrige uno y a cumplir la GPL. En el MSI, que no se actualiza solo, envejece.
 - El helper de credenciales es una pieza mas con su canal local. Cualquier proceso del mismo
   usuario que lea el entorno de un git en marcha podria ver el token del canal mientras dura la
@@ -275,7 +275,7 @@ instalacion y la configuracion del usuario y multiplica lo que hay que actualiza
 en el primer arranque de quien no tiene git, que en Windows es lo normal.
 
 **Descargar MinGit bajo demanda** si no hay git, verificado con un sha256 del manifiesto. Instalador
-mas pequeno y MinGit al dia sin publicar Ramal, a cambio de necesitar red en el primer arranque y
+mas pequeno y MinGit al dia sin publicar Git Rudder, a cambio de necesitar red en el primer arranque y
 de mas codigo y mas superficie de cadena de suministro.
 
 **Un unico helper de credenciales global.** No puede elegir la cuenta segun el repositorio, que

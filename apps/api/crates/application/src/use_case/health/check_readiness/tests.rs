@@ -7,7 +7,7 @@
 
 use std::sync::Arc;
 
-use ramal_api_domain::{ComponentStatus, HealthStatus, ServiceVersion};
+use git_rudder_api_domain::{ComponentStatus, HealthStatus, ServiceVersion};
 
 use super::CheckReadiness;
 use crate::port::HealthProbe;

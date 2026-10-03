@@ -1,5 +1,5 @@
 /*
- * Tema propio de Ramal, para escritorio y web. Los valores son los oklch del
+ * Tema propio de Git Rudder, para escritorio y web. Los valores son los oklch del
  * handoff (la tabla del README y los prototipos *.dc.html, que mandan). El host
  * pone en <html> data-theme="dark" o "light", data-density y, en la web,
  * data-host="web", que sube la letra a 14 px y aplica los matices del prototipo

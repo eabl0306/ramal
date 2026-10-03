@@ -1,4 +1,4 @@
-import { createTranslator } from '@ramal/i18n';
+import { createTranslator } from '@git-rudder/i18n';
 import { describe, expect, it } from 'vitest';
 
 import type { IdentifiedRpcRequest } from '../../../shared/messages';
@@ -22,7 +22,7 @@ function deps(roots: readonly string[]): ReopenRepositoriesDeps & {
 } {
   const panels = new FakePanels();
   for (const root of roots) {
-    panels.show({ surface: 'graph', repoId: 'repo-old', root, title: 'Grafo de Ramal' });
+    panels.show({ surface: 'graph', repoId: 'repo-old', root, title: 'Grafo de Git Rudder' });
   }
   return {
     ids: createRequestIds(),

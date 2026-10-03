@@ -8,15 +8,15 @@ import {
   qualityConfig,
   reactConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
 /**
- * Las piezas de @ramal/ui y lo que puede importar cada una (architecture.md
+ * Las piezas de @git-rudder/ui y lo que puede importar cada una (architecture.md
  * 5.2): lucide-react solo en icons/lucide, @vscode/codicons solo en
  * icons/codicons y @fontsource solo en themes, para que ningun host cargue el
- * juego de iconos o las fuentes de otro. @ramal/i18n solo entra por el enlace
+ * juego de iconos o las fuentes de otro. @git-rudder/i18n solo entra por el enlace
  * de React (src/i18n).
  */
 const elements = [
@@ -58,7 +58,7 @@ const policies = [
   internal('components', ['components', 'icons', 'i18n-binding', 'tokens']),
   internal('entry', ['components', 'icons', 'i18n-binding', 'tokens']),
   external('themes', ['@fontsource/**']),
-  external('i18n-binding', ['react', '@ramal/i18n', 'react-aria-components']),
+  external('i18n-binding', ['react', '@git-rudder/i18n', 'react-aria-components']),
   external('icons', ['react']),
   external('icons-lucide', ['react', 'lucide-react']),
   external('icons-codicons', ['@vscode/codicons/**']),
@@ -88,7 +88,7 @@ const policies = [
       to: {
         module: {
           origin: ['external', 'core'],
-          source: ['vitest', '@testing-library/**', 'react', '@ramal/i18n', 'node:*'],
+          source: ['vitest', '@testing-library/**', 'react', '@git-rudder/i18n', 'node:*'],
         },
       },
     },

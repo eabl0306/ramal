@@ -138,7 +138,7 @@ export interface components {
             title: string;
             /**
              * @description URI que identifica el tipo de problema.
-             * @example https://ramal.bahoque.com/problems/not-found
+             * @example https://git-rudder.com/problems/not-found
              */
             type: string;
         };

@@ -7,7 +7,7 @@
 
 use std::time::Duration;
 
-use ramal_api_application::HealthProbe;
+use git_rudder_api_application::HealthProbe;
 
 use super::{PostgresHealthProbe, describe};
 use crate::config::DatabaseConfig;

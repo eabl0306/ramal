@@ -20,9 +20,9 @@ mod fixture;
 use std::sync::Arc;
 
 use fixture::FixtureRepo;
+use git_rudder_desktop::bootstrap::{build_engine, configure};
+use git_rudder_desktop::picker::{FixedFolderPicker, FolderPicker};
 use pretty_assertions::assert_eq;
-use ramal_desktop::bootstrap::{build_engine, configure};
-use ramal_desktop::picker::{FixedFolderPicker, FolderPicker};
 use serde_json::{Value, json};
 use tauri::ipc::{CallbackFn, InvokeBody};
 use tauri::test::{INVOKE_KEY, MockRuntime, get_ipc_response, mock_builder};
@@ -35,7 +35,7 @@ fn app_with(picker: FixedFolderPicker) -> App<MockRuntime> {
     let picker: Arc<dyn FolderPicker> = Arc::new(picker);
     configure(mock_builder(), Arc::new(build_engine()))
         .manage(picker)
-        .build(ramal_desktop::context())
+        .build(git_rudder_desktop::context())
         .expect("the app must build with the mock runtime")
 }
 

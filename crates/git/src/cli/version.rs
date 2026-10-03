@@ -5,9 +5,9 @@
 //! `OpenRepository` con [`GitVersionInfo::is_supported`], para que `engine/info`
 //! pueda describir igualmente un git viejo.
 //!
-//! [`GitVersionInfo::is_supported`]: ramal_core_application::GitVersionInfo::is_supported
+//! [`GitVersionInfo::is_supported`]: git_rudder_core_application::GitVersionInfo::is_supported
 
-use ramal_core_application::{GitCapabilities, GitVersion};
+use git_rudder_core_application::{GitCapabilities, GitVersion};
 
 /// Primera version con `merge-tree --write-tree` y `rebase --update-refs`.
 const MERGE_TREE_AND_UPDATE_REFS: GitVersion = GitVersion::new(2, 38, 0);

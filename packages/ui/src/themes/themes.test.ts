@@ -5,7 +5,7 @@ import { DENSITIES, DENSITY_TOKENS } from '../tokens/densities';
 import { COLOR_TOKENS, SHAPE_TOKENS, SHARED_TOKENS } from '../tokens/tokens';
 
 const base = parseBlocks(readCss('base.css'));
-const ramal = parseBlocks(readCss('ramal.css'));
+const gitRudder = parseBlocks(readCss('git-rudder.css'));
 const vscode = parseBlocks(readCss('vscode.css'));
 
 /** La tabla del README del handoff: [L, C, H] de cada token, oscuro y claro. */
@@ -81,12 +81,12 @@ function value(block: { declarations: ReadonlyMap<string, string> }, token: stri
   return block.declarations.get(token) ?? '';
 }
 
-describe('ramal.css', () => {
-  const dark = blockWith(ramal, "[data-theme='dark']");
-  const light = blockWith(ramal, "[data-theme='light']");
+describe('git-rudder.css', () => {
+  const dark = blockWith(gitRudder, "[data-theme='dark']");
+  const light = blockWith(gitRudder, "[data-theme='light']");
 
   it('da valor a todos los tokens entre sus bloques y base.css', () => {
-    const defined = new Set([...allDeclarations(ramal), ...allDeclarations(base)]);
+    const defined = new Set([...allDeclarations(gitRudder), ...allDeclarations(base)]);
     const missing = [...COLOR_TOKENS, ...SHAPE_TOKENS, ...SHARED_TOKENS].filter(
       (token) => !defined.has(token),
     );
@@ -106,10 +106,10 @@ describe('ramal.css', () => {
   });
 
   it('el escritorio usa 13 px y la web 14 px, con su claro mas luminoso', () => {
-    const shared = ramal.find((block) => block.declarations.has('--r-font-size-base'));
+    const shared = gitRudder.find((block) => block.declarations.has('--r-font-size-base'));
     expect(shared?.declarations.get('--r-font-size-base')).toBe('13px');
-    expect(value(blockWith(ramal, "[data-host='web']"), '--r-font-size-base')).toBe('14px');
-    const webLight = blockWith(ramal, "[data-host='web'][data-theme='light']");
+    expect(value(blockWith(gitRudder, "[data-host='web']"), '--r-font-size-base')).toBe('14px');
+    const webLight = blockWith(gitRudder, "[data-host='web'][data-theme='light']");
     expect(oklchNumbers(value(webLight, '--r-bg'))).toEqual([0.975, 0.004, 230, 1]);
   });
 });
@@ -167,9 +167,9 @@ describe('vscode.css', () => {
   });
 });
 
-describe('ramal.css: seleccion', () => {
+describe('git-rudder.css: seleccion', () => {
   it('en escritorio y web la seleccion con foco es el acento suave de siempre', () => {
-    const block = ramal.find((candidate) => candidate.declarations.has('--r-selection'));
+    const block = gitRudder.find((candidate) => candidate.declarations.has('--r-selection'));
     expect(block?.declarations.get('--r-selection')).toBe('var(--r-accent-soft)');
     expect(block?.declarations.get('--r-selection-ink')).toBe('var(--r-text)');
   });

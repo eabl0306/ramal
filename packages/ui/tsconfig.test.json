@@ -1,7 +1,7 @@
 // Tests de componentes (Testing Library sobre jsdom) y configuracion de Vitest.
 // Ven Node porque el test de temas lee los CSS del disco.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

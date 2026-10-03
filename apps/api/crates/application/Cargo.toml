@@ -1,5 +1,5 @@
 [package]
-name = "ramal-api-application"
+name = "git-rudder-api-application"
 description = "Casos de uso y puertos de la API."
 version.workspace = true
 edition.workspace = true
@@ -17,7 +17,7 @@ testing = []
 # async-trait para usar los puertos como objetos de trait, y librerias puras.
 async-trait = { workspace = true }
 chrono = { workspace = true }
-ramal-api-domain = { workspace = true }
+git-rudder-api-domain = { workspace = true }
 thiserror = { workspace = true }
 
 [lints]

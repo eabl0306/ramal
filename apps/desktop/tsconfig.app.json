@@ -2,7 +2,7 @@
 // importar (architecture.md 5.2): bridge, i18n, ui y repo-view. Importar otro
 // rompe `tsc -b` con TS6307 aunque ESLint no estuviera bien configurado.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

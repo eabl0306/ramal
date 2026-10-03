@@ -1,4 +1,4 @@
-// ESLint de @ramal/bridge: TypeScript estricto, calidad y fronteras. El paquete no
+// ESLint de @git-rudder/bridge: TypeScript estricto, calidad y fronteras. El paquete no
 // puede importar nada de npm ni de node:*: los transportes concretos (Tauri,
 // postMessage de VS Code) viven en cada app. Lo generado por ts-rs queda fuera
 // del lint (DEFAULT_IGNORES); el cliente puede importarlo y nada mas.
@@ -11,7 +11,7 @@ import {
   nodeConfig,
   qualityConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 

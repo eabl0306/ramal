@@ -1,4 +1,4 @@
-# El modelo de datos de la API de Ramal
+# El modelo de datos de la API de Git Rudder
 
 Este documento es la propuesta de esquema de PostgreSQL 18 que sostiene el contrato de
 [api-surface.md](api-surface.md): cada tabla con sus columnas, tipos, restricciones e
@@ -51,7 +51,7 @@ Son las de Gastonomo mas lo que PostgreSQL 18 permite hacer mejor, y cada una ti
 
 - **Siempre `timestamptz`.** Ni `timestamp` sin zona ni `date`: todo lo que se guarda aqui es
   un instante tecnico (una sesion, una caducidad, una publicacion). Gastonomo necesitaba
-  `DATE` para el dia de un gasto; Ramal no tiene nada parecido.
+  `DATE` para el dia de un gasto; Git Rudder no tiene nada parecido.
 - **`updated_at` lo escribe un disparador** (`touch_updated_at`), no el repositorio. Es el
   mismo argumento que Gastonomo uso para el numero de cambio: un disparador no se olvida en la
   sexta sentencia `UPDATE`.
@@ -100,10 +100,10 @@ en la tabla y en el indice, y no hay mayusculas y minusculas que puedan no coinc
 | Sobre del servidor         | `organization_ai_keys`                 | La API                   | La API                            | `alg`, `kek_id`, `wrapped_dek`, `dek_nonce`, `nonce` (12 bytes), `ciphertext`      |
 
 En los dos, el ciphertext esta ligado a su fila por los datos asociados del AEAD. En la boveda,
-`ramal:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}` ([ADR 0012](adr/0012-boveda-de-extremo-a-extremo.md)),
+`git-rudder:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}` ([ADR 0012](adr/0012-boveda-de-extremo-a-extremo.md)),
 y el contenido sellado repite ademas los metadatos que deciden a donde va el secreto (host de la
 cuenta, URL base de la llave), que el dispositivo compara con la fila. En el sobre del servidor,
-`ramal:org-ai-key:v1:{orgId}:{keyId}` para el secreto y `ramal:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`
+`git-rudder:org-ai-key:v1:{orgId}:{keyId}` para el secreto y `git-rudder:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`
 para la envoltura de la llave de datos ([ADR 0013](adr/0013-proxy-de-ia-de-organizacion.md)): el
 `kek_id` va solo en la envoltura, para que rotar la llave maestra no toque el ciphertext. Una fila
 copiada a otra no descifra. Aqui solo importa que **todo ciphertext lleva al lado el algoritmo y
@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 COMMENT ON TABLE users IS
-    'Cuentas de Ramal. password_hash es Argon2id en formato PHC, o NULL si la cuenta solo entra con OAuth.';
+    'Cuentas de Git Rudder. password_hash es Argon2id en formato PHC, o NULL si la cuenta solo entra con OAuth.';
 ```
 
 - **`password_hash` admite `NULL`**: las cuentas creadas con GitHub, GitLab o Google no tienen
@@ -272,13 +272,13 @@ CREATE TABLE IF NOT EXISTS user_identities (
 );
 
 COMMENT ON TABLE user_identities IS
-    'Identidades OAuth para entrar en Ramal. No guardan tokens del proveedor: se descartan tras leer el perfil.';
+    'Identidades OAuth para entrar en Git Rudder. No guardan tokens del proveedor: se descartan tras leer el perfil.';
 ```
 
 - **La identidad es `provider_user_id`, no el correo.** El correo cambia en el proveedor; el
   identificador del sujeto no.
 - **Una identidad por proveedor y cuenta** (`user_id, provider`): ninguna pantalla pide dos
-  cuentas de GitHub para entrar en Ramal, y permitirlo complica desvincular.
+  cuentas de GitHub para entrar en Git Rudder, y permitirlo complica desvincular.
 - **No hay columna de token.** El token de identidad se usa para leer el perfil y se tira. Las
   cuentas de GitHub para trabajar con Git son otra tabla (`linked_accounts`) y otro esquema.
 
@@ -601,23 +601,23 @@ COMMENT ON TABLE oauth_flows IS
     'Flujos OAuth en curso (10 minutos): identidad y broker de plataformas. Se borran al terminar.';
 ```
 
-- **Una tabla para los dos usos** (entrar en Ramal y el broker de Bitbucket) porque comparten
+- **Una tabla para los dos usos** (entrar en Git Rudder y el broker de Bitbucket) porque comparten
   lo dificil: `state`, caducidad y borrado al terminar. Los `CHECK` por `purpose` impiden que un
   flujo de un tipo lleve campos del otro.
-- **`browser_binding_hash`** es el hash de la cookie `__Host-ramal_oauth`: ata el flujo al
+- **`browser_binding_hash`** es el hash de la cookie `__Host-git_rudder_oauth`: ata el flujo al
   navegador que lo empezo y cierra el login CSRF. El broker de plataformas no la lleva porque lo
   ata el reto del motor (`client_code_challenge`).
 - **`provider_code_verifier` en claro.** Es el verificador PKCE hacia el proveedor, vive 10
   minutos y solo sirve junto al codigo de autorizacion, que nunca pasa por la base.
 - **`client_redirect_uri` con la forma exacta**: el `CHECK` es la ultima barrera; la de verdad es
-  el validador de `ramal-api-http`, que analiza la URL con el crate `url`, exige puerto entre 1024
+  el validador de `git-rudder-api-http`, que analiza la URL con el crate `url`, exige puerto entre 1024
   y 65535 y que la URL vuelta a serializar sea identica. Un `LIKE 'http://127.0.0.1:%'` dejaria
   pasar `http://127.0.0.1:1@evil.example/callback`.
 - **`return_to` relativo por `CHECK`**: la redireccion abierta se cierra tambien en la base, no
   solo en el handler. El patron exige una barra al principio y prohibe una segunda barra, una
   barra invertida, espacios y caracteres de control en el primer segmento: `/\evil.example` y
   `/%09/...` (ya decodificado) no pasan. El handler resuelve antes la ruta contra
-  `https://ramal.bahoque.com` con un analizador WHATWG y exige el mismo origen.
+  `https://git-rudder.com` con un analizador WHATWG y exige el mismo origen.
 - **`user_id` en `link_identity` y `reauthenticate`** es el usuario de la sesion que empezo el
   flujo. En la vuelta se exige que la sesion actual sea de ese usuario y, en `reauthenticate`, que
   la identidad devuelta ya este vinculada a el.
@@ -644,7 +644,7 @@ COMMENT ON TABLE oauth_signup_tickets IS
 ```
 
 Solo llegan aqui correos que el proveedor da por verificados (si no, el flujo termina en error),
-por eso no hay columna de verificacion. El ticket viaja en la cookie `__Host-ramal_signup`.
+por eso no hay columna de verificacion. El ticket viaja en la cookie `__Host-git_rudder_signup`.
 
 ### app_authorization_codes
 
@@ -663,7 +663,7 @@ CREATE TABLE IF NOT EXISTS app_authorization_codes (
     used_at        timestamptz,
     CONSTRAINT app_authorization_codes_hash_key UNIQUE (code_hash),
     CONSTRAINT app_authorization_codes_hash_length CHECK (octet_length(code_hash) = 32),
-    CONSTRAINT app_authorization_codes_client_known CHECK (client_id IN ('ramal-desktop', 'ramal-vscode')),
+    CONSTRAINT app_authorization_codes_client_known CHECK (client_id IN ('git-rudder-desktop', 'git-rudder-vscode')),
     CONSTRAINT app_authorization_codes_challenge_shape CHECK (code_challenge ~ '^[A-Za-z0-9_-]{43}$')
 );
 
@@ -699,7 +699,7 @@ CREATE TABLE IF NOT EXISTS device_authorizations (
     expires_at       timestamptz NOT NULL,
     CONSTRAINT device_authorizations_device_code_key UNIQUE (device_code_hash),
     CONSTRAINT device_authorizations_user_code_key UNIQUE (user_code_hash),
-    CONSTRAINT device_authorizations_client_known CHECK (client_id IN ('ramal-desktop', 'ramal-vscode')),
+    CONSTRAINT device_authorizations_client_known CHECK (client_id IN ('git-rudder-desktop', 'git-rudder-vscode')),
     CONSTRAINT device_authorizations_status_known CHECK (status IN ('pending', 'approved', 'denied', 'consumed')),
     CONSTRAINT device_authorizations_decision_has_user CHECK (status = 'pending' OR user_id IS NOT NULL),
     CONSTRAINT device_authorizations_approved_has_auth_time CHECK (
@@ -971,7 +971,7 @@ COMMENT ON TABLE change_log IS
 - **`change_log_scope_seq_idx` es unico** por el mismo motivo que en Gastonomo: sin el, dos
   filas podrian compartir numero y el cursor no podria pararse entre ellas.
 - **Un log aparte y no una columna `change_seq` en cada tabla**, que es lo que hizo Gastonomo.
-  Gastonomo lo descarto porque su historico no tenia borrados; Ramal si los tiene, y un borrado
+  Gastonomo lo descarto porque su historico no tenia borrados; Git Rudder si los tiene, y un borrado
   necesita una lapida que sobreviva a la fila.
 - **`entity_id` de las entidades de una sola fila por usuario** (perfil, ajustes de
   sincronizacion, cada espacio de preferencias, boveda) es el id del usuario. El tipo ya dice
@@ -1195,7 +1195,7 @@ COMMENT ON TABLE repositories IS
   eso repetirlo no duplica.
 - **`remote_key` lo calcula la API** a partir de la URL, nunca lo acepta del cliente. El
   `CHECK` solo asegura lo minimo (host en minusculas, sin esquema ni usuario): la normalizacion
-  entera es codigo de `ramal-core-domain`.
+  entera es codigo de `git-rudder-core-domain`.
 - **`clone_url` sin contrasena por `CHECK`.** La API ya rechaza con 422 una URL con credenciales;
   el `CHECK` es la ultima barrera para que un token no acabe en claro en esta tabla.
 - **`clone_url` solo con tres formas** (`https://`, `ssh://` o `usuario@host:ruta`), sin espacios
@@ -1515,10 +1515,10 @@ COMMENT ON TABLE organizations IS
 - **Sin columna de owner.** La owner es una membresia con rol `owner`; guardarla tambien aqui
   seria tener dos fuentes de la misma verdad que se pueden separar.
 - **`seats_total` sin `DEFAULT`**: el valor inicial sale de configuracion
-  (`RAMAL__ORGANIZATIONS__DEFAULT_SEATS`) y lo escribe el caso de uso. Con una suscripcion lo
+  (`GIT_RUDDER__ORGANIZATIONS__DEFAULT_SEATS`) y lo escribe el caso de uso. Con una suscripcion lo
   actualizan los webhooks de Paddle. Es el unico sitio donde se lee el limite, este donde este su
   origen.
-- **`trial_ends_at`** es el final de la prueba de 14 dias sin tarjeta, que lleva Ramal y no Paddle
+- **`trial_ends_at`** es el final de la prueba de 14 dias sin tarjeta, que lleva Git Rudder y no Paddle
   ([ADR 0022](adr/0022-proveedor-de-pagos.md)). Lo escribe el caso de uso al crear la organizacion
   (la hora sale del puerto `Clock`). Mientras no haya pasado, la organizacion esta en prueba aunque
   no tenga fila en `subscriptions`.
@@ -1689,8 +1689,8 @@ COMMENT ON TABLE organization_ai_keys IS
 - **Una llave de datos por secreto** (`wrapped_dek`, 32 bytes mas 16 de etiqueta): no hay que
   contar cuantos mensajes cifra cada llave para no repetir nonce, y rotar la llave maestra solo
   reenvuelve 48 bytes por fila, sin tocar el ciphertext. Por eso los datos asociados del secreto
-  son `ramal:org-ai-key:v1:{orgId}:{keyId}`, sin `kek_id`, y el `kek_id` va en los de la
-  envoltura (`ramal:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`): si estuviera en los del secreto, tras
+  son `git-rudder:org-ai-key:v1:{orgId}:{keyId}`, sin `kek_id`, y el `kek_id` va en los de la
+  envoltura (`git-rudder:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`): si estuviera en los del secreto, tras
   rotar ninguna llave descifraria.
 - **`organization_ai_keys_kek_idx`** es la consulta de la rotacion: cuantas filas quedan con la
   llave maestra vieja. Cuando es cero, la vieja se puede retirar.
@@ -1815,7 +1815,7 @@ COMMENT ON TABLE ai_usage_events IS
 
 ## F5: facturacion
 
-**En el MVP, con Paddle** ([ADR 0022](adr/0022-proveedor-de-pagos.md)). Ramal Pro es el plan de una
+**En el MVP, con Paddle** ([ADR 0022](adr/0022-proveedor-de-pagos.md)). Git Rudder Pro es el plan de una
 organizacion por asiento y no hay plan personal de pago
 ([ADR 0026](adr/0026-planes-y-precios.md)). Las dos tablas son lo minimo: una copia del estado de
 la suscripcion y la deduplicacion de webhooks. Las facturas, los metodos de pago y los datos
@@ -1865,8 +1865,8 @@ COMMENT ON TABLE billing_webhook_events IS
   organizacion cancela y vuelve a suscribirse, la fila se actualiza con la suscripcion nueva.
 - **`provider` admite `polar`** porque es el plan B y va detras del mismo puerto. Cambiar de
   proveedor no cambia la forma de la tabla.
-- **Sin estado `trialing`**: la prueba la lleva Ramal y no existe en Paddle. El contrato deriva
-  `trialing` de `organizations.trial_ends_at` cuando no hay fila aqui. Ramal no ofrece pausar una
+- **Sin estado `trialing`**: la prueba la lleva Git Rudder y no existe en Paddle. El contrato deriva
+  `trialing` de `organizations.trial_ends_at` cuando no hay fila aqui. Git Rudder no ofrece pausar una
   suscripcion; si Paddle mandara una pausa, cuenta como `canceled`.
 - **`last_event_at`** es la fecha del ultimo evento aplicado. Los webhooks pueden llegar
   desordenados: un evento con fecha anterior se registra en `billing_webhook_events` y no toca la

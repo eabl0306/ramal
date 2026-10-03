@@ -1,4 +1,4 @@
-import type { HealthResponse } from '@ramal/api-client';
+import type { HealthResponse } from '@git-rudder/api-client';
 import { z } from 'zod';
 
 import {

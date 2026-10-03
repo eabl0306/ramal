@@ -6,7 +6,7 @@ import {
   isTheme,
 } from '../../domain/preferences/preferences';
 
-const STORAGE_KEY = 'ramal.web.preferences';
+const STORAGE_KEY = 'gitRudder.web.preferences';
 
 /** De donde sale el almacenamiento; los tests pasan uno en memoria. */
 export type StorageSource = () => Pick<Storage, 'getItem' | 'setItem'> | undefined;

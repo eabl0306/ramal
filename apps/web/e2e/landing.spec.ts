@@ -29,10 +29,12 @@ for (const desktop of DESKTOPS) {
 test.describe('landing en un movil', () => {
   test.use({ userAgent: USER_AGENTS.iphone });
 
-  test('no destaca ninguna tarjeta y avisa de que Ramal es de escritorio', async ({ page }) => {
+  test('no destaca ninguna tarjeta y avisa de que Git Rudder es de escritorio', async ({
+    page,
+  }) => {
     await page.goto('/');
 
-    await expect(page.getByRole('note')).toContainText('Ramal es una app de escritorio');
+    await expect(page.getByRole('note')).toContainText('Git Rudder es una app de escritorio');
     await expect(page.getByText('Tu sistema')).toHaveCount(0);
     await expect(page.getByRole('button', { name: /Descargar para/u })).toHaveCount(0);
   });

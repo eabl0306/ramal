@@ -1,7 +1,7 @@
 // Tests de Vitest (Testing Library sobre jsdom) y sus ayudas. Incluye
 // tauri.conf.json porque un test comprueba la CSP de produccion.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

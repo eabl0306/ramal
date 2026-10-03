@@ -27,11 +27,11 @@ pub use files::rust_files;
 pub use functions::FunctionScore;
 
 /// Limite de complejidad cognitiva: el mismo que `cognitive-complexity-threshold`
-/// de clippy.toml y que `sonarjs/cognitive-complexity` en @ramal/eslint-config.
+/// de clippy.toml y que `sonarjs/cognitive-complexity` en @git-rudder/eslint-config.
 pub const COGNITIVE_LIMIT: u32 = 15;
 
 /// Limite de complejidad ciclomatica: el mismo que `complexity` en
-/// @ramal/eslint-config.
+/// @git-rudder/eslint-config.
 pub const CYCLOMATIC_LIMIT: u32 = 10;
 
 /// Puntuaciones de todas las funciones (y closures) de un fuente de Rust.

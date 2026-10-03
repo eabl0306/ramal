@@ -4,8 +4,8 @@ import { describeError } from '../../application/engine-errors';
 import type { Logger } from '../../application/ports/logger';
 
 /** Ids que el manifiesto declara en `contributes`. */
-export const COMMAND_OPEN_GRAPH = 'ramal.openGraph';
-const WELCOME_VIEW = 'ramal.welcome';
+export const COMMAND_OPEN_GRAPH = 'gitRudder.openGraph';
+const WELCOME_VIEW = 'gitRudder.welcome';
 
 export interface CommandHandlers {
   readonly openGraph: () => Promise<unknown>;

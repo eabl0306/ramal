@@ -1,6 +1,6 @@
-import { type DetectedPlatform, highlightedDownloadOs } from '@ramal/domain';
-import { formatDate } from '@ramal/i18n';
-import { useLocale, useT } from '@ramal/ui';
+import { type DetectedPlatform, highlightedDownloadOs } from '@git-rudder/domain';
+import { formatDate } from '@git-rudder/i18n';
+import { useLocale, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import { isMobileVisitor } from '../../domain/downloads/recommend';
@@ -25,7 +25,7 @@ export interface DownloadsSectionProps {
 /**
  * Una tarjeta por sistema mas la de VS Code. La del sistema de quien visita se
  * destaca al hidratar, porque detectar el sistema al construir no tiene sentido
- * (ADR 0015); en un movil no se destaca ninguna y se avisa de que Ramal es de
+ * (ADR 0015); en un movil no se destaca ninguna y se avisa de que Git Rudder es de
  * escritorio (gaps B-55).
  */
 export function DownloadsSection({

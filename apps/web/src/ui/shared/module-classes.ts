@@ -9,4 +9,4 @@ export function moduleClasses(styles: Readonly<Record<string, string>>): (name: 
 }
 
 /** Nombre de producto: es una marca y no se traduce. */
-export const PRODUCT_NAME = 'Ramal';
+export const PRODUCT_NAME = 'Git Rudder';

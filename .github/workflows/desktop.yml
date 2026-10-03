@@ -1,10 +1,10 @@
-# Ramal Desktop (apps/desktop): el frontend de Vite y el host de Tauri.
+# Git Rudder Desktop (apps/desktop): el frontend de Vite y el host de Tauri.
 #
 #   - frontend: lint con las reglas de capas, tipos, cobertura (80% en application,
 #     60% global), build de Vite y Playwright contra ese build con el IPC de Tauri
 #     simulado y la CSP de produccion.
 #   - nativo: en Ubuntu 22.04 con los requisitos de Tauri, clippy, tests
-#     (tauri::test) y cobertura (60% global) de ramal-desktop, `tauri build` sin
+#     (tauri::test) y cobertura (60% global) de git-rudder-desktop, `tauri build` sin
 #     empaquetar y el E2E nativo con WebdriverIO bajo xvfb, con el binario real y
 #     git de verdad.
 #
@@ -118,7 +118,7 @@ jobs:
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
 
-      - name: Clippy, tests y cobertura de ramal-desktop (just desktop-rust-check)
+      - name: Clippy, tests y cobertura de git-rudder-desktop (just desktop-rust-check)
         run: just desktop-rust-check
 
       - name: tauri build sin empaquetar (just desktop-build)

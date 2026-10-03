@@ -1,4 +1,4 @@
-import { type Locale, createTranslator } from '@ramal/i18n';
+import { type Locale, createTranslator } from '@git-rudder/i18n';
 import { type ReactElement, type ReactNode, useMemo } from 'react';
 import { I18nProvider as AriaI18nProvider } from 'react-aria-components';
 

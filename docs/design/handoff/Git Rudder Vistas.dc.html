@@ -11,7 +11,7 @@
 <meta name="design_doc_mode" content="canvas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;
 --canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -33,7 +33,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
 </helmet>
 <div style="min-height:100vh;padding:32px 40px 72px;display:flex;flex-direction:column;gap:16px;background:var(--canvas);color:var(--text)">
   <header style="display:flex;flex-direction:column;gap:12px;max-width:1320px">
-    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Ramal Desktop</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">#66 · D-27 – D-41</span></div>
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Git Rudder Desktop</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">#66 · D-27 – D-41</span></div>
     <div><h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.02em">{{ ch.title }}</h1><p style="margin:6px 0 0;max-width:820px;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ ch.sub }}</p></div>
     <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end"><sc-for list="{{ segs }}" as="g" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ g.label }}</span><div style="display:flex;padding:2px;border-radius:9px;border:1px solid var(--border);background:var(--bg)"><sc-for list="{{ g.opts }}" as="o"><button onClick="{{ o.onClick }}" style="height:28px;padding:0 11px;border:0;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;background:{{ o.bg }};color:{{ o.color }}">{{ o.label }}</button></sc-for></div></div></sc-for></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ nav }}" as="n" hint-placeholder-count="26"><button onClick="{{ n.onClick }}" title="{{ n.title }}" style="height:28px;padding:0 9px;border-radius:7px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;border:1px solid {{ n.border }};background:{{ n.bg }};color:{{ n.color }}">{{ n.label }}</button></sc-for></div>
@@ -43,7 +43,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
   <div style="width:1320px;height:800px;position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;box-shadow:var(--shadow)">
     <div style="height:46px;flex-shrink:0;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:center;gap:8px;padding-right:12px"><span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span></div>
-      <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Ramal</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Git Rudder</span></div>
       <div style="display:flex;align-items:center;padding:0 16px;margin-top:6px;color:var(--muted);font-weight:500">{{ t.e_home }}</div>
       <div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:var(--bg);box-shadow:inset 0 2px 0 var(--accent)"><span style="width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;background:oklch(0.5 0.03 260);color:white">GH</span>Cliente Git</div>
     </div>
@@ -171,12 +171,12 @@ const wdiff = (a, b, col) => { const ta = tok(a), tb = tok(b), sb = new Set(tb.m
 
 class Component extends DCLogic {
   state = { ready: false, theme: 'dark', lang: 'es', density: 'desktop', screen: 'd36-bloques', vstate: 'normal', file: null, mode: 'uni', picked: { 5: true, 6: true }, toasts: [], modal: null };
-  componentDidMount() { const p = this.props, up = {}; ['theme', 'lang', 'density', 'screen'].forEach(k => { if (p[k]) up[k] = p[k]; }); this.setState(up); const go = () => window.RAMAL && window.RAMAL.D.v_hist ? this.setState({ ready: true }) : setTimeout(go, 30); go(); }
+  componentDidMount() { const p = this.props, up = {}; ['theme', 'lang', 'density', 'screen'].forEach(k => { if (p[k]) up[k] = p[k]; }); this.setState(up); const go = () => window.GIT_RUDDER && window.GIT_RUDDER.D.v_hist ? this.setState({ ready: true }) : setTimeout(go, 30); go(); }
   componentDidUpdate(pp) { const p = this.props, up = {}; ['theme', 'lang', 'density', 'screen'].forEach(k => { if (pp[k] !== p[k] && p[k]) up[k] = p[k]; }); if (Object.keys(up).length) this.setState(up); document.body.dataset.theme = this.state.theme; }
-  T(k, v) { const R = window.RAMAL; const e = R.D[k] || (R.STATES || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  T(k, v) { const R = window.GIT_RUDDER; const e = R.D[k] || (R.STATES || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
   toast(text, kind) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
   renderVals() {
-    const s = this.state, R = window.RAMAL;
+    const s = this.state, R = window.GIT_RUDDER;
     const E = { on: false, items: [], rows: [], btns: [], left: [], right: [], metas: [], imgs: [], cards: [], fields: [], commits: [], lines: [], files: [] };
     if (!s.ready || !R) return { ch: {}, t: {}, segs: [], nav: [], cur: {}, srch: {}, side: [], hd: E, tabs: E, banner: E, fbar: E, list: E, dv: E, bl: E, gr: E, tl: E, ck: E, fm: E, cf: E, done: E, flo: E, rpn: E, md: E, sv: E, toasts: [] };
     const L = s.lang === 'en' ? 1 : 0, T = this.T.bind(this), id = s.screen, LANE = R.LANE, cmp = s.density === 'vscode';
@@ -241,7 +241,7 @@ class Component extends DCLogic {
       rpn = st === 'merged' ? { on: true, hasKicker: true, kicker: t.st_merged, title: T('v_mergedBy', { user: 'diego-l', ago: L ? '3 h ago' : 'hace 3 h' }), lines: [], btns: [B(T('v_openOn', { platform: 'GitHub' }))], hasWhy: false, hasFiles: false, files: [] }
         : { on: true, hasKicker: true, kicker: 'Checks', title: L ? '2 of 3 checks passed' : '2 de 3 checks correctos', lines: [{ t: '✓ build · 2m 14s', c: 'var(--ok)', f: MONO }, { t: '✓ lint · 41s', c: 'var(--ok)', f: MONO }, { t: '× e2e · 6m 02s', c: 'var(--danger)', f: MONO }, { t: t.v_own, c: 'var(--faint)', f: 'inherit' }], btns: [B(t.v_review + ' ▾'), B(t.v_merge + ' ▾', 'p', { op: 0.45, tip: why }), ...(id === 'd30-pr-conflictos' ? [B(t.v_resolveLocal)] : []), B(t.v_checkout)], hasWhy: true, why, hasFiles: false, files: [] }; }
     if (id.startsWith('d31')) {
-      if (id === 'd31-exito') { done = { on: true, title: T('v_created', { number: 143 }), btns: [B(T('v_openOn', { platform: 'GitHub' }), 'p'), B(t.v_viewRamal), B(t.v_copyLink)] }; }
+      if (id === 'd31-exito') { done = { on: true, title: T('v_created', { number: 143 }), btns: [B(T('v_openOn', { platform: 'GitHub' }), 'p'), B(t.v_viewGitRudder), B(t.v_copyLink)] }; }
       else { hd = { on: true, back: true, left: [chip(t.v_newPr, { fw: 600, size: '15px' })], right: [B('✦ ' + t.v_aiPr, null, { color: 'var(--accent)', border: 'var(--accent)' })] };
         if (id === 'd31-sin-publicar') banner = { on: true, tone: 'var(--warn)', icon: '!', text: T('v_unpub', { branch: 'feature/graph-ui', remote: 'origin' }), btns: [{ label: t.v_pubCont, onClick: () => this.toast(t.v_pubCont) }] };
         const F = (label, value, o) => ({ label, value, isInput: true, isArea: false, isCheck: false, font: 'inherit', chips: [], hasExtra: false, extra: '', ...(o || {}) });
@@ -289,7 +289,7 @@ class Component extends DCLogic {
     return { ch, t, segs, nav, cur, srch, side, hd: { left: [], right: [], ...hd }, tabs: { items: [], ...tabs }, banner: { btns: [], ...banner }, fbar: { items: [], ...fbar }, list: { items: [], ...list }, dv: { rows: [], metas: [], imgs: [], ...dv }, bl: { rows: [], ...bl }, gr: { rows: [], ...gr }, tl: { items: [], ...tl }, ck, fm: { fields: [], commits: [], ...fm }, cf: { cards: [], btns: [], ...cf }, done: { btns: [], ...done }, flo: { btns: [], ...flo }, rpn: { lines: [], btns: [], files: [], ...rpn }, md: { fields: [], ...md }, sv, toasts };
   }
   graph(o) {
-    const R = window.RAMAL, LANE = R.LANE, s = this.state, cmp = s.density === 'vscode', L = s.lang === 'en';
+    const R = window.GIT_RUDDER, LANE = R.LANE, s = this.state, cmp = s.density === 'vscode', L = s.lang === 'en';
     const cs = R.mkCommits();
     const rh = cmp ? 28 : 40, lanesN = o.lanes || (Math.max(...cs.map(c => c.lane)) + 1), colW = 16 + 20 * Math.min(lanesN, 10) + (lanesN > 10 ? (lanesN - 10) * 12 : 0);
     const PX = k => k < 10 ? k * 20 : 200 + (k - 10) * 12;

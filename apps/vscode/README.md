@@ -1,7 +1,7 @@
-# Ramal for VS Code
+# Git Rudder for VS Code
 
 El grafo de commits del repositorio que tienes abierto, con el tema y el idioma de VS Code.
-Ejecuta **Ramal: Open Graph** desde la paleta de comandos o desde la vista Ramal de la barra de
+Ejecuta **Git Rudder: Open Graph** desde la paleta de comandos o desde la vista Git Rudder de la barra de
 actividad.
 
 ## Como esta hecho
@@ -10,18 +10,18 @@ actividad.
   (abrir el grafo, supervisar el motor, enrutar los mensajes de los webviews) y no importa
   `vscode`; `infrastructure` tiene los adaptadores (API de VS Code, proceso del sidecar, marcos
   `Content-Length`, validacion con zod, HTML y CSP de los webviews); `app` es el composition root.
-- `src/webview`: los webviews (React). `VsCodeTransport` lleva el cliente de `@ramal/bridge` por
-  `postMessage` y `GraphApp` monta el `GraphView` de `@ramal/repo-view` con `vscode.css`,
+- `src/webview`: los webviews (React). `VsCodeTransport` lleva el cliente de `@git-rudder/bridge` por
+  `postMessage` y `GraphApp` monta el `GraphView` de `@git-rudder/repo-view` con `vscode.css`,
   densidad compacta y Codicons.
 - `src/shared`: los mensajes entre los dos lados.
-- El motor es el binario `ramal-vscode-engine`. Instalado, siempre el de la VSIX
-  (`dist/bin`). Al desarrollar, el ajuste de usuario `ramal.engine.path`, `RAMAL_ENGINE_PATH` o lo
+- El motor es el binario `git-rudder-vscode-engine`. Instalado, siempre el de la VSIX
+  (`dist/bin`). Al desarrollar, el ajuste de usuario `gitRudder.engine.path`, `GIT_RUDDER_ENGINE_PATH` o lo
   que haya en `target/` del monorepo.
 
 ## Desarrollo
 
 ```sh
-corepack pnpm --filter ramal dev      # host con esbuild en modo watch y Vite en 127.0.0.1:5175
+corepack pnpm --filter git-rudder dev      # host con esbuild en modo watch y Vite en 127.0.0.1:5175
 ```
 
 Despues, "Run Extension" en `.vscode/launch.json` de esta carpeta: carga los webviews desde Vite

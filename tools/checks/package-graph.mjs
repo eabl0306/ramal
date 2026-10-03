@@ -16,7 +16,7 @@ import { workspaceGlobs, workspacePackages } from './lib/workspace.mjs';
  * en la web, en Tauri y en la extension sin arrastrar nada.
  *
  * repo-view si depende de bridge (architecture.md 5.2): habla con el motor por
- * el cliente tipado de @ramal/bridge, que solo conoce el puerto Transport. Asi la
+ * el cliente tipado de @git-rudder/bridge, que solo conoce el puerto Transport. Asi la
  * vista del repositorio no sabe si habla con Tauri o con el host de VS Code: el
  * transporte concreto lo pone cada app.
  *
@@ -25,39 +25,51 @@ import { workspaceGlobs, workspacePackages } from './lib/workspace.mjs';
  * tambien va en `ts_package_dirs` del justfile (ver packageListProblems).
  */
 export const MATRIX = {
-  '@ramal/domain': { dir: 'packages/domain', allowed: [], pure: true },
-  '@ramal/i18n': { dir: 'packages/i18n', allowed: [], pure: true },
-  '@ramal/bridge': { dir: 'packages/bridge', allowed: [], pure: true },
-  '@ramal/ui': { dir: 'packages/ui', allowed: ['@ramal/i18n'] },
-  '@ramal/repo-view': {
+  '@git-rudder/domain': { dir: 'packages/domain', allowed: [], pure: true },
+  '@git-rudder/i18n': { dir: 'packages/i18n', allowed: [], pure: true },
+  '@git-rudder/bridge': { dir: 'packages/bridge', allowed: [], pure: true },
+  '@git-rudder/ui': { dir: 'packages/ui', allowed: ['@git-rudder/i18n'] },
+  '@git-rudder/repo-view': {
     dir: 'packages/repo-view',
-    allowed: ['@ramal/ui', '@ramal/domain', '@ramal/i18n', '@ramal/bridge'],
+    allowed: ['@git-rudder/ui', '@git-rudder/domain', '@git-rudder/i18n', '@git-rudder/bridge'],
   },
-  '@ramal/api-client': { dir: 'packages/api-client', allowed: [] },
-  '@ramal/web': {
+  '@git-rudder/api-client': { dir: 'packages/api-client', allowed: [] },
+  '@git-rudder/web': {
     dir: 'apps/web',
-    allowed: ['@ramal/domain', '@ramal/i18n', '@ramal/ui', '@ramal/api-client'],
+    allowed: ['@git-rudder/domain', '@git-rudder/i18n', '@git-rudder/ui', '@git-rudder/api-client'],
   },
-  '@ramal/desktop': {
+  '@git-rudder/desktop': {
     dir: 'apps/desktop',
-    allowed: ['@ramal/domain', '@ramal/i18n', '@ramal/ui', '@ramal/repo-view', '@ramal/bridge'],
+    allowed: [
+      '@git-rudder/domain',
+      '@git-rudder/i18n',
+      '@git-rudder/ui',
+      '@git-rudder/repo-view',
+      '@git-rudder/bridge',
+    ],
   },
-  ramal: {
+  'git-rudder': {
     dir: 'apps/vscode',
-    allowed: ['@ramal/domain', '@ramal/i18n', '@ramal/ui', '@ramal/repo-view', '@ramal/bridge'],
+    allowed: [
+      '@git-rudder/domain',
+      '@git-rudder/i18n',
+      '@git-rudder/ui',
+      '@git-rudder/repo-view',
+      '@git-rudder/bridge',
+    ],
   },
-  '@ramal/eslint-config': { dir: 'packages/eslint-config', allowed: [] },
-  '@ramal/tsconfig': { dir: 'packages/tsconfig', allowed: [] },
+  '@git-rudder/eslint-config': { dir: 'packages/eslint-config', allowed: [] },
+  '@git-rudder/tsconfig': { dir: 'packages/tsconfig', allowed: [] },
 };
 
 /** Configuracion compartida: cualquiera puede usarla, pero solo para desarrollar. */
-export const CONFIG_PACKAGES = new Set(['@ramal/eslint-config', '@ramal/tsconfig']);
+export const CONFIG_PACKAGES = new Set(['@git-rudder/eslint-config', '@git-rudder/tsconfig']);
 
 const TOOLS_RULE = { allowed: [] };
 const SECTIONS = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
 
 function isInternal(name) {
-  return name === 'ramal' || name.startsWith('@ramal/');
+  return name === 'git-rudder' || name.startsWith('@git-rudder/');
 }
 
 function ruleFor(pkg) {

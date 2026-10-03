@@ -4,7 +4,7 @@
 // de wdio/: sin el, TypeScript 6 toma wdio/ como raiz y escribe wdio.conf.d.ts
 // junto al fuente en lugar de en outDir.
 {
-  "extends": "@ramal/tsconfig/base.json",
+  "extends": "@git-rudder/tsconfig/base.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

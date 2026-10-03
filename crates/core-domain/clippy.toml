@@ -1,6 +1,6 @@
 # Clippy usa el clippy.toml mas cercano al crate y no lo fusiona con el de la
 # raiz, asi que los umbrales comunes se repiten aqui. El test de pureza de
-# ramal-engine (crates/engine/tests/core_purity.rs) falla si dejan de coincidir.
+# git-rudder-engine (crates/engine/tests/core_purity.rs) falla si dejan de coincidir.
 cognitive-complexity-threshold = 15
 too-many-arguments-threshold = 5
 too-many-lines-threshold = 50

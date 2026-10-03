@@ -1,8 +1,8 @@
-//! Adaptadores driven de la API de Ramal.
+//! Adaptadores driven de la API de Git Rudder.
 //!
 //! Aqui viven las piezas que hablan con el mundo exterior: la configuracion por
 //! entorno, la telemetria, el reloj del sistema y PostgreSQL. El nucleo nunca
-//! importa este crate; es el composition root (`ramal-api`) quien conecta estos
+//! importa este crate; es el composition root (`git-rudder-api`) quien conecta estos
 //! adaptadores con los casos de uso. Ninguna consulta SQL sale de aqui.
 
 pub mod clock;

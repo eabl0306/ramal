@@ -1,4 +1,4 @@
-# @ramal/tsconfig
+# @git-rudder/tsconfig
 
 Las configuraciones base de TypeScript. Cada paquete y cada app extiende una y no relaja sus
 reglas: si una estorba, se discute aqui.

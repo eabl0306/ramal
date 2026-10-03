@@ -1,5 +1,5 @@
 /**
- * Idiomas de Ramal y la regla comun para elegirlos (ADR 0017): castellano si la
+ * Idiomas de Git Rudder y la regla comun para elegirlos (ADR 0017): castellano si la
  * subetiqueta principal es `es`, ingles en cualquier otro caso. La usan el
  * extension host con `vscode.env.language`, el escritorio en el primer arranque
  * con el idioma del sistema y el ajuste de IA "igual que VS Code".

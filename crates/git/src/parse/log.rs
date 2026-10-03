@@ -11,7 +11,7 @@
 //! fecha cero, como hace el propio git log. Un sha o un padre invalido si es un
 //! error, porque sin ellos no hay grafo que dibujar.
 
-use ramal_core_domain::{CommitNode, CommitRecord, GitTime, Sha, ShortSha, Signature};
+use git_rudder_core_domain::{CommitNode, CommitRecord, GitTime, Sha, ShortSha, Signature};
 
 use super::ParseError;
 

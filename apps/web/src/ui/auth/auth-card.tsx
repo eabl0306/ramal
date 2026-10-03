@@ -1,5 +1,5 @@
-import { PLATFORMS } from '@ramal/domain';
-import { Button, PlatformBadge, useT } from '@ramal/ui';
+import { PLATFORMS } from '@git-rudder/domain';
+import { Button, PlatformBadge, useT } from '@git-rudder/ui';
 import type { ReactElement, ReactNode, SubmitEvent } from 'react';
 import { Link } from 'react-router';
 
@@ -86,7 +86,7 @@ export interface AuthCardProps {
 /**
  * La tarjeta comun de entrar y crear cuenta: proveedores, campos, la caja de
  * error y el envio. Es un <form> de verdad, asi Enter envia (el prototipo no
- * tenia formulario), y noValidate deja los mensajes a @ramal/domain.
+ * tenia formulario), y noValidate deja los mensajes a @git-rudder/domain.
  */
 export function AuthCard(props: AuthCardProps): ReactElement {
   const t = useT();

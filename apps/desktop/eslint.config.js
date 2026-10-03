@@ -8,7 +8,7 @@ import {
   qualityConfig,
   reactConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
@@ -41,7 +41,12 @@ const fileCategories = [
 ];
 
 const TAURI_MODULES = ['@tauri-apps/api', '@tauri-apps/api/*', '@tauri-apps/plugin-*'];
-const SHARED_UI = ['@ramal/ui', '@ramal/repo-view', '@ramal/i18n', '@ramal/domain'];
+const SHARED_UI = [
+  '@git-rudder/ui',
+  '@git-rudder/repo-view',
+  '@git-rudder/i18n',
+  '@git-rudder/domain',
+];
 
 function internal(type, types) {
   return {
@@ -71,21 +76,21 @@ const policies = [
   internal('infrastructure', ['application', 'infrastructure']),
   internal('ui', ['application', 'ui']),
   internal('app', ['application', 'infrastructure', 'ui', 'app']),
-  external('application', ['@ramal/domain']),
-  typesOnly('application', ['@ramal/bridge']),
-  external('infrastructure', ['@ramal/bridge', '@ramal/domain', ...TAURI_MODULES]),
+  external('application', ['@git-rudder/domain']),
+  typesOnly('application', ['@git-rudder/bridge']),
+  external('infrastructure', ['@git-rudder/bridge', '@git-rudder/domain', ...TAURI_MODULES]),
   external('ui', ['react', ...SHARED_UI]),
-  typesOnly('ui', ['@ramal/bridge']),
+  typesOnly('ui', ['@git-rudder/bridge']),
   external('app', [
     'react',
     'react-dom',
     'react-dom/client',
     '@tanstack/react-query',
-    '@ramal/bridge',
+    '@git-rudder/bridge',
     ...SHARED_UI,
-    '@ramal/ui/icons/lucide',
-    '@ramal/ui/themes/ramal.css',
-    '@ramal/ui/themes/fonts',
+    '@git-rudder/ui/icons/lucide',
+    '@git-rudder/ui/themes/git-rudder.css',
+    '@git-rudder/ui/themes/fonts',
   ]),
   {
     from: { file: { categories: 'test' } },
@@ -102,8 +107,8 @@ const policies = [
             '@testing-library/**',
             'react',
             '@tanstack/react-query',
-            '@ramal/bridge',
-            '@ramal/ui/icons/lucide',
+            '@git-rudder/bridge',
+            '@git-rudder/ui/icons/lucide',
             ...SHARED_UI,
           ],
         },

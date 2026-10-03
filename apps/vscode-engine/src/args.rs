@@ -11,7 +11,7 @@ use thiserror::Error;
 
 /// Ayuda breve para un argumento invalido.
 pub const USAGE: &str =
-    "usage: ramal-vscode-engine [--git-path <path>] [--log-level <filter>] [--version]";
+    "usage: git-rudder-vscode-engine [--git-path <path>] [--log-level <filter>] [--version]";
 
 /// Nivel de log por defecto.
 const DEFAULT_LOG_LEVEL: &str = "info";
@@ -21,7 +21,7 @@ const DEFAULT_LOG_LEVEL: &str = "info";
 pub struct Args {
     /// Ejecutable de git explicito.
     pub git_path: Option<PathBuf>,
-    /// Filtro de `tracing` (`info`, `debug`, `ramal_git=debug`...).
+    /// Filtro de `tracing` (`info`, `debug`, `git_rudder_git=debug`...).
     pub log_level: String,
 }
 

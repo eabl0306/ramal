@@ -13,9 +13,9 @@ mod support;
 
 use std::path::PathBuf;
 
-use ramal_core_application::{GitReadError, GitReader, MINIMUM_GIT_VERSION};
-use ramal_core_domain::RepoRoot;
-use ramal_git::{GitCliConfig, GitCliReader};
+use git_rudder_core_application::{GitReadError, GitReader, MINIMUM_GIT_VERSION};
+use git_rudder_core_domain::RepoRoot;
+use git_rudder_git::{GitCliConfig, GitCliReader};
 use support::FixtureRepo;
 
 fn reader() -> GitCliReader {

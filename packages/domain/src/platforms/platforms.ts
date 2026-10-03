@@ -1,7 +1,7 @@
 /**
  * La unica tabla de plataformas Git (gaps B-38: el prototipo tenia hosts por
  * defecto distintos en cada producto). El nombre es una marca y no se traduce.
- * El color del distintivo no vive aqui sino en los tokens de @ramal/ui.
+ * El color del distintivo no vive aqui sino en los tokens de @git-rudder/ui.
  */
 
 export const PLATFORM_IDS = ['github', 'gitlab', 'bitbucket', 'gitea', 'azure'] as const;

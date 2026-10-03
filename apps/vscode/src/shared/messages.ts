@@ -1,11 +1,11 @@
 /**
  * Mensajes entre un webview y el extension host (architecture.md 4.4). Los dos
- * lados los importan y nadie mas. Solo dependen de los tipos de @ramal/bridge:
+ * lados los importan y nadie mas. Solo dependen de los tipos de @git-rudder/bridge:
  * los sobres `RpcRequest`, `RpcResponse` y `RpcNotification` salen de
- * `ramal-protocol`, asi que el webview y el motor hablan exactamente el mismo
+ * `git-rudder-protocol`, asi que el webview y el motor hablan exactamente el mismo
  * JSON-RPC y el host solo lo reenvia.
  */
-import type { RequestId, RpcNotification, RpcRequest, RpcResponse } from '@ramal/bridge';
+import type { RequestId, RpcNotification, RpcRequest, RpcResponse } from '@git-rudder/bridge';
 
 /** Superficies de React: una por webview. El primer corte solo monta `graph`. */
 export const SURFACES = ['graph', 'changes', 'merge', 'settings'] as const;
@@ -13,7 +13,7 @@ export const SURFACES = ['graph', 'changes', 'merge', 'settings'] as const;
 export type Surface = (typeof SURFACES)[number];
 
 /**
- * Idioma de la interfaz. Repite el `Locale` de @ramal/i18n porque `shared` no
+ * Idioma de la interfaz. Repite el `Locale` de @git-rudder/i18n porque `shared` no
  * puede importarlo; el host comprueba en tipos que los dos coinciden.
  */
 export type WebviewLocale = 'es' | 'en';
@@ -21,7 +21,7 @@ export type WebviewLocale = 'es' | 'en';
 /**
  * Metodos nativos que un webview puede pedir al host, con sus parametros y su
  * resultado. Copiar es el unico del primer corte; los dialogos llegan con el
- * puerto RepoViewHost de @ramal/repo-view (planificado).
+ * puerto RepoViewHost de @git-rudder/repo-view (planificado).
  */
 export interface HostMethods {
   'clipboard/writeText': { params: { text: string }; result: null };

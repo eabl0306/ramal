@@ -5,12 +5,12 @@
 - Revisado: 2026-10-01. Ratificado (matriz de plataformas, sin version portable, MSI sin
   actualizacion automatica) con cuatro correcciones: el motivo real de que MSI, deb y rpm no se
   actualicen solos, `{{bundle_type}}` en la URL del actualizador, el dominio definitivo y las
-  publicaciones en el propio repositorio `eabl0306/ramal`. Lo que cambio esta al final, en
+  publicaciones en el propio repositorio `eabl0306/git-rudder`. Lo que cambio esta al final, en
   [Cambios del 2026-10-01](#cambios-del-2026-10-01).
 
 ## Contexto
 
-Ramal Desktop se instala en macOS, Windows y Linux, y tiene que actualizarse solo. La landing
+Git Rudder Desktop se instala en macOS, Windows y Linux, y tiene que actualizarse solo. La landing
 ensena las descargas de la ultima version por sistema y arquitectura, con su tamano y sus
 requisitos. La extension de VS Code tiene su propia version y se distribuye por las tiendas de
 extensiones.
@@ -44,12 +44,12 @@ API con los artefactos en GitHub Releases, o todo en infraestructura propia.
 ## Decision
 
 Tres piezas: los artefactos en GitHub Releases, el manifiesto del actualizador servido por la API
-de Ramal desde el primer dia, y la landing leyendo la misma API.
+de Git Rudder desde el primer dia, y la landing leyendo la misma API.
 
 ### Artefactos en GitHub Releases del repositorio del producto
 
 - Las publicaciones se suben a GitHub Releases del **propio repositorio del producto,
-  `eabl0306/ramal`**, en la cuenta personal de Ezequiel. No hay repositorio aparte de
+  `eabl0306/git-rudder`**, en la cuenta personal de Ezequiel. No hay repositorio aparte de
   publicaciones ni organizacion de GitHub: el plan de pago de Ezequiel y las herramientas que usa
   (GitKraken, SonarCloud) estan configurados en `eabl0306`.
 - **El repositorio es privado hasta que abre la beta, y se hace publico entonces.** La primera build
@@ -67,7 +67,7 @@ de Ramal desde el primer dia, y la landing leyendo la misma API.
   falla, la publicacion sale sin el y la tarjeta lo dice.
 - **Windows arm64 solo lleva NSIS**: el MSI de Tauri (WiX) no se compila para arm64.
 - Al terminar, la CI registra la publicacion en la API. Se autentica con el token OIDC de GitHub
-  Actions del workflow de publicacion (audiencia `ramal-api`, repositorio y workflow fijados en la
+  Actions del workflow de publicacion (audiencia `git-rudder-api`, repositorio y workflow fijados en la
   configuracion), un reino de autenticacion aparte: no es un usuario y no puede hacer nada mas.
   Mientras no este, sirve un token de publicacion cuya API guarda solo el hash y compara en tiempo
   constante.
@@ -79,7 +79,7 @@ la API valida lo que registra la CI:
 
 - Las URL de descarga tienen que empezar por
   `https://github.com/<propietario>/<repositorio>/releases/download/v{version}/`, con el
-  propietario y el repositorio de la configuracion (`eabl0306/ramal`) y la version de la propia
+  propietario y el repositorio de la configuracion (`eabl0306/git-rudder`) y la version de la propia
   publicacion. Los enlaces a tiendas (Marketplace, Open VSX, Flathub) son URL fijas del codigo.
 - El comando de instalacion no es texto libre: es un valor de una lista (`brew_cask`, `winget`,
   `flatpak`) y la web escribe el comando desde una tabla fija. Un texto libre seria un comando que
@@ -93,14 +93,14 @@ la API valida lo que registra la CI:
 
 En `tauri.conf.json`, dos endpoints por orden:
 
-1. `https://api.ramal.bahoque.com/v1/desktop/updates/{{target}}/{{arch}}/{{current_version}}?channel=stable&bundle={{bundle_type}}`,
+1. `https://api.git-rudder.com/v1/desktop/updates/{{target}}/{{arch}}/{{current_version}}?channel=stable&bundle={{bundle_type}}`,
    que responde 204 si no hay nada mas nuevo para ese destino y ese formato, o 200 con el formato
    que dicta Tauri (en snake_case, porque no es nuestro). **`{{bundle_type}}` va en la URL desde la
    primera build publica**: como la URL no se puede cambiar, es lo que permite a la API responder
    distinto a cada formato (hoy, 204 a MSI, `.deb` y `.rpm`) sin tocar las apps instaladas. Un
    `bundle` que falte o que no se conozca recibe 204: no ofrecer nada es mejor que ofrecer un
    paquete que no es el suyo.
-2. El `latest.json` estatico de las publicaciones de `eabl0306/ramal`, por si la API no responde.
+2. El `latest.json` estatico de las publicaciones de `eabl0306/git-rudder`, por si la API no responde.
    **Solo lleva claves por formato** (`darwin-aarch64-app`, `windows-x86_64-nsis`,
    `linux-x86_64-appimage`...) y ninguna generica: con una clave `{os}-{arch}`, un MSI o un `.deb`
    caerian en ella e intentarian instalar un paquete que no es el suyo.
@@ -109,7 +109,7 @@ Servirlo desde la API da lo que GitHub Releases solo no da:
 
 - **Canales.** `stable` y `beta`; quien esta en beta recibe tambien las estables.
 - **Despliegue gradual.** Cada publicacion lleva un porcentaje. La app manda en la cabecera
-  `X-Ramal-Rollout-Bucket` un numero de 0 a 99 que calcula una vez a partir de una semilla
+  `X-Git Rudder-Rollout-Bucket` un numero de 0 a 99 que calcula una vez a partir de una semilla
   aleatoria propia, distinta del `installationId`, y la API ofrece la version si ese numero cae por
   debajo del porcentaje. Sin cabecera, solo se ofrece al 100%. Asi la consulta del actualizador no
   lleva ningun identificador estable de la instalacion.
@@ -119,9 +119,9 @@ Servirlo desde la API da lo que GitHub Releases solo no da:
   que salga una correccion.
 - **Version minima soportada.** La API la devuelve con la ultima publicacion. Por debajo de ella,
   el motor deja de sincronizar con la nube y la interfaz ensena "Actualiza para seguir
-  sincronizando"; todo lo local sigue funcionando ([ADR 0014](0014-usar-ramal-sin-cuenta.md)).
+  sincronizando"; todo lo local sigue funcionando ([ADR 0014](0014-usar-git-rudder-sin-cuenta.md)).
 
-**El dominio es `api.ramal.bahoque.com`** ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)), y
+**El dominio es `api.git-rudder.com`** ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)), y
 tiene que estar sirviendo antes de la primera build publica, porque esa URL ya no se puede cambiar.
 
 ### Que formatos se actualizan solos
@@ -144,15 +144,15 @@ La tarjeta "Windows Portable (.zip)" del diseno se quita: el empaquetador de Tau
 no seria portable de verdad (los datos van a `%APPDATA%`), tendria que llevar MinGit al lado, nunca
 se actualizaria sola y su reputacion de SmartScreen iria aparte.
 
-La busqueda de actualizaciones se puede apagar en los ajustes, y no necesita cuenta de Ramal
-([ADR 0014](0014-usar-ramal-sin-cuenta.md)).
+La busqueda de actualizaciones se puede apagar en los ajustes, y no necesita cuenta de Git Rudder
+([ADR 0014](0014-usar-git-rudder-sin-cuenta.md)).
 
 ### La landing lee la misma API
 
 `GET /v1/releases/latest?product=desktop` (y `product=vscode`, que tiene su propia version) da por
 sistema los artefactos, su arquitectura, tamano, sha256 y requisitos. La landing lo lee al
 prerenderizar y lo refresca en el cliente ([ADR 0015](0015-framework-web-con-prerender.md)). Las
-etiquetas visibles ("Apple Silicon (.dmg)") las pone la web desde `@ramal/i18n`, no la base de
+etiquetas visibles ("Apple Silicon (.dmg)") las pone la web desde `@git-rudder/i18n`, no la base de
 datos. Los artefactos del actualizador no aparecen en la pagina de descargas.
 
 ### Firmas
@@ -172,8 +172,8 @@ sin decidir.
 `vsce publish --target` al Marketplace y `ovsx publish --target` a Open VSX, en el mismo workflow
 de publicacion que escritorio, con los ocho VSIX por plataforma
 ([ADR 0010](0010-un-motor-para-escritorio-y-vscode.md)). Las tiendas se encargan de actualizarla.
-El identificador de editor `ramal` se reserva cuanto antes en las dos, porque el diseno ya usa
-`ramal.ramal`. Al Marketplace se publica con Entra ID: los tokens globales de Azure DevOps dejan de
+El identificador de editor `git-rudder` se reserva cuanto antes en las dos, porque el diseno ya usa
+`git-rudder.git-rudder`. Al Marketplace se publica con Entra ID: los tokens globales de Azure DevOps dejan de
 funcionar el 2026-12-01.
 
 ## Consecuencias
@@ -194,7 +194,7 @@ En contra:
 - **Perder la llave del actualizador deja todas las instalaciones sin actualizaciones para
   siempre.** Copia fuera de linea obligatoria.
 - **La URL del actualizador es para siempre**, y la del `latest.json` de respaldo lleva
-  `eabl0306/ramal` dentro. Renombrar o transferir el repositorio depende de las redirecciones de
+  `eabl0306/git-rudder` dentro. Renombrar o transferir el repositorio depende de las redirecciones de
   GitHub, que se pierden si alguien reutiliza el nombre viejo.
 - Los usuarios de MSI, `.deb` y `.rpm` no se actualizan solos.
 - **Mientras el repositorio sea privado no hay builds publicas**, y su CI gasta los minutos del plan
@@ -207,7 +207,7 @@ En contra:
   tener un CLA (ADR 0021).
 - Windows arm64 y Linux arm64 se prueban solo en la CI, sin hardware propio, y salen como beta.
 - Firmar en macOS y Windows cuesta dinero y tiempo, y la notarizacion alarga cada publicacion.
-- La base de Linux es Ubuntu 22.04 y Debian 12. Quien tenga algo mas viejo no puede usar Ramal
+- La base de Linux es Ubuntu 22.04 y Debian 12. Quien tenga algo mas viejo no puede usar Git Rudder
   Desktop, aunque si la extension de VS Code.
 - La consulta del actualizador lleva un numero de 0 a 99, tambien sin cuenta. No identifica la
   instalacion, pero es un dato mas que sale del equipo, y la busqueda se puede apagar.
@@ -223,7 +223,7 @@ cada instalacion.
 cambio del mayor coste y trabajo, para servir ficheros que GitHub sirve gratis. Si un dia hace
 falta, cambia la URL de cada artefacto en el registro de publicaciones, no la del actualizador.
 
-**Un repositorio publico aparte solo para publicaciones (`ramal-releases`).** Era la decision de la
+**Un repositorio publico aparte solo para publicaciones (`git-rudder-releases`).** Era la decision de la
 primera version de este ADR, para que las descargas fueran publicas con el producto privado. Con el
 producto publico desde la beta solo anade un token entre repositorios y otro sitio que vigilar.
 
@@ -250,10 +250,11 @@ Se ratifica la decision y se corrige lo que los hechos desmintieron o lo que se 
   una decision de producto.
 - **`{{bundle_type}}` en la URL del actualizador** desde la primera build publica, y el
   `latest.json` de respaldo solo con claves por formato.
-- **Dominio.** `ramal.dev` era el del diseno y es de un tercero. El actualizador vive en
-  `api.ramal.bahoque.com` ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)).
-- **Donde se publican los artefactos.** Ya no hay `ramal-releases`: se publica en
-  `eabl0306/ramal`, que es privado hasta la beta y publico desde entonces.
+- **Dominio.** El del diseno era de un tercero. El actualizador vive en `api.git-rudder.com`
+  ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md), con el dominio propio que eligio el
+  [ADR 0027](0027-renombrado-a-git-rudder.md)).
+- **Donde se publican los artefactos.** Ya no hay `git-rudder-releases`: se publica en
+  `eabl0306/git-rudder`, que es privado hasta la beta y publico desde entonces.
 - **Matriz.** Se ratifica entera; Windows arm64 y Linux arm64 salen como beta hasta que su E2E pase
   en runners arm, y Windows arm64 solo lleva NSIS.
 - **MSI x64** con la etiqueta "sin actualizaciones automáticas", en el lanzamiento, porque los

@@ -1,7 +1,7 @@
 /**
  * Regla local: ningun texto visible se escribe a mano en el JSX.
  *
- * Ramal se traduce entero desde @ramal/i18n. Un texto literal en un componente es
+ * Git Rudder se traduce entero desde @git-rudder/i18n. Un texto literal en un componente es
  * un texto que se queda sin traducir y que nadie ve hasta que alguien cambia de
  * idioma. Por eso se rechaza cualquier nodo de texto con letras y los atributos que
  * el usuario lee (title, aria-label, placeholder, alt, label) con un string fijo.
@@ -55,9 +55,9 @@ export const noJsxLiteralText = {
     ],
     messages: {
       literalText:
-        'Texto visible escrito a mano: "{{text}}". Los textos visibles salen de @ramal/i18n.',
+        'Texto visible escrito a mano: "{{text}}". Los textos visibles salen de @git-rudder/i18n.',
       literalAttribute:
-        'El atributo {{name}} lleva un texto fijo. Los textos visibles salen de @ramal/i18n.',
+        'El atributo {{name}} lleva un texto fijo. Los textos visibles salen de @git-rudder/i18n.',
     },
   },
   create(context) {

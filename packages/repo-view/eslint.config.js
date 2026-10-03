@@ -8,12 +8,12 @@ import {
   qualityConfig,
   reactConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
 /**
- * Las piezas de @ramal/repo-view (architecture.md 4.7 y 5.2):
+ * Las piezas de @git-rudder/repo-view (architecture.md 4.7 y 5.2):
  *
  * - graph: geometria, caminos del SVG y disposicion de la columna del grafo.
  *   Funciones puras sin React; solo leen tipos del protocolo y los tokens.
@@ -21,7 +21,7 @@ const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
  * - view: componentes React. Son los unicos que pintan.
  *
  * Nada habla con la red: el motor se alcanza solo por el cliente de
- * @ramal/bridge, cuyo transporte pone cada app. Tauri, VS Code y api-client
+ * @git-rudder/bridge, cuyo transporte pone cada app. Tauri, VS Code y api-client
  * quedan fuera por no estar en ninguna lista blanca.
  */
 const elements = [
@@ -54,17 +54,17 @@ const policies = [
   internal('data', ['data']),
   internal('view', ['view', 'graph', 'data']),
   internal('entry', ['view', 'graph', 'data']),
-  external('graph', ['@ramal/bridge', '@ramal/ui']),
-  external('data', ['@ramal/bridge', '@ramal/i18n', '@tanstack/react-query', 'react']),
+  external('graph', ['@git-rudder/bridge', '@git-rudder/ui']),
+  external('data', ['@git-rudder/bridge', '@git-rudder/i18n', '@tanstack/react-query', 'react']),
   external('view', [
     'react',
-    '@ramal/bridge',
-    '@ramal/i18n',
-    '@ramal/ui',
+    '@git-rudder/bridge',
+    '@git-rudder/i18n',
+    '@git-rudder/ui',
     '@tanstack/react-query',
     '@tanstack/react-virtual',
   ]),
-  external('entry', ['@ramal/bridge']),
+  external('entry', ['@git-rudder/bridge']),
   {
     from: { file: { categories: 'test' } },
     allow: { to: { element: { types: ['graph', 'data', 'view', 'test-support'] } } },
@@ -79,11 +79,11 @@ const policies = [
             'vitest',
             '@testing-library/**',
             'react',
-            '@ramal/bridge',
-            '@ramal/i18n',
-            '@ramal/ui',
-            '@ramal/ui/icons/lucide',
-            '@ramal/ui/icons/codicons',
+            '@git-rudder/bridge',
+            '@git-rudder/i18n',
+            '@git-rudder/ui',
+            '@git-rudder/ui/icons/lucide',
+            '@git-rudder/ui/icons/codicons',
             '@tanstack/react-query',
             // Solo para leer las hojas de src/view: jsdom no aplica los CSS Modules
             // y el diseno (alto contraste, tintes) solo se comprueba en la regla.
@@ -100,7 +100,7 @@ const policies = [
 /** La vista nunca abre conexiones: toda salida pasa por el cliente del bridge. */
 const NETWORK_GLOBALS = ['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource'].map((name) => ({
   name,
-  message: '@ramal/repo-view no habla con la red: usa el cliente de @ramal/bridge.',
+  message: '@git-rudder/repo-view no habla con la red: usa el cliente de @git-rudder/bridge.',
 }));
 
 export default [

@@ -2,7 +2,7 @@
 # Prueba de humo de la imagen de produccion de la API. Construir no prueba nada:
 # la imagen se arranca y se comprueba su contrato.
 #
-#   bash apps/api/scripts/smoke-image.sh [imagen]      (por defecto ramal-api:local)
+#   bash apps/api/scripts/smoke-image.sh [imagen]      (por defecto git-rudder-api:local)
 #
 # Dos fases, con nombres y puertos propios para no chocar con la pila de compose:
 #
@@ -17,12 +17,12 @@
 # Lo arranca todo con `docker run` y lo borra al salir, falle o no.
 set -euo pipefail
 
-image="${1:-ramal-api:local}"
+image="${1:-git-rudder-api:local}"
 suffix="smoke-$$"
-network="ramal-${suffix}"
-db="ramal-db-${suffix}"
-api_down="ramal-api-down-${suffix}"
-api_ready="ramal-api-ready-${suffix}"
+network="git-rudder-${suffix}"
+db="git-rudder-db-${suffix}"
+api_down="git-rudder-api-down-${suffix}"
+api_ready="git-rudder-api-ready-${suffix}"
 port_down="${SMOKE_PORT_DOWN:-18080}"
 port_ready="${SMOKE_PORT_READY:-18081}"
 body="$(mktemp)"
@@ -59,7 +59,7 @@ wait_for() {
 
 echo "smoke: fase 1, ${image} sin base de datos"
 docker run -d --name "${api_down}" -p "127.0.0.1:${port_down}:8080" \
-  -e RAMAL__DATABASE__URL=postgres://ramal:ramal@127.0.0.1:1/ramal \
+  -e GIT_RUDDER__DATABASE__URL=postgres://git_rudder:git_rudder@127.0.0.1:1/git_rudder \
   "${image}" >/dev/null
 wait_for "http://127.0.0.1:${port_down}/health/live" 200 30 || fail "/health/live no respondio 200"
 grep -q '"status":"ok"' "${body}" || fail "/health/live no dice ok"
@@ -77,10 +77,10 @@ grep -q '"code":"route_not_found"' "${body}" || fail "el 404 no es problem+json"
 echo "smoke: fase 2, ${image} con PostgreSQL 18"
 docker network create "${network}" >/dev/null
 docker run -d --name "${db}" --network "${network}" \
-  -e POSTGRES_USER=ramal -e POSTGRES_PASSWORD=ramal -e POSTGRES_DB=ramal \
+  -e POSTGRES_USER=git_rudder -e POSTGRES_PASSWORD=git_rudder -e POSTGRES_DB=git_rudder \
   postgres:18-alpine >/dev/null
 docker run -d --name "${api_ready}" --network "${network}" -p "127.0.0.1:${port_ready}:8080" \
-  -e "RAMAL__DATABASE__URL=postgres://ramal:ramal@${db}:5432/ramal" \
+  -e "GIT_RUDDER__DATABASE__URL=postgres://git_rudder:git_rudder@${db}:5432/git_rudder" \
   "${image}" >/dev/null
 wait_for "http://127.0.0.1:${port_ready}/health/ready" 200 90 \
   || fail "/health/ready no llego a 200 con la base arriba"

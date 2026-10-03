@@ -1,6 +1,6 @@
-import { RepoViewProvider } from '@ramal/repo-view';
-import { IconProvider } from '@ramal/ui';
-import { lucideIcons } from '@ramal/ui/icons/lucide';
+import { RepoViewProvider } from '@git-rudder/repo-view';
+import { IconProvider } from '@git-rudder/ui';
+import { lucideIcons } from '@git-rudder/ui/icons/lucide';
 import { type ReactElement, useMemo } from 'react';
 
 import { AppearanceProvider } from '../ui/appearance/appearance-provider';
@@ -17,7 +17,7 @@ export interface AppProps {
 }
 
 /**
- * Los proveedores que pone el escritorio (architecture.md 7.4): tema de Ramal e
+ * Los proveedores que pone el escritorio (architecture.md 7.4): tema de Git Rudder e
  * idioma elegidos por el usuario, iconos de Lucide, el QueryClient de la vista de
  * repositorio y las capacidades del host. La densidad comoda va en `<html>`.
  */

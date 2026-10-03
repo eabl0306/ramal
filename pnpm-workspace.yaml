@@ -31,5 +31,5 @@ peerDependencyRules:
     eslint-plugin-jsx-a11y>eslint: "10"
     # openapi-typescript 7.13.0 declara typescript ^5.x, pero solo usa la API
     # estable del compilador para imprimir el esquema, que no cambia en la 6.
-    # Lo genera @ramal/api-client y `just api-client` comprueba que sale igual.
+    # Lo genera @git-rudder/api-client y `just api-client` comprueba que sale igual.
     openapi-typescript>typescript: "6"

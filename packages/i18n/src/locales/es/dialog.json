@@ -1,7 +1,7 @@
 {
   "alias": {
     "title": "Asignar alias",
-    "hint": "El alias solo cambia cómo se muestra en Ramal; la carpeta y el remoto no cambian."
+    "hint": "El alias solo cambia cómo se muestra en Git Rudder; la carpeta y el remoto no cambian."
   },
   "rename": {
     "title": "Renombrar repositorio",

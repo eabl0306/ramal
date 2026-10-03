@@ -6,7 +6,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
-use ramal_core_domain::{GitRef, Head, RefName, RefSnapshot, RepoRoot};
+use git_rudder_core_domain::{GitRef, Head, RefName, RefSnapshot, RepoRoot};
 
 use super::OpenRepository;
 use crate::error::EngineError;
@@ -44,16 +44,19 @@ fn open(
 #[test]
 fn opening_a_folder_inside_a_repo_registers_its_root() {
     let git = FakeGitReader::new()
-        .with_repository("/work/ramal/src", RepoRoot::new("/work/ramal"))
+        .with_repository("/work/git-rudder/src", RepoRoot::new("/work/git-rudder"))
         .with_refs(Ok(on_main()));
 
-    let (result, registry) = open(git, "/work/ramal/src");
+    let (result, registry) = open(git, "/work/git-rudder/src");
     let opened = result.unwrap();
 
     assert!(opened.id.as_str().starts_with("repo-"));
-    assert_eq!(opened.root, RepoRoot::new("/work/ramal"));
+    assert_eq!(opened.root, RepoRoot::new("/work/git-rudder"));
     assert_eq!(opened.refs.head_target(), Some(sha(1)));
-    assert_eq!(registry.get(&opened.id), Some(RepoRoot::new("/work/ramal")));
+    assert_eq!(
+        registry.get(&opened.id),
+        Some(RepoRoot::new("/work/git-rudder"))
+    );
 }
 
 #[test]
@@ -61,11 +64,11 @@ fn an_old_git_is_rejected_before_touching_the_repo() {
     let git = Arc::new(
         FakeGitReader::new()
             .with_version(Ok(version_info(GitVersion::new(2, 33, 9))))
-            .with_repository("/work/ramal", RepoRoot::new("/work/ramal")),
+            .with_repository("/work/git-rudder", RepoRoot::new("/work/git-rudder")),
     );
     let use_case = OpenRepository::new(git.clone(), Arc::new(OpenRepositories::new()));
 
-    let result = block_on(use_case.execute(Path::new("/work/ramal")));
+    let result = block_on(use_case.execute(Path::new("/work/git-rudder")));
 
     assert_eq!(
         result,
@@ -95,7 +98,7 @@ fn a_folder_outside_any_repo_is_not_a_repository() {
 fn a_missing_git_cannot_open_anything() {
     let git = FakeGitReader::new().with_version(Err(GitReadError::NotFound));
 
-    let (result, _) = open(git, "/work/ramal");
+    let (result, _) = open(git, "/work/git-rudder");
 
     assert_eq!(result, Err(EngineError::GitUnavailable));
 }
@@ -103,12 +106,12 @@ fn a_missing_git_cannot_open_anything() {
 #[test]
 fn a_git_failure_reading_refs_does_not_register_the_repo() {
     let git = FakeGitReader::new()
-        .with_repository("/work/ramal", RepoRoot::new("/work/ramal"))
+        .with_repository("/work/git-rudder", RepoRoot::new("/work/git-rudder"))
         .with_refs(Err(GitReadError::Failed {
             detail: "fatal: bad object".to_owned(),
         }));
 
-    let (result, registry) = open(git, "/work/ramal");
+    let (result, registry) = open(git, "/work/git-rudder");
 
     assert_eq!(
         result,
@@ -125,7 +128,7 @@ fn a_discover_failure_is_reported_as_is() {
         detail: "dubious ownership".to_owned(),
     });
 
-    let (result, _) = open(git, "/work/ramal");
+    let (result, _) = open(git, "/work/git-rudder");
 
     assert!(matches!(result, Err(EngineError::GitFailed { .. })));
 }

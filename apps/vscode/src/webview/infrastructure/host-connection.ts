@@ -1,4 +1,4 @@
-import { type BridgeClient, createBridgeClient } from '@ramal/bridge';
+import { type BridgeClient, createBridgeClient } from '@git-rudder/bridge';
 
 import type { InitMessage, Surface, WebviewReadyMessage } from '../../shared/messages';
 

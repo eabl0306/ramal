@@ -1,6 +1,6 @@
-import type { Locale } from '@ramal/i18n';
-import { I18nProvider, IconProvider, type IconSet } from '@ramal/ui';
-import { lucideIcons } from '@ramal/ui/icons/lucide';
+import type { Locale } from '@git-rudder/i18n';
+import { I18nProvider, IconProvider, type IconSet } from '@git-rudder/ui';
+import { lucideIcons } from '@git-rudder/ui/icons/lucide';
 import { QueryClient } from '@tanstack/react-query';
 import { type RenderResult, render } from '@testing-library/react';
 import type { ReactElement } from 'react';

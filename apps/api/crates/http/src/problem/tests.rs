@@ -5,7 +5,7 @@
     reason = "tests fail loudly on purpose; a panic here is the assertion"
 )]
 
-use ramal_api_application::AppError;
+use git_rudder_api_application::AppError;
 use salvo::http::header::CONTENT_TYPE;
 use salvo::prelude::{Response, StatusCode};
 
@@ -43,7 +43,7 @@ fn the_fallback_body_is_a_valid_problem() {
 fn the_type_field_keeps_its_rfc_name_and_errors_are_omitted_when_absent() {
     let problem = Problem::new("conflict", "Conflicto", StatusCode::CONFLICT, "d", "c");
     let body = serde_json::to_value(&problem).expect("serializes");
-    assert_eq!(body["type"], "https://ramal.bahoque.com/problems/conflict");
+    assert_eq!(body["type"], "https://git-rudder.com/problems/conflict");
     assert!(body.get("errors").is_none());
     assert!(body.get("kind").is_none());
 }

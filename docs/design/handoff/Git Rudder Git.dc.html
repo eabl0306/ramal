@@ -11,7 +11,7 @@
 <meta name="design_doc_mode" content="canvas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:13px;
 --canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -32,7 +32,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
 <div style="min-height:100vh;padding:32px 40px 72px;display:flex;flex-direction:column;gap:18px;background:var(--canvas);color:var(--text)">
 
   <header style="display:flex;flex-direction:column;gap:12px;max-width:1280px">
-    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Ramal Desktop</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">#65 · D-12 – D-25</span></div>
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Git Rudder Desktop</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">#65 · D-12 – D-25</span></div>
     <div><h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.02em">{{ ch.title }}</h1><p style="margin:6px 0 0;max-width:820px;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ ch.sub }}</p></div>
     <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end">
       <sc-for list="{{ segs }}" as="g" hint-placeholder-count="4">
@@ -53,7 +53,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
   <div style="width:1280px;height:780px;position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;box-shadow:var(--shadow)">
     <div style="height:46px;flex-shrink:0;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
       <sc-if value="{{ win.mac }}"><div style="display:flex;align-items:center;gap:8px;padding-right:12px"><span style="width:12px;height:12px;border-radius:50%;background:#ff5f57"></span><span style="width:12px;height:12px;border-radius:50%;background:#febc2e"></span><span style="width:12px;height:12px;border-radius:50%;background:#28c840"></span></div></sc-if>
-      <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Ramal</span></div>
+      <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Git Rudder</span></div>
       <sc-if value="{{ win.tabs }}">
         <div style="display:flex;align-items:center;padding:0 16px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:{{ win.homeBg }};color:{{ win.homeColor }};box-shadow:{{ win.homeShadow }}">{{ t.e_home }}</div>
         <sc-if value="{{ win.hasRepoTab }}"><div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;background:var(--bg);box-shadow:inset 0 2px 0 var(--accent)"><span style="width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;background:{{ win.tabBadge }};color:white">{{ win.tabAbbr }}</span>{{ win.repoTab }}</div><sc-if value="{{ win.hasTab2 }}"><div style="display:flex;align-items:center;gap:8px;padding:0 12px;margin-top:6px;border-radius:9px 9px 0 0;font-weight:500;color:var(--muted)"><span style="position:relative;width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:8px;font-weight:700;background:oklch(0.64 0.17 40);color:white;box-shadow:0 0 0 2px var(--panel),0 0 0 4px {{ win.ringColor }}">GL</span>api-gateway</div></sc-if><div style="display:none"><span style="color:var(--faint);font-size:15px">×</span></div></sc-if>
@@ -286,16 +286,16 @@ const SCR = [
   ['d24-upstream', 'D-24', ['Upstream y primer push', 'Upstream and first push'], [['publish', 'Publicar rama', 'Publish branch'], ['set', 'Establecer upstream', 'Set upstream']]],
   ['d25-historial', 'D-25', ['Deshacer y rehacer', 'Undo and redo'], [['open', 'Historial', 'History'], ['published', 'Ya publicado', 'Already pushed'], ['toast', 'Tras deshacer', 'After undo']]]
 ];
-const CH = { title: ['Credenciales y operaciones de Git', 'Credentials and Git operations'], sub: ['Cuentas (D-12 a D-15) y operaciones (D-17 a D-25) sobre la vista de repositorio y Ajustes de Ramal Desktop. Elige pantalla y variante; los flujos principales responden a clics.', 'Accounts (D-12 to D-15) and operations (D-17 to D-25) on top of the repository view and Settings of Ramal Desktop. Pick a screen and variant; main flows respond to clicks.'],
+const CH = { title: ['Credenciales y operaciones de Git', 'Credentials and Git operations'], sub: ['Cuentas (D-12 a D-15) y operaciones (D-17 a D-25) sobre la vista de repositorio y Ajustes de Git Rudder Desktop. Elige pantalla y variante; los flujos principales responden a clics.', 'Accounts (D-12 to D-15) and operations (D-17 to D-25) on top of the repository view and Settings of Git Rudder Desktop. Pick a screen and variant; main flows respond to clicks.'],
   theme: ['Tema', 'Theme'], lang: ['Idioma', 'Language'], density: ['Densidad del resolvedor', 'Resolver density'], dark: ['Oscuro', 'Dark'], light: ['Claro', 'Light'] };
 const PLAT_SCOPES = { github: 'repo, read:org, workflow', gitlab: 'api, read_repository, write_repository', glself: 'api, read_repository, write_repository', gitea: 'write:repository, read:user', ghes: 'repo, read:org', bitbucket: 'repository:write, pullrequest:write', azure: 'Code (Read & Write)' };
 
 class Component extends DCLogic {
   state = { ready: false, theme: 'dark', lang: 'es', density: 'desktop', screen: 'd12-plataforma', v: 'github', toasts: [], remain: 900, tok: '', reveal: false, ssh: false, def: true, label: 'Trabajo', pass: '', remember: false, pct: 34, msg: '', aiBusy: false, panelOff: false, ddOff: false, cfDone: false };
-  componentDidMount() { const p = this.props, up = {}; ['theme', 'lang', 'density'].forEach(k => { if (p[k]) up[k] = p[k]; }); if (p.screen) Object.assign(up, this.vs(p.screen)); this.setState(up); const go = () => window.RAMAL && window.RAMAL.D.g_connTitle ? this.setState({ ready: true }) : setTimeout(go, 30); go(); this._k = e => { if (e.key === 'Escape') this.setState({ panelOff: true, ddOff: true }); }; window.addEventListener('keydown', this._k); }
+  componentDidMount() { const p = this.props, up = {}; ['theme', 'lang', 'density'].forEach(k => { if (p[k]) up[k] = p[k]; }); if (p.screen) Object.assign(up, this.vs(p.screen)); this.setState(up); const go = () => window.GIT_RUDDER && window.GIT_RUDDER.D.g_connTitle ? this.setState({ ready: true }) : setTimeout(go, 30); go(); this._k = e => { if (e.key === 'Escape') this.setState({ panelOff: true, ddOff: true }); }; window.addEventListener('keydown', this._k); }
   componentWillUnmount() { clearInterval(this._iv); clearTimeout(this._t); window.removeEventListener('keydown', this._k); }
   componentDidUpdate(pp) { const p = this.props, up = {}; ['theme', 'lang', 'density'].forEach(k => { if (pp[k] !== p[k] && p[k]) up[k] = p[k]; }); if (pp.screen !== p.screen && p.screen) Object.assign(up, this.vs(p.screen)); if (Object.keys(up).length) this.setState(up); document.body.dataset.theme = this.state.theme; }
-  T(k, v) { const R = window.RAMAL; const e = R.D[k] || (R.STATES || {})[k] || (R.VAULT || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
+  T(k, v) { const R = window.GIT_RUDDER; const e = R.D[k] || (R.STATES || {})[k] || (R.VAULT || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (v) for (const x in v) s = s.split('{' + x + '}').join(v[x]); return s; }
   toast(text, kind = 'ok') { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }].slice(-3) })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3200); }
   vs(id, v) { clearInterval(this._iv); clearTimeout(this._t); const sc = SCR.find(x => x[0] === id); v = v || (sc[3][0] ? sc[3][0][0] : 'base'); const st = { screen: id, v, panelOff: false, ddOff: false, tok: '', reveal: false, pass: v === 'bad' ? 'otra frase' : '', aiBusy: v === 'ai', cfDone: v === 'done', dangerQ: null, skipQ: false, confirmUndo: null, cancelMergeQ: false };
     if (id === 'd12-github-codigo' && v === 'wait') { st.remain = 900; this._iv = setInterval(() => this.setState(s => ({ remain: Math.max(0, s.remain - 1) })), 1000); }
@@ -306,7 +306,7 @@ class Component extends DCLogic {
   go(id, v) { this.setState(this.vs(id, v)); }
 
   renderVals() {
-    const s = this.state, R = window.RAMAL;
+    const s = this.state, R = window.GIT_RUDDER;
     if (!s.ready || !R) return { ch: {}, t: {}, segs: [], nav: [], vars: [], cur: {}, win: {}, pg: {}, hm: { btns: [], tiles: [], cards: [], ws: [], skel: [], fakeFilters: [], typeOpts: [] }, rp: { tools: [], side: [], rows: [], files: [], banners: [], dd: { items: [], submenu: [] }, cf: { panes: [], out: [] }, cfp: { files: [], btns: [] }, op: {} }, st: { nav: [], cards: [] }, pn: { blocks: [], btns: [] }, act: {}, toasts: [] };
     const L = s.lang === 'en' ? 1 : 0, T = this.T.bind(this), P = R.PLAT, id = s.screen, v = s.v;
     const t = {}; for (const k in (R.STATES || {})) t[k] = R.STATES[k][L]; for (const k in R.D) t[k] = R.D[k][L];
@@ -316,7 +316,7 @@ class Component extends DCLogic {
     const nav = SCR.map(([sid, code, ttl]) => { const on = id === sid; return { label: sid, title: code + ' · ' + ttl[L], bg: on ? 'var(--accent-soft)' : 'var(--surface)', border: on ? 'var(--accent)' : 'var(--border)', color: on ? 'var(--accent)' : 'var(--text)', onClick: () => this.go(sid) }; });
     const sc = SCR.find(x => x[0] === id);
     const vars = sc[3].map(([k, es, en]) => { const on = v === k; return { label: L ? en : es, bg: on ? 'var(--accent)' : 'var(--surface)', border: on ? 'var(--accent)' : 'var(--border)', color: on ? 'var(--accent-ink)' : 'var(--text)', onClick: () => this.go(id, k) }; });
-    const cur = { id: sc[1], title: sc[2][L], hasNote: id === 'd13-ssh' && v === 'gpg', note: L ? 'GPG asks through the system pinentry; Ramal only shows the waiting state.' : 'GPG pregunta con el pinentry del sistema; Ramal solo enseña la espera.' };
+    const cur = { id: sc[1], title: sc[2][L], hasNote: id === 'd13-ssh' && v === 'gpg', note: L ? 'GPG asks through the system pinentry; Git Rudder only shows the waiting state.' : 'GPG pregunta con el pinentry del sistema; Git Rudder solo enseña la espera.' };
     const settingsPage = id.startsWith('d12') || id === 'd14-tarjetas';
     const win = { mac: true, ctrls: false, tabs: true, signedIn: true, signedOut: false, hasRepoTab: !settingsPage, hasSetTab: settingsPage, homeBg: 'transparent', homeColor: 'var(--muted)', homeShadow: 'none', repoTab: 'Cliente Git', tabAbbr: 'GH', tabBadge: P.github.color, hasTab2: id === 'd17-progreso' && v === 'tab', ringColor: 'var(--accent)', esBg: L ? 'transparent' : 'var(--accent)', esColor: L ? 'var(--muted)' : 'var(--accent-ink)', enBg: L ? 'var(--accent)' : 'transparent', enColor: L ? 'var(--accent-ink)' : 'var(--muted)' };
     const pg = { home: false, repo: !settingsPage, settings: settingsPage };

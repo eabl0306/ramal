@@ -6,7 +6,7 @@
 //! /health/live      publico
 //! /health/ready     publico
 //! /openapi.json     publico
-//! /swagger-ui/      solo si se pide (RAMAL__SERVER__SWAGGER_UI): desarrollo
+//! /swagger-ui/      solo si se pide (GIT_RUDDER__SERVER__SWAGGER_UI): desarrollo
 //! /v1/...           los contextos de dominio (ninguno en el primer corte)
 //! ```
 //!
@@ -19,8 +19,8 @@ mod health;
 use salvo::oapi::swagger_ui::SwaggerUi;
 use salvo::prelude::{Router, Service};
 
+use git_rudder_api_domain::ServiceVersion;
 pub use health::HealthDependencies;
-use ramal_api_domain::ServiceVersion;
 
 use crate::catcher::ProblemCatcher;
 use crate::middleware::RequestId;

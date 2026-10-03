@@ -4,7 +4,7 @@
 // @types/vscode solo existe alli.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Ramal Node",
+  "display": "Git Rudder Node",
   "extends": "./base.json",
   "compilerOptions": {
     "lib": ["ES2023"],

@@ -1,8 +1,8 @@
-// Codigo de produccion de @ramal/api-client. Corre en el navegador, asi que ve
+// Codigo de produccion de @git-rudder/api-client. Corre en el navegador, asi que ve
 // la lib DOM (fetch, Request, Response) pero no los tipos de Node. No referencia
 // ningun paquete del workspace: architecture.md 5.2 solo le deja openapi-fetch.
 {
-  "extends": "@ramal/tsconfig/library.json",
+  "extends": "@git-rudder/tsconfig/library.json",
   "compilerOptions": {
     "lib": ["ES2023", "DOM"],
     "composite": true,

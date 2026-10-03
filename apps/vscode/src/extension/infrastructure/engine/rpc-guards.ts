@@ -1,4 +1,4 @@
-import type { RpcNotification, RpcResponse } from '@ramal/bridge';
+import type { RpcNotification, RpcResponse } from '@git-rudder/bridge';
 
 /**
  * Comprobaciones minimas de lo que manda el sidecar. El motor es de fiar (va en

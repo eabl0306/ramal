@@ -6,7 +6,7 @@ export interface EngineArgsInput {
 }
 
 /**
- * Argumentos con los que se lanza `ramal-vscode-engine` (apps/vscode-engine,
+ * Argumentos con los que se lanza `git-rudder-vscode-engine` (apps/vscode-engine,
  * args.rs). El git va primero porque es lo que el usuario ya le dijo a su editor
  * que use (ADR 0009); sin el, el sidecar busca el primero del `PATH`. Una ruta
  * vacia no se pasa: el sidecar la tomaria por un git que no existe. La ruta va

@@ -76,10 +76,10 @@ mod log {
     use std::net::SocketAddr;
 
     pub fn listening(address: SocketAddr) {
-        tracing::info!(%address, "ramal api is listening");
+        tracing::info!(%address, "git-rudder api is listening");
     }
 
     pub fn stopped() {
-        tracing::info!("ramal api stopped");
+        tracing::info!("git-rudder api stopped");
     }
 }

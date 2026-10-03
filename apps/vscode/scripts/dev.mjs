@@ -2,7 +2,7 @@
 // webviews se sirven con el servidor de Vite (recarga en caliente).
 //
 // Lanza la extension con la configuracion "Run Extension" de .vscode/launch.json,
-// que pone RAMAL_WEBVIEW_DEV_SERVER: solo con esa variable y en modo desarrollo
+// que pone GIT_RUDDER_WEBVIEW_DEV_SERVER: solo con esa variable y en modo desarrollo
 // el host carga los webviews desde Vite, con su CSP de desarrollo.
 import { context } from 'esbuild';
 import { createServer } from 'vite';

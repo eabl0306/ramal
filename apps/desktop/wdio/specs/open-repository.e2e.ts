@@ -5,12 +5,12 @@ import { FIXTURE_COMMITS } from '../support/fixture-repo';
 /**
  * El camino del primer corte con todo real: el comando repo_pick_and_open abre la
  * carpeta en el motor, el comando rpc trae graph/window con git de verdad y
- * @ramal/repo-view lo pinta en WebKitGTK con la CSP de produccion.
+ * @git-rudder/repo-view lo pinta en WebKitGTK con la CSP de produccion.
  *
  * El idioma del arranque depende del sistema, asi que lo primero es fijarlo con
  * el conmutador de la barra de titulo.
  */
-describe('Ramal Desktop con el motor real', () => {
+describe('Git Rudder Desktop con el motor real', () => {
   it('abre el repositorio elegido y pinta su grafo', async () => {
     await $('button=ES').click();
     await $('button=Abrir repositorio local').click();

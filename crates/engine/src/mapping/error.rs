@@ -4,8 +4,8 @@
 //! `data.kind`. El detalle de un fallo de git no sale del motor: se registra aqui y
 //! al cliente llega un mensaje fijo.
 
-use ramal_core_application::EngineError;
-use ramal_protocol::{ErrorKind, RpcError, error_code};
+use git_rudder_core_application::EngineError;
+use git_rudder_protocol::{ErrorKind, RpcError, error_code};
 
 /// Error de un caso de uso.
 #[must_use]

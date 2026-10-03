@@ -13,7 +13,7 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, PoisonError};
 
-use ramal_core_domain::{RepoId, RepoRoot};
+use git_rudder_core_domain::{RepoId, RepoRoot};
 
 /// Base de FNV-1a de 64 bits.
 const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;

@@ -1,5 +1,5 @@
 [package]
-name = "ramal-api-infrastructure"
+name = "git-rudder-api-infrastructure"
 description = "Adaptadores driven de la API: configuracion, PostgreSQL y telemetria."
 version.workspace = true
 edition.workspace = true
@@ -11,8 +11,8 @@ license.workspace = true
 async-trait = { workspace = true }
 chrono = { workspace = true }
 figment = { workspace = true }
-ramal-api-application = { workspace = true }
-ramal-api-domain = { workspace = true }
+git-rudder-api-application = { workspace = true }
+git-rudder-api-domain = { workspace = true }
 serde = { workspace = true }
 sqlx = { workspace = true }
 thiserror = { workspace = true }

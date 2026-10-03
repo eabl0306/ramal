@@ -1,4 +1,4 @@
-# ADR 0014: Ramal funciona sin cuenta de Ramal
+# ADR 0014: Git Rudder funciona sin cuenta de Git Rudder
 
 - Estado: aceptado
 - Fecha: 2026-09-30
@@ -8,12 +8,12 @@
 
 ## Contexto
 
-Ramal es, antes que nada, un cliente Git. Quien lo instala quiere abrir un repositorio y ver su
+Git Rudder es, antes que nada, un cliente Git. Quien lo instala quiere abrir un repositorio y ver su
 grafo, no crear una cuenta. Pero los tres productos comparten una cuenta y hay funciones que no
 tienen sentido sin ella: sincronizar ajustes y cuentas entre equipos, equipos y organizaciones,
 llaves de IA de organizacion, la lista de dispositivos y el panel web.
 
-La decision de partida del usuario: **todo lo que es Git local funciona sin cuenta de Ramal.** La
+La decision de partida del usuario: **todo lo que es Git local funciona sin cuenta de Git Rudder.** La
 sincronizacion, los equipos, las llaves de IA de organizacion, los dispositivos y el panel exigen
 iniciar sesion. Este ADR fija que significa eso en el codigo y en el contrato, porque es facil de
 romper sin querer: basta un caso de uso que pida la sesion "por si acaso", o una pantalla que no
@@ -84,14 +84,14 @@ dispositivo, tambien con cuenta: nunca llegan a la API.
 - Si la cuenta no tiene ese dato en la nube (un documento de preferencias con version 0, ningun
   workspace), el equipo sube el suyo como version inicial. Los ids los genero el cliente, asi que
   un reintento no duplica nada.
-- Si la cuenta ya lo tiene, gana la nube y el equipo lo aplica. El usuario que configuro Ramal en
+- Si la cuenta ya lo tiene, gana la nube y el equipo lo aplica. El usuario que configuro Git Rudder en
   otra maquina espera encontrar esa configuracion, no que la sobrescriba un equipo recien llegado.
 - Las cuentas de plataforma creadas en local se suben como metadatos, y su token solo si hay
   boveda configurada.
 
 **Al cerrar sesion**, el motor borra la llave de la boveda en cache y las copias sincronizadas de
 los tokens y llaves que no se crearon en ese equipo. Lo que el usuario creo alli se queda en su
-llavero, porque sin cuenta Ramal sigue siendo un cliente Git que necesita esas credenciales para
+llavero, porque sin cuenta Git Rudder sigue siendo un cliente Git que necesita esas credenciales para
 hacer push, salvo que el usuario marque "Borrar también las añadidas en este equipo", que viene
 apagada. Los repositorios, los ajustes locales y el historial no se tocan. La misma limpieza corre
 cuando un refresco recibe un 401 con el `code` `session_ended`: un equipo revocado desde otro sitio
@@ -114,7 +114,7 @@ No hay telemetria prevista. Si algun dia la hay, tendra su propio ADR y sera opc
 
 A favor:
 
-- Ramal se puede usar en una maquina sin red, en un entorno que no deja crear cuentas o
+- Git Rudder se puede usar en una maquina sin red, en un entorno que no deja crear cuentas o
   simplemente por quien no quiere una, y sigue siendo un cliente Git completo.
 - La caida de la API no deja a nadie sin hacer commit ni push.
 - La cuenta es un anadido con valor claro (sincronizar, equipo, IA de organizacion), no un peaje.
@@ -124,7 +124,7 @@ A favor:
 En contra:
 
 - Hay que disenar y probar cada pantalla en dos estados, con y sin sesion.
-- El broker publico de Bitbucket deja que cualquiera gaste el cupo del consumer de Ramal. Si se
+- El broker publico de Bitbucket deja que cualquiera gaste el cupo del consumer de Git Rudder. Si se
   abusa, pasa a exigir sesion y el camino sin cuenta queda en el API token.
 - La regla de "gana la nube" en el primer inicio de sesion puede descartar ajustes locales que el
   usuario queria conservar. Se acepta por simple; si molesta, el aviso del primer inicio de sesion
@@ -141,7 +141,7 @@ delante de un cliente Git. Es la queja mas comun contra otros productos del sect
 **Producto solo local, sin nube.** Pierde la sincronizacion entre equipos y todo lo de equipos,
 que es lo que justifica la cuenta.
 
-**Broker de OAuth solo con sesion.** Obligaria a crear una cuenta de Ramal para conectar
+**Broker de OAuth solo con sesion.** Obligaria a crear una cuenta de Git Rudder para conectar
 Bitbucket, que es parte de trabajar con Git. Queda como respuesta si el broker publico se abusa.
 
 **Fusionar campo a campo los ajustes locales con los de la nube.** Mas fiel a lo que el usuario

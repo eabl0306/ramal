@@ -1,7 +1,7 @@
 //! Puerto para comprobar si una dependencia del servicio responde.
 
 use async_trait::async_trait;
-use ramal_api_domain::ComponentName;
+use git_rudder_api_domain::ComponentName;
 use thiserror::Error;
 
 /// Fallo de una sonda: la dependencia no respondio, o respondio mal.

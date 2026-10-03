@@ -39,7 +39,7 @@ function installer(
 
 /** El nombre que da `vsce package --target`: <nombre>-<destino>-<version>.vsix. */
 const VSIX_FILES: readonly DownloadEntry[] = VSIX_TARGETS.map((target) =>
-  file(`vsix-${target}`, `ramal-${target}-1.3.0.vsix`, null, null),
+  file(`vsix-${target}`, `git-rudder-${target}-1.3.0.vsix`, null, null),
 );
 
 const STATIC_RELEASE: ReleaseInfo = {
@@ -48,18 +48,18 @@ const STATIC_RELEASE: ReleaseInfo = {
   cards: [
     {
       target: 'mac',
-      primary: installer('apple-silicon-dmg', 'Ramal-2.4.0-arm64.dmg', 121, {
+      primary: installer('apple-silicon-dmg', 'Git-Rudder-2.4.0-arm64.dmg', 121, {
         os: 'mac',
         arch: 'arm64',
         format: 'dmg',
       }),
       alternates: [
-        installer('intel-dmg', 'Ramal-2.4.0-x64.dmg', 118, {
+        installer('intel-dmg', 'Git-Rudder-2.4.0-x64.dmg', 118, {
           os: 'mac',
           arch: 'x64',
           format: 'dmg',
         }),
-        installer('universal-dmg', 'Ramal-2.4.0-universal.dmg', 231, {
+        installer('universal-dmg', 'Git-Rudder-2.4.0-universal.dmg', 231, {
           os: 'mac',
           arch: 'universal',
           format: 'dmg',
@@ -69,18 +69,18 @@ const STATIC_RELEASE: ReleaseInfo = {
     },
     {
       target: 'windows',
-      primary: installer('windows-x64-exe', 'Ramal-Setup-2.4.0-x64.exe', 102, {
+      primary: installer('windows-x64-exe', 'Git-Rudder-Setup-2.4.0-x64.exe', 102, {
         os: 'windows',
         arch: 'x64',
         format: 'exe',
       }),
       alternates: [
-        installer('windows-arm64-exe', 'Ramal-Setup-2.4.0-arm64.exe', 104, {
+        installer('windows-arm64-exe', 'Git-Rudder-Setup-2.4.0-arm64.exe', 104, {
           os: 'windows',
           arch: 'arm64',
           format: 'exe',
         }),
-        installer('windows-x64-msi', 'Ramal-2.4.0-x64.msi', 109, {
+        installer('windows-x64-msi', 'Git-Rudder-2.4.0-x64.msi', 109, {
           os: 'windows',
           arch: 'x64',
           format: 'msi',
@@ -90,24 +90,24 @@ const STATIC_RELEASE: ReleaseInfo = {
     },
     {
       target: 'linux',
-      primary: installer('linux-deb', 'ramal_2.4.0_amd64.deb', 92, {
+      primary: installer('linux-deb', 'git_rudder_2.4.0_amd64.deb', 92, {
         os: 'linux',
         arch: 'x64',
         format: 'deb',
       }),
       alternates: [
-        installer('linux-rpm', 'ramal-2.4.0.x86_64.rpm', 97, {
+        installer('linux-rpm', 'git-rudder-2.4.0.x86_64.rpm', 97, {
           os: 'linux',
           arch: 'x64',
           format: 'rpm',
         }),
-        installer('linux-appimage', 'Ramal-2.4.0.AppImage', 112, {
+        installer('linux-appimage', 'Git-Rudder-2.4.0.AppImage', 112, {
           os: 'linux',
           arch: 'x64',
           format: 'appimage',
         }),
         { kind: 'store', store: 'flathub' },
-        installer('linux-arm64-deb', 'ramal_2.4.0_arm64.deb', 94, {
+        installer('linux-arm64-deb', 'git_rudder_2.4.0_arm64.deb', 94, {
           os: 'linux',
           arch: 'arm64',
           format: 'deb',

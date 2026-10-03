@@ -14,18 +14,19 @@ import { createFixtureRepo } from './scripts/fixture-repo.mjs';
 const root = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * El sidecar que se prueba: el de RAMAL_ENGINE_PATH o el que compilo cargo, con
+ * El sidecar que se prueba: el de GIT_RUDDER_ENGINE_PATH o el que compilo cargo, con
  * release primero porque es lo que construye `just vscode-engine-build`.
  */
 function engineBinary() {
-  const explicit = process.env['RAMAL_ENGINE_PATH'];
+  const explicit = process.env['GIT_RUDDER_ENGINE_PATH'];
   if (explicit !== undefined && explicit !== '') return explicit;
-  const name = process.platform === 'win32' ? 'ramal-vscode-engine.exe' : 'ramal-vscode-engine';
+  const name =
+    process.platform === 'win32' ? 'git-rudder-vscode-engine.exe' : 'git-rudder-vscode-engine';
   const found = ['release', 'debug']
     .map((profile) => path.join(root, '..', '..', 'target', profile, name))
     .find((candidate) => existsSync(candidate));
   if (found === undefined) {
-    throw new Error('no ramal-vscode-engine binary: run `just vscode-engine-build` first');
+    throw new Error('no git-rudder-vscode-engine binary: run `just vscode-engine-build` first');
   }
   return found;
 }
@@ -48,6 +49,6 @@ export default defineConfig({
     '--skip-welcome',
     '--skip-release-notes',
   ],
-  env: { RAMAL_ENGINE_PATH: engineBinary(), RAMAL_IT_GIT_PATH: profile.gitPath },
+  env: { GIT_RUDDER_ENGINE_PATH: engineBinary(), GIT_RUDDER_IT_GIT_PATH: profile.gitPath },
   mocha: { ui: 'tdd', timeout: 60_000 },
 });

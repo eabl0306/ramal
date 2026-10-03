@@ -13,24 +13,24 @@
     "commitAmend": "Commit (amend)"
   },
   "tab": {
-    "graph": "Grafo de Ramal",
-    "settings": "Configuración de Ramal"
+    "graph": "Grafo de Git Rudder",
+    "settings": "Configuración de Git Rudder"
   },
   "diff": {
     "workingTree": "{file} (Árbol de trabajo)",
     "index": "{file} (Índice)",
     "commit": "{file} ({sha})"
   },
-  "commandPlaceholder": "Escribe un comando de Ramal",
-  "sourceRamal": "Origen: Ramal",
+  "commandPlaceholder": "Escribe un comando de Git Rudder",
+  "sourceGitRudder": "Origen: Git Rudder",
   "settings": {
     "followsVsCode": "El tema y el idioma siguen la configuración de VS Code.",
     "sync": "Sincronizar configuración desde la nube",
-    "syncDescription": "Usa las cuentas vinculadas, llaves de IA y preferencias de tu cuenta de Ramal.",
+    "syncDescription": "Usa las cuentas vinculadas, llaves de IA y preferencias de tu cuenta de Git Rudder.",
     "openDashboard": "Abrir panel web",
-    "openDesktop": "Abrir en Ramal Desktop",
+    "openDesktop": "Abrir en Git Rudder Desktop",
     "section": {
-      "account": "Cuenta de Ramal",
+      "account": "Cuenta de Git Rudder",
       "platforms": "Plataformas Git",
       "ai": "IA",
       "git": "Git"
@@ -44,8 +44,8 @@
   "host": {
     "noFolder": "Abre una carpeta con un repositorio Git para ver su grafo.",
     "pickRepository": "Elige el repositorio que quieres abrir",
-    "engineStopped": "El motor de Ramal se ha detenido después de caerse varias veces.",
+    "engineStopped": "El motor de Git Rudder se ha detenido después de caerse varias veces.",
     "retry": "Reintentar",
-    "protocolMismatch": "Esta instalación de Ramal está dañada: el motor usa la versión {engine} del protocolo y la extensión espera la {expected}. Reinstala la extensión."
+    "protocolMismatch": "Esta instalación de Git Rudder está dañada: el motor usa la versión {engine} del protocolo y la extensión espera la {expected}. Reinstala la extensión."
   }
 }

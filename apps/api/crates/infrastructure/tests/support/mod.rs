@@ -1,7 +1,7 @@
 //! Acceso a un PostgreSQL de verdad para los tests de integracion.
 //!
-//! Sin `RAMAL_TEST_DATABASE_URL` los tests se saltan solos, para que `cargo test`
-//! pase en una maquina sin base de datos. Con `RAMAL_TEST_REQUIRE_DATABASE=1`
+//! Sin `GIT_RUDDER_TEST_DATABASE_URL` los tests se saltan solos, para que `cargo test`
+//! pase en una maquina sin base de datos. Con `GIT_RUDDER_TEST_REQUIRE_DATABASE=1`
 //! saltarse deja de estar permitido y la falta de la URL es un fallo: lo ponen
 //! `just api-test-db` y la CI, porque un test que se salta en silencio en la CI
 //! es un verde falso.
@@ -17,13 +17,13 @@
     reason = "tests fail loudly on purpose; a panic here is the assertion"
 )]
 
-use ramal_api_infrastructure::{DatabaseConfig, PgPool, connect_pool, run_migrations};
+use git_rudder_api_infrastructure::{DatabaseConfig, PgPool, connect_pool, run_migrations};
 
 /// Variable que habilita los tests contra PostgreSQL.
-pub const URL_VAR: &str = "RAMAL_TEST_DATABASE_URL";
+pub const URL_VAR: &str = "GIT_RUDDER_TEST_DATABASE_URL";
 
 /// Variable que convierte el salto en fallo.
-pub const REQUIRE_VAR: &str = "RAMAL_TEST_REQUIRE_DATABASE";
+pub const REQUIRE_VAR: &str = "GIT_RUDDER_TEST_REQUIRE_DATABASE";
 
 /// Indica si la base es obligatoria. La bandera es explicita a proposito: solo
 /// el comando que promete probar la base la enciende.

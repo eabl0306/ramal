@@ -55,7 +55,7 @@ describe('CSP de los webviews', () => {
 describe('documento del webview', () => {
   it('lleva la CSP, las hojas, el modulo con su nonce y el contenedor', () => {
     const html = renderWebviewPage({
-      title: 'Grafo de Ramal',
+      title: 'Grafo de Git Rudder',
       lang: 'es',
       csp: productionCsp(SOURCE, 'n0nce'),
       nonce: 'n0nce',

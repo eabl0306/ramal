@@ -2,7 +2,7 @@
 
 use std::time::Duration;
 
-use ramal_api_infrastructure::{PersistenceError, PgPool, run_migrations};
+use git_rudder_api_infrastructure::{PersistenceError, PgPool, run_migrations};
 
 /// Espera entre reintentos cuando las migraciones fallan.
 const RETRY_INTERVAL: Duration = Duration::from_secs(10);

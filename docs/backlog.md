@@ -1,9 +1,9 @@
 # Backlog
 
-Este documento es el backlog del producto: todo lo que hay que construir en Ramal Desktop,
-Ramal for VS Code, Ramal Web, la API y el motor compartido, agrupado en epicas, en el orden
-recomendado y con sus dependencias. Se carga tal cual en el GitHub Project "Ramal" del repo
-`eabl0306/ramal`: cada epica es un issue con la etiqueta `epic` y cada issue cuelga de una
+Este documento es el backlog del producto: todo lo que hay que construir en Git Rudder Desktop,
+Git Rudder for VS Code, Git Rudder Web, la API y el motor compartido, agrupado en epicas, en el orden
+recomendado y con sus dependencias. Se carga tal cual en el GitHub Project "Git Rudder" del repo
+`eabl0306/git-rudder`: cada epica es un issue con la etiqueta `epic` y cada issue cuelga de una
 epica.
 
 Sale de los documentos que ya existen y no los repite. El que, el porque y el como de cada
@@ -47,18 +47,18 @@ no tiene issue, es un fallo de este backlog y se corrige aqui.
 ## Que es el MVP
 
 El MVP es la primera version publica y usable: alguien puede dejar su cliente Git actual y usar
-Ramal a diario, en escritorio o en VS Code, con o sin cuenta, y un equipo puede pagar Ramal Pro
+Git Rudder a diario, en escritorio o en VS Code, con o sin cuenta, y un equipo puede pagar Git Rudder Pro
 para trabajar junto. En terminos de la API son las fases F0 a F5 de api-surface.md, mas todo el
 cliente local. Equipos y facturacion entran porque asi lo decidio Q-01 (E01-01) el 2026-10-01.
 
 **Hecho significa:**
 
-- Ramal Desktop se instala firmado en macOS, Windows y Linux con los formatos de X-09, se
+- Git Rudder Desktop se instala firmado en macOS, Windows y Linux con los formatos de X-09, se
   actualiza solo donde el formato lo permite, y la URL del actualizador apunta a la API
-  (`https://api.ramal.bahoque.com`, con `{{bundle_type}}`) desde el primer build publico.
-- Ramal for VS Code esta publicado en VS Code Marketplace y Open VSX, con una VSIX por plataforma
+  (`https://api.git-rudder.com`, con `{{bundle_type}}`) desde el primer build publico.
+- Git Rudder for VS Code esta publicado en VS Code Marketplace y Open VSX, con una VSIX por plataforma
   que lleva su motor.
-- Sin cuenta de Ramal funciona todo lo local: abrir, iniciar y clonar; grafo fluido en repos de
+- Sin cuenta de Git Rudder funciona todo lo local: abrir, iniciar y clonar; grafo fluido en repos de
   100 000 commits; staging por archivo, hunk y linea; commit y amend; ramas, tags, stash, reset,
   merge, cherry-pick, revert y rebase interactivo; conflictos de cualquier operacion; deshacer y
   rehacer; fetch, pull y push con varias cuentas por plataforma.
@@ -72,15 +72,15 @@ cliente local. Equipos y facturacion entran porque asi lo decidio Q-01 (E01-01) 
 - Con una organizacion: crearla, invitar al equipo, roles y asientos, workspaces compartidos y
   llaves de IA de la organizacion que nunca salen del servidor y se usan a traves del proxy de la
   API, con politica y cuotas (E27, E28 y E29).
-- Ramal Pro se cobra con Paddle como merchant of record (E30): un plan de organizacion por
+- Git Rudder Pro se cobra con Paddle como merchant of record (E30): un plan de organizacion por
   asiento, a 8 USD al mes en pago anual (96 USD anuales) o 10 USD en pago mensual, con 14 dias de
   prueba sin tarjeta y un asiento como minimo. Lo personal es gratis para siempre: todo Git local,
   pull requests, IA con llave propia y sincronizacion personal de extremo a extremo, repos privados
   incluidos.
 - La web tiene landing con descargas reales, toda la autenticacion, el panel personal, las
   pantallas de equipo, la pagina de precios con el checkout y las paginas legales y de error.
-- La API y la web estan desplegadas en `https://api.ramal.bahoque.com` y
-  `https://ramal.bahoque.com`, con copias de seguridad, observabilidad y alertas, y las suites E2E
+- La API y la web estan desplegadas en `https://api.git-rudder.com` y
+  `https://git-rudder.com`, con copias de seguridad, observabilidad y alertas, y las suites E2E
   de escritorio, VS Code y pila completa pasan en CI.
 - Todas las filas P0 y P1 de gaps.md tienen su issue cerrado y ningun bug B-xx del prototipo se ha
   copiado.
@@ -97,7 +97,7 @@ Cuatro carriles que avanzan en paralelo:
 1. **Transversal, desde el primer dia.** E00 (se cierra con el scaffold), E01 (decisiones y
    diseno: varias bloquean el release y la forma del producto) y E02 (los ADRs que faltan).
 2. **Cliente local:** E03, E04, E05, E06, E07, E08, E09, E10, E11, E12, E13, E14 y E15. Va
-   primero porque Ramal tiene que funcionar sin cuenta (decision 4) y porque es lo que el usuario
+   primero porque Git Rudder tiene que funcionar sin cuenta (decision 4) y porque es lo que el usuario
    usa a diario. La vista de repositorio (E07) se construye a la vez que el motor de lectura y
    escritura (E05 y E06), issue a issue.
 3. **Nube:** E16, E17, E18, E19, E20, E21, E22, E23 y E24. E17 (descargas y actualizaciones)
@@ -260,11 +260,11 @@ flowchart LR
 | Etiqueta              | Color    | Para que                                                      |
 | --------------------- | -------- | ------------------------------------------------------------- |
 | `epic`                | `3E4B9E` | Epica que agrupa issues del backlog                           |
-| `area:api`            | `1D76DB` | Ramal API (Salvo, PostgreSQL)                                 |
+| `area:api`            | `1D76DB` | Git Rudder API (Salvo, PostgreSQL)                            |
 | `area:engine`         | `5319E7` | Motor Git de Rust compartido (crates/*, sidecar)              |
-| `area:desktop`        | `0E8A16` | Ramal Desktop (Tauri y frontend)                              |
-| `area:vscode`         | `007ACC` | Ramal for VS Code (extension host y webviews)                 |
-| `area:web`            | `FBCA04` | Ramal Web (landing, autenticacion y panel)                    |
+| `area:desktop`        | `0E8A16` | Git Rudder Desktop (Tauri y frontend)                         |
+| `area:vscode`         | `007ACC` | Git Rudder for VS Code (extension host y webviews)            |
+| `area:web`            | `FBCA04` | Git Rudder Web (landing, autenticacion y panel)               |
 | `area:ui`             | `D876E3` | Paquetes de interfaz compartidos: ui, repo-view, i18n, domain |
 | `area:infra`          | `6E7781` | Monorepo, CI, despliegue y operacion                          |
 | `area:docs`           | `0075CA` | Documentacion y ADRs                                          |
@@ -292,14 +292,14 @@ Esqueleto de todas las piezas con un solo caso real de punta a punta: abrir un r
 | E00-04 | ci(ci): workflow unico con filtros por pieza y all-green          | infra, chore     | E00-02, E00-03         |
 | E00-05 | feat(api): esqueleto de la API con salud y OpenAPI                | api, feature     | E00-01                 |
 | E00-06 | feat(engine): primer corte del motor con el grafo                 | engine, feature  | E00-01                 |
-| E00-07 | feat(engine): sidecar ramal-vscode-engine por stdio               | engine, feature  | E00-06                 |
-| E00-08 | feat(engine): tipos del protocolo generados en @ramal/bridge      | engine, feature  | E00-06                 |
+| E00-07 | feat(engine): sidecar git-rudder-vscode-engine por stdio          | engine, feature  | E00-06                 |
+| E00-08 | feat(engine): tipos del protocolo generados en @git-rudder/bridge | engine, feature  | E00-06                 |
 | E00-09 | feat(desktop): abrir una carpeta y ver su grafo                   | desktop, feature | E00-08, E00-12         |
-| E00-10 | feat(vscode): comando "Ramal: Open Graph"                         | vscode, feature  | E00-07, E00-08, E00-12 |
+| E00-10 | feat(vscode): comando "Git Rudder: Open Graph"                    | vscode, feature  | E00-07, E00-08, E00-12 |
 | E00-11 | feat(web): landing, maqueta de login y registro, y ruta de estado | web, feature     | E00-05, E00-12         |
 | E00-12 | feat(ui): primer corte de los paquetes compartidos                | ui, feature      | E00-01                 |
 | E00-13 | chore(infra): pila Docker de desarrollo y smoke test              | infra, chore     | E00-05                 |
-| E00-14 | chore(api): cliente @ramal/api-client generado                    | api, chore       | E00-05                 |
+| E00-14 | chore(api): cliente @git-rudder/api-client generado               | api, chore       | E00-05                 |
 | E00-15 | docs(docs): README, CLAUDE.md y documentos base                   | docs, chore      | -                      |
 
 ### E01 Decisiones abiertas y huecos de diseno
@@ -308,31 +308,31 @@ Hito: MVP. Area principal: `area:design`. Depende de: nada.
 
 Cierra lo que bloquea diseno o backlog y encarga al diseno los cambios que obligan las decisiones de arquitectura. Conviene resolverlo en paralelo desde el primer dia.
 
-| Clave  | Issue                                                                   | Etiquetas              | Depende de |
-| ------ | ----------------------------------------------------------------------- | ---------------------- | ---------- |
-| E01-01 | docs(docs): decidir si equipos entran en la primera version             | design, decision       | -          |
-| E01-02 | docs(api): decidir el proveedor de pagos                                | api, decision          | -          |
-| E01-03 | docs(docs): decidir que es gratis, que es Ramal Pro y el precio         | design, decision       | -          |
-| E01-04 | docs(release): ratificar las plataformas de ADR 0016 y ADR 0010         | release, decision      | -          |
-| E01-05 | docs(api): decidir si las sesiones muestran la ciudad                   | api, decision          | -          |
-| E01-06 | docs(engine): decidir los modelos de IA recomendados                    | engine, decision       | -          |
-| E01-07 | docs(release): ratificar que Windows Portable se quita (ADR 0016)       | release, decision      | -          |
-| E01-08 | docs(release): ratificar el repo publico de publicaciones (ADR 0016)    | release, decision      | -          |
-| E01-09 | docs(engine): ratificar el cierre de sesion de ADR 0012                 | engine, decision       | -          |
-| E01-10 | docs(vscode): decidir que manda entre Settings Sync y la nube de Ramal  | vscode, decision       | -          |
-| E01-11 | docs(engine): ratificar MinGit como respaldo en Windows (ADR 0009)      | engine, decision       | -          |
-| E01-12 | docs(infra): decidir donde se despliegan la API y la web                | infra, decision        | -          |
-| E01-13 | docs(api): decidir el proveedor de correo transaccional                 | api, decision          | -          |
-| E01-14 | docs(ui): disenar los estados comunes                                   | design, feature        | -          |
-| E01-15 | docs(ui): disenar las pantallas de la boveda                            | design, feature        | -          |
-| E01-16 | docs(desktop): disenar la entrada y el ciclo de vida del repo           | design, feature        | -          |
-| E01-17 | docs(desktop): disenar credenciales y operaciones de Git                | design, feature        | -          |
-| E01-18 | docs(desktop): disenar las vistas que los menus prometen y el diff real | design, feature        | -          |
-| E01-19 | docs(desktop): disenar ventana, ajustes que faltan y equipo             | design, feature        | -          |
-| E01-20 | docs(vscode): especificar las contribuciones nativas de VS Code         | design, feature        | -          |
-| E01-21 | docs(web): disenar las vistas de autenticacion que faltan               | design, feature        | -          |
-| E01-22 | docs(web): disenar el panel, el sitio publico y el equipo               | design, feature        | -          |
-| E01-23 | docs(ui): revisar el diseno contra los bugs del prototipo               | design, bug-prevention | -          |
+| Clave  | Issue                                                                       | Etiquetas              | Depende de |
+| ------ | --------------------------------------------------------------------------- | ---------------------- | ---------- |
+| E01-01 | docs(docs): decidir si equipos entran en la primera version                 | design, decision       | -          |
+| E01-02 | docs(api): decidir el proveedor de pagos                                    | api, decision          | -          |
+| E01-03 | docs(docs): decidir que es gratis, que es Git Rudder Pro y el precio        | design, decision       | -          |
+| E01-04 | docs(release): ratificar las plataformas de ADR 0016 y ADR 0010             | release, decision      | -          |
+| E01-05 | docs(api): decidir si las sesiones muestran la ciudad                       | api, decision          | -          |
+| E01-06 | docs(engine): decidir los modelos de IA recomendados                        | engine, decision       | -          |
+| E01-07 | docs(release): ratificar que Windows Portable se quita (ADR 0016)           | release, decision      | -          |
+| E01-08 | docs(release): ratificar el repo publico de publicaciones (ADR 0016)        | release, decision      | -          |
+| E01-09 | docs(engine): ratificar el cierre de sesion de ADR 0012                     | engine, decision       | -          |
+| E01-10 | docs(vscode): decidir que manda entre Settings Sync y la nube de Git Rudder | vscode, decision       | -          |
+| E01-11 | docs(engine): ratificar MinGit como respaldo en Windows (ADR 0009)          | engine, decision       | -          |
+| E01-12 | docs(infra): decidir donde se despliegan la API y la web                    | infra, decision        | -          |
+| E01-13 | docs(api): decidir el proveedor de correo transaccional                     | api, decision          | -          |
+| E01-14 | docs(ui): disenar los estados comunes                                       | design, feature        | -          |
+| E01-15 | docs(ui): disenar las pantallas de la boveda                                | design, feature        | -          |
+| E01-16 | docs(desktop): disenar la entrada y el ciclo de vida del repo               | design, feature        | -          |
+| E01-17 | docs(desktop): disenar credenciales y operaciones de Git                    | design, feature        | -          |
+| E01-18 | docs(desktop): disenar las vistas que los menus prometen y el diff real     | design, feature        | -          |
+| E01-19 | docs(desktop): disenar ventana, ajustes que faltan y equipo                 | design, feature        | -          |
+| E01-20 | docs(vscode): especificar las contribuciones nativas de VS Code             | design, feature        | -          |
+| E01-21 | docs(web): disenar las vistas de autenticacion que faltan                   | design, feature        | -          |
+| E01-22 | docs(web): disenar el panel, el sitio publico y el equipo                   | design, feature        | -          |
+| E01-23 | docs(ui): revisar el diseno contra los bugs del prototipo                   | design, bug-prevention | -          |
 
 ### E02 ADRs pendientes
 
@@ -378,11 +378,11 @@ Textos ES/EN y logica pura de interfaz que comparten escritorio, VS Code y web, 
 
 Hito: MVP. Area principal: `area:ui`. Depende de: E00.
 
-Tokens, temas, densidades y componentes base de @ramal/ui, mas los estados comunes que el prototipo no tiene. Se hacen una vez y sirven a los tres productos.
+Tokens, temas, densidades y componentes base de @git-rudder/ui, mas los estados comunes que el prototipo no tiene. Se hacen una vez y sirven a los tres productos.
 
 | Clave  | Issue                                                             | Etiquetas   | Depende de     |
 | ------ | ----------------------------------------------------------------- | ----------- | -------------- |
-| E04-01 | feat(ui): temas Ramal claro, oscuro y del sistema                 | ui, feature | E00-12         |
+| E04-01 | feat(ui): temas Git Rudder claro, oscuro y del sistema            | ui, feature | E00-12         |
 | E04-02 | feat(ui): tema de VS Code mapeado a --vscode-*                    | ui, feature | E04-01         |
 | E04-03 | feat(ui): densidades de escritorio y de VS Code                   | ui, feature | E04-01         |
 | E04-04 | feat(ui): proveedor de iconos Lucide y Codicons                   | ui, feature | E04-01         |
@@ -469,7 +469,7 @@ Todas las operaciones que cambian el repositorio. Siempre con el git CLI, para r
 
 Hito: MVP. Area principal: `area:ui`. Depende de: E00, E03, E04, E05, E06, E09.
 
-La vista de repositorio de @ramal/repo-view que usan escritorio y VS Code: grafo, WIP, detalle, diff, resolvedor de conflictos y rebase. Solo habla con el motor por @ramal/bridge.
+La vista de repositorio de @git-rudder/repo-view que usan escritorio y VS Code: grafo, WIP, detalle, diff, resolvedor de conflictos y rebase. Solo habla con el motor por @git-rudder/bridge.
 
 | Clave  | Issue                                                           | Etiquetas          | Depende de                     |
 | ------ | --------------------------------------------------------------- | ------------------ | ------------------------------ |
@@ -502,7 +502,7 @@ La vista de repositorio de @ramal/repo-view que usan escritorio y VS Code: grafo
 
 Hito: MVP. Area principal: `area:desktop`. Depende de: E00, E03, E05, E06, E07, E09, E11, E21.
 
-La ventana de Ramal Desktop: pestanas, inicio con la lista de repos y paginas de workspace. Todo lo local funciona sin cuenta; la nube solo anade sincronizacion.
+La ventana de Git Rudder Desktop: pestanas, inicio con la lista de repos y paginas de workspace. Todo lo local funciona sin cuenta; la nube solo anade sincronizacion.
 
 | Clave  | Issue                                                       | Etiquetas        | Depende de                             |
 | ------ | ----------------------------------------------------------- | ---------------- | -------------------------------------- |
@@ -557,9 +557,9 @@ Donde guarda cada dispositivo sus secretos (llavero del sistema o SecretStorage)
 
 | Clave  | Issue                                                           | Etiquetas       | Depende de             |
 | ------ | --------------------------------------------------------------- | --------------- | ---------------------- |
-| E10-01 | feat(engine): crate ramal-keychain sobre keyring-core           | engine, feature | -                      |
+| E10-01 | feat(engine): crate git-rudder-keychain sobre keyring-core      | engine, feature | -                      |
 | E10-02 | feat(engine): SecretStore de VS Code por peticion inversa       | engine, feature | E00-07                 |
-| E10-03 | feat(engine): crate ramal-vault                                 | engine, feature | -                      |
+| E10-03 | feat(engine): crate git-rudder-vault                            | engine, feature | -                      |
 | E10-04 | feat(engine): crear la boveda y el codigo de recuperacion       | engine, feature | E10-01, E10-03, E20-01 |
 | E10-05 | feat(engine): desbloquear en un dispositivo nuevo               | engine, feature | E10-04                 |
 | E10-06 | feat(engine): cambiar frase, regenerar codigo y rotar la llave  | engine, feature | E10-05, E20-02         |
@@ -576,7 +576,7 @@ Conectar cuentas de GitHub, GitLab, Bitbucket, Gitea y Azure DevOps, y leer o cr
 
 | Clave  | Issue                                                            | Etiquetas       | Depende de     |
 | ------ | ---------------------------------------------------------------- | --------------- | -------------- |
-| E11-01 | feat(engine): crate ramal-platforms                              | engine, feature | -              |
+| E11-01 | feat(engine): crate git-rudder-platforms                         | engine, feature | -              |
 | E11-02 | feat(engine): conectar GitHub                                    | engine, feature | E11-01, E10-01 |
 | E11-03 | feat(engine): conectar GitLab                                    | engine, feature | E11-01, E10-01 |
 | E11-04 | feat(engine): conectar Bitbucket                                 | engine, feature | E11-01, E20-08 |
@@ -601,11 +601,11 @@ Conectar cuentas de GitHub, GitLab, Bitbucket, Gitea y Azure DevOps, y leer o cr
 
 Hito: MVP. Area principal: `area:engine`. Depende de: E00, E01, E05, E10.
 
-Generar mensajes de commit, textos de PR y resumenes con la llave del usuario, llamando al proveedor desde el dispositivo. Es la unica forma de que funcione Ollama y de que el codigo no pase por Ramal.
+Generar mensajes de commit, textos de PR y resumenes con la llave del usuario, llamando al proveedor desde el dispositivo. Es la unica forma de que funcione Ollama y de que el codigo no pase por Git Rudder.
 
 | Clave  | Issue                                                           | Etiquetas       | Depende de             |
 | ------ | --------------------------------------------------------------- | --------------- | ---------------------- |
-| E12-01 | feat(engine): crate ramal-ai con los proveedores                | engine, feature | -                      |
+| E12-01 | feat(engine): crate git-rudder-ai con los proveedores           | engine, feature | -                      |
 | E12-02 | feat(engine): llaves personales en el llavero                   | engine, feature | E12-01, E10-01         |
 | E12-03 | feat(engine): modelos desde la lista del proveedor              | engine, feature | E12-01, E01-06, E12-14 |
 | E12-04 | feat(engine): URL base de proveedores                           | engine, feature | E12-01                 |
@@ -657,11 +657,11 @@ Todo lo que rodea a la vista de repo en escritorio: primer arranque, git ausente
 
 Hito: MVP. Area principal: `area:vscode`. Depende de: E00, E05, E06, E07, E08, E09, E11, E12.
 
-La extension de VS Code: contenedor RAMAL, arboles nativos, vista Cambios, grafo, editor de merge, diff nativo, ajustes, barra de estado y paleta. Lo nativo se hace nativo y en React solo queda lo que VS Code no puede dibujar.
+La extension de VS Code: contenedor GIT_RUDDER, arboles nativos, vista Cambios, grafo, editor de merge, diff nativo, ajustes, barra de estado y paleta. Lo nativo se hace nativo y en React solo queda lo que VS Code no puede dibujar.
 
 | Clave  | Issue                                                                | Etiquetas       | Depende de     |
 | ------ | -------------------------------------------------------------------- | --------------- | -------------- |
-| E14-01 | feat(vscode): contenedor RAMAL y vistas de bienvenida                | vscode, feature | E00-10         |
+| E14-01 | feat(vscode): contenedor GIT_RUDDER y vistas de bienvenida           | vscode, feature | E00-10         |
 | E14-02 | feat(vscode): arboles nativos de ramas, remotos, PRs, stashes y tags | vscode, feature | E05-08, E05-09 |
 | E14-03 | feat(vscode): vista Cambios en webview                               | vscode, feature | E07-10         |
 | E14-04 | feat(vscode): panel del grafo                                        | vscode, feature | E07-03, E07-11 |
@@ -680,7 +680,7 @@ La extension de VS Code: contenedor RAMAL, arboles nativos, vista Cambios, grafo
 | E14-17 | feat(vscode): repo vacio y HEAD separado                             | vscode, feature | E05-16         |
 | E14-18 | feat(vscode): PRs sin cuenta y errores de plataforma e IA            | vscode, feature | E11-01, E12-11 |
 | E14-19 | feat(vscode): recorrido de bienvenida                                | vscode, feature | E14-01         |
-| E14-20 | feat(vscode): abrir en Ramal Desktop                                 | vscode, feature | E08-17         |
+| E14-20 | feat(vscode): abrir en Git Rudder Desktop                            | vscode, feature | E08-17         |
 | E14-21 | feat(vscode): crear pull request en webview                          | vscode, feature | E11-18         |
 
 ### E15 VS Code: motor, sesion y distribucion
@@ -693,7 +693,7 @@ Lo que hace que la extension funcione en cualquier entorno: supervision del side
 | ------ | ----------------------------------------------------------------- | --------------- | ---------------------- |
 | E15-01 | feat(vscode): motor no disponible                                 | vscode, feature | E00-10                 |
 | E15-02 | feat(vscode): secretos del motor en SecretStorage                 | vscode, feature | E10-02                 |
-| E15-03 | feat(vscode): proveedor de autenticacion de Ramal                 | vscode, feature | E21-02, E23-07         |
+| E15-03 | feat(vscode): proveedor de autenticacion de Git Rudder            | vscode, feature | E21-02, E23-07         |
 | E15-04 | feat(vscode): estado sin sesion                                   | vscode, feature | E15-03                 |
 | E15-05 | feat(vscode): integracion con vscode.git                          | vscode, feature | -                      |
 | E15-06 | feat(vscode): convivencia con el Git integrado y GitLens          | vscode, feature | E15-05                 |
@@ -708,7 +708,7 @@ Lo que hace que la extension funcione en cualquier entorno: supervision del side
 
 Hito: MVP. Area principal: `area:api`. Depende de: E00, E01.
 
-Cuentas de Ramal, inicio de sesion en la web y en las apps nativas, sesiones y perfil. La API es el servidor de autorizacion.
+Cuentas de Git Rudder, inicio de sesion en la web y en las apps nativas, sesiones y perfil. La API es el servidor de autorizacion.
 
 | Clave  | Issue                                                             | Etiquetas    | Depende de     |
 | ------ | ----------------------------------------------------------------- | ------------ | -------------- |
@@ -814,7 +814,7 @@ En escritorio y VS Code solo el motor de Rust habla con la API; ningun webview l
 
 | Clave  | Issue                                                     | Etiquetas       | Depende de                     |
 | ------ | --------------------------------------------------------- | --------------- | ------------------------------ |
-| E21-01 | feat(engine): crate ramal-cloud-client                    | engine, feature | E00-06                         |
+| E21-01 | feat(engine): crate git-rudder-cloud-client               | engine, feature | E00-06                         |
 | E21-02 | feat(engine): iniciar sesion desde el motor               | engine, feature | E21-01, E16-11, E16-12, E10-01 |
 | E21-03 | feat(engine): refresco y sesion perdida                   | engine, feature | E21-02                         |
 | E21-04 | feat(engine): perfil y dispositivo                        | engine, feature | E21-02, E18-02                 |
@@ -831,7 +831,7 @@ En escritorio y VS Code solo el motor de Rust habla con la API; ningun webview l
 
 Hito: MVP. Area principal: `area:web`. Depende de: E00, E01, E03, E04, E07, E17.
 
-La parte publica de Ramal Web: landing, descargas con deteccion de sistema, paginas legales y de error. Se prerenderiza y lee las descargas de la API.
+La parte publica de Git Rudder Web: landing, descargas con deteccion de sistema, paginas legales y de error. Se prerenderiza y lee las descargas de la API.
 
 | Clave  | Issue                                                   | Etiquetas    | Depende de             |
 | ------ | ------------------------------------------------------- | ------------ | ---------------------- |
@@ -862,7 +862,7 @@ Registro, inicio de sesion y todas las paginas de cuenta que faltan en el diseno
 | E23-04 | feat(web): olvide mi contrasena                      | web, feature | E23-01, E16-06 |
 | E23-05 | feat(web): restablecer contrasena                    | web, feature | E23-04         |
 | E23-06 | feat(web): verificacion de correo                    | web, feature | E23-03, E16-07 |
-| E23-07 | feat(web): autorizar Ramal Desktop o VS Code         | web, feature | E23-01, E16-11 |
+| E23-07 | feat(web): autorizar Git Rudder Desktop o VS Code    | web, feature | E23-01, E16-11 |
 | E23-08 | feat(web): codigo de dispositivo                     | web, feature | E23-01, E16-12 |
 | E23-09 | feat(web): estados de OAuth                          | web, feature | E23-01, E16-09 |
 | E23-10 | feat(web): reautenticar antes de acciones sensibles  | web, feature | E23-01, E16-05 |
@@ -873,7 +873,7 @@ Registro, inicio de sesion y todas las paginas de cuenta que faltan en el diseno
 
 Hito: MVP. Area principal: `area:web`. Depende de: E00, E16, E18, E19, E20, E23.
 
-El panel de Ramal Web para lo personal: resumen, dispositivos, workspaces, repos y cuentas vinculadas de solo lectura. Tambien la configuracion en la nube, el estado de la boveda, exportar y borrar la cuenta.
+El panel de Git Rudder Web para lo personal: resumen, dispositivos, workspaces, repos y cuentas vinculadas de solo lectura. Tambien la configuracion en la nube, el estado de la boveda, exportar y borrar la cuenta.
 
 | Clave  | Issue                                               | Etiquetas    | Depende de                     |
 | ------ | --------------------------------------------------- | ------------ | ------------------------------ |
@@ -898,28 +898,28 @@ Hito: MVP. Area principal: `area:release`. Depende de: E00, E01, E13, E15, E17.
 
 Firmar, publicar y distribuir escritorio y la extension por todos los canales. El actualizador apunta a la API desde el primer build publico.
 
-| Clave  | Issue                                                          | Etiquetas      | Depende de                             |
-| ------ | -------------------------------------------------------------- | -------------- | -------------------------------------- |
-| E25-01 | chore(release): reservar nombres y cuentas                     | release, chore | -                                      |
-| E25-02 | chore(release): llave de firma del actualizador                | release, chore | -                                      |
-| E25-03 | chore(release): firma y notarizacion en macOS                  | release, chore | -                                      |
-| E25-04 | chore(release): firma en Windows                               | release, chore | -                                      |
-| E25-05 | ci(release): workflow de release de escritorio                 | release, chore | E25-02, E25-03, E25-04, E01-04, E13-15 |
-| E25-06 | ci(release): publicar en GitHub Releases y registrar en la API | release, chore | E25-05, E01-08, E17-02, E25-16         |
-| E25-07 | ci(release): actualizador con respaldo estatico                | release, chore | E25-06, E17-07                         |
-| E25-08 | ci(release): VSIX por plataforma en Marketplace y Open VSX     | release, chore | E25-01, E15-11                         |
-| E25-09 | ci(release): winget                                            | release, chore | E25-06                                 |
-| E25-10 | ci(release): Homebrew                                          | release, chore | E25-06                                 |
-| E25-11 | ci(release): Flathub                                           | release, chore | E25-06                                 |
-| E25-12 | ci(release): paquetes deb, rpm y AppImage                      | release, chore | E25-06                                 |
-| E25-13 | ci(release): imagenes Docker de la API y la web                | release, chore | -                                      |
-| E25-14 | chore(release): versiones y notas por producto                 | release, chore | -                                      |
-| E25-15 | test(release): instalar y actualizar en cada plataforma        | release, test  | E25-07, E25-08                         |
-| E25-16 | chore(release): hacer publico eabl0306/ramal al abrir la beta  | release, chore | E01-08                                 |
+| Clave  | Issue                                                              | Etiquetas      | Depende de                             |
+| ------ | ------------------------------------------------------------------ | -------------- | -------------------------------------- |
+| E25-01 | chore(release): reservar nombres y cuentas                         | release, chore | -                                      |
+| E25-02 | chore(release): llave de firma del actualizador                    | release, chore | -                                      |
+| E25-03 | chore(release): firma y notarizacion en macOS                      | release, chore | -                                      |
+| E25-04 | chore(release): firma en Windows                                   | release, chore | -                                      |
+| E25-05 | ci(release): workflow de release de escritorio                     | release, chore | E25-02, E25-03, E25-04, E01-04, E13-15 |
+| E25-06 | ci(release): publicar en GitHub Releases y registrar en la API     | release, chore | E25-05, E01-08, E17-02, E25-16         |
+| E25-07 | ci(release): actualizador con respaldo estatico                    | release, chore | E25-06, E17-07                         |
+| E25-08 | ci(release): VSIX por plataforma en Marketplace y Open VSX         | release, chore | E25-01, E15-11                         |
+| E25-09 | ci(release): winget                                                | release, chore | E25-06                                 |
+| E25-10 | ci(release): Homebrew                                              | release, chore | E25-06                                 |
+| E25-11 | ci(release): Flathub                                               | release, chore | E25-06                                 |
+| E25-12 | ci(release): paquetes deb, rpm y AppImage                          | release, chore | E25-06                                 |
+| E25-13 | ci(release): imagenes Docker de la API y la web                    | release, chore | -                                      |
+| E25-14 | chore(release): versiones y notas por producto                     | release, chore | -                                      |
+| E25-15 | test(release): instalar y actualizar en cada plataforma            | release, test  | E25-07, E25-08                         |
+| E25-16 | chore(release): hacer publico eabl0306/git-rudder al abrir la beta | release, chore | E01-08                                 |
 
 E25-16 sale de la decision Q-08 (E01-08): el repo del producto se queda en la cuenta personal
 `eabl0306`, privado hasta abrir la beta y publico desde entonces. No hay organizacion ni repo
-`ramal-releases`: los releases se publican en el propio `eabl0306/ramal` (E25-06), y como un
+`git-rudder-releases`: los releases se publican en el propio `eabl0306/git-rudder` (E25-06), y como un
 release de un repo privado no se puede descargar, la primera build publica espera a E25-16. El
 actualizador consulta primero la API y usa como respaldo el `latest.json` de esos releases
 (E17-07 y E25-07).
@@ -930,31 +930,31 @@ Hito: MVP. Area principal: `area:infra`. Depende de: E00, E01, E05, E08, E14, E1
 
 La capa fina de E2E real y el despliegue de la API. Mas lo necesario para operarla: observabilidad, alertas, copias y custodia de llaves.
 
-| Clave  | Issue                                                                     | Etiquetas      | Depende de             |
-| ------ | ------------------------------------------------------------------------- | -------------- | ---------------------- |
-| E26-01 | test(desktop): E2E real con WebdriverIO                                   | desktop, test  | E08-07                 |
-| E26-02 | test(vscode): E2E de webviews con acquireVsCodeApi falso                  | vscode, test   | E14-03                 |
-| E26-03 | test(vscode): integracion con @vscode/test-cli bajo xvfb                  | vscode, test   | E15-01                 |
-| E26-04 | test(web): Playwright con red simulada                                    | web, test      | E23-01                 |
-| E26-05 | test(infra): Playwright contra la pila completa                           | infra, test    | E24-01, E00-13         |
-| E26-06 | test(engine): snapshots de contrato del protocolo                         | engine, test   | E05-22                 |
-| E26-07 | chore(infra): despliegue de la API y la web                               | infra, chore   | E01-12, E25-13, E26-17 |
-| E26-08 | feat(infra): observabilidad                                               | infra, feature | E26-07                 |
-| E26-09 | feat(infra): alertas en produccion                                        | infra, feature | E26-08                 |
-| E26-10 | chore(infra): copias de seguridad de PostgreSQL                           | infra, chore   | E26-07                 |
-| E26-11 | chore(infra): custodia de llaves                                          | infra, chore   | E25-02                 |
-| E26-12 | chore(infra): secretos de CI y produccion                                 | infra, chore   | -                      |
-| E26-13 | test(infra): revision de seguridad                                        | infra, test    | -                      |
-| E26-14 | test(engine): rendimiento con repos grandes                               | engine, test   | E05-02                 |
-| E26-15 | chore(infra): dependencias al dia                                         | infra, chore   | -                      |
-| E26-16 | fix(api): migraciones que aguantan volver a una version anterior          | api, chore     | -                      |
-| E26-17 | chore(infra): DNS de ramal.bahoque.com, rutas en Caddy y correo en Resend | infra, chore   | E01-12, E01-13         |
+| Clave  | Issue                                                                  | Etiquetas      | Depende de             |
+| ------ | ---------------------------------------------------------------------- | -------------- | ---------------------- |
+| E26-01 | test(desktop): E2E real con WebdriverIO                                | desktop, test  | E08-07                 |
+| E26-02 | test(vscode): E2E de webviews con acquireVsCodeApi falso               | vscode, test   | E14-03                 |
+| E26-03 | test(vscode): integracion con @vscode/test-cli bajo xvfb               | vscode, test   | E15-01                 |
+| E26-04 | test(web): Playwright con red simulada                                 | web, test      | E23-01                 |
+| E26-05 | test(infra): Playwright contra la pila completa                        | infra, test    | E24-01, E00-13         |
+| E26-06 | test(engine): snapshots de contrato del protocolo                      | engine, test   | E05-22                 |
+| E26-07 | chore(infra): despliegue de la API y la web                            | infra, chore   | E01-12, E25-13, E26-17 |
+| E26-08 | feat(infra): observabilidad                                            | infra, feature | E26-07                 |
+| E26-09 | feat(infra): alertas en produccion                                     | infra, feature | E26-08                 |
+| E26-10 | chore(infra): copias de seguridad de PostgreSQL                        | infra, chore   | E26-07                 |
+| E26-11 | chore(infra): custodia de llaves                                       | infra, chore   | E25-02                 |
+| E26-12 | chore(infra): secretos de CI y produccion                              | infra, chore   | -                      |
+| E26-13 | test(infra): revision de seguridad                                     | infra, test    | -                      |
+| E26-14 | test(engine): rendimiento con repos grandes                            | engine, test   | E05-02                 |
+| E26-15 | chore(infra): dependencias al dia                                      | infra, chore   | -                      |
+| E26-16 | fix(api): migraciones que aguantan volver a una version anterior       | api, chore     | -                      |
+| E26-17 | chore(infra): DNS de git-rudder.com, rutas en Caddy y correo en Resend | infra, chore   | E01-12, E01-13         |
 
 E26-16 y E26-17 salen de las decisiones de despliegue y correo (E01-12 y E01-13). La API y la web
 van en la instancia de Lightsail que ya existe (`apps-01`), con el mismo patron que Gastonomo, y
 volver atras un despliegue no puede dejar a la API quejandose de migraciones que no conoce
-(E26-16). E26-17 da de alta `ramal.bahoque.com` y `api.ramal.bahoque.com` en el DNS y en el
-Caddy compartido, y el dominio de envio en un equipo de Resend propio de Ramal, con SPF, DKIM y
+(E26-16). E26-17 da de alta `git-rudder.com` y `api.git-rudder.com` en el DNS y en el
+Caddy compartido, y el dominio de envio en un equipo de Resend propio de Git Rudder, con SPF, DKIM y
 DMARC por fases.
 
 ### E27 API: organizaciones, equipo e invitaciones
@@ -982,7 +982,7 @@ Organizaciones con miembros, roles, invitaciones y asientos, y workspaces compar
 
 Hito: MVP. Area principal: `area:api`. Depende de: E00, E12, E21, E27.
 
-Llaves de IA de la organizacion que nunca salen del servidor, politica de uso y proxy de generacion (fase F4). Es la unica via por la que el codigo del usuario pasa por Ramal. Entra en el MVP por la decision Q-01 (E01-01).
+Llaves de IA de la organizacion que nunca salen del servidor, politica de uso y proxy de generacion (fase F4). Es la unica via por la que el codigo del usuario pasa por Git Rudder. Entra en el MVP por la decision Q-01 (E01-01).
 
 | Clave  | Issue                                           | Etiquetas       | Depende de             |
 | ------ | ----------------------------------------------- | --------------- | ---------------------- |
@@ -1023,20 +1023,20 @@ Las pantallas de equipo en web, escritorio y VS Code. Y las llaves de organizaci
 
 Hito: MVP. Area principal: `area:api`. Depende de: E00, E01, E27.
 
-Planes, suscripcion y asientos con Paddle como merchant of record (fase F5), detras de un puerto `BillingProvider` para que otro proveedor sea solo otro adaptador (plan B: Polar). Paddle se ocupa del IVA y de los impuestos de ventas en todo el mundo. El webhook llega a `/v1/billing/webhooks/paddle`; el checkout es una pagina de la web con Paddle.js, y la CSP abre los dominios de Paddle solo en esa pagina; los E2E usan el sandbox de Paddle; los identificadores de Paddle se guardan en la organizacion. Ramal Pro es un plan de organizacion por asiento: 8 USD al mes en pago anual o 10 USD en pago mensual, 14 dias de prueba sin tarjeta y un asiento como minimo. Entra en el MVP por la decision Q-01 (E01-01), y con ella las filas W-17 y W-18 de gaps.md; Q-02 y Q-03 ya estan decididas.
+Planes, suscripcion y asientos con Paddle como merchant of record (fase F5), detras de un puerto `BillingProvider` para que otro proveedor sea solo otro adaptador (plan B: Polar). Paddle se ocupa del IVA y de los impuestos de ventas en todo el mundo. El webhook llega a `/v1/billing/webhooks/paddle`; el checkout es una pagina de la web con Paddle.js, y la CSP abre los dominios de Paddle solo en esa pagina; los E2E usan el sandbox de Paddle; los identificadores de Paddle se guardan en la organizacion. Git Rudder Pro es un plan de organizacion por asiento: 8 USD al mes en pago anual o 10 USD en pago mensual, 14 dias de prueba sin tarjeta y un asiento como minimo. Entra en el MVP por la decision Q-01 (E01-01), y con ella las filas W-17 y W-18 de gaps.md; Q-02 y Q-03 ya estan decididas.
 
-| Clave  | Issue                                                                    | Etiquetas        | Depende de     |
-| ------ | ------------------------------------------------------------------------ | ---------------- | -------------- |
-| E30-01 | docs(api): reglas de la facturacion                                      | api, decision    | E01-02, E01-03 |
-| E30-02 | feat(api): suscripcion de la organizacion                                | api, feature     | E30-01, E27-01 |
-| E30-03 | feat(api): checkout, asientos y portal                                   | api, feature     | E30-02         |
-| E30-04 | feat(api): webhooks del proveedor                                        | api, feature     | E30-02         |
-| E30-05 | feat(api): limites del plan                                              | api, feature     | E30-02         |
-| E30-06 | feat(web): pagina de precios                                             | web, feature     | E30-01         |
-| E30-07 | feat(web): gestion de la suscripcion                                     | web, feature     | E30-03         |
-| E30-08 | feat(desktop): plan en escritorio y VS Code                              | desktop, feature | E30-02         |
-| E30-09 | docs(web): condiciones de pago en los terminos                           | web, chore       | E30-01         |
-| E30-10 | docs(docs): decidir el pais de facturacion y los descuentos de Ramal Pro | design, decision | E01-02, E01-03 |
+| Clave  | Issue                                                                         | Etiquetas        | Depende de     |
+| ------ | ----------------------------------------------------------------------------- | ---------------- | -------------- |
+| E30-01 | docs(api): reglas de la facturacion                                           | api, decision    | E01-02, E01-03 |
+| E30-02 | feat(api): suscripcion de la organizacion                                     | api, feature     | E30-01, E27-01 |
+| E30-03 | feat(api): checkout, asientos y portal                                        | api, feature     | E30-02         |
+| E30-04 | feat(api): webhooks del proveedor                                             | api, feature     | E30-02         |
+| E30-05 | feat(api): limites del plan                                                   | api, feature     | E30-02         |
+| E30-06 | feat(web): pagina de precios                                                  | web, feature     | E30-01         |
+| E30-07 | feat(web): gestion de la suscripcion                                          | web, feature     | E30-03         |
+| E30-08 | feat(desktop): plan en escritorio y VS Code                                   | desktop, feature | E30-02         |
+| E30-09 | docs(web): condiciones de pago en los terminos                                | web, chore       | E30-01         |
+| E30-10 | docs(docs): decidir el pais de facturacion y los descuentos de Git Rudder Pro | design, decision | E01-02, E01-03 |
 
 ### E31 Despues del MVP: motor y apps
 
@@ -1094,13 +1094,13 @@ se cambia, se mueven los issues afectados.
    2026-10-01 Q-01 (E01-01) decidio lo que suponia gaps.md: todo sale en la primera version
    publica. E27, E28, E29 y E30 pasaron enteras al hito MVP, juntas porque las llaves de
    organizacion no tienen sentido sin equipos y los equipos son lo que se cobra. Lo personal es
-   gratis para siempre y Ramal Pro es un plan de organizacion por asiento (Q-03, E01-03), cobrado
+   gratis para siempre y Git Rudder Pro es un plan de organizacion por asiento (Q-03, E01-03), cobrado
    con Paddle (Q-02, E01-02).
 2. **El estado y el reinicio de la boveda en la web entran en el MVP** (E24-10). gaps.md ya los
    pone en P1 (K-10): el reinicio (`DELETE /v1/vault`) solo existe en la web y es la unica salida
    de K-08.
 3. **Sin sesion los workspaces son locales** y se suben al iniciar sesion si la nube no tiene
-   ninguno ([ADR 0014](adr/0014-usar-ramal-sin-cuenta.md)). Lo que pide sesion es sincronizarlos
+   ninguno ([ADR 0014](adr/0014-usar-git-rudder-sin-cuenta.md)). Lo que pide sesion es sincronizarlos
    (X-06).
 4. **"Actualizado" es la ultima actividad del repositorio**: lo mas reciente entre el ultimo
    commit de HEAD, el ultimo fetch y la ultima apertura. Es lo mismo en las tarjetas del inicio de

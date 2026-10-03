@@ -1,7 +1,7 @@
 // Tests de Vitest de los dos lados y su configuracion. Ven Node y el DOM: los del
 // extension host corren en Node y los de los webviews en jsdom.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

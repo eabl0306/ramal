@@ -1,4 +1,4 @@
-import { type BridgeErrorKind, type RepoHandle, isBridgeErrorKind } from '@ramal/bridge';
+import { type BridgeErrorKind, type RepoHandle, isBridgeErrorKind } from '@git-rudder/bridge';
 
 import type {
   PickRepositoryResult,

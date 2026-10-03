@@ -9,9 +9,9 @@
 
 use std::sync::Arc;
 
-use ramal_engine::{CallContext, ENGINE_VERSION, Engine, EngineBuilder, EngineConfig};
-use ramal_protocol::RpcMethod as _;
-use ramal_protocol::methods::EngineInfoMethod;
+use git_rudder_engine::{CallContext, ENGINE_VERSION, Engine, EngineBuilder, EngineConfig};
+use git_rudder_protocol::RpcMethod as _;
+use git_rudder_protocol::methods::EngineInfoMethod;
 use tauri::{App, AppHandle, Builder, Manager as _, Runtime};
 
 use crate::commands;
@@ -19,10 +19,10 @@ use crate::picker::{DialogFolderPicker, FolderPicker};
 
 /// Variable de entorno con el filtro de log (sintaxis de `tracing`), por defecto
 /// `info`. El log va a stderr.
-pub const LOG_ENV_VAR: &str = "RAMAL_LOG";
+pub const LOG_ENV_VAR: &str = "GIT_RUDDER_LOG";
 
 /// Solo con la feature `e2e`: carpeta que el selector elige sin ensenar el dialogo.
-pub const E2E_FOLDER_ENV_VAR: &str = "RAMAL_E2E_FOLDER";
+pub const E2E_FOLDER_ENV_VAR: &str = "GIT_RUDDER_E2E_FOLDER";
 
 /// Arranca la app de escritorio y no vuelve hasta que se cierra.
 ///
@@ -123,7 +123,7 @@ fn log_without_git(message: &str) {
     tracing::warn!(message, "engine started without a usable git");
 }
 
-/// Log a stderr con el filtro de `RAMAL_LOG`. Si ya hay un subscriber (en los
+/// Log a stderr con el filtro de `GIT_RUDDER_LOG`. Si ya hay un subscriber (en los
 /// tests), se respeta.
 fn init_tracing() {
     let filter = tracing_subscriber::EnvFilter::try_from_env(LOG_ENV_VAR)

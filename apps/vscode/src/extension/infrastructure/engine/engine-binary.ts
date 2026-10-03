@@ -9,9 +9,9 @@ export interface EngineBinaryInput {
   readonly extensionPath: string;
   readonly mode: HostMode;
   readonly platform: string;
-  /** `ramal.engine.path` a nivel de usuario; solo cuenta fuera de produccion. */
+  /** `gitRudder.engine.path` a nivel de usuario; solo cuenta fuera de produccion. */
   readonly configuredPath?: string | undefined;
-  /** `RAMAL_ENGINE_PATH`; solo cuenta fuera de produccion. */
+  /** `GIT_RUDDER_ENGINE_PATH`; solo cuenta fuera de produccion. */
   readonly environmentPath?: string | undefined;
   /** Para los tests; por defecto mira el disco. */
   readonly exists?: (file: string) => boolean;
@@ -19,12 +19,12 @@ export interface EngineBinaryInput {
 
 /** Nombre del binario del sidecar en esta plataforma. */
 export function engineBinaryName(platform: string): string {
-  return platform === 'win32' ? 'ramal-vscode-engine.exe' : 'ramal-vscode-engine';
+  return platform === 'win32' ? 'git-rudder-vscode-engine.exe' : 'git-rudder-vscode-engine';
 }
 
 /**
  * Que binario se ejecuta (architecture.md 4.4). En produccion siempre el de la
- * VSIX, `dist/bin/ramal-vscode-engine`: un ajuste que eligiera el binario seria
+ * VSIX, `dist/bin/git-rudder-vscode-engine`: un ajuste que eligiera el binario seria
  * ejecucion de codigo con solo abrir una carpeta. En desarrollo y en los tests
  * de integracion se acepta el ajuste de usuario, la variable de entorno o lo
  * que haya compilado cargo en `target/` del monorepo, por ese orden.

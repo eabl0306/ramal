@@ -3,15 +3,15 @@
 Sustituye los ficheros del handoff (`docs/design/handoff/`) por los de esta carpeta. Lo que queda abierto va al final.
 
 ## #70 Web
-- `Ramal Web.dc.html`: se quitó el panel antiguo. Iniciar sesión, OAuth y `startPage=dashboard` llevan a `Ramal Web Panel.dc.html` (cierra X-01, X-02, B-37, B-38 y B-58).
+- `Git Rudder Web.dc.html`: se quitó el panel antiguo. Iniciar sesión, OAuth y `startPage=dashboard` llevan a `Git Rudder Web Panel.dc.html` (cierra X-01, X-02, B-37, B-38 y B-58).
 - Panel: el selector de organización dice "Nueva organización…" y el aviso de correo sin confirmar usa `auth.vBanner`, `auth.vResend` y `auth.vResent`. La etiqueta del proveedor ya no sale como `{serviceProvider}`: `t()` buscaba `legal.provider` antes que las claves locales.
 - W-18: chips de plan `trial_last_day` (la banda pasa a `--warn` y usa el plural `_one`) y `active_monthly` (`biMonthlyLine` y `biPriceMonth`). El modal de asientos cobra según el ciclo.
 - W-22: variante `rotacion-recomendada` con la banda `dvRotate`. Al cerrar la sesión de otro dispositivo, la banda aparece en Cuenta.
 - W-28 `404-panel`: barra lateral del panel a partir de 900 px.
 
 ## #71 Bugs
-- `Ramal.dc.html`: "Cerrar sesión" abre K-09 (`k9Title`, `k9Body` y la casilla `k9Check`, apagada). `marta@ramal.dev` pasa a `marta@example.com`.
-- `Ramal Git.dc.html`: "Abortar" (merge, rebase, cherry-pick, revert y el rebase del squash) y "Eliminar stash" confirman con el modal de peligro, con el foco en Cancelar. Los títulos de peligro ya no se concatenan (antes salía "¿Remove lock and retry?").
+- `Git Rudder.dc.html`: "Cerrar sesión" abre K-09 (`k9Title`, `k9Body` y la casilla `k9Check`, apagada). `marta@ramal.dev` pasa a `marta@example.com`.
+- `Git Rudder Git.dc.html`: "Abortar" (merge, rebase, cherry-pick, revert y el rebase del squash) y "Eliminar stash" confirman con el modal de peligro, con el foco en Cancelar. Los títulos de peligro ya no se concatenan (antes salía "¿Remove lock and retry?").
 - VS Code B-10: el primer resumen falla con "Reintentar" y la nota "no se ha cobrado". B-23, B-26 y B-27 ya estaban en el prototipo: etiquetas por operación, los menús actúan sobre la rama del elemento y "Eliminar rama remota…" va aparte.
 
 ## #63 Bóveda
@@ -26,7 +26,7 @@ Sustituye los ficheros del handoff (`docs/design/handoff/`) por los de esta carp
 
 ## #67 Ajustes
 - D-42 `d42-minimo` a 1024 px: barra lateral de 196, panel de 252, búsqueda de 132 y sin columna de autor. Los mensajes ya no se cortan.
-- `ramal-data.js`: `AIPROV` ya no trae modelo por defecto. `Ramal.dc.html`: el formulario de llave (X-10) quita el alcance (siempre personal; las de la organización se gestionan en la web) y el modelo se elige de la lista del proveedor.
+- `git-rudder-data.js`: `AIPROV` ya no trae modelo por defecto. `Git Rudder.dc.html`: el formulario de llave (X-10) quita el alcance (siempre personal; las de la organización se gestionan en la web) y el modelo se elige de la lista del proveedor.
 
 ## #68 VS Code
 - V-13 Historial de archivo: estados `V-13` y `V-13-sin-historial`, y el menú "Historial del archivo" abre la pestaña "Historial: {file}" con carga, filas filtradas, detalle de un solo archivo y vacío (`noHistory`).

@@ -17,7 +17,7 @@ importers:
       '@eslint/js':
         specifier: 10.0.1
         version: 10.0.1(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:packages/eslint-config
       eslint:
@@ -44,16 +44,16 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@ramal/bridge':
+      '@git-rudder/bridge':
         specifier: workspace:*
         version: link:../../packages/bridge
-      '@ramal/i18n':
+      '@git-rudder/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@ramal/repo-view':
+      '@git-rudder/repo-view':
         specifier: workspace:*
         version: link:../../packages/repo-view
-      '@ramal/ui':
+      '@git-rudder/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@tanstack/react-query':
@@ -72,10 +72,10 @@ importers:
       '@playwright/test':
         specifier: 1.63.0
         version: 1.63.0
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@tauri-apps/cli':
@@ -147,16 +147,16 @@ importers:
 
   apps/vscode:
     dependencies:
-      '@ramal/bridge':
+      '@git-rudder/bridge':
         specifier: workspace:*
         version: link:../../packages/bridge
-      '@ramal/i18n':
+      '@git-rudder/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@ramal/repo-view':
+      '@git-rudder/repo-view':
         specifier: workspace:*
         version: link:../../packages/repo-view
-      '@ramal/ui':
+      '@git-rudder/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@tanstack/react-query':
@@ -175,10 +175,10 @@ importers:
       '@playwright/test':
         specifier: 1.63.0
         version: 1.63.0
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@testing-library/dom':
@@ -241,16 +241,16 @@ importers:
 
   apps/web:
     dependencies:
-      '@ramal/api-client':
+      '@git-rudder/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
-      '@ramal/domain':
+      '@git-rudder/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@ramal/i18n':
+      '@git-rudder/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@ramal/ui':
+      '@git-rudder/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@react-router/node':
@@ -275,10 +275,10 @@ importers:
       '@playwright/test':
         specifier: 1.63.0
         version: 1.63.0
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
       '@react-router/dev':
@@ -333,10 +333,10 @@ importers:
         specifier: 0.17.0
         version: 0.17.0
     devDependencies:
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@types/node':
@@ -360,10 +360,10 @@ importers:
 
   packages/bridge:
     devDependencies:
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@vitest/coverage-v8':
@@ -381,10 +381,10 @@ importers:
 
   packages/domain:
     devDependencies:
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@types/node':
@@ -451,10 +451,10 @@ importers:
 
   packages/i18n:
     devDependencies:
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@types/node':
@@ -475,23 +475,23 @@ importers:
 
   packages/repo-view:
     dependencies:
-      '@ramal/bridge':
+      '@git-rudder/bridge':
         specifier: workspace:*
         version: link:../bridge
-      '@ramal/i18n':
+      '@git-rudder/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@ramal/ui':
+      '@git-rudder/ui':
         specifier: workspace:*
         version: link:../ui
       '@tanstack/react-virtual':
         specifier: 3.14.13
         version: 3.14.13(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
     devDependencies:
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@tanstack/react-query':
@@ -556,7 +556,7 @@ importers:
       '@fontsource/ibm-plex-sans':
         specifier: 5.3.0
         version: 5.3.0
-      '@ramal/i18n':
+      '@git-rudder/i18n':
         specifier: workspace:*
         version: link:../i18n
       '@vscode/codicons':
@@ -569,10 +569,10 @@ importers:
         specifier: 1.21.1
         version: 1.21.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
     devDependencies:
-      '@ramal/eslint-config':
+      '@git-rudder/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@ramal/tsconfig':
+      '@git-rudder/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@testing-library/dom':

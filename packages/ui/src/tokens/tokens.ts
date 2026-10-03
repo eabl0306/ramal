@@ -1,9 +1,9 @@
 /**
  * Los tokens semanticos que leen los componentes (architecture.md 7.1). Los dos
- * temas dan valor a todos; un test lo comprueba leyendo ramal.css y vscode.css.
+ * temas dan valor a todos; un test lo comprueba leyendo git-rudder.css y vscode.css.
  *
  * Desde TypeScript solo se usan como var(--...): un color literal en un
- * componente lo rechaza ramal/no-raw-colors.
+ * componente lo rechaza git-rudder/no-raw-colors.
  */
 export const COLOR_TOKENS = [
   '--r-bg',

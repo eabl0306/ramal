@@ -16,8 +16,8 @@ Tres decisiones anteriores lo condicionan:
 - **Los tokens son de extremo a extremo** ([ADR 0012](0012-boveda-de-extremo-a-extremo.md)): el
   servidor no puede descifrarlos, no hay cuentas compartidas con el equipo y la web no puede probar
   una conexion.
-- **Ramal funciona sin cuenta** ([ADR 0014](0014-usar-ramal-sin-cuenta.md)): conectar una
-  plataforma no puede exigir una cuenta de Ramal.
+- **Git Rudder funciona sin cuenta** ([ADR 0014](0014-usar-git-rudder-sin-cuenta.md)): conectar una
+  plataforma no puede exigir una cuenta de Git Rudder.
 - **Las credenciales se eligen por repositorio** con el helper de credenciales y `core.sshCommand`
   ([ADR 0009](0009-motor-git-hibrido.md)).
 
@@ -66,7 +66,7 @@ por plataforma, el companero que lo clonara entregaria su token de GitHub a ese 
 
 ### Como se conecta cada plataforma
 
-| Plataforma                    | Metodo por defecto                                                               | Tambien                                                   | Pasa por la API de Ramal               |
+| Plataforma                    | Metodo por defecto                                                               | Tambien                                                   | Pasa por la API de Git Rudder          |
 | ----------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------- |
 | GitHub (github.com)           | Device flow de la OAuth App, solo con `client_id`                                | PAT de grano fino                                         | No                                     |
 | GitHub Enterprise Server      | PAT                                                                              | OAuth App que registre el cliente, despues del MVP        | No                                     |
@@ -79,7 +79,7 @@ por plataforma, el companero que lo clonara entregaria su token de GitHub a ese 
 ### Clientes publicos primero
 
 Donde el proveedor lo permite, el motor es un cliente OAuth publico: device flow o PKCE con
-redireccion de loopback. **El token va de la plataforma al dispositivo y nunca pasa por Ramal.**
+redireccion de loopback. **El token va de la plataforma al dispositivo y nunca pasa por Git Rudder.**
 
 - Los `client_id` van compilados en el motor, para poder conectar una cuenta aunque la API no
   responda. `GET /v1/platform-oauth/providers` solo los sobreescribe, para poder rotarlos sin
@@ -104,7 +104,7 @@ minutos. Para Bitbucket, la API pone el secreto en el canje y no guarda el token
    Bitbucket de la victima a otro servidor.
 2. Bitbucket vuelve a la API, que **no canjea todavia**: redirige al loopback del motor con el
    codigo y el id del flujo. El navegador aterriza en el receptor del motor, que sirve la pagina
-   "Cuenta conectada, vuelve a Ramal" (o el error del proveedor). Si el flujo no existe o caduco,
+   "Cuenta conectada, vuelve a Git Rudder" (o el error del proveedor). Si el flujo no existe o caduco,
    la API no tiene a donde redirigir y manda al navegador a una pagina de error de la web.
 3. El motor canjea en la API con su verificador. La API comprueba que casa con el reto, canjea con
    Bitbucket poniendo el secreto, devuelve los tokens en la respuesta y borra el flujo.
@@ -115,7 +115,7 @@ del proceso durante el canje y nada mas: no se escribe en la base, no se registr
 trazas no registra ni la query ni el cuerpo) y la respuesta lleva `Cache-Control: no-store`. Es el
 unico sitio de la API por donde pasa un token de plataforma, y vive aislado en su propio modulo.
 
-El broker es publico, sin sesion de Ramal, con limite por IP. Los tokens de Bitbucket caducan a las
+El broker es publico, sin sesion de Git Rudder, con limite por IP. Los tokens de Bitbucket caducan a las
 2 horas y el refresco va por el mismo broker.
 
 ### Tokens personales donde no hay OAuth
@@ -127,11 +127,11 @@ una organizacion: la interfaz avisa con tiempo de que caduca.
 
 ### Pull requests, checks y revisiones: directo desde el motor
 
-`ramal-platforms` (planificado) implementa el puerto `PlatformClient` para las cinco plataformas y
+`git-rudder-platforms` (planificado) implementa el puerto `PlatformClient` para las cinco plataformas y
 el motor llama a cada una con el token de la cuenta del repositorio, con una cache local. **La API
-de Ramal no ve ningun pull request.** El panel web no ensena PRs, asi que no hace falta proxy.
+de Git Rudder no ve ningun pull request.** El panel web no ensena PRs, asi que no hace falta proxy.
 
-- Latencia minima, y sigue funcionando si la API de Ramal cae.
+- Latencia minima, y sigue funcionando si la API de Git Rudder cae.
 - Los limites de peticiones de cada plataforma son por token de usuario de todos modos.
 - Ni el codigo ni los metadatos de los PRs pasan por nuestros servidores.
 
@@ -155,9 +155,9 @@ de Ramal no ve ningun pull request.** El panel web no ensena PRs, asi que no hac
 
 A favor:
 
-- Ningun token de plataforma toca el servidor de Ramal, salvo el canje de Bitbucket, que pasa por
+- Ningun token de plataforma toca el servidor de Git Rudder, salvo el canje de Bitbucket, que pasa por
   memoria y se va.
-- Conectar GitHub, GitLab.com y las plataformas con PAT funciona sin cuenta de Ramal y sin que la
+- Conectar GitHub, GitLab.com y las plataformas con PAT funciona sin cuenta de Git Rudder y sin que la
   API este levantada.
 - Varias cuentas de la misma plataforma conviven repositorio a repositorio.
 - Nada depende de metodos que los proveedores ya retiraron (app passwords de Bitbucket, OAuth de
@@ -165,8 +165,8 @@ A favor:
 
 En contra:
 
-- **El broker publico permite gastar el cupo del consumer de Bitbucket de Ramal a cualquiera.** Si
-  se abusa, pasa a exigir sesion de Ramal y el camino sin cuenta queda en el API token. Tambien
+- **El broker publico permite gastar el cupo del consumer de Bitbucket de Git Rudder a cualquiera.** Si
+  se abusa, pasa a exigir sesion de Git Rudder y el camino sin cuenta queda en el API token. Tambien
   permite usar un refresh token robado de nuestro consumer; quien lo tiene ya tiene acceso a esa
   cuenta hasta que caduque.
 - **Las organizaciones de GitHub pueden bloquear la OAuth App** hasta que un admin la apruebe. La
@@ -183,7 +183,7 @@ En contra:
 ## Alternativas descartadas
 
 **Broker OAuth para todas las plataformas, con los tokens cifrados en el servidor.** Era la
-propuesta del analisis. Rompe la decision de extremo a extremo y obliga a tener cuenta de Ramal
+propuesta del analisis. Rompe la decision de extremo a extremo y obliga a tener cuenta de Git Rudder
 para conectar cualquier plataforma.
 
 **GitHub App en lugar de OAuth App.** Solo llega a los repositorios donde esta instalada, y un

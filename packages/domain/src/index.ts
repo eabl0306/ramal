@@ -1,4 +1,4 @@
-// API publica de @ramal/domain. Solo se exporta lo que usan las apps; cada
+// API publica de @git-rudder/domain. Solo se exporta lo que usan las apps; cada
 // modulo vive en su carpeta y se prueba por separado.
 
 export {

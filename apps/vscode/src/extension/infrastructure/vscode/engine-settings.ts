@@ -8,7 +8,7 @@ const LOG_LEVELS = ['error', 'warn', 'info', 'debug', 'trace'] as const;
 type LogLevel = (typeof LOG_LEVELS)[number];
 
 export interface EngineSettings {
-  /** `ramal.engine.path` del usuario; el de workspace no se lee nunca. */
+  /** `gitRudder.engine.path` del usuario; el de workspace no se lee nunca. */
   readonly path: string | undefined;
   readonly logLevel: LogLevel;
 }
@@ -24,7 +24,7 @@ function isLogLevel(value: unknown): value is LogLevel {
  * comprueba contra la lista antes de pasarlo como argumento.
  */
 export function readEngineSettings(): EngineSettings {
-  const config = vscode.workspace.getConfiguration('ramal.engine');
+  const config = vscode.workspace.getConfiguration('gitRudder.engine');
   const path = config.inspect<string>('path')?.globalValue;
   const level = config.get<unknown>('logLevel');
   return { path, logLevel: isLogLevel(level) ? level : 'info' };

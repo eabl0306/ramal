@@ -1,4 +1,4 @@
-import { I18nProvider } from '@ramal/ui';
+import { I18nProvider } from '@git-rudder/ui';
 import { type ReactElement, type ReactNode, useEffect, useMemo, useState } from 'react';
 
 import type { AppearanceStore } from '../../application/ports/appearance-store';
@@ -22,7 +22,7 @@ export interface AppearanceProviderProps {
 
 /**
  * Tema e idioma de la ventana. Pone `data-theme` y `lang` en el documento,
- * guarda cada cambio del usuario y monta el `I18nProvider` de @ramal/ui con el
+ * guarda cada cambio del usuario y monta el `I18nProvider` de @git-rudder/ui con el
  * idioma elegido, asi que todo lo de dentro se traduce al cambiarlo.
  */
 export function AppearanceProvider({

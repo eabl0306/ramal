@@ -5,7 +5,7 @@
 // el directorio de cada fichero, asi que aqui solo se aplican la capa
 // recomendada, la de Node, la de calidad y la de tests.
 import js from '@eslint/js';
-import { DEFAULT_IGNORES, nodeConfig, qualityConfig, testsConfig } from '@ramal/eslint-config';
+import { DEFAULT_IGNORES, nodeConfig, qualityConfig, testsConfig } from '@git-rudder/eslint-config';
 
 /** Lo que linta esta configuracion. apps/ queda fuera: cada app trae la suya. */
 const FILES = [

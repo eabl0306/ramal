@@ -35,7 +35,7 @@ Cada brief repite las que mas le afectan; estas valen siempre.
 - **Fuente de verdad.** Los prototipos y el README del handoff. Donde no coinciden, manda el
   prototipo. Las pantallas nuevas copian la cabecera de estilos y los componentes del prototipo del
   producto que toque.
-- **Tokens.** Solo los de la tabla del README del handoff (en codigo, los `--r-*` de `@ramal/ui`).
+- **Tokens.** Solo los de la tabla del README del handoff (en codigo, los `--r-*` de `@git-rudder/ui`).
   Ningun color nuevo; los fondos suaves son el color al 10 o 14 % con `color-mix`. `--info` informa,
   `--accent` es la accion principal y la marca, `--ok` exito, `--warn` aviso y `--danger` peligro. En
   VS Code, los valores Dark Modern y Light Modern del README, que en la extension seran variables
@@ -56,20 +56,20 @@ Cada brief repite las que mas le afectan; estas valen siempre.
   correcto, con tildes. Plurales con claves `_one` y `_other` sobre `{count}`; marcadores con nombre
   (`{branch}`, `{device}`), nunca `{n}` ambiguo; glifos y atajos fuera de las cadenas; nunca se trocea
   una traduccion para fabricar otra (ADR 0017). Sin emojis, sin guiones largos y sin "simulado".
-- **Textos nuevos** en `ramal-data.js`, donde diga cada brief. Una clave existente con otro texto no se
+- **Textos nuevos** en `git-rudder-data.js`, donde diga cada brief. Una clave existente con otro texto no se
   pisa: se crea otra.
 - **VS Code: lo nativo se especifica, no se dibuja** (X-11). Paleta, quick input, notificaciones,
   barra de estado, arboles y `viewsWelcome` se describen con su texto. Solo se dibujan los webviews:
-  grafo con detalle, editor de merge, crear PR y ajustes de Ramal (que incluye el panel de la
+  grafo con detalle, editor de merge, crear PR y ajustes de Git Rudder (que incluye el panel de la
   boveda).
 - **Acciones destructivas** con modal de peligro: titulo en pregunta, consecuencia en una caja, boton
   `--danger`, foco inicial en "Cancelar" (patron completo en el brief #71, seccion 10).
 - **Decisiones de producto que el diseno no puede contradecir:**
-  - Ramal funciona sin cuenta: las zonas de nube invitan a entrar en vez de desaparecer (X-06).
+  - Git Rudder funciona sin cuenta: las zonas de nube invitan a entrar en vez de desaparecer (X-06).
   - No hay cuentas de plataforma compartidas con el equipo (X-01) y la web solo ve y quita cuentas
     vinculadas (X-02).
   - Nadie puede recuperar los secretos de la boveda si se pierden la frase y el codigo, tampoco el
-    soporte de Ramal (X-03).
+    soporte de Git Rudder (X-03).
   - Las sesiones y dispositivos no muestran ubicacion: dispositivo, sistema, app o navegador y ultima
     actividad (decision #53).
   - El selector de modelo de IA se rellena con la lista del proveedor y marca el recomendado por nivel:
@@ -77,23 +77,22 @@ Cada brief repite las que mas le afectan; estas valen siempre.
     version; sin red ni cache, solo la lista (decision #54, X-10).
   - Las llaves de IA de la organizacion se ven de solo lectura en Desktop y VS Code, con la etiqueta
     "De la organización"; el admin fija su modelo por funcion (X-05, decision #54).
-  - Ramal Pro es un plan de organizacion por asiento: USD 8 al mes facturado al ano (USD 96) o USD 10
+  - Git Rudder Pro es un plan de organizacion por asiento: USD 8 al mes facturado al ano (USD 96) o USD 10
     al mes, 14 dias de prueba sin tarjeta, minimo 1 asiento. Lo personal (Git local, PRs, IA con llave
     propia y sincronizacion personal) es gratis siempre (decision #51).
-- **Dominio y datos de muestra.** La web es `https://ramal.bahoque.com` y la API
-  `https://api.ramal.bahoque.com`. `ramal.dev` y `ramal.app` son de terceros: los correos de muestra
-  usan `example.com`. Nada de "App password" de Bitbucket ni de modelos de IA fijos.
+- **Dominio y datos de muestra.** La web es `https://git-rudder.com` y la API
+  `https://api.git-rudder.com`. Los correos de muestra usan `example.com`. Nada de "App password" de Bitbucket ni de modelos de IA fijos.
 
 ## Formato de exportacion
 
-- Un zip por brief: `ramal-handoff-<issue>-<slug>.zip`, con la misma estructura que el handoff
+- Un zip por brief: `git-rudder-handoff-<issue>-<slug>.zip`, con la misma estructura que el handoff
   original:
   - `README.md` solo con lo nuevo (pantallas, componentes, medidas y estados, con los ids de
     `gaps.md`).
   - Los `*.dc.html` nuevos o corregidos. Props comunes: `theme` (`dark`, `light`) y `lang` (`es`,
     `en`); segun el brief, `product` (`desktop`, `vscode`, `web`), `os` y `screen` o `state` (un valor
     por pantalla o estado, con el id de `gaps.md`).
-  - `ramal-data.js` con los textos nuevos.
+  - `git-rudder-data.js` con los textos nuevos.
   - `support.js` sin cambios.
 - Cada `*.dc.html` se abre en el navegador desde la misma carpeta, como los originales.
 

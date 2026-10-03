@@ -3,7 +3,7 @@
 use std::sync::Arc;
 use std::time::Instant;
 
-use ramal_api_domain::{ComponentHealth, HealthReport, Latency, ServiceVersion};
+use git_rudder_api_domain::{ComponentHealth, HealthReport, Latency, ServiceVersion};
 
 use crate::port::{Clock, HealthProbe};
 

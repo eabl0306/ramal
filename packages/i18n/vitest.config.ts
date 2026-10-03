@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
 /**
- * @ramal/i18n es nucleo: 80% de cobertura. Lo generado se excluye porque no es
+ * @git-rudder/i18n es nucleo: 80% de cobertura. Lo generado se excluye porque no es
  * logica, solo una tabla que el test de paridad compara entera.
  */
 const CORE_THRESHOLD = { lines: 80, statements: 80, branches: 80, functions: 80 };

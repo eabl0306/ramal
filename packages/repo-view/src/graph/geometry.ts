@@ -1,9 +1,9 @@
-import type { GraphGeometry } from '@ramal/ui';
+import type { GraphGeometry } from '@git-rudder/ui';
 
 /**
- * Geometria del SVG del grafo: la de `DENSITIES` de @ramal/ui mas el alto de
+ * Geometria del SVG del grafo: la de `DENSITIES` de @git-rudder/ui mas el alto de
  * fila, que tambien sale de la densidad. Se recibe como parametro en lugar de
- * leer @ramal/ui aqui, asi estas funciones son puras y los tests fijan los
+ * leer @git-rudder/ui aqui, asi estas funciones son puras y los tests fijan los
  * numeros del diseno sin montar React.
  */
 export interface GraphMetrics extends GraphGeometry {

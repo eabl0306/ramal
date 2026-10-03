@@ -1,7 +1,7 @@
 import { type Locator, expect, test } from '@playwright/test';
 
 /**
- * Medidas del prototipo web (docs/design/handoff/Ramal Web.dc.html) tomadas en
+ * Medidas del prototipo web (docs/design/handoff/Git Rudder Web.dc.html) tomadas en
  * un navegador de verdad: jsdom no aplica los CSS Modules, asi que un test
  * unitario solo puede leer la hoja. Aqui se mide la caja que se pinta.
  */

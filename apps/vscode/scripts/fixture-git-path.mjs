@@ -18,7 +18,7 @@ function gitOnPath() {
  * configura (vacio si no configura ninguno).
  */
 export function createGitPathProfile() {
-  const root = mkdtempSync(path.join(tmpdir(), 'ramal-vscode-profile-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'git-rudder-vscode-profile-'));
   const userDir = path.join(root, 'user-data', 'User');
   mkdirSync(userDir, { recursive: true });
   let gitPath = '';

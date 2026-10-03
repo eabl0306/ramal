@@ -1,5 +1,5 @@
 // Juego de iconos de escritorio y web. Es una subruta propia
-// (@ramal/ui/icons/lucide) para que Lucide nunca entre en el bundle de VS Code.
+// (@git-rudder/ui/icons/lucide) para que Lucide nunca entre en el bundle de VS Code.
 import {
   Archive,
   ArchiveRestore,

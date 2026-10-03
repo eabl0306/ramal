@@ -1,5 +1,5 @@
-// API publica de @ramal/i18n: idiomas, traductor tipado y formatos. El enlace
-// con React (I18nProvider, useT) vive en @ramal/ui para que este paquete siga
+// API publica de @git-rudder/i18n: idiomas, traductor tipado y formatos. El enlace
+// con React (I18nProvider, useT) vive en @git-rudder/ui para que este paquete siga
 // sin dependencias.
 
 export { FALLBACK_LOCALE, LOCALES, type Locale, isLocale, resolveLocale } from './locale';

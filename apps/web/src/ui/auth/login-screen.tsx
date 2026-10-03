@@ -1,4 +1,4 @@
-import { useT } from '@ramal/ui';
+import { useT } from '@git-rudder/ui';
 import { type ReactElement, useState } from 'react';
 
 import { signIn, signInWithProvider } from '../../application/use-cases/authenticate';

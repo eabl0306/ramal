@@ -1,5 +1,5 @@
-import type { GraphRow } from '@ramal/bridge';
-import { codicons } from '@ramal/ui/icons/codicons';
+import type { GraphRow } from '@git-rudder/bridge';
+import { codicons } from '@git-rudder/ui/icons/codicons';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';

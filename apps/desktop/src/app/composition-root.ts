@@ -1,6 +1,6 @@
-import { type BridgeClient, createBridgeClient } from '@ramal/bridge';
-import { isLocale, resolveLocale } from '@ramal/i18n';
-import { createRepoViewQueryClient } from '@ramal/repo-view';
+import { type BridgeClient, createBridgeClient } from '@git-rudder/bridge';
+import { isLocale, resolveLocale } from '@git-rudder/i18n';
+import { createRepoViewQueryClient } from '@git-rudder/repo-view';
 import type { QueryClient } from '@tanstack/react-query';
 
 import type { AppearanceStore, StoredAppearance } from '../application/ports/appearance-store';
@@ -52,7 +52,7 @@ export function createContainer(env: DesktopEnv): Container {
 /**
  * La apariencia del arranque: lo que el usuario eligio y, para lo que no eligio,
  * tema oscuro (el del diseno) e idioma del sistema con la regla comun de
- * @ramal/i18n (castellano si es `es`, ingles en cualquier otro caso).
+ * @git-rudder/i18n (castellano si es `es`, ingles en cualquier otro caso).
  */
 export function initialAppearance(stored: StoredAppearance, systemLanguage: string): Appearance {
   return {

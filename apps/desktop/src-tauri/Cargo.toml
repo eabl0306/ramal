@@ -1,23 +1,23 @@
 [package]
-name = "ramal-desktop"
-description = "Host de Ramal Desktop (Tauri 2): el motor de Git en proceso detras del comando rpc."
+name = "git-rudder-desktop"
+description = "Host de Git Rudder Desktop (Tauri 2): el motor de Git en proceso detras del comando rpc."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 license.workspace = true
 # Fuera de default-members (Cargo.toml raiz): Tauri enlaza con webkit2gtk, que no
-# esta en todas las maquinas. Se compila con -p ramal-desktop o dentro de la imagen
+# esta en todas las maquinas. Se compila con -p git-rudder-desktop o dentro de la imagen
 # de tools/docker (just desktop-docker-rust-check).
 
 # El arranque es una funcion de biblioteca y main.rs es una llamada: asi los tests
 # (y cargo-llvm-cov) llegan tambien al composition root (ADR 0006).
 [lib]
-name = "ramal_desktop"
+name = "git_rudder_desktop"
 path = "src/lib.rs"
 
 [[bin]]
-name = "ramal-desktop"
+name = "git-rudder-desktop"
 path = "src/main.rs"
 
 [features]
@@ -30,8 +30,8 @@ e2e = ["dep:tauri-plugin-wdio-webdriver"]
 # Solo el motor y el protocolo del workspace: el host habla con el motor, no con
 # sus piezas (lo vigila crates/engine/tests/architecture.rs).
 [dependencies]
-ramal-engine = { workspace = true }
-ramal-protocol = { workspace = true }
+git-rudder-engine = { workspace = true }
+git-rudder-protocol = { workspace = true }
 serde_json = { workspace = true }
 tauri = { workspace = true }
 tauri-plugin-dialog = { workspace = true }

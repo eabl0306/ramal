@@ -1,4 +1,4 @@
-import { Icon, IconButton, useT } from '@ramal/ui';
+import { Icon, IconButton, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import styles from './title-bar.module.css';

@@ -14,7 +14,7 @@ equipos y la facturacion en el MVP, las invitaciones tambien salen desde el prim
 Lo que ya esta decidido o medido:
 
 - La API envia por **SMTP con `lettre`**, que ya figura en la lista de crates de
-  `ramal-api-infrastructure` y en la de prohibidos del nucleo. En desarrollo el buzon es Mailpit,
+  `git-rudder-api-infrastructure` y en la de prohibidos del nucleo. En desarrollo el buzon es Mailpit,
   que ya esta en `compose.yaml`. Con SMTP, cambiar de proveedor es cambiar la configuracion.
 - El volumen es bajo: de dos a cinco correos por usuario el primer mes y casi nada despues. Con
   1.000 altas al mes, unos 3.000 a 5.000 correos. El riesgo no es el total sino el pico del dia
@@ -24,19 +24,19 @@ Lo que ya esta decidido o medido:
   verifica exacto** (tener verificado `bahoque.com` no verifica `mail.bahoque.com`, y el primer
   envio se rechazo con un 550 por eso) y el puerto 465 no funciono con su transporte; el que
   funciona es el 587 con STARTTLS.
-- El dominio de Ramal es `ramal.bahoque.com` ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)).
+- El dominio de Git Rudder es `git-rudder.com` ([ADR 0027](0027-renombrado-a-git-rudder.md)).
 
 ## Decision
 
 **Resend, por SMTP, en un equipo de Resend aparte del de Gastonomo.**
 
-- **Equipo propio** para que Ramal no comparta cuota, llaves ni factura con Gastonomo, y para que
+- **Equipo propio** para que Git Rudder no comparta cuota, llaves ni factura con Gastonomo, y para que
   un problema de reputacion de uno no toque al otro.
 - **Plan gratuito durante la beta privada** (3.000 correos al mes, 100 al dia) y **Pro (20 USD al
   mes, 50.000 correos, sin tope diario) al abrir la beta publica**. El tope de 100 al dia es lo
   unico que puede bloquear altas en un lanzamiento, y Pro lo quita.
 - **SMTP con `lettre`** en el puerto 587 con STARTTLS. La configuracion es
-  `RAMAL__MAIL__{HOST,PORT,USERNAME,PASSWORD,FROM,STARTTLS}`. Las claves van comentadas en
+  `GIT_RUDDER__MAIL__{HOST,PORT,USERNAME,PASSWORD,FROM,STARTTLS}`. Las claves van comentadas en
   `.env.example` hasta que la API las lea, porque una clave desconocida hace fallar el arranque.
   La contrasena SMTP (la llave de API de Resend) es un secreto de Actions que escribe el
   despliegue.
@@ -45,16 +45,16 @@ Lo que ya esta decidido o medido:
 
 ### Remitente y registros
 
-- **Remitente en un subdominio de `ramal.bahoque.com`, verificado exacto en Resend**, por ejemplo
-  `Ramal <no-reply@mail.ramal.bahoque.com>`. Se verifica ese nombre, no `bahoque.com` ni
-  `ramal.bahoque.com`.
+- **Remitente en un subdominio de `git-rudder.com`, verificado exacto en Resend**, por ejemplo
+  `Git Rudder <no-reply@mail.git-rudder.com>`. Se verifica ese nombre exacto, no
+  `git-rudder.com`.
 - Resend da los registros para ese subdominio (DKIM, y MX y SPF para el dominio de rebote). Los
   valores salen de su panel y se crean en Route 53.
-- **DMARC en el subdominio exacto del remitente** (`_dmarc.mail.ramal.bahoque.com`), por etapas:
+- **DMARC en el subdominio exacto del remitente** (`_dmarc.mail.git-rudder.com`), por etapas:
   `p=none` con informes, despues `p=quarantine` tras dos a cuatro semanas de informes limpios, y
-  despues `p=reject`. Va en el subdominio y no en `bahoque.com` para no cambiar la politica del
-  dominio que usan Gastonomo y el resto: los receptores miran primero el registro del dominio
-  exacto del remitente.
+  despues `p=reject`. Va en el subdominio del remitente y no en `git-rudder.com` porque los
+  receptores miran primero el registro del dominio exacto, y asi la politica del dominio principal
+  queda libre para la web y para cualquier remitente que venga despues.
 - El correo lleva `Reply-To` a un buzon real. Cual es, y que buzon recibe los informes de DMARC,
   esta sin decidir (ver Consecuencias).
 - Alta del dominio en Google Postmaster Tools para ver la reputacion.
@@ -77,7 +77,7 @@ En contra:
   La politica de privacidad tiene que nombrarlo como encargado del tratamiento.
 - **Falta decidir que buzon real recibe las respuestas y los informes de DMARC.** Sin el,
   `Reply-To` no se puede fijar y DMARC no puede pasar de `p=none`. Si ese buzon esta en otro
-  dominio, ese dominio tiene que autorizar la recepcion de informes de `mail.ramal.bahoque.com`.
+  dominio, ese dominio tiene que autorizar la recepcion de informes de `mail.git-rudder.com`.
 - Hay que mantener a mano el calendario de DMARC (`none`, `quarantine`, `reject`).
 
 ## Alternativas descartadas

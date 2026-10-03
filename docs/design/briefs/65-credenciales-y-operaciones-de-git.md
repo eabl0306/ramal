@@ -1,10 +1,10 @@
-# Brief #65: credenciales y operaciones de Git (Ramal Desktop)
+# Brief #65: credenciales y operaciones de Git (Git Rudder Desktop)
 
 ## Contexto
 
-Solo Ramal Desktop: alta de cuentas, preguntas de credenciales, tokens caducados, cuenta por repo,
+Solo Git Rudder Desktop: alta de cuentas, preguntas de credenciales, tokens caducados, cuenta por repo,
 progreso, errores, conflictos fuera del merge, rebase detenido, mensajes de squash y merge, HEAD
-separado, upstream y deshacer. Cuelga de `Ramal.dc.html`: Ajustes > Plataformas Git (tarjeta de
+separado, upstream y deshacer. Cuelga de `Git Rudder.dc.html`: Ajustes > Plataformas Git (tarjeta de
 cuenta con metodo, permisos y punto de estado), barra de herramientas del repo, fila WIP, resolvedor
 con su panel derecho (caja `--warn`, lista de archivos, "Completar merge"), editor de rebase, modal
 de merge, modal generico y toasts. Error con detalle es C-02 de #62. D-16 y D-26 son P2 y no entran.
@@ -44,65 +44,65 @@ iguales en los dos idiomas (`{branch}`, `{host}`); los contadores usan `{count}`
   "Solo en este equipo" o "Se sincroniza cifrada". Si la sincronizacion de cuentas esta activa y no
   hay boveda, al guardar se encadena K-01 de #63.
 - **Errores.** Token invalido; permisos insuficientes (lista de los que faltan y "Crear un token
-  nuevo"); la organizacion de GitHub no aprobo la OAuth App de Ramal (enlace de solicitud); la
+  nuevo"); la organizacion de GitHub no aprobo la OAuth App de Git Rudder (enlace de solicitud); la
   organizacion exige autorizar con SSO (la cuenta se anade igual, con aviso y "Autorizar en GitHub");
   codigo caducado; autorizacion cancelada; host inalcanzable o certificado no valido; cuenta ya
   conectada (con "Actualizar credenciales").
 - **Actualizar credenciales.** El mismo formulario con el metodo conservado (B-35), el token vacio y
   oculto (B-37) y la etiqueta.
 
-| Uso                   | Texto                                                                                                                                                                                                                                                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Titulo                | "Conectar una cuenta" / "Connect an account" · "Actualizar credenciales" / "Update credentials"                                                                                                                                                        |
-| Variantes de host     | "GitHub Enterprise Server" · "GitLab propio" / "Self-managed GitLab" · "Servidor" / "Host"                                                                                                                                                             |
-| GitHub                | "Conectar con GitHub" / "Connect with GitHub" · "Copiar y abrir github.com/login/device" / "Copy and open github.com/login/device"                                                                                                                     |
-| Espera de codigo      | "Escribe este código en GitHub para autorizar Ramal." / "Enter this code on GitHub to authorize Ramal." · "Esperando a que autorices…" / "Waiting for you to authorize…"                                                                               |
-| Navegador             | "Continuar en el navegador" / "Continue in the browser" · "Autoriza Ramal en {platform} y vuelve aquí." / "Authorize Ramal on {platform} and come back here."                                                                                          |
-| Alternativas          | "Usar un token de grano fino" / "Use a fine-grained token" · "Usar un token personal" / "Use a personal access token" · "Usar un API token" / "Use an API token"                                                                                       |
-| Token                 | "Token de acceso" / "Access token" · "Permisos necesarios: {scopes}" / "Required scopes: {scopes}" · "Crear token en {host}" / "Create token on {host}"                                                                                                |
-| Azure DevOps          | "Organización" / "Organization" · "El token tiene que ser de esta organización. Los tokens globales dejan de funcionar el 1 de diciembre de 2026." / "The token must belong to this organization. Global tokens stop working on December 1, 2026."     |
-| SSH                   | "Usar SSH para fetch y push" / "Use SSH for fetch and push" · "Llave SSH" / "SSH key"                                                                                                                                                                  |
-| Validando             | "Comprobando con {platform}…" / "Checking with {platform}…"                                                                                                                                                                                            |
-| Exito                 | "Conectada como @{user}" / "Connected as @{user}" · "Caduca el {date}" / "Expires on {date}" · "Hacer predeterminada para {platform}" / "Make default for {platform}"                                                                                  |
-| Donde se guarda       | "Solo en este equipo" / "Only on this device" · "Se sincroniza cifrada de extremo a extremo" / "Syncs end-to-end encrypted"                                                                                                                            |
-| Token invalido        | "{platform} no acepta este token." / "{platform} doesn't accept this token."                                                                                                                                                                           |
-| Permisos              | "A este token le faltan permisos: {scopes}." / "This token is missing scopes: {scopes}." · "Crear un token nuevo" / "Create a new token"                                                                                                               |
-| OAuth App no aprobada | "La organización {org} todavía no ha aprobado Ramal. Pide a un admin que lo apruebe." / "The {org} organization hasn't approved Ramal yet. Ask an admin to approve it." · "Solicitar aprobación" / "Request approval"                                  |
-| SSO                   | "{org} exige autorizar Ramal con su inicio de sesión único. Sin eso, sus repositorios fallarán." / "{org} requires authorizing Ramal with its single sign-on. Without it, its repositories will fail." · "Autorizar en GitHub" / "Authorize on GitHub" |
-| Caducado              | "El código ha caducado." / "The code has expired." · "Pedir otro" / "Get a new one"                                                                                                                                                                    |
-| Cancelado             | "Cancelaste la autorización." / "You cancelled the authorization."                                                                                                                                                                                     |
-| Host                  | "No podemos conectar con {host}." / "We can't reach {host}." · "El certificado de {host} no es válido." / "{host}'s certificate isn't valid."                                                                                                          |
-| Ya conectada          | "@{user} ya está conectada." / "@{user} is already connected."                                                                                                                                                                                         |
+| Uso                   | Texto                                                                                                                                                                                                                                                            |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Titulo                | "Conectar una cuenta" / "Connect an account" · "Actualizar credenciales" / "Update credentials"                                                                                                                                                                  |
+| Variantes de host     | "GitHub Enterprise Server" · "GitLab propio" / "Self-managed GitLab" · "Servidor" / "Host"                                                                                                                                                                       |
+| GitHub                | "Conectar con GitHub" / "Connect with GitHub" · "Copiar y abrir github.com/login/device" / "Copy and open github.com/login/device"                                                                                                                               |
+| Espera de codigo      | "Escribe este código en GitHub para autorizar Git Rudder." / "Enter this code on GitHub to authorize Git Rudder." · "Esperando a que autorices…" / "Waiting for you to authorize…"                                                                               |
+| Navegador             | "Continuar en el navegador" / "Continue in the browser" · "Autoriza Git Rudder en {platform} y vuelve aquí." / "Authorize Git Rudder on {platform} and come back here."                                                                                          |
+| Alternativas          | "Usar un token de grano fino" / "Use a fine-grained token" · "Usar un token personal" / "Use a personal access token" · "Usar un API token" / "Use an API token"                                                                                                 |
+| Token                 | "Token de acceso" / "Access token" · "Permisos necesarios: {scopes}" / "Required scopes: {scopes}" · "Crear token en {host}" / "Create token on {host}"                                                                                                          |
+| Azure DevOps          | "Organización" / "Organization" · "El token tiene que ser de esta organización. Los tokens globales dejan de funcionar el 1 de diciembre de 2026." / "The token must belong to this organization. Global tokens stop working on December 1, 2026."               |
+| SSH                   | "Usar SSH para fetch y push" / "Use SSH for fetch and push" · "Llave SSH" / "SSH key"                                                                                                                                                                            |
+| Validando             | "Comprobando con {platform}…" / "Checking with {platform}…"                                                                                                                                                                                                      |
+| Exito                 | "Conectada como @{user}" / "Connected as @{user}" · "Caduca el {date}" / "Expires on {date}" · "Hacer predeterminada para {platform}" / "Make default for {platform}"                                                                                            |
+| Donde se guarda       | "Solo en este equipo" / "Only on this device" · "Se sincroniza cifrada de extremo a extremo" / "Syncs end-to-end encrypted"                                                                                                                                      |
+| Token invalido        | "{platform} no acepta este token." / "{platform} doesn't accept this token."                                                                                                                                                                                     |
+| Permisos              | "A este token le faltan permisos: {scopes}." / "This token is missing scopes: {scopes}." · "Crear un token nuevo" / "Create a new token"                                                                                                                         |
+| OAuth App no aprobada | "La organización {org} todavía no ha aprobado Git Rudder. Pide a un admin que lo apruebe." / "The {org} organization hasn't approved Git Rudder yet. Ask an admin to approve it." · "Solicitar aprobación" / "Request approval"                                  |
+| SSO                   | "{org} exige autorizar Git Rudder con su inicio de sesión único. Sin eso, sus repositorios fallarán." / "{org} requires authorizing Git Rudder with its single sign-on. Without it, its repositories will fail." · "Autorizar en GitHub" / "Authorize on GitHub" |
+| Caducado              | "El código ha caducado." / "The code has expired." · "Pedir otro" / "Get a new one"                                                                                                                                                                              |
+| Cancelado             | "Cancelaste la autorización." / "You cancelled the authorization."                                                                                                                                                                                               |
+| Host                  | "No podemos conectar con {host}." / "We can't reach {host}." · "El certificado de {host} no es válido." / "{host}'s certificate isn't valid."                                                                                                                    |
+| Ya conectada          | "@{user} ya está conectada." / "@{user} is already connected."                                                                                                                                                                                                   |
 
 - **Variantes.** Claro y oscuro; un estado por plataforma; exito, cada error.
 
 ### 2. D-13 Peticiones de credenciales durante fetch, pull, push y clone
 
 - **Proposito.** git las pide por `GIT_ASKPASS` y `SSH_ASKPASS` cuando ninguna cuenta encaja; si
-  Ramal no las dibuja, la operacion se cuelga.
+  Git Rudder no las dibuja, la operacion se cuelga.
 - **Muestra.** Modal de 460 px con contexto arriba: la operacion y el remoto en mono
   (`git push origin feature/graph-ui`). Tres variantes:
   1. Usuario y token HTTPS: campos "Usuario" y "Token o contraseña" (oculto), casilla "Guardar como
-     cuenta de Ramal para {host}" (si se marca, valida como D-12) y, en github.com o gitlab.com,
+     cuenta de Git Rudder para {host}" (si se marca, valida como D-12) y, en github.com o gitlab.com,
      enlace "Conectar con OAuth". "Cancelar" aborta la operacion.
   2. Frase de una llave SSH: ruta de la llave en mono, campo oculto, casilla "Recordar hasta cerrar
-     Ramal" (apagada). Error en linea si la frase no vale.
+     Git Rudder" (apagada). Error en linea si la frase no vale.
   3. Huella de un host desconocido: host, tipo de llave y huella SHA256 en mono, y el consejo de
      comprobarla. "Confiar y continuar" la anade a `known_hosts`.
   4. Huella cambiada: variante de peligro sin boton de continuar, solo "Cerrar" y explicacion.
 - **Fuera.** La frase de una llave GPG la pide `pinentry` del sistema (X-13): no se dibuja como
   dialogo propio. El boton de commit ensena "Esperando a la ventana de GPG…" mientras tanto.
 
-| Uso              | Texto                                                                                                                                                                                                                                                                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Titulo HTTPS     | "Credenciales para {host}" / "Credentials for {host}"                                                                                                                                                                                                                                                                                |
-| Campos           | "Usuario" / "Username" · "Token o contraseña" / "Token or password" · "Guardar como cuenta de Ramal para {host}" / "Save as a Ramal account for {host}" · "Conectar con OAuth" / "Connect with OAuth"                                                                                                                                |
-| Titulo SSH       | "Frase de la llave SSH" / "SSH key passphrase" · "Recordar hasta cerrar Ramal" / "Remember until Ramal closes" · "Desbloquear" / "Unlock"                                                                                                                                                                                            |
-| Frase incorrecta | "La frase no es correcta." / "That passphrase is wrong."                                                                                                                                                                                                                                                                             |
-| Titulo huella    | "¿Confiar en {host}?" / "Trust {host}?"                                                                                                                                                                                                                                                                                              |
-| Texto huella     | "Es la primera vez que te conectas a este servidor. Comprueba la huella con quien lo administra." / "This is your first connection to this server. Check the fingerprint with whoever runs it." · "Confiar y continuar" / "Trust and continue"                                                                                       |
-| Huella cambiada  | "La huella de {host} ha cambiado" / "{host}'s fingerprint has changed" · "Puede ser un cambio legítimo del servidor o alguien interceptando la conexión. Ramal no continuará. Revisa tu known_hosts." / "It may be a legitimate server change or someone intercepting the connection. Ramal won't continue. Check your known_hosts." |
-| GPG              | "Esperando a la ventana de GPG…" / "Waiting for the GPG window…"                                                                                                                                                                                                                                                                     |
+| Uso              | Texto                                                                                                                                                                                                                                                                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Titulo HTTPS     | "Credenciales para {host}" / "Credentials for {host}"                                                                                                                                                                                                                                                                                          |
+| Campos           | "Usuario" / "Username" · "Token o contraseña" / "Token or password" · "Guardar como cuenta de Git Rudder para {host}" / "Save as a Git Rudder account for {host}" · "Conectar con OAuth" / "Connect with OAuth"                                                                                                                                |
+| Titulo SSH       | "Frase de la llave SSH" / "SSH key passphrase" · "Recordar hasta cerrar Git Rudder" / "Remember until Git Rudder closes" · "Desbloquear" / "Unlock"                                                                                                                                                                                            |
+| Frase incorrecta | "La frase no es correcta." / "That passphrase is wrong."                                                                                                                                                                                                                                                                                       |
+| Titulo huella    | "¿Confiar en {host}?" / "Trust {host}?"                                                                                                                                                                                                                                                                                                        |
+| Texto huella     | "Es la primera vez que te conectas a este servidor. Comprueba la huella con quien lo administra." / "This is your first connection to this server. Check the fingerprint with whoever runs it." · "Confiar y continuar" / "Trust and continue"                                                                                                 |
+| Huella cambiada  | "La huella de {host} ha cambiado" / "{host}'s fingerprint has changed" · "Puede ser un cambio legítimo del servidor o alguien interceptando la conexión. Git Rudder no continuará. Revisa tu known_hosts." / "It may be a legitimate server change or someone intercepting the connection. Git Rudder won't continue. Check your known_hosts." |
+| GPG              | "Esperando a la ventana de GPG…" / "Waiting for the GPG window…"                                                                                                                                                                                                                                                                               |
 
 - **Variantes.** Claro y oscuro; las cuatro variantes.
 
@@ -361,16 +361,16 @@ iguales en los dos idiomas (`{branch}`, `{host}`); los contadores usan `{count}`
 - Acciones destructivas con el modal de peligro de #71 (boton `--danger`, foco inicial en
   "Cancelar"): force push, borrar el bloqueo, descartar y cambiar, salir de HEAD separado con commits
   sueltos, abortar.
-- Textos al diccionario `D`, colores de los tokens, ningun "simulado" (B-46). Datos de ejemplo sin
-  `ramal.dev` (usa `example.com`).
+- Textos al diccionario `D`, colores de los tokens, ningun "simulado" (B-46). Datos de ejemplo con
+  correos de `example.com`.
 
 ## Entregable
 
-- Zip `ramal-handoff-65-git.zip` con la estructura del original: `README.md` (seccion de pantallas
-  nuevas con los ids), `Ramal Git.dc.html`, `ramal-data.js` (original mas claves nuevas) y
+- Zip `git-rudder-handoff-65-git.zip` con la estructura del original: `README.md` (seccion de pantallas
+  nuevas con los ids), `Git Rudder Git.dc.html`, `git-rudder-data.js` (original mas claves nuevas) y
   `support.js`.
-- `Ramal Git.dc.html` reutiliza la vista de repositorio y Ajustes > Plataformas Git de
-  `Ramal.dc.html`. Si D-42 (#67) ya existe, usa su barra de titulo.
+- `Git Rudder Git.dc.html` reutiliza la vista de repositorio y Ajustes > Plataformas Git de
+  `Git Rudder.dc.html`. Si D-42 (#67) ya existe, usa su barra de titulo.
 - Props: `theme`, `lang`, `density` (`desktop` de 40 px, `vscode` de 28 px, solo para el resolvedor
   de D-19) y `screen`: `d12-plataforma`, `d12-github-codigo`, `d12-navegador`, `d12-token`,
   `d12-azure`, `d12-exito`, `d12-error-permisos`, `d12-error-sso`, `d12-actualizar`, `d13-https`,

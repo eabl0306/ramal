@@ -1,10 +1,10 @@
-# ramal-vscode-engine
+# git-rudder-vscode-engine
 
-El motor de Git de Ramal servido por JSON-RPC 2.0 sobre stdio. La extension de VS Code lo
+El motor de Git de Git Rudder servido por JSON-RPC 2.0 sobre stdio. La extension de VS Code lo
 lanza como proceso hijo; el protocolo es el mismo que usa escritorio en proceso.
 
 ```
-ramal-vscode-engine [--git-path <ruta>] [--log-level <filtro>] [--version]
+git-rudder-vscode-engine [--git-path <ruta>] [--log-level <filtro>] [--version]
 ```
 
 - Marcos `Content-Length: <bytes>\r\n\r\n` mas el JSON. Mas de 32 MiB cierra la conexion.

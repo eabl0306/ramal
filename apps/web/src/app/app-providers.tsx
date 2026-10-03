@@ -1,5 +1,5 @@
-import { I18nProvider, IconProvider, ToastProvider } from '@ramal/ui';
-import { lucideIcons } from '@ramal/ui/icons/lucide';
+import { I18nProvider, IconProvider, ToastProvider } from '@git-rudder/ui';
+import { lucideIcons } from '@git-rudder/ui/icons/lucide';
 import type { ReactElement, ReactNode } from 'react';
 
 import type { Language } from '../domain/preferences/preferences';

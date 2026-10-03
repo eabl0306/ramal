@@ -12,12 +12,12 @@
 
 use std::sync::Arc;
 
+use git_rudder_core_application::testing::{FakeGitReader, version_info};
+use git_rudder_core_application::{GitReadError, GitVersion};
+use git_rudder_core_domain::RepoRoot;
+use git_rudder_engine::{CallContext, CallOrigin, Engine, EngineBuilder, EngineConfig};
+use git_rudder_protocol::{ErrorKind, RpcError, RpcOutcome, RpcRequest, RpcResponse, error_code};
 use pretty_assertions::assert_eq;
-use ramal_core_application::testing::{FakeGitReader, version_info};
-use ramal_core_application::{GitReadError, GitVersion};
-use ramal_core_domain::RepoRoot;
-use ramal_engine::{CallContext, CallOrigin, Engine, EngineBuilder, EngineConfig};
-use ramal_protocol::{ErrorKind, RpcError, RpcOutcome, RpcRequest, RpcResponse, error_code};
 use serde_json::json;
 
 fn engine_with(git: FakeGitReader) -> Engine {
@@ -122,7 +122,7 @@ async fn an_old_git_is_described_but_cannot_open_repositories() {
     let old = Ok(version_info(GitVersion::new(2, 30, 1)));
     let git = FakeGitReader::new()
         .with_version(old)
-        .with_repository("/work/ramal", RepoRoot::new("/work/ramal"));
+        .with_repository("/work/git-rudder", RepoRoot::new("/work/git-rudder"));
     let engine = engine_with(git);
 
     let info = engine
@@ -132,7 +132,7 @@ async fn an_old_git_is_described_but_cannot_open_repositories() {
     let error = engine
         .dispatch(
             "repo/open",
-            json!({ "path": "/work/ramal" }),
+            json!({ "path": "/work/git-rudder" }),
             CallContext::host(),
         )
         .await
@@ -149,7 +149,7 @@ async fn an_old_git_is_described_but_cannot_open_repositories() {
 #[tokio::test]
 async fn a_git_failure_keeps_its_detail_out_of_the_response() {
     let git = FakeGitReader::new()
-        .with_repository("/work/ramal", RepoRoot::new("/work/ramal"))
+        .with_repository("/work/git-rudder", RepoRoot::new("/work/git-rudder"))
         .with_refs(Err(GitReadError::Failed {
             detail: "fatal: secret path /home/ana/private".to_owned(),
         }));
@@ -158,7 +158,7 @@ async fn a_git_failure_keeps_its_detail_out_of_the_response() {
     let error = engine
         .dispatch(
             "repo/open",
-            json!({ "path": "/work/ramal" }),
+            json!({ "path": "/work/git-rudder" }),
             CallContext::host(),
         )
         .await

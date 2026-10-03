@@ -1,5 +1,5 @@
 [package]
-name = "ramal-vscode-engine"
+name = "git-rudder-vscode-engine"
 description = "Sidecar de la extension de VS Code: el motor de Git servido por JSON-RPC 2.0 sobre stdio."
 version.workspace = true
 edition.workspace = true
@@ -13,14 +13,14 @@ license.workspace = true
 path = "src/lib.rs"
 
 [[bin]]
-name = "ramal-vscode-engine"
+name = "git-rudder-vscode-engine"
 path = "src/main.rs"
 
 # Solo el motor y el protocolo del workspace: el host habla con el motor, no con
 # sus piezas (lo vigila crates/engine/tests/architecture.rs).
 [dependencies]
-ramal-engine = { workspace = true }
-ramal-protocol = { workspace = true }
+git-rudder-engine = { workspace = true }
+git-rudder-protocol = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["io-std", "io-util", "sync"] }

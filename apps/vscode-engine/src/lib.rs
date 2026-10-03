@@ -3,7 +3,7 @@
 //! de VS Code.
 //!
 //! stdout es solo protocolo. Todo el log va a stderr, que el extension host vuelca
-//! en el canal "Ramal Engine"; por eso `print_stdout` esta denegado en clippy. El
+//! en el canal "Git Rudder Engine"; por eso `print_stdout` esta denegado en clippy. El
 //! proceso termina cuando se cierra stdin: si el extension host muere, el motor no
 //! se queda huerfano.
 
@@ -35,7 +35,7 @@ pub fn run<I: IntoIterator<Item = OsString>>(arguments: I) -> ExitCode {
         Err(error) => {
             let _ = writeln!(
                 std::io::stderr(),
-                "ramal-vscode-engine: {error}\n{}",
+                "git-rudder-vscode-engine: {error}\n{}",
                 args::USAGE
             );
             return ExitCode::from(USAGE_EXIT);
@@ -51,7 +51,7 @@ fn serve_stdio(args: &Args) -> ExitCode {
     };
     let handler = Arc::new(EngineHandler::new(bootstrap::build_engine(args)));
     tracing::info!(
-        version = ramal_engine::ENGINE_VERSION,
+        version = git_rudder_engine::ENGINE_VERSION,
         "engine ready on stdio"
     );
     let result = runtime.block_on(server::serve(
@@ -97,7 +97,10 @@ fn protocol_failure(error: &server::ServeError) -> ExitCode {
 }
 
 fn print_version() -> ExitCode {
-    let line = format!("ramal-vscode-engine {}", ramal_engine::ENGINE_VERSION);
+    let line = format!(
+        "git-rudder-vscode-engine {}",
+        git_rudder_engine::ENGINE_VERSION
+    );
     match writeln!(std::io::stdout(), "{line}") {
         Ok(()) => ExitCode::SUCCESS,
         Err(_) => ExitCode::FAILURE,

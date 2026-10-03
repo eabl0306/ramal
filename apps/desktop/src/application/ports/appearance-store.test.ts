@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { THEMES, isThemeName } from './appearance-store';
 
 describe('isThemeName', () => {
-  it('acepta los dos temas de ramal.css', () => {
+  it('acepta los dos temas de git-rudder.css', () => {
     expect(THEMES.every(isThemeName)).toBe(true);
   });
 

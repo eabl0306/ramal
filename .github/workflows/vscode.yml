@@ -76,7 +76,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Instalar Chromium de Playwright
-        run: pnpm --fail-if-no-match --filter ramal exec playwright install --with-deps chromium
+        run: pnpm --fail-if-no-match --filter git-rudder exec playwright install --with-deps chromium
 
       # El bundle de produccion con un acquireVsCodeApi falso y la CSP real.
       - name: E2E del webview (just vscode-e2e)
@@ -144,9 +144,9 @@ jobs:
       - name: Comprobar el contenido de la VSIX
         run: |
           set -euo pipefail
-          vsix="$(ls apps/vscode/ramal-linux-x64-*.vsix)"
+          vsix="$(ls apps/vscode/git-rudder-linux-x64-*.vsix)"
           unzip -l "${vsix}"
-          unzip -l "${vsix}" | grep -q 'extension/dist/bin/ramal-vscode-engine$'
+          unzip -l "${vsix}" | grep -q 'extension/dist/bin/git-rudder-vscode-engine$'
           unzip -l "${vsix}" | grep -q 'extension/dist/extension.cjs$'
           unzip -l "${vsix}" | grep -q 'extension/dist/webview/manifest.json$'
           if unzip -l "${vsix}" | grep -q '\.map$'; then
@@ -157,6 +157,6 @@ jobs:
       - name: Subir la VSIX
         uses: actions/upload-artifact@v7
         with:
-          name: ramal-vscode-linux-x64
+          name: git-rudder-vscode-linux-x64
           path: apps/vscode/*.vsix
           if-no-files-found: error

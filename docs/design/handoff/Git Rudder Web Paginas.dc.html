@@ -10,7 +10,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;
 --bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -42,11 +42,11 @@ button:disabled{cursor:default}
   </div>
 
   <sc-if value="{{ inPanel }}">
-    <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--border)"><div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600">Ramal</span><span style="color:var(--faint)">/</span><span style="height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;font-weight:500">ACME Studio</span><div style="flex:1"></div><div style="width:32px;height:32px;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px">MR</div></div>
+    <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--border)"><div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600">Git Rudder</span><span style="color:var(--faint)">/</span><span style="height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;font-weight:500">ACME Studio</span><div style="flex:1"></div><div style="width:32px;height:32px;border-radius:50%;background:oklch(0.68 0.2 300);color:oklch(0.2 0.02 300);display:grid;place-items:center;font-weight:700;font-size:11px">MR</div></div>
   </sc-if>
   <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
     <header class="noprint" style="position:sticky;top:0;z-index:20;height:64px;display:flex;align-items:center;gap:16px;padding:0 {{ pad }}px;background:color-mix(in oklch, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)">
-      <a href="./Ramal Web.dc.html" style="display:flex;align-items:center;gap:9px;color:var(--text)"><span style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</span><span style="font-weight:600;font-size:16px">Ramal</span></a>
+      <a href="./Git Rudder Web.dc.html" style="display:flex;align-items:center;gap:9px;color:var(--text)"><span style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</span><span style="font-weight:600;font-size:16px">Git Rudder</span></a>
       <sc-if value="{{ wide }}"><nav style="display:flex;gap:4px;margin-left:8px"><sc-for list="{{ navLinks }}" as="n"><a onClick="{{ n.onClick }}" style="padding:8px 12px;border-radius:8px;color:var(--muted);font-weight:500;white-space:nowrap" style-hover="color:var(--text);background:var(--surface2)">{{ n.label }}</a></sc-for></nav></sc-if>
       <div style="flex:1"></div>
       <sc-if value="{{ wide }}">
@@ -69,7 +69,7 @@ button:disabled{cursor:default}
   </sc-if>
 
   <div style="flex:1;display:flex;min-height:0">
-  <sc-if value="{{ panelSide }}"><nav aria-label="Panel" style="width:232px;flex-shrink:0;padding:14px 10px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px"><sc-for list="{{ panelNav }}" as="n"><a href="./Ramal Web Panel.dc.html" style="height:34px;padding:0 10px;border-radius:8px;display:flex;align-items:center;font-weight:500;color:var(--text)" style-hover="background:var(--surface2)">{{ n }}</a></sc-for></nav></sc-if>
+  <sc-if value="{{ panelSide }}"><nav aria-label="Panel" style="width:232px;flex-shrink:0;padding:14px 10px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:2px"><sc-for list="{{ panelNav }}" as="n"><a href="./Git Rudder Web Panel.dc.html" style="height:34px;padding:0 10px;border-radius:8px;display:flex;align-items:center;font-weight:500;color:var(--text)" style-hover="background:var(--surface2)">{{ n }}</a></sc-for></nav></sc-if>
   <main style="flex:1;min-width:0;display:flex;flex-direction:column">
     <sc-if value="{{ isPricing }}" hint-placeholder-val="{{ true }}">
       <section style="max-width:1080px;width:100%;margin:0 auto;padding:64px {{ pad }}px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px">
@@ -110,7 +110,7 @@ button:disabled{cursor:default}
     <sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
       <section style="max-width:1080px;width:100%;margin:0 auto;padding:36px {{ pad }}px 64px;display:flex;flex-direction:column;gap:18px">
         <h1 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-0.02em">{{ co.title }}</h1>
-        <sc-if value="{{ co.notOwner }}"><div role="alert" style="padding:14px 16px;border-radius:12px;background:color-mix(in oklch, var(--danger) 10%, transparent);color:var(--danger);display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1">{{ co.notOwnerText }}</span><a href="./Ramal Web Panel.dc.html" style="font-weight:600">{{ t.coGoBilling }}</a></div></sc-if>
+        <sc-if value="{{ co.notOwner }}"><div role="alert" style="padding:14px 16px;border-radius:12px;background:color-mix(in oklch, var(--danger) 10%, transparent);color:var(--danger);display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1">{{ co.notOwnerText }}</span><a href="./Git Rudder Web Panel.dc.html" style="font-weight:600">{{ t.coGoBilling }}</a></div></sc-if>
         <sc-if value="{{ co.isOwner }}">
           <div style="display:grid;gap:18px;align-items:start;grid-template-columns:{{ co.cols }}">
             <div style="padding:22px;border-radius:14px;background:var(--surface);border:1px solid var(--border);display:flex;flex-direction:column;gap:16px">
@@ -126,7 +126,7 @@ button:disabled{cursor:default}
               <sc-if value="{{ co.isLoading }}"><div aria-busy="true" style="display:flex;flex-direction:column;gap:12px;animation:pulse 1.4s ease-in-out infinite"><span style="font-size:13px;color:var(--muted)">{{ t.coLoading }}</span><sc-for list="{{ co.skel }}" as="h"><span style="border-radius:9px;border:1px dashed var(--border);background:var(--bg);height:{{ h }}px"></span></sc-for></div></sc-if>
               <sc-if value="{{ co.isSlot }}"><div style="flex:1;min-height:340px;border-radius:12px;border:1px dashed var(--faint);display:grid;place-items:center;text-align:center;padding:20px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--faint)">{{ t.coPaddle }} · Paddle.js inline</div></sc-if>
               <sc-if value="{{ co.isBlocked }}"><div role="alert" style="padding:14px;border-radius:10px;background:color-mix(in oklch, var(--danger) 10%, transparent);color:var(--danger);line-height:1.5;display:flex;flex-direction:column;gap:10px"><span>{{ t.coBlocked }}</span><button onClick="{{ co.retry }}" style="align-self:flex-start;height:34px;padding:0 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-weight:500">{{ t.coRetry }}</button></div></sc-if>
-              <sc-if value="{{ co.isMsg }}"><div role="status" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:30px 10px"><div style="width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:700;background:{{ co.msgBg }};color:{{ co.msgColor }}">{{ co.msgIcon }}</div><p style="margin:0;max-width:360px;line-height:1.55">{{ co.msg }}</p><sc-if value="{{ co.hasMsgBtn }}"><a href="./Ramal Web Panel.dc.html" style="font-weight:600">{{ t.coGoBilling }}</a></sc-if></div></sc-if>
+              <sc-if value="{{ co.isMsg }}"><div role="status" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:30px 10px"><div style="width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:700;background:{{ co.msgBg }};color:{{ co.msgColor }}">{{ co.msgIcon }}</div><p style="margin:0;max-width:360px;line-height:1.55">{{ co.msg }}</p><sc-if value="{{ co.hasMsgBtn }}"><a href="./Git Rudder Web Panel.dc.html" style="font-weight:600">{{ t.coGoBilling }}</a></sc-if></div></sc-if>
             </div>
           </div>
         </sc-if>
@@ -201,9 +201,9 @@ button:disabled{cursor:default}
   </div>
   <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
     <footer class="noprint" style="border-top:1px solid var(--border);padding:24px {{ pad }}px;display:flex;align-items:center;gap:8px 18px;flex-wrap:wrap;color:var(--faint);font-size:13px">
-      <span style="font-weight:600;color:var(--text)">Ramal</span>
+      <span style="font-weight:600;color:var(--text)">Git Rudder</span>
       <sc-for list="{{ foot }}" as="l"><a onClick="{{ l.onClick }}" style="color:var(--faint)" style-hover="color:var(--text)">{{ l.label }}</a></sc-for>
-      <span style="flex:1"></span><span>© 2026 Ramal</span>
+      <span style="flex:1"></span><span>© 2026 Git Rudder</span>
     </footer>
   </sc-if>
 
@@ -245,7 +245,7 @@ class Component extends DCLogic {
   timers = [];
   componentDidMount() {
     this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs);
-    const go = () => window.RAMAL && window.RAMAL.WEB70 ? this.boot() : setTimeout(go, 30); go();
+    const go = () => window.GIT_RUDDER && window.GIT_RUDDER.WEB70 ? this.boot() : setTimeout(go, 30); go();
   }
   componentWillUnmount() { window.removeEventListener('resize', this._rs); this.timers.forEach(clearTimeout); }
   componentDidUpdate(pp) {
@@ -262,7 +262,7 @@ class Component extends DCLogic {
   later(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
   get L() { return this.state.lang === 'en' ? 1 : 0; }
   t(k, v) {
-    const R = window.RAMAL, W = R.WEB70, n = v && (v.count ?? v.days); let e = null;
+    const R = window.GIT_RUDDER, W = R.WEB70, n = v && (v.count ?? v.days); let e = null;
     for (const ns of ['pricing', 'billing', 'team', 'legal', 'dashboard', 'account', 'download']) { const key = ns + '.' + k; e = W[key] || (n != null ? W[key + (n === 1 ? '_one' : '_other')] : null); if (e) break; }
     if (!e) e = LX[k] || R.D[k] || (R.STATES || {})[k]; if (!e) return k; return fill(e[this.L], v);
   }
@@ -282,13 +282,13 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state;
-    if (!s.ready || !window.RAMAL || !window.RAMAL.WEB70) return { t: {}, proto: [], isPublic: true, isPricing: true, cd: {}, co: {}, lg: {}, dc: {}, rn: {} };
+    if (!s.ready || !window.GIT_RUDDER || !window.GIT_RUDDER.WEB70) return { t: {}, proto: [], isPublic: true, isPricing: true, cd: {}, co: {}, lg: {}, dc: {}, rn: {} };
     const T = this.t.bind(this), L = this.L, vw = s.vw || 1280, wide = vw >= 900, pad = vw < 600 ? 16 : 28, sc = s.screen, st = s.st;
     const t = {}; ['prKicker', 'prTitle', 'prFree', 'prFreePrice', 'prFreeSub', 'prPro', 'prSave', 'prDownload', 'prSignup', 'prTrialSub', 'prFootnote', 'prCompare', 'prYes', 'prPickOrg', 'prCreateOther', 'coSummary', 'coSeats', 'coPaddle', 'coLoading', 'coBlocked', 'coRetry', 'coGoBilling', 'coNote1', 'coNote2', 'invLoading', 'print', 'lgToc', 'dcIndex', 'dcSoon', 'rnAll', 'rnBeta', 'rnEmpty', 'rnDownload', 'e500Retry', 'cancel'].forEach(k => { t[k] = T(k); });
     const chip = (id, on, onClick) => ({ id, onClick, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', border: on ? 'var(--accent)' : 'var(--border)' });
     const proto = [{ label: 'screen', chips: Object.keys(SCREENS).map(id => chip(id, sc === id, () => this.apply(id))) }, { label: 'state', chips: SCREENS[sc].map(id => chip(id, st === id, () => this.apply(sc, id))).concat([chip(ROUTE[sc], false, () => {})]) }];
     const loggedIn = (sc === 'W-17' && st !== 'sin-sesion') || sc === 'W-18' || (sc === 'W-11' && ['mismo-email', 'uniendote', 'unido', 'otro-email', 'ya-miembro'].includes(st));
-    const toWeb = () => { location.href = './Ramal Web.dc.html'; }, toAuth = h => { location.href = './Ramal Web Auth.dc.html#' + h; }, toPanel = () => { location.href = './Ramal Web Panel.dc.html'; };
+    const toWeb = () => { location.href = './Git Rudder Web.dc.html'; }, toAuth = h => { location.href = './Git Rudder Web Auth.dc.html#' + h; }, toPanel = () => { location.href = './Git Rudder Web Panel.dc.html'; };
     const inPanel = sc === 'W-28' && st === '404-panel';
     const base = { t, proto, wide, narrow: !wide, pad, wideDoc: vw >= 1100, isPublic: !inPanel, inPanel, panelSide: inPanel && vw >= 900, panelNav: [['Resumen', 'Overview'], ['Workspaces', 'Workspaces'], ['Repositorios', 'Repositories'], ['Cuentas vinculadas', 'Linked accounts'], ['Equipo', 'Team'], ['IA de la organización', 'Organization AI'], ['Facturación', 'Billing'], ['Sincronización', 'Sync'], ['Cuenta', 'Account']].map(x => x[s.lang === 'en' ? 1 : 0]), toasts: s.toasts.map(x => ({ text: x.text })),
       navLinks: [[T('features'), toWeb], [T('prNav'), () => this.apply('W-17', loggedIn ? 'con-sesion' : 'sin-sesion')], [T('download'), toWeb], ['VS Code', toWeb]].map(([label, onClick]) => ({ label, onClick })),
@@ -307,8 +307,8 @@ class Component extends DCLogic {
       Object.assign(base, { proPrice: ann ? T('prProAnnual') : T('prProMonthly'), proSub: ann ? T('prProAnnualS') : T('prProMonthlyS'), freeList: [1, 2, 3, 4, 5].map(i => T('prF' + i)), proList: [1, 2, 3, 4, 5].map(i => T('prP' + i)),
         compare: [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => ({ label: T('cmp' + i), free: i <= 5 ? T('prYes') : T('prNo'), freeColor: i <= 5 ? 'var(--ok)' : 'var(--faint)' })), faq: [1, 2, 3, 4, 5].map(i => ({ q: T('faq' + i + 'Q'), a: T('faq' + i + 'A') })),
         trialLabel: st === 'con-plan' ? T('prSeePlan') : T('prTrial'), showTrialSub: st !== 'con-plan', goDownload: toWeb, goSignup: () => toAuth('signup'),
-        onTrial: () => st === 'sin-sesion' ? toAuth('signup') : st === 'con-sesion' ? (location.href = './Ramal Web Panel.dc.html') : st === 'con-plan' ? toPanel() : this.setState({ modal: true }),
-        pickOrgs: [{ ini: 'AS', name: 'ACME Studio', note: T('prHasPlan'), disabled: true, opacity: 0.5 }, { ini: 'LR', name: 'Lab Ruiz', note: '', disabled: false, opacity: 1, onClick: () => this.apply('W-18', 'cargando') }], newOrg: () => { location.href = './Ramal Web Panel.dc.html'; } });
+        onTrial: () => st === 'sin-sesion' ? toAuth('signup') : st === 'con-sesion' ? (location.href = './Git Rudder Web Panel.dc.html') : st === 'con-plan' ? toPanel() : this.setState({ modal: true }),
+        pickOrgs: [{ ini: 'AS', name: 'ACME Studio', note: T('prHasPlan'), disabled: true, opacity: 0.5 }, { ini: 'LR', name: 'Lab Ruiz', note: '', disabled: false, opacity: 1, onClick: () => this.apply('W-18', 'cargando') }], newOrg: () => { location.href = './Git Rudder Web Panel.dc.html'; } });
     }
     if (sc === 'W-18') {
       const used = 5, price = ann ? 96 : 10, seats = Math.max(used, s.seats);

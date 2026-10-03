@@ -109,7 +109,7 @@ jobs:
               - *node
               - *recipes
               - 'apps/web/**'
-              # El contrato de la API: @ramal/api-client se genera de el y la web
+              # El contrato de la API: @git-rudder/api-client se genera de el y la web
               # comprueba que el cliente commiteado sigue al dia.
               - 'apps/api/openapi.json'
               - '.github/workflows/web.yml'

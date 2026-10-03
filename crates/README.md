@@ -1,16 +1,16 @@
 # El motor de Git (crates/)
 
-El motor del cliente, en Rust. Lo usan los dos hosts: Ramal Desktop lo lleva en proceso y la
-extension de VS Code como sidecar (`apps/vscode-engine`). Los dos entran por `ramal-engine`, asi
+El motor del cliente, en Rust. Lo usan los dos hosts: Git Rudder Desktop lo lleva en proceso y la
+extension de VS Code como sidecar (`apps/vscode-engine`). Los dos entran por `git-rudder-engine`, asi
 que el protocolo es el mismo en los dos productos.
 
-| Crate                                         | Papel                                                                          |
-| --------------------------------------------- | ------------------------------------------------------------------------------ |
-| `core-domain` (`ramal-core-domain`)           | Dominio puro: sha, refs y su huella, commits, fecha de git, carriles del grafo |
-| `core-application` (`ramal-core-application`) | Puerto `GitReader`, casos de uso, registro de repos abiertos y fakes           |
-| `protocol` (`ramal-protocol`)                 | Metodos, DTOs y sobre JSON-RPC; genera los tipos de `@ramal/bridge` con ts-rs  |
-| `git` (`ramal-git`)                           | Adaptador del git CLI: version, descubrimiento, refs y log                     |
-| `engine` (`ramal-engine`)                     | Dispatch, mapeo dominio a DTO y composition root compartido                    |
+| Crate                                              | Papel                                                                              |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `core-domain` (`git-rudder-core-domain`)           | Dominio puro: sha, refs y su huella, commits, fecha de git, carriles del grafo     |
+| `core-application` (`git-rudder-core-application`) | Puerto `GitReader`, casos de uso, registro de repos abiertos y fakes               |
+| `protocol` (`git-rudder-protocol`)                 | Metodos, DTOs y sobre JSON-RPC; genera los tipos de `@git-rudder/bridge` con ts-rs |
+| `git` (`git-rudder-git`)                           | Adaptador del git CLI: version, descubrimiento, refs y log                         |
+| `engine` (`git-rudder-engine`)                     | Dispatch, mapeo dominio a DTO y composition root compartido                        |
 
 Metodos del primer corte: `engine/info`, `repo/open` (solo lo llaman los hosts) y
 `graph/window`. El detalle esta en `docs/architecture.md` (4.2 y 6.5).

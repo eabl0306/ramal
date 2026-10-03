@@ -1,4 +1,4 @@
-import type { DetectedPlatform } from '@ramal/domain';
+import type { DetectedPlatform } from '@git-rudder/domain';
 import { type RenderResult, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router';
