@@ -115,7 +115,7 @@ export class VsCodeWebviewPanels implements WebviewSurface, vscode.Disposable {
 
   #create(request: ShowSurfaceRequest, key: string): OpenPanel {
     const panel = vscode.window.createWebviewPanel(
-      `git-rudder.${request.surface}`,
+      `gitRudder.${request.surface}`,
       request.title,
       vscode.ViewColumn.Active,
       { enableScripts: true, localResourceRoots: [this.#webviewRoot] },

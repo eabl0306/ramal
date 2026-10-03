@@ -68,9 +68,14 @@ async function whenAvailable<T>(call: () => Promise<T>, timeoutMs = 30_000): Pro
 
 /** Mata con SIGKILL los sidecars que cuelgan de este extension host, como una caida. */
 function killSidecar(): void {
-  const output = execFileSync('pgrep', ['-P', String(process.pid), 'git-rudder-vscode'], {
-    encoding: 'utf8',
-  });
+  // -f mira la linea de comando entera: Linux corta el nombre del proceso a 15
+  // caracteres y "git-rudder-vscode-engine" no cabe. El -P lo deja en los hijos
+  // de este extension host, asi que no puede cazar nada ajeno.
+  const output = execFileSync(
+    'pgrep',
+    ['-P', String(process.pid), '-f', 'git-rudder-vscode-engine'],
+    { encoding: 'utf8' },
+  );
   const pids = output.split('\n').filter((line) => line.trim() !== '');
   assert.ok(pids.length > 0, 'the engine sidecar is running');
   for (const pid of pids) process.kill(Number(pid), 'SIGKILL');
