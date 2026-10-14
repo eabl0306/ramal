@@ -29,8 +29,8 @@
     "@fontsource/ibm-plex-sans": "5.3.0",
     "@ramal/i18n": "workspace:*",
     "@vscode/codicons": "0.0.45",
-    "lucide-react": "1.49.0",
-    "react-aria-components": "1.21.1"
+    "lucide-react": "1.55.0",
+    "react-aria-components": "1.22.1"
   },
   "peerDependencies": {
     "react": "^19.3.0",
@@ -43,17 +43,17 @@
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
     "@testing-library/user-event": "14.6.7",
-    "@types/node": "24.19.0",
+    "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@vitejs/plugin-react": "6.1.1",
-    "@vitest/coverage-v8": "5.0.2",
-    "eslint": "10.11.0",
-    "jsdom": "30.1.1",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "5.0.3",
+    "eslint": "10.12.0",
+    "jsdom": "30.1.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "typescript": "6.0.3",
-    "vite": "8.3.1",
-    "vitest": "5.0.2"
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
   }
 }
