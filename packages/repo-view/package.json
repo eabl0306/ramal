@@ -22,7 +22,7 @@
     "@ramal/bridge": "workspace:*",
     "@ramal/i18n": "workspace:*",
     "@ramal/ui": "workspace:*",
-    "@tanstack/react-virtual": "3.14.13"
+    "@tanstack/react-virtual": "3.14.21"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.104.0",
@@ -32,22 +32,22 @@
   "devDependencies": {
     "@ramal/eslint-config": "workspace:*",
     "@ramal/tsconfig": "workspace:*",
-    "@tanstack/react-query": "5.104.0",
+    "@tanstack/react-query": "5.104.3",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.7",
-    "@types/node": "24.19.0",
+    "@testing-library/user-event": "14.6.8",
+    "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@vitejs/plugin-react": "6.1.1",
-    "@vitest/coverage-v8": "5.0.2",
-    "eslint": "10.11.0",
-    "jsdom": "30.1.1",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "5.0.5",
+    "eslint": "10.13.0",
+    "jsdom": "30.1.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "typescript": "6.0.3",
-    "vite": "8.3.1",
-    "vitest": "5.0.2"
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
   }
 }
