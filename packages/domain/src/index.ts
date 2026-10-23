@@ -165,6 +165,8 @@ export {
 
 export { MIN_MASKABLE_LENGTH, SECRET_MASK, maskSecret } from './secrets/mask-secret';
 
+export { type RemoteRef, parseRemoteUrl, remoteRepoName } from './remotes/remote-url';
+
 export {
   type CommitMessageParts,
   type CommitReadiness,
