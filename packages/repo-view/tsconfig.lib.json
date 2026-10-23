@@ -1,8 +1,8 @@
 // Codigo de produccion de @git-rudder/repo-view. Solo referencia los paquetes del
-// workspace que puede importar (architecture.md 5.2): ui, i18n y bridge.
+// workspace que puede importar (architecture.md 5.2): ui, i18n, bridge y domain.
 // Importar otro rompe `tsc -b` con TS6307 aunque ESLint no estuviera bien
-// configurado. @git-rudder/domain tambien esta permitido, pero el grafo del primer
-// corte no lo usa: su referencia llega con la primera pieza que lo necesite.
+// configurado. La referencia a @git-rudder/domain llego con las iniciales del
+// autor, que son logica compartida y no del grafo (issue #93).
 {
   "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
@@ -16,7 +16,8 @@
   "references": [
     { "path": "../ui/tsconfig.lib.json" },
     { "path": "../i18n/tsconfig.lib.json" },
-    { "path": "../bridge" }
+    { "path": "../bridge" },
+    { "path": "../domain/tsconfig.lib.json" }
   ],
   "include": ["src"],
   "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/test"]

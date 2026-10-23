@@ -13,6 +13,14 @@ export {
   validateLogin,
   validateSignup,
 } from './auth/auth-form';
+export {
+  MIN_PASSPHRASE_LENGTH,
+  MIN_PASSPHRASE_SCORE,
+  type PassphraseIssue,
+  type PassphraseScore,
+  type PassphraseStrength,
+  passphraseStrength,
+} from './auth/passphrase';
 
 export {
   type CpuArch,
@@ -164,6 +172,11 @@ export {
 } from './time/relative-time';
 
 export { MIN_MASKABLE_LENGTH, SECRET_MASK, maskSecret } from './secrets/mask-secret';
+
+export { authorInitials } from './people/initials';
+export { avatarColorIndex } from './people/avatar-color';
+
+export { type RemoteRef, parseRemoteUrl, remoteRepoName } from './remotes/remote-url';
 
 export {
   type CommitMessageParts,

@@ -1,8 +1,8 @@
 import type { GraphRow } from '@git-rudder/bridge';
+import { authorInitials } from '@git-rudder/domain';
 
 import { type EdgeSpan, edgePath } from './edge-path';
 import { type GraphMetrics, laneX, rowY } from './geometry';
-import { authorInitials } from './initials';
 
 /** Una arista con su clave estable y las filas ya resueltas. */
 export interface EdgeEntry extends EdgeSpan {

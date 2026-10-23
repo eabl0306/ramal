@@ -2,28 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { refLabel } from '../test/fixtures';
 
-import { authorInitials } from './initials';
 import { nextRowIndex } from './keyboard';
 import { MAX_VISIBLE_REFS, refColor, refIcon, splitRefs } from './refs';
-
-describe('authorInitials', () => {
-  it('toma la primera letra de la primera y de la ultima palabra', () => {
-    expect(authorInitials('Ana Maria Ruiz')).toBe('AR');
-    expect(authorInitials('  marta   rios ')).toBe('MR');
-  });
-
-  it('toma dos letras de un nombre de una palabra o de usuario', () => {
-    expect(authorInitials('ezequiel')).toBe('EZ');
-    expect(authorInitials('j')).toBe('J');
-    expect(authorInitials('dev.bot')).toBe('DB');
-  });
-
-  it('no parte caracteres fuera del plano basico y aguanta un nombre sin letras', () => {
-    expect(authorInitials('Ångström Ñu')).toBe('ÅÑ');
-    expect(authorInitials('𝒜lex')).toBe('𝒜L');
-    expect(authorInitials('  -- ')).toBe('?');
-  });
-});
 
 describe('refs de una fila', () => {
   const head = refLabel('main', { isHead: true });
