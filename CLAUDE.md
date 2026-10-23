@@ -182,6 +182,10 @@ Se aplican a los dos lenguajes y rompen el build ([ADR 0005](docs/adr/0005-enfor
   escritorio y del extension host) y 60% global, tambien en el host de Tauri.
 - Colores solo desde los tokens de `@git-rudder/ui` (stylelint y `git-rudder/no-raw-colors`). Ningun texto
   visible escrito en un componente (`git-rudder/no-jsx-literal-text`): sale de `@git-rudder/i18n`.
+- En `@git-rudder/i18n`, dos claves no significan lo mismo: el mismo castellano lleva el mismo
+  ingles (y al reves), un texto compartido vive solo en `common`, y un texto con `{count}` tiene
+  `_one` y `_other`. Lo comprueba `packages/i18n/test/consistency.test.ts`, con las excepciones
+  declaradas y con motivo ([ADR 0017](docs/adr/0017-internacionalizacion-compartida.md)).
 
 Los avisos son errores en todas partes: `-D warnings` en Rust y `--max-warnings 0` en ESLint y
 stylelint.

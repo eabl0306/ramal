@@ -4,7 +4,7 @@
     "download": "Download",
     "vscode": "VS Code",
     "login": "Log in",
-    "signup": "Sign up",
+    "signup": "Create account",
     "openDashboard": "Open dashboard"
   },
   "hero": {
@@ -102,7 +102,6 @@
   "footer": {
     "docs": "Docs",
     "releaseNotes": "Release notes",
-    "status": "Status",
     "privacy": "Privacy"
   },
   "auth": {
@@ -112,10 +111,8 @@
     "signupSubtitle": "Sync Git Rudder across your machines and work as a team.",
     "continueWith": "Continue with {provider}",
     "orEmail": "or with email",
-    "email": "Email",
     "password": "Password",
     "forgot": "Forgot it?",
-    "name": "Name",
     "organization": "Organization (optional)",
     "passwordHint": "At least 8 characters",
     "passwordOk": "Valid password",
@@ -174,11 +171,7 @@
     "ownerYou": "Yours",
     "disconnect": "Disconnect…",
     "testConnection": "Test connection",
-    "unlink": "Unlink from account…",
-    "platform": "Platform",
-    "host": "Host",
-    "user": "Username",
-    "token": "Access token"
+    "unlink": "Unlink from account…"
   },
   "team": {
     "subtitle": "Members of {org}, their roles and invitations.",
@@ -217,14 +210,8 @@
     "deleteConfirm": "This cannot be undone. Repositories on disk are not touched."
   },
   "common": {
-    "copy": "Copy",
     "copied": "Copied: {text}",
-    "save": "Save",
-    "cancel": "Cancel",
-    "create": "Create",
-    "remove": "Remove",
     "rename": "Rename…",
-    "delete": "Delete",
     "saved": "Changes saved",
     "signOut": "Sign out",
     "signedOut": "Signed out",

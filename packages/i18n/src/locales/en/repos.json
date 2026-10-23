@@ -26,7 +26,6 @@
       "remote": "Remote",
       "label": "Type"
     },
-    "platform": "Platform",
     "account": "Account",
     "workspace": "Workspace",
     "group": "Group",
@@ -51,7 +50,8 @@
   },
   "pr": {
     "title": "Pull requests",
-    "empty": "No pull requests with this state.",
+    "empty": "No open pull requests",
+    "emptyForState": "No pull requests with this state.",
     "state": {
       "all": "All",
       "open": "Open",

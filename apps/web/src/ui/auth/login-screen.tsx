@@ -42,7 +42,7 @@ export function LoginScreen(): ReactElement {
       switchLink={{ to: '/signup', label: t('web.nav.signup') }}
     >
       <AuthField
-        label={t('web.auth.email')}
+        label={t('common.email')}
         type="email"
         name="email"
         autoComplete="email"

@@ -30,7 +30,7 @@ export function CommandBox({ command, onCopy, compact = false }: CommandBoxProps
         $
       </span>
       <code className={css('command-text')}>{command}</code>
-      <span className={css('copy')}>{t('web.common.copy')}</span>
+      <span className={css('copy')}>{t('common.copy')}</span>
     </button>
   );
 }

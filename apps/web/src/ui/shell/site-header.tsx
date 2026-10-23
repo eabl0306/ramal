@@ -74,7 +74,7 @@ export function SiteFooter(): ReactElement {
     <footer className={css('footer')}>
       <span className={css('footer-brand')}>{PRODUCT_NAME}</span>
       <Link to="/status" className={css('footer-link')}>
-        {t('web.footer.status')}
+        {t('web.status.title')}
       </Link>
     </footer>
   );

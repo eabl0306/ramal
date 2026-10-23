@@ -73,6 +73,9 @@
   "account": {
     "title": "Añadir cuenta"
   },
+  "invite": {
+    "title": "Invitar al equipo"
+  },
   "resetHard": {
     "title": "¿Reset --hard a {sha}?",
     "info": "Se perderán los cambios sin commit y los commits posteriores en la rama actual."
@@ -88,7 +91,8 @@
   },
   "clone": {
     "title": "Clonar repositorio",
-    "url": "URL o owner/repo",
+    "url": "URL del repositorio",
+    "urlPlaceholder": "URL o owner/repo",
     "destination": "Carpeta de destino"
   },
   "open": {

@@ -79,6 +79,9 @@ describe('SiteFooter', () => {
   it('enlaza la pagina de estado', () => {
     renderScreen(<SiteFooter />);
 
-    expect(screen.getByRole('link', { name: 'Estado' })).toHaveAttribute('href', '/status');
+    expect(screen.getByRole('link', { name: 'Estado del servicio' })).toHaveAttribute(
+      'href',
+      '/status',
+    );
   });
 });
