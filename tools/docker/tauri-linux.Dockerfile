@@ -19,7 +19,7 @@ FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 # Las tres versiones van a la par que el repo: rust-toolchain.toml, .nvmrc y el
 # `packageManager` de package.json. Se suben juntas.
-ARG RUST_VERSION=1.98.1
+ARG RUST_VERSION=1.99.1
 ARG RUSTUP_VERSION=1.29.1
 ARG NODE_VERSION=24.21.0
 ARG PNPM_VERSION=11.18.0

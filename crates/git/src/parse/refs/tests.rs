@@ -87,7 +87,9 @@ fn tags_that_do_not_end_in_a_commit_are_skipped() {
     ]
     .concat();
 
-    assert!(parse_refs(stdout.as_bytes()).unwrap().refs.is_empty());
+    let snapshot = parse_refs(stdout.as_bytes()).unwrap();
+
+    assert!(snapshot.refs.is_empty(), "{:?}", snapshot.refs);
 }
 
 #[test]
@@ -97,5 +99,6 @@ fn malformed_lines_are_errors() {
         parse_refs(line(["refs/heads/main", "commit", "nope", "", "", ""]).as_bytes()).is_err()
     );
     assert!(parse_refs(line(["refs/stash", "commit", A, "", "", ""]).as_bytes()).is_err());
-    assert!(parse_refs(b"").unwrap().refs.is_empty());
+    let empty = parse_refs(b"").unwrap();
+    assert!(empty.refs.is_empty(), "{:?}", empty.refs);
 }

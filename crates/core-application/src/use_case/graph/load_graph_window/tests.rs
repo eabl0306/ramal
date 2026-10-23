@@ -97,7 +97,7 @@ fn an_empty_repository_gives_an_empty_window_without_reading_the_log() {
 
     let window = block_on(s.use_case.execute(&s.id, 0, 200, None)).unwrap();
 
-    assert!(window.rows.is_empty());
+    assert!(window.rows.is_empty(), "{:?}", window.rows);
     assert!(!window.has_more);
     assert_eq!(window.lane_count, 0);
     assert_eq!(s.git.calls().read_log, 0);

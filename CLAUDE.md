@@ -11,7 +11,7 @@ API y un solo motor de Git en Rust que comparten escritorio y VS Code.
 
 | Ruta                                                    | Que es                                 | Toolchain                                           | Comando de verificacion                          |
 | ------------------------------------------------------- | -------------------------------------- | --------------------------------------------------- | ------------------------------------------------ |
-| `apps/api`                                              | API HTTP (5 crates `ramal-api-*`)      | Cargo, Rust 1.98.1, ed. 2024, Salvo, SQLx           | `just api-check` y `just api-test-db`            |
+| `apps/api`                                              | API HTTP (5 crates `ramal-api-*`)      | Cargo, Rust 1.99.1, ed. 2024, Salvo, SQLx           | `just api-check` y `just api-test-db`            |
 | `apps/web`                                              | Landing prerenderizada y SPA           | pnpm 11.18, Node 24, React Router 8, Vite           | `just web-check`                                 |
 | `apps/desktop`                                          | Ramal Desktop (`@ramal/desktop`)       | Tauri 2 (`src-tauri`, crate `ramal-desktop`) y Vite | `just desktop-check` y `just desktop-rust-check` |
 | `apps/vscode`                                           | Extension de VS Code (paquete `ramal`) | Node 24, esbuild y Vite                             | `just vscode-check`                              |
@@ -23,7 +23,7 @@ API y un solo motor de Git en Rust que comparten escritorio y VS Code.
 | `tools/rust-complexity`                                 | Cognitiva y ciclomatica de Rust        | Cargo (syn, sin compilar el codigo)                 | `just rust-complexity`                           |
 
 Usa **pnpm por corepack**, nunca npm ni yarn ni un pnpm global de otra version. La version
-esta fijada en `packageManager` (11.18.0). Rust lo fija `rust-toolchain.toml` (1.98.1).
+esta fijada en `packageManager` (11.18.0). Rust lo fija `rust-toolchain.toml` (1.99.1).
 
 ## Arquitectura: la regla que no se negocia
 
