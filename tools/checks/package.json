@@ -15,7 +15,8 @@
     "check-eslint-configs": "./eslint-configs.mjs",
     "check-rust-test-modules": "./rust-test-modules.mjs",
     "check-toolchain-versions": "./toolchain-versions.mjs",
-    "check-docker-context": "./docker-context.mjs"
+    "check-docker-context": "./docker-context.mjs",
+    "check-docs-links": "./docs-links.mjs"
   },
   "scripts": {
     "test": "node --test \"*.test.mjs\""
