@@ -58,6 +58,26 @@ const SAME_ES: readonly SharedText[] = [
     keys: ['common.delete', 'vscode.confirm.dropStash.button'],
     reason: '"Eliminar" es borrar algo y tirar un stash, que en git es "Drop" y no "Delete"',
   },
+  {
+    keys: ['common.ok', 'web.team.invAccept'],
+    reason:
+      '"Aceptar" es el boton de un dialogo y aceptar una invitacion; en ingles son "OK" y "Accept"',
+  },
+  {
+    keys: ['web.auth.deviceCode.reject', 'web.team.invDecline'],
+    reason:
+      '"Rechazar" es rechazar un codigo de equipo y declinar una invitacion; en ingles son "Reject" y "Decline"',
+  },
+  {
+    keys: ['web.dashboard.dcIndex', 'web.footer.docs'],
+    reason:
+      '"Documentacion" es el titulo de la pagina y la etiqueta corta del pie; en ingles son "Documentation" y "Docs"',
+  },
+  {
+    keys: ['web.billing.coSummary', 'web.dashboard.nav.overview'],
+    reason:
+      '"Resumen" es el resumen del pedido y la vista general del panel; en ingles son "Summary" y "Overview"',
+  },
 ];
 
 /**
@@ -212,6 +232,10 @@ const BANNED_IN_ENGLISH: readonly { readonly pattern: RegExp; readonly instead: 
   {
     pattern: /\blog(ging)? in\b/iu,
     instead: '"sign in", que es el verbo que usa el resto del producto',
+  },
+  {
+    pattern: /\blog(ging|ged)? out\b/iu,
+    instead: '"sign out", que es el verbo que usa el resto del producto',
   },
 ];
 
