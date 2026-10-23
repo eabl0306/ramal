@@ -108,6 +108,10 @@ tiene Workspace Trust; escritorio necesita su propio equivalente:
   repositorios dentro de carpetas de confianza ya lo son; los que se abren fuera de ellas pasan por
   la misma comprobacion.
 
+El detalle de esta decision, con la lista de claves que obligan a preguntar y la frontera del
+webview que la acompana, esta en
+[ADR 0020](0020-confianza-de-repositorios-y-frontera-del-webview.md).
+
 ### Version minima 2.34 y deteccion de capacidades
 
 - Git 2.34 es la primera con firma de commits por SSH, y es la que trae Ubuntu 22.04, la base
