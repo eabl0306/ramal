@@ -192,7 +192,7 @@ stylelint.
 just                       # lista todas las recetas
 just check                 # todo el enforcement, como la CI sin lo caro
 just ci                    # check + cargo deny, tipos generados, e2e, builds y stack-smoke
-just guard                 # tools/checks: tamano, tests apagados, TODO, grafo, limites, versiones
+just guard                 # tools/checks: tamano, tests apagados, TODO, grafo, limites, versiones, enlaces
 just fmt / just fmt-check  # prettier y rustfmt
 just api-test-db           # tests de la API contra el Postgres de compose; no se pueden saltar
 just engine-check          # motor y sidecar: clippy, tests y cobertura

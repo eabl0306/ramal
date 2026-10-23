@@ -134,8 +134,8 @@ build: api-build web-build desktop-web-build vscode-build
 
 # Los scripts de tools/checks: tamano de fichero, tests apagados, marcadores sin
 # ticket, grafo de paquetes, limites apagados en linea, lints heredados por cada
-# crate, eslint.config.js por paquete, tests de Rust fuera de linea y versiones
-# de los Dockerfile.
+# crate, eslint.config.js por paquete, tests de Rust fuera de linea, versiones
+# de los Dockerfile y enlaces y anclas entre documentos.
 [group('monorepo')]
 [doc('Reglas comunes a todos los lenguajes (tools/checks).')]
 guard:
