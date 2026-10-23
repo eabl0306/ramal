@@ -5,7 +5,7 @@
     "unified": "Unificada"
   },
   "stageFile": "Preparar archivo",
-  "unstageFile": "Quitar de preparados",
+  "unstageFile": "Quitar el archivo de preparados",
   "status": {
     "modified": "Modificado",
     "added": "Añadido",

@@ -2,7 +2,8 @@
 
 - Estado: aceptado
 - Fecha: 2026-09-30
-- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte
+- Revisado: 2026-10-01, para alinearlo con el codigo del primer corte; 2026-10-23, con las
+  reglas de los textos repetidos y de los recuentos
 
 ## Contexto
 
@@ -46,6 +47,7 @@ src/plural.ts                   Sufijos _one y _other resueltos con Intl.PluralR
 src/format.ts                   formatRelativeTime, formatDate, formatTimeZone, formatShortcut
 src/locale.ts                   Locale ("es" | "en") y resolveLocale
 test/parity.test.ts             Paridad de claves, de parametros y de plurales entre es y en
+test/consistency.test.ts        Que dos claves no signifiquen lo mismo, y los recuentos
 ```
 
 Los textos van en JSON y no en TypeScript. TypeScript tipa las claves de un JSON importado, pero
@@ -76,6 +78,43 @@ mande correos. El enlace con React (`I18nProvider`, `useT`) vive en `@git-rudder
 Sufijos `_one` y `_other` (y `_zero` si hace falta) resueltos con `Intl.PluralRules` sobre el
 parametro `count`. `t("repos.results", { count: 1 })` da "1 repositorio". Es la misma convencion de
 datos que i18next, asi que cambiar a i18next algun dia no obliga a reescribir los diccionarios.
+
+### Dos claves nunca significan lo mismo
+
+Separar los espacios de nombres evita que las claves choquen, pero no el problema que hay detras, y
+tiene dos caras. Cuando dos claves dicen lo mismo, `common.cancel` y `web.common.cancel` conviven sin
+chocar y durante un tiempo dicen lo mismo de verdad; el dia que alguien cambia una, el producto dice
+dos cosas para el mismo boton y nada falla. Y cuando dos claves con el mismo nombre significan cosas
+distintas, dejarlas en `repos.localOnly` y `states.localOnly` no dice cual es cual: el nombre tiene
+que decirlo. De ahi cuatro reglas, que comprueba `test/consistency.test.ts`:
+
+1. **Dos claves con el mismo texto castellano llevan el mismo ingles.** El castellano es la fuente,
+   asi que si el ingles se separa, una de las dos traducciones esta mal.
+2. **Dos claves con el mismo ingles llevan el mismo castellano.** Menos grave, porque el traductor
+   busca por clave y no por texto ingles (es justo lo que se le reprocha a `vscode.l10n`), pero casi
+   siempre es un descuido: "{count} PR abiertos" y "{count} PRs abiertos" para el mismo
+   "{count} open PRs".
+3. **`common` es el unico sitio de un texto compartido.** Ningun otro espacio repite un par
+   (castellano, ingles) que ya este en `common`. Un texto generico de todo el producto va a
+   `common`, nunca a `<espacio>.common`.
+4. **Un texto con `{count}` tiene formas plurales.** La regla que ya habia era la contraria, que un
+   plural ensene el recuento. Sin esta, una clave con contador y sin `_one` pasaba sin que nadie la
+   viera, y en pantalla sale siempre la forma `_other` ("1 repositorios"), porque el traductor elige
+   la forma con el parametro `count` y no encuentra ninguna.
+
+Las dos primeras admiten excepciones, y se declaran en el test con su motivo y por el conjunto
+exacto de claves: una clave nueva con ese texto vuelve a fallar, y una excepcion que ya no hace
+falta tambien. Hoy son cuatro: "Usuario", que en ingles es "User" (el grupo de ajustes) y "Username"
+(el campo); "Plataformas Git", porque el manifiesto de VS Code escribe las categorias de ajustes en
+Title Case; "Open", que es "Abrir" en el menu y "Abierto" en el estado de un pull request; y "All",
+que es "Todas" las plataformas y "Todos" los repositorios.
+
+**Los numeros que no son recuentos no se llaman `count` y no llevan plural**: un ordinal
+("Conflicto 3"), un identificador ("PR #142"), una posicion ("Paso 2 de 4"), un importe ("120 USD al
+ano") o un nombre que el prototipo llamaba `{n}` ("¿Quitar {name} de la lista?"). Y **un texto no
+lleva dos recuentos**: "{members} miembros y {pending} invitaciones" no se puede pluralizar con un
+solo `count`, asi que son dos claves que la interfaz compone. En un "{used} de {count} asientos" el
+sustantivo concuerda con el total, asi que el total es el que se llama `count`.
 
 ### Formatos
 
@@ -136,6 +175,8 @@ porque la regla es la misma, sin ninguno de esos costes.
 - El tipado: una clave o un parametro que no existe no compila, y el ingles esta tipado contra el
   castellano.
 - `test/parity.test.ts`: mismas claves, mismos parametros y plurales completos en los dos idiomas.
+- `test/consistency.test.ts`: las cuatro reglas de arriba, con sus excepciones declaradas y con
+  motivo. Falla tambien si una excepcion ya no hace falta.
 - La regla de ESLint `git-rudder/no-jsx-literal-text`: un texto literal en un componente no pasa el lint
   ([ADR 0005](0005-enforcement-automatizado.md)).
 
@@ -152,13 +193,43 @@ En la conversion se quitaron tres claves: `D.accSub`, que duplicaba otra, y `W.o
 X-01). La etiqueta del
 rol de propietario es "Titular" (gaps B-50).
 
+`STATES`, `VAULT`, `VS`, `WAUTH` y `WEB70` llegan despues. Las 28 claves de `STATES` que chocan
+con `D` se resolvieron mirando donde esta cada una en el prototipo, no por el nombre: 20 tienen el
+mismo texto y son la misma cosa, asi que se quedan con una sola clave. Las ocho restantes son dos
+cosas distintas, y el nombre lo dice:
+
+| Clave del prototipo | En `D` es                      | En `STATES` es                      | Claves                                             |
+| ------------------- | ------------------------------ | ----------------------------------- | -------------------------------------------------- |
+| `noPrs`             | el vacio con un filtro puesto  | el vacio sin filtro                 | `repos.pr.emptyForState` y `repos.pr.empty`        |
+| `cloneUrl`          | el placeholder del campo       | la etiqueta del campo               | `dialog.clone.urlPlaceholder` y `dialog.clone.url` |
+| `inviteTitle`       | el titulo con la organizacion  | el titulo del dialogo, sin ella     | `team.inviteTitle` y `dialog.invite.title`         |
+| `planName`          | el nombre del plan             | el plan y sus asientos              | `settings.account.planName` mas `planSeats`        |
+| `invite`            | la accion que abre el dialogo  | el boton que lo confirma            | `team.invite` y `common.invite`                    |
+| `localOnly`         | un repositorio sin remoto      | un ajuste que no se ha sincronizado | `repos.localOnly` y `settings.sync.deviceOnly`     |
+| `saved`             | el aviso de despues de guardar | el estado de la sincronizacion      | `toast.saved` y `settings.sync.saved`              |
+| `secAccount`        | "Account & team"               | "Account and team"                  | una sola, con `&`                                  |
+
+Las dos de la sincronizacion llegan con su pantalla; las demas ya estan en el paquete.
+
+Al escribir las reglas, el diccionario que ya estaba en el repositorio tenia 15 claves que
+repetian un texto de `common` (casi todo `web.common.*` y los campos de `web.accounts.*`), que se
+han borrado, y cinco inconsistencias reales, que se han corregido:
+`settings.account.revokeSession` decia "Cerrar" para "Revoke", que es el mismo fallo que este ADR
+cita del prototipo y habia sobrevivido a la conversion; `diff.unstageFile` no decia "archivo" en
+castellano y su hermana `stageFile` si; `repos.workspace.openPrCount_other` pluralizaba la sigla
+("PRs"); `web.nav.signup` decia "Sign up" donde el titulo de la pagina dice "Create account"; y el
+enlace del pie a la pagina de estado tenia clave propia en vez de usar el titulo de esa pagina.
+
 ## Consecuencias
 
 A favor:
 
 - Una clave que falta, un parametro mal escrito o una traduccion que se olvido de un idioma se
   descubren al compilar, no en la pantalla de un usuario.
-- "1 repositorio" y "2 repositorios" en los dos idiomas.
+- "1 repositorio" y "2 repositorios" en los dos idiomas, y una clave con contador no puede
+  olvidarse de sus formas.
+- Dos textos iguales no pueden separarse en silencio: en cuanto una traduccion se aparta de otra
+  identica, la CI lo dice.
 - El motor y la API no saben nada de idiomas mas alla del castellano de los mensajes de respaldo.
 - Una sola regla de idioma para las tres apps y para la IA.
 
@@ -171,6 +242,8 @@ En contra:
 - El extension host traduce con su propio traductor en lugar del mecanismo de VS Code. Si VS Code
   anadiera algo que solo funciona con `vscode.l10n`, habria que adaptarse.
 - Exportar los textos de correo a la API es un generador mas con su comprobacion en la CI.
+- Las excepciones de las reglas de textos repetidos hay que mantenerlas: cambiar un texto puede
+  obligar a quitar una o a anadir otra, y el test lo dice pero no lo arregla.
 
 ## Alternativas descartadas
 

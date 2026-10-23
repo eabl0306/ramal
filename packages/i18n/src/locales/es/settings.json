@@ -15,8 +15,6 @@
   "profile": {
     "subtitle": "Tu identidad en Git Rudder. Es lo que ve tu equipo en invitaciones y actividad.",
     "changePhoto": "Cambiar foto",
-    "fullName": "Nombre",
-    "username": "Usuario",
     "timezone": "Zona horaria",
     "saveChanges": "Guardar cambios"
   },
@@ -26,13 +24,15 @@
     "planName": "Git Rudder Pro",
     "planRenewal_one": "Se renueva el {date} · {count} asiento",
     "planRenewal_other": "Se renueva el {date} · {count} asientos",
+    "planSeats_one": "{count} asiento",
+    "planSeats_other": "{count} asientos",
     "manageSubscription": "Gestionar suscripción",
     "session": "Sesión",
     "signedInAs": "Sesión iniciada como",
     "signOut": "Cerrar sesión",
     "sessions": "Sesiones activas",
     "thisDevice": "Este dispositivo",
-    "revokeSession": "Cerrar"
+    "revokeSession": "Revocar"
   },
   "accounts": {
     "title": "Cuentas",

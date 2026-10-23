@@ -26,7 +26,6 @@
       "remote": "Remoto",
       "label": "Tipo"
     },
-    "platform": "Plataforma",
     "account": "Cuenta",
     "workspace": "Workspace",
     "group": "Agrupar",
@@ -47,11 +46,12 @@
     "repoCount_one": "{count} repositorio",
     "repoCount_other": "{count} repositorios",
     "openPrCount_one": "{count} PR abierto",
-    "openPrCount_other": "{count} PRs abiertos"
+    "openPrCount_other": "{count} PR abiertos"
   },
   "pr": {
     "title": "Pull requests",
-    "empty": "No hay pull requests con este estado.",
+    "empty": "No hay pull requests abiertos",
+    "emptyForState": "No hay pull requests con este estado.",
     "state": {
       "all": "Todos",
       "open": "Abierto",

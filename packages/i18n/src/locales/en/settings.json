@@ -15,8 +15,6 @@
   "profile": {
     "subtitle": "Your Git Rudder identity. It is what your team sees in invitations and activity.",
     "changePhoto": "Change photo",
-    "fullName": "Name",
-    "username": "Username",
     "timezone": "Time zone",
     "saveChanges": "Save changes"
   },
@@ -26,6 +24,8 @@
     "planName": "Git Rudder Pro",
     "planRenewal_one": "Renews on {date} · {count} seat",
     "planRenewal_other": "Renews on {date} · {count} seats",
+    "planSeats_one": "{count} seat",
+    "planSeats_other": "{count} seats",
     "manageSubscription": "Manage subscription",
     "session": "Session",
     "signedInAs": "Signed in as",

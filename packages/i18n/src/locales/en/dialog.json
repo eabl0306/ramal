@@ -73,6 +73,9 @@
   "account": {
     "title": "Add account"
   },
+  "invite": {
+    "title": "Invite to the team"
+  },
   "resetHard": {
     "title": "Reset --hard to {sha}?",
     "info": "Uncommitted changes and later commits on the current branch will be lost."
@@ -88,7 +91,8 @@
   },
   "clone": {
     "title": "Clone repository",
-    "url": "URL or owner/repo",
+    "url": "Repository URL",
+    "urlPlaceholder": "URL or owner/repo",
     "destination": "Destination folder"
   },
   "open": {

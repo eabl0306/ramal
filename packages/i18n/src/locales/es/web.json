@@ -102,7 +102,6 @@
   "footer": {
     "docs": "Documentación",
     "releaseNotes": "Notas de la versión",
-    "status": "Estado",
     "privacy": "Privacidad"
   },
   "auth": {
@@ -112,10 +111,8 @@
     "signupSubtitle": "Sincroniza Git Rudder entre tus equipos y trabaja en equipo.",
     "continueWith": "Continuar con {provider}",
     "orEmail": "o con email",
-    "email": "Email",
     "password": "Contraseña",
     "forgot": "¿La olvidaste?",
-    "name": "Nombre",
     "organization": "Organización (opcional)",
     "passwordHint": "Mínimo 8 caracteres",
     "passwordOk": "Contraseña válida",
@@ -174,11 +171,7 @@
     "ownerYou": "Tuya",
     "disconnect": "Desconectar…",
     "testConnection": "Probar conexión",
-    "unlink": "Quitar de la cuenta…",
-    "platform": "Plataforma",
-    "host": "Servidor",
-    "user": "Usuario",
-    "token": "Token de acceso"
+    "unlink": "Quitar de la cuenta…"
   },
   "team": {
     "subtitle": "Miembros de {org}, sus roles e invitaciones.",
@@ -217,14 +210,8 @@
     "deleteConfirm": "Esta acción es irreversible. Tus repositorios en disco no se tocan."
   },
   "common": {
-    "copy": "Copiar",
     "copied": "Copiado: {text}",
-    "save": "Guardar",
-    "cancel": "Cancelar",
-    "create": "Crear",
-    "remove": "Quitar",
     "rename": "Renombrar…",
-    "delete": "Eliminar",
     "saved": "Cambios guardados",
     "signOut": "Cerrar sesión",
     "signedOut": "Sesión cerrada",

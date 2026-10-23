@@ -33,6 +33,7 @@ export const PARAMS = {
   'repos.workspace.openPrCount': ['count'],
   'repos.workspace.repoCount': ['count'],
   'settings.account.planRenewal': ['count', 'date'],
+  'settings.account.planSeats': ['count'],
   'settings.accounts.addFor': ['platform'],
   'settings.accounts.usedIn': ['count'],
   'settings.git.everyMinutes': ['minutes'],

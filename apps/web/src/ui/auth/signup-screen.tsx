@@ -64,14 +64,14 @@ function SignupFieldset({
   return (
     <>
       <AuthField
-        label={t('web.auth.name')}
+        label={t('common.name')}
         name="name"
         autoComplete="name"
         value={fields.name}
         onChange={onEdit('name')}
       />
       <AuthField
-        label={t('web.auth.email')}
+        label={t('common.email')}
         type="email"
         name="email"
         autoComplete="email"
