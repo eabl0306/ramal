@@ -76,6 +76,10 @@
   "invite": {
     "title": "Invite to the team"
   },
+  "revokeSession": {
+    "title": "Sign out {device}?",
+    "info": "That device loses access to your account and will delete what came from the cloud the next time it connects. If it never reconnects, it keeps what it had: revoke its tokens on each platform too."
+  },
   "resetHard": {
     "title": "Reset --hard to {sha}?",
     "info": "Uncommitted changes and later commits on the current branch will be lost."

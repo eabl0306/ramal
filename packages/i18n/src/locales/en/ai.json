@@ -11,9 +11,14 @@
     "scope": "Belongs to",
     "scopePersonal": "Personal",
     "scopeOrganization": "Organization",
+    "scopeOrganizationDescription": "Encrypted on Git Rudder's servers; Git Rudder uses them to generate on behalf of your organization.",
     "labelPlaceholder": "Personal, Team…",
     "empty": "No keys yet. Add one to enable AI features.",
     "none": "No key"
+  },
+  "org": {
+    "usesServers": "Uses Git Rudder's servers",
+    "firstUse": "With an organization key, your staged changes go through Git Rudder's servers to generate the text. With a personal key, they don't."
   },
   "features": {
     "title": "Where to use AI",

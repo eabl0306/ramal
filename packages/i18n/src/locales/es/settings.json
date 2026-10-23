@@ -34,6 +34,9 @@
     "thisDevice": "Este dispositivo",
     "revokeSession": "Revocar"
   },
+  "vault": {
+    "noRecovery": "Nadie puede recuperar tus secretos si pierdes la frase y el código de recuperación, tampoco el soporte de Git Rudder."
+  },
   "accounts": {
     "title": "Cuentas",
     "subtitle": "Conecta varias cuentas por plataforma. Cada repositorio remoto usa una de ellas para fetch, push y pull requests.",

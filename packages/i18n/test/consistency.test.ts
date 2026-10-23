@@ -59,6 +59,11 @@ const SAME_EN: readonly SharedText[] = [
     keys: ['repos.filter.allPlatforms', 'repos.filter.kind.all', 'repos.pr.state.all'],
     reason: 'concordancia de genero: "Todas" las plataformas y "Todos" los repositorios y estados',
   },
+  {
+    keys: ['staging.commitLabel', 'vscode.scm.commit', 'vscode.scm.commitButton'],
+    reason:
+      '"Commit" es el sustantivo (la etiqueta y el comando, que en castellano se queda en "Commit") y el verbo del boton del panel SCM, que es "Confirmar" (gaps B-47)',
+  },
 ];
 
 /**

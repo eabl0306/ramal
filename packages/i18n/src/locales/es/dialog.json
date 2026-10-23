@@ -76,6 +76,10 @@
   "invite": {
     "title": "Invitar al equipo"
   },
+  "revokeSession": {
+    "title": "¿Cerrar la sesión de {device}?",
+    "info": "Ese dispositivo pierde el acceso a tu cuenta y borrará lo que llegó de la nube la próxima vez que se conecte. Si nunca vuelve a conectarse, conserva lo que ya tenía: revoca también sus tokens en cada plataforma."
+  },
   "resetHard": {
     "title": "¿Reset --hard a {sha}?",
     "info": "Se perderán los cambios sin commit y los commits posteriores en la rama actual."

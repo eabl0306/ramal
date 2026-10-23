@@ -34,6 +34,9 @@
     "thisDevice": "This device",
     "revokeSession": "Revoke"
   },
+  "vault": {
+    "noRecovery": "Nobody can recover your secrets if you lose the passphrase and the recovery code, not even Git Rudder support."
+  },
   "accounts": {
     "title": "Accounts",
     "subtitle": "Connect several accounts per platform. Each remote repository uses one of them for fetch, push and pull requests.",
