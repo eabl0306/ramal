@@ -16,7 +16,8 @@ const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
  * Las piezas de @git-rudder/repo-view (architecture.md 4.7 y 5.2):
  *
  * - graph: geometria, caminos del SVG y disposicion de la columna del grafo.
- *   Funciones puras sin React; solo leen tipos del protocolo y los tokens.
+ *   Funciones puras sin React; solo leen tipos del protocolo, los tokens y la
+ *   logica compartida de @git-rudder/domain.
  * - data: la ventana del motor con TanStack Query sobre el cliente del bridge.
  * - view: componentes React. Son los unicos que pintan.
  *
@@ -54,11 +55,12 @@ const policies = [
   internal('data', ['data']),
   internal('view', ['view', 'graph', 'data']),
   internal('entry', ['view', 'graph', 'data']),
-  external('graph', ['@git-rudder/bridge', '@git-rudder/ui']),
+  external('graph', ['@git-rudder/bridge', '@git-rudder/domain', '@git-rudder/ui']),
   external('data', ['@git-rudder/bridge', '@git-rudder/i18n', '@tanstack/react-query', 'react']),
   external('view', [
     'react',
     '@git-rudder/bridge',
+    '@git-rudder/domain',
     '@git-rudder/i18n',
     '@git-rudder/ui',
     '@tanstack/react-query',

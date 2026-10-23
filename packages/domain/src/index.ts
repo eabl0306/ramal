@@ -165,6 +165,9 @@ export {
 
 export { MIN_MASKABLE_LENGTH, SECRET_MASK, maskSecret } from './secrets/mask-secret';
 
+export { authorInitials } from './people/initials';
+export { avatarColorIndex } from './people/avatar-color';
+
 export { type RemoteRef, parseRemoteUrl, remoteRepoName } from './remotes/remote-url';
 
 export {

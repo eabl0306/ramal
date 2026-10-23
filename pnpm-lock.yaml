@@ -478,6 +478,9 @@ importers:
       '@git-rudder/bridge':
         specifier: workspace:*
         version: link:../bridge
+      '@git-rudder/domain':
+        specifier: workspace:*
+        version: link:../domain
       '@git-rudder/i18n':
         specifier: workspace:*
         version: link:../i18n

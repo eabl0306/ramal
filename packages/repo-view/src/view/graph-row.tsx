@@ -1,9 +1,8 @@
 import type { GraphRow } from '@git-rudder/bridge';
+import { authorInitials } from '@git-rudder/domain';
 import { formatDate } from '@git-rudder/i18n';
 import { laneColor, useLocale } from '@git-rudder/ui';
 import { type ReactElement, memo } from 'react';
-
-import { authorInitials } from '../graph/initials';
 
 import { moduleClasses } from './css';
 import styles from './graph-grid.module.css';
