@@ -118,5 +118,22 @@
     "info": "It was ended from another device or the web dashboard, or it expired after a while without using Git Rudder on this device.",
     "renewFailed": "We couldn't renew your session. Sign in again: your accounts and keys on this device are still here.",
     "cleanup": "For security, we removed your vault key and the accounts and keys that came from other devices. What you added here is still available and Git works as before."
+  },
+  "leaveVaultSetup": {
+    "title": "Leave without creating the vault?",
+    "info": "What you added will be saved on this device only.",
+    "stay": "Stay",
+    "leave": "Leave"
+  },
+  "signOut": {
+    "title": "Sign out on this device?",
+    "info": "Signing out removes your vault key and the accounts and keys that came from other devices. The ones you added here stay so Git keeps working.",
+    "infoNoVault": "The accounts and keys you added here stay so Git keeps working. Your repositories and local settings aren't touched.",
+    "removed": "Removed: {accounts} accounts and {keys} keys from other devices",
+    "kept": "Kept: {accounts} accounts and {keys} keys added here",
+    "alsoLocal": "Also delete the ones added on this device",
+    "alsoLocalWarn": "You'll need to reconnect those accounts to fetch, push or open pull requests on this device.",
+    "working": "Signing out…",
+    "offline": "Offline: the session will be ended on the server when you reconnect."
   }
 }
