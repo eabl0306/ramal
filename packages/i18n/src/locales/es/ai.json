@@ -11,9 +11,14 @@
     "scope": "Pertenece a",
     "scopePersonal": "Personal",
     "scopeOrganization": "Organización",
+    "scopeOrganizationDescription": "Cifradas en los servidores de Git Rudder; Git Rudder las usa para generar en nombre de tu organización.",
     "labelPlaceholder": "Personal, Equipo…",
     "empty": "Aún no hay llaves. Añade una para activar las funciones de IA.",
     "none": "Sin llave"
+  },
+  "org": {
+    "usesServers": "Usa los servidores de Git Rudder",
+    "firstUse": "Con una llave de la organización, los cambios preparados pasan por los servidores de Git Rudder para generar el texto. Con una llave personal, no."
   },
   "features": {
     "title": "Dónde usar la IA",

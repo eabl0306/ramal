@@ -8,6 +8,7 @@ import { CATALOGS, NAMESPACES } from '../src/catalog';
 import { PARAMS } from '../src/generated/params';
 import { placeholdersOf } from '../src/interpolate';
 import { PLURAL_SUFFIXES } from '../src/keys';
+import { LOCALES } from '../src/locale';
 import { flattenTree } from '../src/messages';
 
 /**
@@ -124,6 +125,17 @@ describe('ficheros de los diccionarios', () => {
         .sort();
       expect(files).toEqual([...NAMESPACES].sort());
     }
+  });
+
+  it('solo se ofrecen los idiomas que estan traducidos', () => {
+    // El prototipo ofrecia frances sin traduccion (gaps B-47). La lista de idiomas
+    // que ensena un selector sale de common.language, asi que tiene que tener una
+    // entrada por idioma de LOCALES y ninguna mas.
+    const offered = [...es.keys()]
+      .filter((key) => key.startsWith('common.language.'))
+      .map((key) => key.slice('common.language.'.length))
+      .sort();
+    expect(offered).toEqual([...LOCALES].sort());
   });
 
   it('los espacios de nombres son los de la arquitectura', () => {

@@ -13,6 +13,7 @@ export const PARAMS = {
   'dialog.forcePush.title': ['branch'],
   'dialog.removeRepo.title': ['name'],
   'dialog.resetHard.title': ['sha'],
+  'dialog.revokeSession.title': ['device'],
   'graph.detail.files': ['count'],
   'graph.refs.more': ['count'],
   'graph.refs.moreLabel': ['count', 'names'],

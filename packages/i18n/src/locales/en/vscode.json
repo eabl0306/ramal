@@ -9,6 +9,7 @@
   "scm": {
     "messagePlaceholder": "Message ({shortcut} to commit on \"{branch}\")",
     "commit": "Commit",
+    "commitButton": "Commit",
     "commitAndPush": "Commit & Push",
     "commitAmend": "Commit (Amend)"
   },
@@ -26,7 +27,7 @@
   "settings": {
     "followsVsCode": "Theme and language follow your VS Code settings.",
     "sync": "Sync settings from the cloud",
-    "syncDescription": "Use the linked accounts, AI keys and preferences from your Git Rudder account.",
+    "syncDescription": "Use my Git Rudder account settings. This VS Code uses your accounts, your Git and AI preferences and, if you turned it on in your account, your AI keys. Theme, language and the rest of the editor are synced by VS Code.",
     "openDashboard": "Open web dashboard",
     "openDesktop": "Open in Git Rudder Desktop",
     "section": {
