@@ -38,7 +38,137 @@
     "subscription": "Suscripción"
   },
   "vault": {
-    "noRecovery": "Nadie puede recuperar tus secretos si pierdes la frase y el código de recuperación, tampoco el soporte de Git Rudder."
+    "noRecovery": "Nadie puede recuperar tus secretos si pierdes la frase y el código de recuperación, tampoco el soporte de Git Rudder.",
+    "setup": {
+      "title": "Protege tus secretos con una frase de sincronización",
+      "bodyAccounts": "Para que tus cuentas de plataforma lleguen a tus otros equipos, Git Rudder cifra sus tokens en este equipo antes de subirlos. Solo tú tienes la llave.",
+      "bodyAiKeys": "Para que tus llaves de IA lleguen a tus otros equipos, Git Rudder las cifra en este equipo antes de subirlas. Solo tú tienes la llave.",
+      "whyNotPassword": "No es tu contraseña de Git Rudder. La contraseña la comprueba el servidor; esta frase nunca sale de tus equipos. Si entras con GitHub, GitLab o Google, también la necesitas.",
+      "passphrase": "Frase de sincronización",
+      "repeat": "Repite la frase",
+      "hint": "Al menos 12 caracteres. Una frase de varias palabras es fácil de recordar y difícil de adivinar.",
+      "noRecoveryDetail": "Si olvidas la frase y pierdes el código de recuperación, nadie podrá recuperar tus secretos, tampoco el soporte de Git Rudder. Tendrías que volver a conectar tus cuentas.",
+      "notNowNote": "Con «Ahora no», lo que añadas se guarda solo en este equipo.",
+      "stepOf": "Paso {step} de {total}",
+      "alreadyExists": "Ya tienes una bóveda creada en otro equipo. Desbloquéala con tu frase.",
+      "syncPrompt": "¿Sincronizar esta cuenta con tus otros equipos? Necesitas una frase de sincronización que solo conoces tú.",
+      "start": "Configurar la bóveda",
+      "create": "Crear bóveda",
+      "creating": "Creando tu bóveda…",
+      "uploadFailed": "No se pudo crear la bóveda. El código que guardaste sigue valiendo.",
+      "doneTitle": "Bóveda creada",
+      "doneBody": "Tus secretos se sincronizan cifrados. En cada equipo nuevo te pediremos la frase una vez."
+    },
+    "strength": {
+      "weak": "Débil",
+      "acceptable": "Aceptable",
+      "strong": "Fuerte"
+    },
+    "error": {
+      "tooShort": "La frase necesita al menos 12 caracteres.",
+      "guessable": "Es fácil de adivinar. Añade más palabras.",
+      "mismatch": "Las frases no coinciden.",
+      "wrongPassphrase": "La frase no es correcta.",
+      "wrongPassphraseAgain": "¿No la recuerdas? Usa el código de recuperación o mira qué hacer si la olvidaste.",
+      "codeTooShort": "El código tiene 32 caracteres. Revisa que esté completo.",
+      "wrongCode": "El código no es correcto.",
+      "dailyLimit": "Has pedido tu bóveda demasiadas veces hoy. Vuelve a intentarlo mañana.",
+      "changedElsewhere": "La bóveda cambió en otro equipo. Vuelve a intentarlo.",
+      "oldKey": "Este equipo tiene una llave antigua. Desbloquea la bóveda otra vez."
+    },
+    "code": {
+      "title": "Guarda tu código de recuperación",
+      "body": "Es la única forma de abrir tu bóveda si olvidas la frase. Solo lo verás ahora: Git Rudder no lo guarda.",
+      "noOne": "Nadie más puede recuperarlo, tampoco el soporte de Git Rudder. Guárdalo fuera de este equipo.",
+      "copied": "Código copiado",
+      "download": "Descargar .txt",
+      "fileName": "git-rudder-codigo-de-recuperacion.txt",
+      "saved": "He guardado el código en un lugar seguro",
+      "newTitle": "Tu nuevo código de recuperación",
+      "oldVoid": "El código anterior ya no sirve.",
+      "label": "Código de recuperación",
+      "new": "Nuevo código de recuperación"
+    },
+    "unlock": {
+      "title": "Desbloquea tu bóveda en este equipo",
+      "body": "Escribe tu frase de sincronización para usar aquí las cuentas y llaves que añadiste en otros equipos.",
+      "afterRotation": "La llave de tu bóveda cambió en otro equipo. Escribe tu frase para seguir usando tus cuentas sincronizadas.",
+      "emailNotice": "Te enviaremos un correo para avisarte de que este equipo tiene acceso.",
+      "useCode": "Usar el código de recuperación",
+      "usePassphrase": "Usar la frase",
+      "forgot": "Olvidé la frase",
+      "button": "Desbloquear",
+      "unlocking": "Desbloqueando…",
+      "fetching": "Descargando tus secretos…",
+      "done_one": "Bóveda desbloqueada · {count} secreto listo",
+      "done_other": "Bóveda desbloqueada · {count} secretos listos",
+      "afterCode": "Has entrado con el código de recuperación. ¿Quieres poner una frase nueva ahora?",
+      "changePassphrase": "Cambiar la frase"
+    },
+    "locked": {
+      "banner": "Tu bóveda está bloqueada en este equipo. Ves tus cuentas sincronizadas, pero sus tokens no se pueden usar hasta que la desbloquees.",
+      "row": "Bloqueada · Desbloquear para usar",
+      "test": "Desbloquea la bóveda para probarla",
+      "noToken": "Sin token en este equipo",
+      "accountInVault": "Esta cuenta está en tu bóveda, que está bloqueada en este equipo."
+    },
+    "account": {
+      "updateCredentials": "Actualizar credenciales",
+      "credentialsMismatch": "Las credenciales no coinciden con la cuenta. Git Rudder no las usará.",
+      "reconnect": "Reconectar",
+      "resetFromWeb": "Tu bóveda se restableció desde el panel web. Configúrala de nuevo para sincronizar tus secretos.",
+      "localTip": "El token está solo en el llavero de este equipo. No se sube a la nube.",
+      "syncAccount": "Sincronizar esta cuenta",
+      "syncKey": "Sincronizar esta llave",
+      "signInToSync": "Inicia sesión para sincronizarla",
+      "savedLocal": "Cuenta guardada solo en este equipo",
+      "otherUser": "Añadida con otra cuenta de Git Rudder",
+      "otherUserAsk": "Esta cuenta se añadió con otra cuenta de Git Rudder en este equipo. ¿Subirla a la tuya?",
+      "upload": "Subir a mi cuenta"
+    },
+    "card": {
+      "title": "Bóveda",
+      "none": "Sin configurar. Se crea la primera vez que sincronizas una cuenta o una llave.",
+      "unlocked": "Desbloqueada en este equipo · creada el {date}",
+      "locked": "Bloqueada en este equipo",
+      "since": "Bóveda configurada el {date}"
+    },
+    "rotate": {
+      "menu": "Rotar la llave…",
+      "recommended": "Se cerró la sesión de un equipo que tenía tu bóveda. Rota la llave para que ese equipo no pueda leer lo que subas a partir de ahora.",
+      "button": "Rotar la llave",
+      "title": "Rotar la llave de la bóveda",
+      "body": "Git Rudder crea una llave nueva, vuelve a cifrar tus secretos y te da un código de recuperación nuevo. Tus otros equipos te pedirán la frase la próxima vez.",
+      "working_one": "Volviendo a cifrar {count} secreto… No cierres Git Rudder.",
+      "working_other": "Volviendo a cifrar {count} secretos… No cierres Git Rudder.",
+      "done": "Llave rotada. Tus otros equipos te pedirán la frase.",
+      "newCodeTitle": "Generar un código de recuperación nuevo",
+      "newCodeWarn": "El código anterior dejará de servir.",
+      "newCodeAsk": "¿Crees que alguien conoce el código anterior?",
+      "needPassphrase": "Escribe tu frase para rotar la llave.",
+      "newCodeButton": "Generar código nuevo"
+    },
+    "change": {
+      "title": "Cambiar la frase de sincronización",
+      "newPassphrase": "Frase nueva",
+      "newRepeat": "Repite la frase nueva",
+      "otherDevices": "Tus otros equipos siguen funcionando sin pedirte nada.",
+      "ask": "¿Crees que alguien conoce tu frase anterior?",
+      "askNo": "No, solo quiero cambiarla",
+      "askYes": "Sí, o no estoy seguro",
+      "rotateInfo": "Cambiar la frase no basta si alguien conoce la anterior. También rotaremos la llave: te daremos un código de recuperación nuevo y tus otros equipos te pedirán la frase nueva.",
+      "andRotate": "Cambiar y rotar la llave",
+      "done": "Frase cambiada"
+    },
+    "forgot": {
+      "title": "¿Olvidaste la frase?",
+      "otherDevice": "¿Tienes otro equipo con la bóveda desbloqueada?",
+      "otherDeviceHelp": "Ábrelo y ve a {path}. En VS Code: {vscodePath}. No perderás nada.",
+      "haveCode": "¿Tienes el código de recuperación?",
+      "neither": "¿No tienes ninguna de las dos cosas?",
+      "neitherHelp": "Puedes restablecer la bóveda desde el panel web. Se borran de la nube las copias cifradas de tus cuentas y llaves, y nadie puede recuperarlas, tampoco el soporte de Git Rudder. Lo que tienes en cada equipo se conserva, y el primer equipo que cree una bóveda nueva lo vuelve a subir.",
+      "openWeb": "Abrir el panel web"
+    }
   },
   "accounts": {
     "title": "Cuentas",

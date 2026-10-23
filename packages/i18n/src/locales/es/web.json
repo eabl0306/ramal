@@ -212,7 +212,11 @@
     "exportDescription": "Descarga un JSON con todo lo sincronizado",
     "deleteAccount": "Eliminar cuenta…",
     "deleteAccountDescription": "Borra tu cuenta y la configuración en la nube",
-    "deleteConfirm": "Esta acción es irreversible. Tus repositorios en disco no se tocan."
+    "deleteConfirm": "Esta acción es irreversible. Tus repositorios en disco no se tocan.",
+    "stopAccountsTitle": "¿Dejar de sincronizar las cuentas vinculadas?",
+    "stopKeysTitle": "¿Dejar de sincronizar las llaves de IA?",
+    "stopBody": "Se borran de la nube sus datos y sus copias cifradas. Cada equipo conserva su copia local y la cuenta que usa cada repositorio.",
+    "stopButton": "Dejar de sincronizar"
   },
   "common": {
     "copied": "Copiado: {text}",
@@ -247,5 +251,26 @@
   "notFound": {
     "title": "Página no encontrada",
     "text": "Esta dirección no existe en Git Rudder."
+  },
+  "vault": {
+    "title": "Bóveda",
+    "none": "Sin configurar. Se crea en Git Rudder Desktop o VS Code la primera vez que sincronizas una cuenta o una llave.",
+    "setUpOn": "Configurada el {date}",
+    "help": "Tus cuentas y llaves viajan cifradas con tu frase de sincronización. Esta web no puede leerlas.",
+    "reset": {
+      "menu": "Restablecer la bóveda…",
+      "title": "¿Restablecer la bóveda?",
+      "what": "Se borran de la nube las copias cifradas de tus cuentas vinculadas y llaves de IA. Los datos de las cuentas (plataforma, usuario y servidor) se quedan.",
+      "noOne": "Nadie puede recuperar esas copias, tampoco el soporte de Git Rudder.",
+      "kept": "Cada equipo conserva sus propias credenciales; el primero que cree una bóveda nueva vuelve a subir las suyas.",
+      "tryFirst": "Antes, prueba otra salida: si un equipo sigue desbloqueado, cambia la frase desde él y no perderás nada.",
+      "confirmType": "Escribe {phrase} para confirmar",
+      "button": "Restablecer la bóveda",
+      "working": "Restableciendo…",
+      "done": "Bóveda restablecida. Te enviamos un correo de aviso.",
+      "limit": "Demasiados intentos. Vuelve a intentarlo en una hora."
+    },
+    "needsPassphrase": "Requiere tu frase de sincronización; se configura en Git Rudder Desktop o VS Code. Mientras tanto se sincronizan las cuentas sin sus tokens.",
+    "needsPassphraseShort": "Requiere tu frase de sincronización."
   }
 }

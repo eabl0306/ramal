@@ -39,5 +39,11 @@
   "checking": "Comprobando…",
   "clearSearch": "Limpiar búsqueda",
   "skipToContent": "Saltar al contenido",
-  "continue": "Continuar"
+  "continue": "Continuar",
+  "notNow": "Ahora no",
+  "show": "Mostrar",
+  "hide": "Ocultar",
+  "back": "Atrás",
+  "later": "Más tarde",
+  "setUp": "Configurar"
 }

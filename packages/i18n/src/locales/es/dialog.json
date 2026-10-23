@@ -118,5 +118,22 @@
     "info": "Se cerró desde otro dispositivo o desde el panel web, o caducó tras un tiempo sin usar Git Rudder en este equipo.",
     "renewFailed": "No pudimos renovar tu sesión. Vuelve a iniciarla: tus cuentas y llaves de este equipo siguen aquí.",
     "cleanup": "Por seguridad, borramos de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de otros equipos. Lo que añadiste aquí sigue disponible y Git funciona igual."
+  },
+  "leaveVaultSetup": {
+    "title": "¿Salir sin crear la bóveda?",
+    "info": "Lo que añadiste se guardará solo en este equipo.",
+    "stay": "Seguir aquí",
+    "leave": "Salir"
+  },
+  "signOut": {
+    "title": "¿Cerrar sesión en este equipo?",
+    "info": "Al cerrar sesión se borran de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de otros equipos. Las que añadiste aquí se quedan para que Git siga funcionando.",
+    "infoNoVault": "Las cuentas y llaves que añadiste aquí se quedan para que Git siga funcionando. Tus repositorios y ajustes locales no se tocan.",
+    "removed": "Se borran: {accounts} cuentas y {keys} llaves de otros equipos",
+    "kept": "Se quedan: {accounts} cuentas y {keys} llaves añadidas aquí",
+    "alsoLocal": "Borrar también las añadidas en este equipo",
+    "alsoLocalWarn": "Tendrás que volver a conectar esas cuentas para hacer fetch, push o pull requests en este equipo.",
+    "working": "Cerrando sesión…",
+    "offline": "Sin conexión: la sesión se cerrará en el servidor cuando vuelvas a conectarte."
   }
 }

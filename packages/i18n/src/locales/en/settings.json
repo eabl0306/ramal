@@ -38,7 +38,137 @@
     "subscription": "Subscription"
   },
   "vault": {
-    "noRecovery": "Nobody can recover your secrets if you lose the passphrase and the recovery code, not even Git Rudder support."
+    "noRecovery": "Nobody can recover your secrets if you lose the passphrase and the recovery code, not even Git Rudder support.",
+    "setup": {
+      "title": "Protect your secrets with a sync passphrase",
+      "bodyAccounts": "So your platform accounts reach your other devices, Git Rudder encrypts their tokens on this device before uploading them. Only you hold the key.",
+      "bodyAiKeys": "So your AI keys reach your other devices, Git Rudder encrypts them on this device before uploading them. Only you hold the key.",
+      "whyNotPassword": "It isn't your Git Rudder password. The server checks your password; this passphrase never leaves your devices. You need it even if you sign in with GitHub, GitLab or Google.",
+      "passphrase": "Sync passphrase",
+      "repeat": "Repeat the passphrase",
+      "hint": "At least 12 characters. A phrase of several words is easy to remember and hard to guess.",
+      "noRecoveryDetail": "If you forget the passphrase and lose the recovery code, nobody can recover your secrets, not even Git Rudder support. You'd have to reconnect your accounts.",
+      "notNowNote": "With \"Not now\", what you add is saved on this device only.",
+      "stepOf": "Step {step} of {total}",
+      "alreadyExists": "You already have a vault created on another device. Unlock it with your passphrase.",
+      "syncPrompt": "Sync this account with your other devices? You need a sync passphrase that only you know.",
+      "start": "Set up vault",
+      "create": "Create vault",
+      "creating": "Creating your vault…",
+      "uploadFailed": "The vault couldn't be created. The code you saved is still valid.",
+      "doneTitle": "Vault created",
+      "doneBody": "Your secrets now sync encrypted. Each new device will ask for the passphrase once."
+    },
+    "strength": {
+      "weak": "Weak",
+      "acceptable": "Acceptable",
+      "strong": "Strong"
+    },
+    "error": {
+      "tooShort": "The passphrase needs at least 12 characters.",
+      "guessable": "It's easy to guess. Add more words.",
+      "mismatch": "The passphrases don't match.",
+      "wrongPassphrase": "That passphrase isn't correct.",
+      "wrongPassphraseAgain": "Can't remember it? Use the recovery code or see what to do if you forgot it.",
+      "codeTooShort": "The code has 32 characters. Check that it's complete.",
+      "wrongCode": "That code isn't correct.",
+      "dailyLimit": "You've requested your vault too many times today. Try again tomorrow.",
+      "changedElsewhere": "The vault changed on another device. Try again.",
+      "oldKey": "This device has an old key. Unlock the vault again."
+    },
+    "code": {
+      "title": "Save your recovery code",
+      "body": "It's the only way to open your vault if you forget the passphrase. You'll only see it now: Git Rudder doesn't store it.",
+      "noOne": "Nobody else can recover it, not even Git Rudder support. Keep it somewhere other than this device.",
+      "copied": "Code copied",
+      "download": "Download .txt",
+      "fileName": "git-rudder-recovery-code.txt",
+      "saved": "I've saved the code somewhere safe",
+      "newTitle": "Your new recovery code",
+      "oldVoid": "The previous code no longer works.",
+      "label": "Recovery code",
+      "new": "New recovery code"
+    },
+    "unlock": {
+      "title": "Unlock your vault on this device",
+      "body": "Enter your sync passphrase to use the accounts and keys you added on other devices.",
+      "afterRotation": "Your vault key changed on another device. Enter your passphrase to keep using your synced accounts.",
+      "emailNotice": "We'll email you to let you know this device now has access.",
+      "useCode": "Use the recovery code",
+      "usePassphrase": "Use the passphrase",
+      "forgot": "I forgot the passphrase",
+      "button": "Unlock",
+      "unlocking": "Unlocking…",
+      "fetching": "Downloading your secrets…",
+      "done_one": "Vault unlocked · {count} secret ready",
+      "done_other": "Vault unlocked · {count} secrets ready",
+      "afterCode": "You used the recovery code. Do you want to set a new passphrase now?",
+      "changePassphrase": "Change passphrase"
+    },
+    "locked": {
+      "banner": "Your vault is locked on this device. You can see your synced accounts, but their tokens can't be used until you unlock it.",
+      "row": "Locked · Unlock to use",
+      "test": "Unlock the vault to test it",
+      "noToken": "No token on this device",
+      "accountInVault": "This account is in your vault, which is locked on this device."
+    },
+    "account": {
+      "updateCredentials": "Update credentials",
+      "credentialsMismatch": "The credentials don't match the account. Git Rudder won't use them.",
+      "reconnect": "Reconnect",
+      "resetFromWeb": "Your vault was reset from the web dashboard. Set it up again to sync your secrets.",
+      "localTip": "The token is only in this device's keychain. It isn't uploaded to the cloud.",
+      "syncAccount": "Sync this account",
+      "syncKey": "Sync this key",
+      "signInToSync": "Sign in to sync it",
+      "savedLocal": "Account saved on this device only",
+      "otherUser": "Added with another Git Rudder account",
+      "otherUserAsk": "This account was added with another Git Rudder account on this device. Upload it to yours?",
+      "upload": "Upload to my account"
+    },
+    "card": {
+      "title": "Vault",
+      "none": "Not set up. It's created the first time you sync an account or a key.",
+      "unlocked": "Unlocked on this device · created on {date}",
+      "locked": "Locked on this device",
+      "since": "Vault set up on {date}"
+    },
+    "rotate": {
+      "menu": "Rotate key…",
+      "recommended": "A device that had your vault was signed out. Rotate the key so that device can't read anything you upload from now on.",
+      "button": "Rotate key",
+      "title": "Rotate the vault key",
+      "body": "Git Rudder creates a new key, re-encrypts your secrets and gives you a new recovery code. Your other devices will ask for the passphrase next time.",
+      "working_one": "Re-encrypting {count} secret… Don't close Git Rudder.",
+      "working_other": "Re-encrypting {count} secrets… Don't close Git Rudder.",
+      "done": "Key rotated. Your other devices will ask for the passphrase.",
+      "newCodeTitle": "Generate a new recovery code",
+      "newCodeWarn": "The previous code will stop working.",
+      "newCodeAsk": "Do you think someone knows the previous code?",
+      "needPassphrase": "Enter your passphrase to rotate the key.",
+      "newCodeButton": "Generate new code"
+    },
+    "change": {
+      "title": "Change sync passphrase",
+      "newPassphrase": "New passphrase",
+      "newRepeat": "Repeat the new passphrase",
+      "otherDevices": "Your other devices keep working without asking you for anything.",
+      "ask": "Do you think someone knows your old passphrase?",
+      "askNo": "No, I just want to change it",
+      "askYes": "Yes, or I'm not sure",
+      "rotateInfo": "Changing the passphrase isn't enough if someone knows the old one. We'll also rotate the key: you'll get a new recovery code and your other devices will ask for the new passphrase.",
+      "andRotate": "Change and rotate key",
+      "done": "Passphrase changed"
+    },
+    "forgot": {
+      "title": "Forgot your passphrase?",
+      "otherDevice": "Do you have another device with the vault unlocked?",
+      "otherDeviceHelp": "Open it and go to {path}. In VS Code: {vscodePath}. You won't lose anything.",
+      "haveCode": "Do you have the recovery code?",
+      "neither": "Have neither?",
+      "neitherHelp": "You can reset the vault from the web dashboard. The encrypted copies of your accounts and keys are deleted from the cloud, and nobody can recover them, not even Git Rudder support. What each device has is kept, and the first device to create a new vault uploads it again.",
+      "openWeb": "Open the web dashboard"
+    }
   },
   "accounts": {
     "title": "Accounts",

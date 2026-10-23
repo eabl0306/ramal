@@ -212,7 +212,11 @@
     "exportDescription": "Download a JSON with everything synced",
     "deleteAccount": "Delete account…",
     "deleteAccountDescription": "Deletes your account and cloud settings",
-    "deleteConfirm": "This cannot be undone. Repositories on disk are not touched."
+    "deleteConfirm": "This cannot be undone. Repositories on disk are not touched.",
+    "stopAccountsTitle": "Stop syncing linked accounts?",
+    "stopKeysTitle": "Stop syncing AI keys?",
+    "stopBody": "Their details and encrypted copies are deleted from the cloud. Each device keeps its local copy and the account each repository uses.",
+    "stopButton": "Stop syncing"
   },
   "common": {
     "copied": "Copied: {text}",
@@ -247,5 +251,26 @@
   "notFound": {
     "title": "Page not found",
     "text": "This address does not exist in Git Rudder."
+  },
+  "vault": {
+    "title": "Vault",
+    "none": "Not set up. It's created in Git Rudder Desktop or VS Code the first time you sync an account or a key.",
+    "setUpOn": "Set up on {date}",
+    "help": "Your accounts and keys travel encrypted with your sync passphrase. This website can't read them.",
+    "reset": {
+      "menu": "Reset vault…",
+      "title": "Reset the vault?",
+      "what": "The encrypted copies of your linked accounts and AI keys are deleted from the cloud. Account details (platform, username and host) stay.",
+      "noOne": "Nobody can recover those copies, not even Git Rudder support.",
+      "kept": "Each device keeps its own credentials; the first one to create a new vault uploads its own again.",
+      "tryFirst": "First, try another way: if a device is still unlocked, change the passphrase there and you won't lose anything.",
+      "confirmType": "Type {phrase} to confirm",
+      "button": "Reset vault",
+      "working": "Resetting…",
+      "done": "Vault reset. We sent you a notification email.",
+      "limit": "Too many attempts. Try again in an hour."
+    },
+    "needsPassphrase": "Requires your sync passphrase, set up in Git Rudder Desktop or VS Code. Until then, accounts sync without their tokens.",
+    "needsPassphraseShort": "Requires your sync passphrase."
   }
 }
