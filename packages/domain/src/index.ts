@@ -13,6 +13,14 @@ export {
   validateLogin,
   validateSignup,
 } from './auth/auth-form';
+export {
+  MIN_PASSPHRASE_LENGTH,
+  MIN_PASSPHRASE_SCORE,
+  type PassphraseIssue,
+  type PassphraseScore,
+  type PassphraseStrength,
+  passphraseStrength,
+} from './auth/passphrase';
 
 export {
   type CpuArch,
