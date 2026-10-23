@@ -1,4 +1,4 @@
-import type { Locale } from '@ramal/i18n';
+import type { Locale } from '@git-rudder/i18n';
 import { type RenderResult, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 

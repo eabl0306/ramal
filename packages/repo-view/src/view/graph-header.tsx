@@ -1,5 +1,5 @@
-import type { PlainKey } from '@ramal/i18n';
-import { Button, useT } from '@ramal/ui';
+import type { PlainKey } from '@git-rudder/i18n';
+import { Button, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import { COLUMN_COUNT } from '../graph/columns';
@@ -9,7 +9,7 @@ import styles from './graph-grid.module.css';
 
 const css = moduleClasses(styles);
 
-/** Las columnas, en orden (COLUMN_COUNT); el texto de cada cabecera sale de @ramal/i18n. */
+/** Las columnas, en orden (COLUMN_COUNT); el texto de cada cabecera sale de @git-rudder/i18n. */
 const COLUMN_KEYS: readonly PlainKey[] = [
   'graph.column.refs',
   'graph.column.graph',

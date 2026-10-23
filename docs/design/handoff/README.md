@@ -1,6 +1,6 @@
-# Handoff de diseno de Ramal
+# Handoff de diseno de Git Rudder
 
-Prototipos de Claude Design de los tres productos: Ramal Desktop, Ramal for VS Code y Ramal Web.
+Prototipos de Claude Design de los tres productos: Git Rudder Desktop, Git Rudder for VS Code y Git Rudder Web.
 Son la fuente de verdad visual. Donde el texto de este README y un prototipo no coinciden, manda el
 prototipo.
 
@@ -27,26 +27,26 @@ comentario de diseno pendiente del issue.
 
 | Fichero                        | Producto               | Issue          | Props y valores                                                                                                                                                                                                                                                              | Pantallas o estados                                                       |
 | ------------------------------ | ---------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `Ramal.dc.html`                | Desktop                | base, #71      | `theme` (dark, light), `lang` (es, en), `graphNodes` (avatar, dot)                                                                                                                                                                                                           | App interactiva sin prop de pantalla: se navega con clics                 |
-| `Ramal VS Code.dc.html`        | VS Code                | base, #68, #71 | `vsTheme` (dark, light), `vsLanguage` (en, es), `state` (16 valores)                                                                                                                                                                                                         | 16 estados                                                                |
-| `Ramal Web.dc.html`            | Web                    | base, #70, #71 | `theme`, `lang`, `startPage` (landing, login, signup), `os` (mac, win, linux, mobile, unknown), `downloads` (normal, api-caida, sin-version)                                                                                                                                 | 3 paginas de entrada. Ya no tiene panel: iniciar sesion lleva a Web Panel |
-| `Ramal Estados.dc.html`        | Los tres               | #62            | `product` (desktop, vscode, web), `theme`, `lang`, `state` (all, C-01 a C-10)                                                                                                                                                                                                | 10 laminas; `all` las apila                                               |
-| `Ramal Boveda.dc.html`         | Desktop, VS Code y web | #63            | `product` (desktop, vscode, web), `theme`, `lang`, `screen` (K-01 a K-10, X-04)                                                                                                                                                                                              | 11 pantallas mas la rotacion (boton ROT) y 77 subestados                  |
-| `Ramal Entrada.dc.html`        | Desktop                | #64            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedOut, signedIn), `screen` (28 valores)                                                                                                                                                                        | 28 pantallas y 78 subestados                                              |
-| `Ramal Git.dc.html`            | Desktop                | #65            | `theme`, `lang`, `density` (desktop, vscode), `screen` (33 valores)                                                                                                                                                                                                          | 33 pantallas y 64 subestados                                              |
-| `Ramal Vistas.dc.html`         | Desktop                | #66            | `theme`, `lang`, `density` (desktop, vscode), `screen` (26 valores)                                                                                                                                                                                                          | 26 pantallas y 55 subestados                                              |
-| `Ramal Ajustes.dc.html`        | Desktop                | #67            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedIn, signedOut), `role` (personal, member, admin, owner), `install` (dmg, nsis, msi, appimage, deb, rpm), `screen` (25 valores)                                                                               | 25 pantallas y 66 subestados                                              |
-| `Ramal Correcciones.dc.html`   | Los tres               | #71            | Ninguna. Solo en castellano y pensada en oscuro: abrela con `?theme=dark`                                                                                                                                                                                                    | 1 pagina con 11 grupos y 36 entradas                                      |
-| `Ramal Web Auth.dc.html`       | Web                    | #69            | `theme`, `lang`, `screen` (15 valores), `state` (texto libre, el subestado), `client` (desktop, vscode)                                                                                                                                                                      | 15 pantallas y 92 subestados                                              |
-| `Ramal Web Panel.dc.html`      | Web                    | #70            | `theme`, `lang`, `screen` (15 valores), `context` (personal, org), `role` (owner, admin, member), `plan` (none, trialing, active, past_due, cancel_scheduled, canceled, inactive; los chips anaden trial_last_day y active_monthly), `state` (normal, empty, loading, error) | 15 pantallas y 26 subestados por chips                                    |
-| `Ramal Web Paginas.dc.html`    | Web                    | #70            | `theme`, `lang`, `screen` (10 valores), `state` (texto libre, el subestado)                                                                                                                                                                                                  | 10 pantallas y 35 subestados                                              |
-| `Ramal Local Callback.dc.html` | Motor (pagina local)   | #69            | `kind` (signin, platform), `client` (desktop, vscode), `result` (success, cancelled, error), `platform` (GitLab, Bitbucket), `lang`. El tema sale de `prefers-color-scheme`                                                                                                  | 12 combinaciones                                                          |
+| `Git Rudder.dc.html`                | Desktop                | base, #71      | `theme` (dark, light), `lang` (es, en), `graphNodes` (avatar, dot)                                                                                                                                                                                                           | App interactiva sin prop de pantalla: se navega con clics                 |
+| `Git Rudder VS Code.dc.html`        | VS Code                | base, #68, #71 | `vsTheme` (dark, light), `vsLanguage` (en, es), `state` (16 valores)                                                                                                                                                                                                         | 16 estados                                                                |
+| `Git Rudder Web.dc.html`            | Web                    | base, #70, #71 | `theme`, `lang`, `startPage` (landing, login, signup), `os` (mac, win, linux, mobile, unknown), `downloads` (normal, api-caida, sin-version)                                                                                                                                 | 3 paginas de entrada. Ya no tiene panel: iniciar sesion lleva a Web Panel |
+| `Git Rudder Estados.dc.html`        | Los tres               | #62            | `product` (desktop, vscode, web), `theme`, `lang`, `state` (all, C-01 a C-10)                                                                                                                                                                                                | 10 laminas; `all` las apila                                               |
+| `Git Rudder Boveda.dc.html`         | Desktop, VS Code y web | #63            | `product` (desktop, vscode, web), `theme`, `lang`, `screen` (K-01 a K-10, X-04)                                                                                                                                                                                              | 11 pantallas mas la rotacion (boton ROT) y 77 subestados                  |
+| `Git Rudder Entrada.dc.html`        | Desktop                | #64            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedOut, signedIn), `screen` (28 valores)                                                                                                                                                                        | 28 pantallas y 78 subestados                                              |
+| `Git Rudder Git.dc.html`            | Desktop                | #65            | `theme`, `lang`, `density` (desktop, vscode), `screen` (33 valores)                                                                                                                                                                                                          | 33 pantallas y 64 subestados                                              |
+| `Git Rudder Vistas.dc.html`         | Desktop                | #66            | `theme`, `lang`, `density` (desktop, vscode), `screen` (26 valores)                                                                                                                                                                                                          | 26 pantallas y 55 subestados                                              |
+| `Git Rudder Ajustes.dc.html`        | Desktop                | #67            | `theme`, `lang`, `os` (macos, windows, linux), `session` (signedIn, signedOut), `role` (personal, member, admin, owner), `install` (dmg, nsis, msi, appimage, deb, rpm), `screen` (25 valores)                                                                               | 25 pantallas y 66 subestados                                              |
+| `Git Rudder Correcciones.dc.html`   | Los tres               | #71            | Ninguna. Solo en castellano y pensada en oscuro: abrela con `?theme=dark`                                                                                                                                                                                                    | 1 pagina con 11 grupos y 36 entradas                                      |
+| `Git Rudder Web Auth.dc.html`       | Web                    | #69            | `theme`, `lang`, `screen` (15 valores), `state` (texto libre, el subestado), `client` (desktop, vscode)                                                                                                                                                                      | 15 pantallas y 92 subestados                                              |
+| `Git Rudder Web Panel.dc.html`      | Web                    | #70            | `theme`, `lang`, `screen` (15 valores), `context` (personal, org), `role` (owner, admin, member), `plan` (none, trialing, active, past_due, cancel_scheduled, canceled, inactive; los chips anaden trial_last_day y active_monthly), `state` (normal, empty, loading, error) | 15 pantallas y 26 subestados por chips                                    |
+| `Git Rudder Web Paginas.dc.html`    | Web                    | #70            | `theme`, `lang`, `screen` (10 valores), `state` (texto libre, el subestado)                                                                                                                                                                                                  | 10 pantallas y 35 subestados                                              |
+| `Git Rudder Local Callback.dc.html` | Motor (pagina local)   | #69            | `kind` (signin, platform), `client` (desktop, vscode), `result` (success, cancelled, error), `platform` (GitLab, Bitbucket), `lang`. El tema sale de `prefers-color-scheme`                                                                                                  | 12 combinaciones                                                          |
 
 En total, 206 pantallas o estados en el eje principal. En la revision de la segunda ronda se
 renderizaron los 223 valores de pantalla o estado de las props y los 329 subestados internos
 (chips), todos sin errores. Ademas:
 
-- `ramal-data.js`: datos de muestra y todos los textos en castellano e ingles. Al diccionario `D`
+- `git-rudder-data.js`: datos de muestra y todos los textos en castellano e ingles. Al diccionario `D`
   original se suman las claves nuevas de Desktop (prefijos `e_`, `g_`, `v_` y `a_`) y cinco objetos:
   `STATES` (#62), `VAULT` (#63), `VS` (#68, claves `vscode.*`), `WAUTH` (#69, claves `auth.*`) y
   `WEB70` (#70, espacios `dashboard`, `team`, `orgAi`, `billing`, `pricing`, `account`, `legal` y
@@ -59,7 +59,7 @@ renderizaron los 223 valores de pantalla o estado de las props y los 329 subesta
   las de 2x y sin las anotaciones del prototipo (#523).
 - `media/`: imagenes del recorrido de bienvenida de VS Code
   (`walkthrough-{1-grafo,2-plataforma,3-ia,4-cuenta}-{dark,light}.svg`, 480x300, sin texto). Van con
-  los pasos `vscode.walkthrough.step1` a `step4` de `ramal-data.js`.
+  los pasos `vscode.walkthrough.step1` a `step4` de `git-rudder-data.js`.
 
 ## Como abrirlos
 
@@ -67,14 +67,14 @@ renderizaron los 223 valores de pantalla o estado de las props y los 329 subesta
 
    ```bash
    cd docs/design/handoff && python3 -m http.server 8000
-   # http://localhost:8000/Ramal%20Estados.dc.html
+   # http://localhost:8000/Git Rudder%20Estados.dc.html
    ```
 
    Con `file://` tambien abren, pero Chromium bloquea la lectura que `support.js` hace del propio
    fichero y el resultado puede variar.
 
 2. Hace falta red: `support.js` carga React y Babel desde unpkg, casi todos cargan IBM Plex desde
-   Google Fonts y `Ramal VS Code.dc.html` carga los Codicons desde jsDelivr.
+   Google Fonts y `Git Rudder VS Code.dc.html` carga los Codicons desde jsDelivr.
 
 3. Los props. `support.js` no los lee de la URL: cada prototipo arranca con los valores por defecto
    de su atributo `data-props`. De la query solo lee `theme`, y solo para el color del lienzo. Para
@@ -89,15 +89,15 @@ renderizaron los 223 valores de pantalla o estado de las props y los 329 subesta
    - Con la query: abre `...dc.html?screen=K-03&theme=light&lang=en` y pega en la consola
      `__dcSetProps(__dcRootName(), Object.fromEntries(new URLSearchParams(location.search)))`.
 
-   `Ramal Web Auth.dc.html` y `Ramal Web Paginas.dc.html` leen ademas la pantalla del hash
-   (`#W-01`, `#W-27-terminos`), y asi se enlazan entre ellos y con `Ramal Web.dc.html`.
+   `Git Rudder Web Auth.dc.html` y `Git Rudder Web Paginas.dc.html` leen ademas la pantalla del hash
+   (`#W-01`, `#W-27-terminos`), y asi se enlazan entre ellos y con `Git Rudder Web.dc.html`.
 
 4. Muchos prototipos traen arriba una barra propia con chips de pantalla, tema, idioma y variante, y
-   los flujos se recorren con clics. Las variantes de `Ramal Web Panel.dc.html` (por ejemplo
+   los flujos se recorren con clics. Las variantes de `Git Rudder Web Panel.dc.html` (por ejemplo
    `email-sin-confirmar` en W-12, `checkout-202` en W-18, `rotacion-recomendada` en W-22 o los planes
-   `trial_last_day` y `active_monthly`) y el chip Estado de `Ramal Vistas.dc.html` solo se eligen con
+   `trial_last_day` y `active_monthly`) y el chip Estado de `Git Rudder Vistas.dc.html` solo se eligen con
    esos chips.
-   `Ramal.dc.html` no tiene prop de pantalla: el resolvedor se abre con el merge del menu de la rama
+   `Git Rudder.dc.html` no tiene prop de pantalla: el resolvedor se abre con el merge del menu de la rama
    `hotfix/login` y los ajustes con el engranaje.
 
 5. Algunos estados avanzan solos con un temporizador (1 a 4 s): los de carga de Web Paginas y Web
@@ -106,7 +106,7 @@ renderizaron los 223 valores de pantalla o estado de las props y los 329 subesta
 ## Cambios del 2026-10-02
 
 La segunda ronda llego el mismo dia que la revision de la primera. Cambia diez prototipos y
-`ramal-data.js`; Estados, Web Auth, Local Callback, Correcciones, `support.js`, `img/` y `media/` son
+`git-rudder-data.js`; Estados, Web Auth, Local Callback, Correcciones, `support.js`, `img/` y `media/` son
 identicos byte a byte. La lista del disenador esta en [`CAMBIOS-pendientes.md`](CAMBIOS-pendientes.md).
 En resumen:
 
@@ -120,13 +120,13 @@ En resumen:
 - **#66 Vistas.** Chip Estado en D-27 a D-31; primera carga, error y "Cargar más" en D-40; 14
   carriles en D-41; un diff por archivo en D-33 y D-37, y el modal de stash de los seleccionados.
 - **#67 Ajustes.** D-42 a 1024 px sin cortar los mensajes. `AIPROV` sin modelo por defecto y el
-  formulario de llave de `Ramal.dc.html` sin alcance.
+  formulario de llave de `Git Rudder.dc.html` sin alcance.
 - **#68 VS Code.** V-13 (`V-13` y `V-13-sin-historial`), sin llave de la organizacion cuando no hay
   sesion y B-10 con Reintentar.
-- **#70 Web.** `Ramal Web.dc.html` sin el panel antiguo; Web Panel con los planes `trial_last_day` y
+- **#70 Web.** `Git Rudder Web.dc.html` sin el panel antiguo; Web Panel con los planes `trial_last_day` y
   `active_monthly`, W-22 `rotacion-recomendada` y los tres textos rotos arreglados; W-28 con barra
   lateral.
-- **#71 Ramal.** "Cerrar sesión" abre K-09 y los correos de muestra son de `example.com`.
+- **#71 Git Rudder.** "Cerrar sesión" abre K-09 y los correos de muestra son de `example.com`.
 
 Tras la revision se cerraron #64, #68 y #70. #63, #66, #67 y #71 se cerraron el mismo dia sin otra
 ronda: lo que dice "Para cerrar" en su apartado y lo menor de todos se resuelven al implementar (#523). El README que traia la entrega es el
@@ -134,7 +134,7 @@ indice corto de 25 lineas de la primera ronda: no sustituye a este.
 
 ## Que se diseno en cada issue
 
-El zip traia un README de indice que remite a los README de cada handoff (`ramal-handoff-NN-*`), con
+El zip traia un README de indice que remite a los README de cada handoff (`git-rudder-handoff-NN-*`), con
 el detalle de pantallas, estados y claves. Esos README no venian en el zip entregado, ni en la
 segunda ronda. Esta seccion los sustituye con lo que se lee en los prototipos y en las dos revisiones
 del 2026-10-02 (cada pantalla y estado renderizado en claro y oscuro, castellano e ingles, sin
@@ -144,7 +144,7 @@ Los valores de `screen` empiezan por el id de `gaps.md` en minusculas: `d12-toke
 Cada apartado acaba con lo que falta. "Para cerrar" es lo que mantenia abierto el issue y "Menor", lo
 que no bloqueaba. Las dos cosas se disenan en codigo al implementar y su indice es el issue #523.
 
-### #62 Estados comunes: `Ramal Estados.dc.html`
+### #62 Estados comunes: `Git Rudder Estados.dc.html`
 
 Una lamina por estado, con `product` para la densidad (Desktop y web 40 px, VS Code 28 px) y, en VS
 Code, una caja "Nativo de VS Code: se especifica, no se dibuja" con la notificacion, el quick input o
@@ -163,13 +163,13 @@ el `viewsWelcome` que toca.
 | `C-09` | C-09 | Tema Sistema, Claro u Oscuro, conmutador rapido y aviso de idioma detectado                          |
 | `C-10` | C-10 | Matriz de 14 controles en reposo, hover, foco, pulsado y deshabilitado                               |
 
-Tambien corrige B-61 en `Ramal.dc.html` (toast de informacion en `--info`).
+Tambien corrige B-61 en `Git Rudder.dc.html` (toast de informacion en `--info`).
 
 Menor (#523): el error en textarea y en select de C-03; los bordes de las cajas de error y aviso mezclan
 el color con `--border` en oklch y salen violeta y verdoso (pasa tambien en Boveda, Git, Ajustes,
 Entrada y Vistas); tokens nuevos fuera de la tabla (`--sk-hi`, `--danger-ink`).
 
-### #63 Boveda: `Ramal Boveda.dc.html`
+### #63 Boveda: `Git Rudder Boveda.dc.html`
 
 | Valor  | Id   | Que ensena                                                                                                                                                                                |
 | ------ | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -177,7 +177,7 @@ Entrada y Vistas); tokens nuevos fuera de la tabla (`--sk-hi`, `--danger-ink`).
 | `K-02` | K-02 | Codigo de recuperacion: copiar, descargar, casilla, error al subir y exito                                                                                                                |
 | `K-03` | K-03 | Desbloquear con la frase o con el codigo, con errores, 429 y llave cambiada                                                                                                               |
 | `K-04` | K-04 | Listas con cuentas y llaves bloqueadas, fila de token rotado en otro equipo con "Reconectar", permisos y "Usada en N repos", "Probar conexión" desactivado y estados de la tarjeta Boveda |
-| `K-05` | K-05 | "Solo en este equipo", sin sesion, sin boveda y categoria apagada (una nota, sin boveda bloqueada), otra cuenta de Ramal y subida pendiente de decidir (ADR 0012)                         |
+| `K-05` | K-05 | "Solo en este equipo", sin sesion, sin boveda y categoria apagada (una nota, sin boveda bloqueada), otra cuenta de Git Rudder y subida pendiente de decidir (ADR 0012)                         |
 | `K-06` | K-06 | Cambiar la frase, con la pregunta de si alguien la conoce                                                                                                                                 |
 | `K-07` | K-07 | Regenerar el codigo                                                                                                                                                                       |
 | `K-08` | K-08 | "Olvidé la frase": otro equipo, codigo y reinicio en la web                                                                                                                               |
@@ -191,17 +191,17 @@ el aviso de K-01 (`vsSyncPrompt`, en `empty`) y la notificacion de K-04 (`useLoc
 en texto, como pide X-11.
 
 Para cerrar: "Sincronizar esta llave" no existe en las filas de llave de K-04 y K-05 (la clave
-`syncThisKey` esta en `ramal-data.js`, pero ningun prototipo la usa); en VS Code cada cuenta sigue
+`syncThisKey` esta en `git-rudder-data.js`, pero ningun prototipo la usa); en VS Code cada cuenta sigue
 siendo la tarjeta de Desktop en una columna, no la fila de entidad de V-22 (estado y chips a la
 derecha y menu ⋯), y las llaves tampoco llevan ⋯.
 
 Menor (#523): "Usada en 1 repos" sin plural y los textos de la fila rotada escritos en el prototipo,
-fuera de `VAULT`; "Reconectar" abre `Ramal Git.dc.html` en D-12 y no en D-14, porque Git no lee el
+fuera de `VAULT`; "Reconectar" abre `Git Rudder Git.dc.html` en D-12 y no en D-14, porque Git no lee el
 hash; en VS Code la tarjeta nativa de K-01 queda debajo del panel y solo se ve tras "← Atrás", y K-04
 `useLocked` saca ademas el toast del webview; en K-05 sin sesion sigue la llave de la organizacion;
-en VS Code la pagina de la tarjeta Boveda se titula "Cuenta y equipo" y no "Cuenta de Ramal".
+en VS Code la pagina de la tarjeta Boveda se titula "Cuenta y equipo" y no "Cuenta de Git Rudder".
 
-### #64 Entrada y ciclo de vida del repo: `Ramal Entrada.dc.html`
+### #64 Entrada y ciclo de vida del repo: `Git Rudder Entrada.dc.html`
 
 | Ids  | Valores de `screen`                                                                                               |
 | ---- | ----------------------------------------------------------------------------------------------------------------- |
@@ -228,7 +228,7 @@ Menor (#523): D-03 dentro de D-01 ensena la barra de titulo de Inicio (pestana, 
 de la version en tarjeta; la rejilla de D-06 no tiene menu ⋯ ni los estados clonando y error, ni un
 caso sin cuenta para el host; D-05 a 1024 px apila las tarjetas en vez de usar tercios.
 
-### #65 Credenciales y operaciones de Git: `Ramal Git.dc.html`
+### #65 Credenciales y operaciones de Git: `Git Rudder Git.dc.html`
 
 | Ids  | Valores de `screen`                                                                                                                                    |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -261,7 +261,7 @@ idiomas; el titulo del bloqueo ("¿Quitar el bloqueo…?") no coincide con su bo
 bloqueo…") y el foco de ese modal queda en el boton de peligro; el texto de abortar el squash habla
 de resoluciones que no hay.
 
-### #66 Vistas de los menus y diff real: `Ramal Vistas.dc.html`
+### #66 Vistas de los menus y diff real: `Git Rudder Vistas.dc.html`
 
 | Ids  | Valores de `screen`                                                                                    |
 | ---- | ------------------------------------------------------------------------------------------------------ |
@@ -316,7 +316,7 @@ sin aviso de `stale_window`, con el esqueleto generico y el error a toda la vist
 pagina; D-41 sin divisor arrastrable, sin tooltips de ref ni de "+n" y sin "Sin coincidencias en el
 historial"; plurales ("1 ramas ocultas") y unos 40 textos nuevos escritos en el prototipo.
 
-### #67 Ventana, ajustes y equipo: `Ramal Ajustes.dc.html`
+### #67 Ventana, ajustes y equipo: `Git Rudder Ajustes.dc.html`
 
 | Ids  | Valores de `screen`                                                                            |
 | ---- | ---------------------------------------------------------------------------------------------- |
@@ -346,20 +346,20 @@ ni "Pestaña anterior"; D-47 sin el selector de organizaciones, los menus de la 
 fila, las invitaciones con correo sin verificar ni confirmar "Cerrar todas las demás"; D-48 sin el
 resumen de "Fetch de todos" (el toast nunca se pinta), "Ver errores", reordenar, borrar un compartido
 ni el estado sin sesion; D-49 sin clonar sin cuenta, punycode, ref no encontrada ni "Copiar enlace de
-Ramal"; D-51 con el interruptor de cuentas encendido sin boveda, y encender un secreto no lleva a
+Git Rudder"; D-51 con el interruptor de cuentas encendido sin boveda, y encender un secreto no lleva a
 K-01. Del brief faltan tambien los errores de generacion con la llave de la organizacion (X-05) y el
 estado "sin recomendaciones" (X-10).
 
-Menor (#523): en `Ramal.dc.html` la lista de modelos del formulario de llave no sigue al proveedor
+Menor (#523): en `Git Rudder.dc.html` la lista de modelos del formulario de llave no sigue al proveedor
 elegido y la llave de la organizacion sigue como fila editable (la referencia es Ajustes `x05-ia`);
-en `Ramal VS Code.dc.html`, al quitar `AIPROV.model`, el paso de modelo de "Añadir llave" ensena
+en `Git Rudder VS Code.dc.html`, al quitar `AIPROV.model`, el paso de modelo de "Añadir llave" ensena
 "model" para Gemini, Mistral, OpenRouter y Ollama; "1 invitaciones"; el estado de D-51 empieza con un
 punto suelto; "Email" en vez de "Correo" en el modal de invitar; D-45 no liga `install` a `os`; la
 titular sin ⋯ en la vista de admin; X-05 con llave personal y modelo fijado por la organizacion a la
 vez; "Cerrar sesión…" de Ajustes no abre K-09; el borde verdoso del aviso de version minima; un guion
 delante de los grupos de workspaces.
 
-### #68 Contribuciones de VS Code: `Ramal VS Code.dc.html`
+### #68 Contribuciones de VS Code: `Git Rudder VS Code.dc.html`
 
 | Valor de `state`                       | Ids                                           |
 | -------------------------------------- | --------------------------------------------- |
@@ -376,9 +376,9 @@ delante de los grupos de workspaces.
 | `V-13`, `V-13-sin-historial`           | V-13                                          |
 
 Solo se dibujan los webviews: Cambios, el grafo con su detalle, el editor de merge, Crear pull request
-y Configuracion de Ramal. Lo nativo (paleta, QuickInput, modales, notificaciones, menus) sale como
+y Configuracion de Git Rudder. Lo nativo (paleta, QuickInput, modales, notificaciones, menus) sale como
 tarjetas en el registro "Llamadas nativas" de la derecha, con la API que lo pinta. Todos los textos
-nativos estan en `VS` de `ramal-data.js`: comandos (`vscode.command.*`, categoria Ramal), vistas,
+nativos estan en `VS` de `git-rudder-data.js`: comandos (`vscode.command.*`, categoria Git Rudder), vistas,
 menus, barra de estado, QuickInput, confirmaciones, recorrido y manifiesto. El atajo del grafo es
 Ctrl+K Ctrl+G (Cmd+K Cmd+G en macOS), sin choque en VS Code 1.138.
 
@@ -399,7 +399,7 @@ organizacion no reaparece; con la nube apagada se ve la llave de la organizacion
 quiere); el texto del fallo de B-10 y un color literal de la pestana de historial estan en el
 prototipo, fuera de `VS` y de los tokens.
 
-### #69 Autenticacion web: `Ramal Web Auth.dc.html` y `Ramal Local Callback.dc.html`
+### #69 Autenticacion web: `Git Rudder Web Auth.dc.html` y `Git Rudder Local Callback.dc.html`
 
 | Valor de `screen`                                  | Id   | Subestados (`state`)                                                                                         |
 | -------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------ |
@@ -418,14 +418,14 @@ prototipo, fuera de `VS` y de los tokens.
 
 Las rutas de cada pantalla estan en la constante `ROUTES` y en la barra del prototipo
 (`/forgot-password`, `/reset-password`, `/verify-email`, `/activate`, `/reauthenticate`...).
-`client=vscode` cambia W-05 y W-06. `Ramal Local Callback.dc.html` pinta las paginas que sirve el
+`client=vscode` cambia W-05 y W-06. `Git Rudder Local Callback.dc.html` pinta las paginas que sirve el
 receptor local del motor al volver del navegador (inicio de sesion y plataforma, con exito, cancelado
 o error) y `local-callback.template.html` es su version estatica.
 
 Menor (#523): a 375 px la barra superior desborda; W-35 ofrece la contrasena a una cuenta que no la
 tiene.
 
-### #70 Panel, sitio publico y equipo: `Ramal Web Panel.dc.html`, `Ramal Web Paginas.dc.html` y `Ramal Web.dc.html`
+### #70 Panel, sitio publico y equipo: `Git Rudder Web Panel.dc.html`, `Git Rudder Web Paginas.dc.html` y `Git Rudder Web.dc.html`
 
 | Fichero y valor                                                          | Ids                    |
 | ------------------------------------------------------------------------ | ---------------------- |
@@ -436,7 +436,7 @@ tiene.
 | Web Paginas `W-17`, `W-18`, `W-11`                                       | W-17, W-18, W-11       |
 | Web Paginas `W-27-terminos`, `W-27-privacidad`, `W-27-reembolsos`        | W-27                   |
 | Web Paginas `W-28`, `W-29-docs`, `W-29-releases`, `goodbye`              | W-28, W-29, W-24       |
-| Ramal Web (landing): Precios, descargas con `os` y `downloads`, `img/`   | W-17, W-30, X-09, X-12 |
+| Git Rudder Web (landing): Precios, descargas con `os` y `downloads`, `img/`   | W-17, W-30, X-09, X-12 |
 
 Los subestados de Web Paginas son: W-17 sin-sesion, con-sesion, con-organizaciones, con-plan; W-18
 cargando, formulario, paddle-bloqueado, activando, activado, activacion-lenta, no-es-titular; W-11
@@ -444,8 +444,8 @@ cargando, sin-sesion, mismo-email, uniendote, unido, otro-email, caducada, no-ex
 404-publica, 404-panel, 500, sin-conexion; W-29-docs indice, articulo; W-29-releases lista, detalle,
 cargando, vacia, error. Los tres ficheros se pueden ver a 768 y 375 px (W-30).
 
-`Ramal Web.dc.html` ya no tiene panel: iniciar sesion, OAuth y `startPage=dashboard` llevan a
-`Ramal Web Panel.dc.html`. En Web Panel, los chips de plan suman `trial_last_day` (banda `--warn`) y
+`Git Rudder Web.dc.html` ya no tiene panel: iniciar sesion, OAuth y `startPage=dashboard` llevan a
+`Git Rudder Web Panel.dc.html`. En Web Panel, los chips de plan suman `trial_last_day` (banda `--warn`) y
 `active_monthly`, y el modal de asientos cobra segun el ciclo; W-22 tiene el chip
 `rotacion-recomendada`; el selector dice "Nueva organización…", el aviso de correo sin confirmar usa
 `auth.vBanner` y la etiqueta del proveedor ya no sale como `{serviceProvider}`. En Web Paginas,
@@ -456,28 +456,28 @@ Code con notas del prototipo); W-28 `404-panel` dice "Sincronización" donde el 
 "Configuración en la nube", su barra superior esta simplificada y bajo 900 px no hay boton de menu;
 la prop `plan` no lista los planes nuevos; `trial_last_day` ensena la misma fecha que la prueba de 3
 dias; "1 invitaciones pendientes"; "+ Invitar miembro" sigue habilitado con el correo sin confirmar;
-el salto de Ramal Web al panel no pasa tema ni idioma y cae en Equipo; al eliminar la organizacion
+el salto de Git Rudder Web al panel no pasa tema ni idioma y cae en Equipo; al eliminar la organizacion
 (W-12), la reautenticacion habla de eliminar la cuenta; codigo muerto del panel antiguo en
-`Ramal Web.dc.html` (`addAcc`, `teamAcc`, `test`); `cancel_scheduled` dice a la vez que se cancela
+`Git Rudder Web.dc.html` (`addAcc`, `teamAcc`, `test`); `cancel_scheduled` dice a la vez que se cancela
 y que se renueva; "All platforms" duplicado en el hero movil; el placeholder "ACME producción" sin
 traducir.
 
-### #71 Revision de bugs: `Ramal Correcciones.dc.html` y los tres prototipos base
+### #71 Revision de bugs: `Git Rudder Correcciones.dc.html` y los tres prototipos base
 
-`Ramal Correcciones.dc.html` lista en 11 grupos los 30 bugs que se corrigieron en el dibujo, con el
-antes, el despues y donde verlo. Las correcciones estan en `Ramal.dc.html`, `Ramal VS Code.dc.html`,
-`Ramal Web.dc.html` y `ramal-data.js`: "Titular" en vez de "Propietaria", confirmaciones de peligro,
+`Git Rudder Correcciones.dc.html` lista en 11 grupos los 30 bugs que se corrigieron en el dibujo, con el
+antes, el despues y donde verlo. Las correcciones estan en `Git Rudder.dc.html`, `Git Rudder VS Code.dc.html`,
+`Git Rudder Web.dc.html` y `git-rudder-data.js`: "Titular" en vez de "Propietaria", confirmaciones de peligro,
 resolvedor, resumen de IA bajo demanda, mascaras y campos de secreto.
 
 La tabla de 62 filas que pedia el brief (cada bug corregido en el diseno o regla de implementacion)
 no venia en el zip. El estado de cada bug esta ahora en la columna "Estado en el diseno" de la
 seccion 3 de [`../gaps.md`](../gaps.md).
 
-La segunda ronda corrige: "Cerrar sesión" de `Ramal.dc.html` abre K-09 y el correo de muestra es
+La segunda ronda corrige: "Cerrar sesión" de `Git Rudder.dc.html` abre K-09 y el correo de muestra es
 `marta@example.com`; Abortar y Eliminar stash de Git confirman; Web Panel pone el foco en Cancelar;
 en VS Code, B-10 (error con Reintentar), B-23 (etiquetas segun la operacion), B-26 (el menu actua
 sobre la rama pulsada) y B-27 ("Eliminar rama remota…" aparte); el panel antiguo de
-`Ramal Web.dc.html` se quito (B-37, B-38 en la web, B-58); B-14 con los 14 carriles de Vistas
+`Git Rudder Web.dc.html` se quito (B-37, B-38 en la web, B-58); B-14 con los 14 carriles de Vistas
 `d41-filtros`.
 
 Para cerrar: sin confirmacion en "Abortar rebase" de Git `d20-edit`, "Force push con lease…" de Git
@@ -485,24 +485,24 @@ Para cerrar: sin confirmacion en "Abortar rebase" de Git `d20-edit`, "Force push
 host es siempre `gitlab.acme.dev`, sin la tabla por plataforma (B-38); Estados usa aun la mascara
 vieja `sk-ant-••••••••9c1e` (B-34).
 
-Menor (#523): `Ramal Correcciones.dc.html` no se actualizo en la segunda ronda; Git `d19-pull` llama
+Menor (#523): `Git Rudder Correcciones.dc.html` no se actualizo en la segunda ronda; Git `d19-pull` llama
 "Entrante" a B y la tabla de #71 pide "Remoto ({upstream})", mientras #68 agrupa merge y pull como
 "Entrante": hay que alinear los briefs.
 
 ## Notas para implementar
 
-- Los textos de `ramal-data.js` son la base, no el resultado: unas 30 claves nuevas con contador no
+- Los textos de `git-rudder-data.js` son la base, no el resultado: unas 30 claves nuevas con contador no
   tienen `_one` y `_other`, algunas llevan glifos o atajos dentro, ocho claves de `STATES` y `D` se
   llaman igual con otro texto, y varios prototipos recortan o pegan traducciones para fabricar otras.
-  En `@ramal/i18n` se arregla al copiarlas (ADR 0017, issue #522).
-- La paleta de VS Code no coincide entre `Ramal VS Code.dc.html` y el modo `product=vscode` de
+  En `@git-rudder/i18n` se arregla al copiarlas (ADR 0017, issue #522).
+- La paleta de VS Code no coincide entre `Git Rudder VS Code.dc.html` y el modo `product=vscode` de
   Boveda y Estados. En la extension se usan las variables `--vscode-*`, asi que solo afecta a los
   prototipos.
 - La segunda ronda trae unos 60 textos nuevos escritos dentro de los prototipos y no en
-  `ramal-data.js` (unos 40 en Vistas, 14 en Git, 9 en Web Paginas, 5 en Ramal, 2 en Boveda y 2 en VS
-  Code). Algunos se arman pegando trozos. Pasan a `@ramal/i18n` con el resto (#522).
+  `git-rudder-data.js` (unos 40 en Vistas, 14 en Git, 9 en Web Paginas, 5 en Git Rudder, 2 en Boveda y 2 en VS
+  Code). Algunos se arman pegando trozos. Pasan a `@git-rudder/i18n` con el resto (#522).
 - `AIPROV` ya no trae modelo por defecto: el modelo sale siempre de la lista del proveedor (X-10).
-  Los modelos que aun aparecen en `Ramal.dc.html` y `Ramal VS Code.dc.html` son de muestra.
+  Los modelos que aun aparecen en `Git Rudder.dc.html` y `Git Rudder VS Code.dc.html` son de muestra.
 - Lo que no se debe copiar de los prototipos sigue en la seccion 3 de [`../gaps.md`](../gaps.md).
 
 ## Especificacion base (handoff original)
@@ -510,18 +510,18 @@ Menor (#523): `Ramal Correcciones.dc.html` no se actualizo en la segunda ronda; 
 Lo que sigue es el README del handoff original, en ingles, con los titulos bajados dos niveles. Sus
 tablas de tokens, medidas y componentes siguen valiendo. Lo que ha cambiado desde entonces:
 
-- **Stack recomendado.** No aplica: Ramal usa Tauri 2, un motor en Rust con el git del sistema y la
+- **Stack recomendado.** No aplica: Git Rudder usa Tauri 2, un motor en Rust con el git del sistema y la
   web con React Router y Vite ([`../../architecture.md`](../../architecture.md)).
-- **VS Code.** Lo nativo (paleta, quick input, notificaciones con "Origen: Ramal", barra de estado,
-  menus) ya no se dibuja: lo especifica `Ramal VS Code.dc.html` (X-11). `vsLanguage` solo admite `en`
+- **VS Code.** Lo nativo (paleta, quick input, notificaciones con "Origen: Git Rudder", barra de estado,
+  menus) ya no se dibuja: lo especifica `Git Rudder VS Code.dc.html` (X-11). `vsLanguage` solo admite `en`
   y `es` y el atajo del grafo es Ctrl+K Ctrl+G.
-- **Panel web.** Lo sustituye `Ramal Web Panel.dc.html`. La web ya no conecta, prueba ni comparte
-  cuentas de plataforma (X-01, X-02). `Ramal Web.dc.html` ya no tiene panel: iniciar sesion y OAuth
-  llevan a `Ramal Web Panel.dc.html`, y `startPage` ya no ofrece `dashboard`.
+- **Panel web.** Lo sustituye `Git Rudder Web Panel.dc.html`. La web ya no conecta, prueba ni comparte
+  cuentas de plataforma (X-01, X-02). `Git Rudder Web.dc.html` ya no tiene panel: iniciar sesion y OAuth
+  llevan a `Git Rudder Web Panel.dc.html`, y `startPage` ya no ofrece `dashboard`.
 - **Landing y descargas.** La vista previa son las imagenes de `img/`, no el prototipo en un iframe
   (X-12). Sin Windows portable, macOS Universal en `.dmg`, un VSIX por plataforma y Linux desde Ubuntu
   22.04 y Debian 12 (X-09, ADR 0016).
-- **Ajustes de Desktop.** La navegacion es la de `Ramal Ajustes.dc.html`. Las llaves de IA ya no
+- **Ajustes de Desktop.** La navegacion es la de `Git Rudder Ajustes.dc.html`. Las llaves de IA ya no
   tienen alcance ni modelo libre: las de la organizacion son de solo lectura y el modelo se elige de la
   lista del proveedor (X-05, X-10). En el modelo de datos salen `Account.team` y `AIKey.scope`.
 - **Menus de rama.** Nombran la rama sobre la que actuan y separan borrar la local y la remota (B-26,
@@ -531,14 +531,14 @@ tablas de tokens, medidas y componentes siguen valiendo. Lo que ha cambiado desd
   `--scrim`, `--sk-hi` y `--fn`, que la tabla no recoge.
 - **Assets y ficheros.** Ya hay imagenes (`img/`, `media/`) y catorce prototipos: ver el indice de
   arriba.
-### Handoff: Ramal — cliente Git (Desktop, extensión VS Code y web)
+### Handoff: Git Rudder — cliente Git (Desktop, extensión VS Code y web)
 
 #### Overview
-Ramal is a Git client (functionally inspired by GitKraken) made of three products that share one account system:
+Git Rudder is a Git client (functionally inspired by GitKraken) made of three products that share one account system:
 
-1. **Ramal Desktop** (Electron/Tauri): repository list with search and filters, workspaces with aggregated PRs, a commit graph of every branch, staging and commits, side-by-side diff, a line-by-line merge conflict resolver, interactive rebase, context menus for everything, and settings (profile, Ramal account and team, Git platform accounts, AI keys, Git options, appearance).
-2. **Ramal for VS Code** (extension): the same repo view without the repo list or workspaces, since the repo is the open folder. It follows the VS Code theme and language (falls back to English).
-3. **Ramal Web**: marketing site with per-platform downloads, sign-up and login, and a cloud dashboard (overview and devices, workspaces, repositories, linked accounts, team, cloud-sync settings).
+1. **Git Rudder Desktop** (Electron/Tauri): repository list with search and filters, workspaces with aggregated PRs, a commit graph of every branch, staging and commits, side-by-side diff, a line-by-line merge conflict resolver, interactive rebase, context menus for everything, and settings (profile, Git Rudder account and team, Git platform accounts, AI keys, Git options, appearance).
+2. **Git Rudder for VS Code** (extension): the same repo view without the repo list or workspaces, since the repo is the open folder. It follows the VS Code theme and language (falls back to English).
+3. **Git Rudder Web**: marketing site with per-platform downloads, sign-up and login, and a cloud dashboard (overview and devices, workspaces, repositories, linked accounts, team, cloud-sync settings).
 
 The UI is bilingual (ES/EN) everywhere and supports dark and light themes.
 
@@ -548,7 +548,7 @@ The files in this bundle are **design references built in HTML**: working protot
 - **VS Code extension:** extension host for Git and commands, with webviews for the graph, merge editor and settings, using `--vscode-*` CSS variables.
 - **Web:** Next.js (or similar) with auth (email plus GitHub/GitLab/Google OAuth) and an API for syncing settings.
 
-The prototypes are "Design Components" (`*.dc.html`). Each file has a template (markup with `{{ }}` holes, `<sc-for>` for loops and `<sc-if>` for conditionals) and a `class Component` holding all the state and logic in `renderVals()`. `support.js` is the runtime that renders them. Open any `.dc.html` in a browser, from the same folder, to try it. All data is fake (`ramal-data.js`).
+The prototypes are "Design Components" (`*.dc.html`). Each file has a template (markup with `{{ }}` holes, `<sc-for>` for loops and `<sc-if>` for conditionals) and a `class Component` holding all the state and logic in `renderVals()`. `support.js` is the runtime that renders them. Open any `.dc.html` in a browser, from the same folder, to try it. All data is fake (`git-rudder-data.js`).
 
 #### Fidelity
 **High fidelity.** Colors, typography, spacing, states and interactions are final. Recreate them pixel-perfect with the target stack's libraries.
@@ -603,10 +603,10 @@ Uses VS Code Dark Modern / Light Modern values: editor `#1f1f1f`/`#ffffff`, side
 
 ---
 
-#### Screens — Ramal Desktop (`Ramal.dc.html`)
+#### Screens — Git Rudder Desktop (`Git Rudder.dc.html`)
 
 ##### Global layout
-- **Title bar / tabs (46px, --panel):** "R" logo (24px, teal, radius 8) + "Ramal". "Inicio" tab, a "⚙︎ Configuración" tab (when open), one tab per open repo (platform badge + name + ×, max 220px), "+". Active tab: `background:var(--bg)` + `box-shadow: inset 0 2px 0 var(--accent)`. On the right: ES/EN segmented control, ☀︎/☾ icon theme switch, ⚙︎, avatar (opens Profile).
+- **Title bar / tabs (46px, --panel):** "R" logo (24px, teal, radius 8) + "Git Rudder". "Inicio" tab, a "⚙︎ Configuración" tab (when open), one tab per open repo (platform badge + name + ×, max 220px), "+". Active tab: `background:var(--bg)` + `box-shadow: inset 0 2px 0 var(--accent)`. On the right: ES/EN segmented control, ☀︎/☾ icon theme switch, ⚙︎, avatar (opens Profile).
 - **Context menu (whole app):** 236px min, radius 12, items 32px. Submenus open on hover with "›". Danger items use --danger. Items with a check (✓) can stay open (`keep`) for multi-select. Opens with right-click and with the `⋯` buttons. Esc closes it.
 - **Generic modal:** 460px (580 wide), radius 16. Field types: info, text, textarea, select, segmented, checkbox, action (AI button). Primary button uses accent, or danger for destructive actions.
 - **Toasts:** bottom-right, colored dot (ok/warn/info), 3.2 s.
@@ -643,22 +643,22 @@ Uses VS Code Dark Modern / Light Modern values: editor `#1f1f1f`/`#ffffff`, side
 - Other menus: file (stage, view diff, discard, history, blame, .gitignore, editor, copy path), stash (apply/pop/drop), tag, remote, submodule, PR.
 
 ##### 4. Settings (its own tab, left nav with groups)
-- **Usuario:** *Perfil* (64px avatar, name, username, email, time zone, Guardar). *Cuenta y equipo* (Ramal Pro plan + Gestionar suscripción, session + Cerrar sesión, "ACME Studio" organization with members, roles and pending invitations, Invitar, active sessions).
+- **Usuario:** *Perfil* (64px avatar, name, username, email, time zone, Guardar). *Cuenta y equipo* (Git Rudder Pro plan + Gestionar suscripción, session + Cerrar sesión, "ACME Studio" organization with members, roles and pending invitations, Invitar, active sessions).
 - **Conexiones:** *Plataformas Git* (groups per platform, several accounts each: @user, label, host, method OAuth/Token/SSH, scopes, "Usada en N repos", Predeterminada / Hacer predeterminada, menu to test/edit/disconnect). *IA*: keys (provider: Anthropic, OpenAI, Groq, Google Gemini, Mistral, OpenRouter, Ollama local, any OpenAI-compatible; label; masked key; model; **belongs to: Personal / Organización**; default). "Dónde usar la IA": toggle + key select for Mensajes de commit, Pull requests, Resumen de commits. Preferences: language, Conventional Commits, exclude sensitive files, extra instructions.
 - **Aplicación:** *Git* (user.name/email, default branch, sign commits, auto fetch, default pull, prune, SSH keys). *Apariencia* (theme, language, graph nodes).
 - Generic settings row: label + description on the left, control (input / select / segmented / toggle 38×22 / button / textarea) on the right, wrapping on narrow widths.
 
-#### Screens — Ramal for VS Code (`Ramal VS Code.dc.html`)
-- Title bar with the command center (opens the **command palette**, ⇧⌘P). Activity bar 48px with the Ramal "R" icon active (inset 2px accent). ⚙︎ at the bottom opens settings.
-- **"RAMAL" view** (`clamp(230px,24vw,300px)`) with 22px section headers: CAMBIOS (commit textarea with ✦ IA, Commit button ▾ Commit/Commit y push/Amend; groups "Cambios de merge" (C), "Cambios preparados", "Cambios", each with inline +/−), RAMAS, REMOTOS, PULL REQUESTS, STASHES, TAGS.
-- **Editor tabs:** "Ramal Graph" (pinned; compact toolbar with icon-only buttons, 28px rows, detail pane on the right), "Merge: <file>" (same resolver as desktop), "<file> (Working Tree)" diff, "Ramal Settings" (styled like the VS Code settings editor: "Ramal › AI: **Commit Messages**" + checkbox/select; sections Cuenta de Ramal and sync, Plataformas Git, IA, Git). No appearance or language settings: they **follow VS Code**.
-- Status bar: remote indicator, "⎇ branch*", "⟳ 0↓ 2↑" (push), "⚠ N conflictos", "✦ <AI provider>", "Ramal: @account".
-- Dialogs use the quick-input style (centered at the top, 600px). Notifications bottom-right with "Origen: Ramal".
+#### Screens — Git Rudder for VS Code (`Git Rudder VS Code.dc.html`)
+- Title bar with the command center (opens the **command palette**, ⇧⌘P). Activity bar 48px with the Git Rudder "R" icon active (inset 2px accent). ⚙︎ at the bottom opens settings.
+- **"GIT_RUDDER" view** (`clamp(230px,24vw,300px)`) with 22px section headers: CAMBIOS (commit textarea with ✦ IA, Commit button ▾ Commit/Commit y push/Amend; groups "Cambios de merge" (C), "Cambios preparados", "Cambios", each with inline +/−), RAMAS, REMOTOS, PULL REQUESTS, STASHES, TAGS.
+- **Editor tabs:** "Git Rudder Graph" (pinned; compact toolbar with icon-only buttons, 28px rows, detail pane on the right), "Merge: <file>" (same resolver as desktop), "<file> (Working Tree)" diff, "Git Rudder Settings" (styled like the VS Code settings editor: "Git Rudder › AI: **Commit Messages**" + checkbox/select; sections Cuenta de Git Rudder and sync, Plataformas Git, IA, Git). No appearance or language settings: they **follow VS Code**.
+- Status bar: remote indicator, "⎇ branch*", "⟳ 0↓ 2↑" (push), "⚠ N conflictos", "✦ <AI provider>", "Git Rudder: @account".
+- Dialogs use the quick-input style (centered at the top, 600px). Notifications bottom-right with "Origen: Git Rudder".
 - Language: `vsLanguage` es → Spanish, **anything else → English**.
 
-#### Screens — Ramal Web (`Ramal Web.dc.html`)
+#### Screens — Git Rudder Web (`Git Rudder Web.dc.html`)
 - Sticky nav 64px with blur: logo, Funciones / Descargar / VS Code, ES/EN, ☀︎/☾, Iniciar sesión, **Crear cuenta** (or "Abrir panel" when logged in).
-- **Landing:** v2.4 pill, hero H1 + subtitle, "Descargar para <OS detectado>" + "Todas las plataformas" + link to VS Code. Product preview (the real app in a window frame). Six features (grid with 1px borders, numbered 01–06). VS Code section with a preview and `code --install-extension ramal.ramal`. **Downloads:** macOS (Apple Silicon/Intel/Universal, `brew install --cask ramal`), Windows (x64/ARM64/.msi/portable, `winget install Ramal.Ramal`), Linux (.deb/.rpm/AppImage/Flathub/ARM64, `flatpak install flathub io.ramal.Ramal`), VS Code (Marketplace, Open VSX, .vsix). The card for the user's OS is highlighted ("Tu sistema"). Account CTA and footer.
+- **Landing:** v2.4 pill, hero H1 + subtitle, "Descargar para <OS detectado>" + "Todas las plataformas" + link to VS Code. Product preview (the real app in a window frame). Six features (grid with 1px borders, numbered 01–06). VS Code section with a preview and `code --install-extension git-rudder.git-rudder`. **Downloads:** macOS (Apple Silicon/Intel/Universal, `brew install --cask git-rudder`), Windows (x64/ARM64/.msi/portable, `winget install Git Rudder.Git Rudder`), Linux (.deb/.rpm/AppImage/Flathub/ARM64, `flatpak install flathub com.gitrudder.GitRudder`), VS Code (Marketplace, Open VSX, .vsix). The card for the user's OS is highlighted ("Tu sistema"). Account CTA and footer.
 - **Auth** (420px card): OAuth GitHub/GitLab/Google, "o con email", fields. Login: email, password + "¿La olvidaste?". Sign-up: name, email, password with an 8+ character hint, organization (optional), terms. Validation: required name, email regex, password ≥ 8, terms accepted. Error shown in a danger box.
 - **Dashboard:** top bar 56px (organization switcher, Descargar, ES/EN, theme, avatar menu → Cerrar sesión). Nav: Resumen (counter tiles + synced devices), Workspaces (cards with repo chips, **Compartido con equipo / Solo tú** toggle, rename/delete), Repositorios (search; table repo | origin (platform + @account) | workspaces (multiple) | updated | ⋯ with workspace checkboxes and unlink), Cuentas vinculadas (per platform, owner Tuya/Equipo, test/share/disconnect), Equipo (used seats with a bar, members with a role select, invite, resend, remove), Configuración en la nube (profile; what syncs: workspaces and repos, accounts (encrypted tokens), AI preferences, AI keys (**off by default: they stay on each device**), Git, appearance; export JSON; delete account).
 
@@ -678,7 +678,7 @@ Member    { name, email, role: 'owner'|'admin'|'member', pending? }
 ```
 - A file counts as resolved when every hunk has at least one selected line, or when it has a manual edit with no `<<<<<<<`/`=======`/`>>>>>>>` markers left.
 - The resolver output is the context lines plus, for each hunk, the selected lines of A followed by the selected lines of B, in their original order.
-- Real lane assignment for the graph: see the `DIFF` sample in `ramal-data.js` (the reuse-free-lanes algorithm).
+- Real lane assignment for the graph: see the `DIFF` sample in `git-rudder-data.js` (the reuse-free-lanes algorithm).
 - Web ↔ app sync: account + workspaces + repos (without local paths from other devices) + accounts (encrypted tokens) + preferences. AI keys are not synced unless the user turns it on.
 
 #### Interactions to keep
@@ -692,8 +692,8 @@ Member    { name, email, role: 'owner'|'admin'|'member', pending? }
 No images. Icons are Unicode glyphs (⎇ ⟳ ↓ ↑ ⊟ ⊞ ⇄ ◆ ⇅ ✦ ⚙︎ ☀︎ ☾ ⋯). **In production, replace them with a consistent icon set** (e.g. Lucide or Codicons in VS Code). The "R" logo is a placeholder.
 
 #### Files
-- `Ramal.dc.html` — desktop app (home, workspaces, repo, diff, conflicts, rebase, settings).
-- `Ramal VS Code.dc.html` — VS Code extension (props `vsTheme`, `vsLanguage`).
-- `Ramal Web.dc.html` — landing, auth and dashboard (props `theme`, `lang`, `startPage`).
-- `ramal-data.js` — fake data and the complete ES/EN dictionary (`D`). Reuse the keys as the base for real i18n.
+- `Git Rudder.dc.html` — desktop app (home, workspaces, repo, diff, conflicts, rebase, settings).
+- `Git Rudder VS Code.dc.html` — VS Code extension (props `vsTheme`, `vsLanguage`).
+- `Git Rudder Web.dc.html` — landing, auth and dashboard (props `theme`, `lang`, `startPage`).
+- `git-rudder-data.js` — fake data and the complete ES/EN dictionary (`D`). Reuse the keys as the base for real i18n.
 - `support.js` — runtime needed to open the `.dc.html` files in a browser (not part of the product).

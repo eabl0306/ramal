@@ -1,5 +1,5 @@
 [package]
-name = "ramal-core-domain"
+name = "git-rudder-core-domain"
 description = "Nucleo de dominio del cliente de Git: tipos y reglas puras, sin IO ni runtime."
 version.workspace = true
 edition.workspace = true
@@ -8,8 +8,8 @@ publish.workspace = true
 license.workspace = true
 
 # Lista blanca estricta: solo thiserror. Ni serde (la forma del JSON la decide
-# ramal-protocol) ni dev-dependencies, porque Cargo.lock las apunta igual y el
-# test de arquitectura de ramal-engine las cuenta como dependencias directas.
+# git-rudder-protocol) ni dev-dependencies, porque Cargo.lock las apunta igual y el
+# test de arquitectura de git-rudder-engine las cuenta como dependencias directas.
 [dependencies]
 thiserror = { workspace = true }
 

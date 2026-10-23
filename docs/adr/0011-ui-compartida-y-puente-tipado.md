@@ -9,9 +9,9 @@
 La vista de repositorio (grafo, fila WIP, detalle de commit, diff, resolver de conflictos, editor
 de rebase) se pinta en dos hosts muy distintos:
 
-- **Ramal Desktop**, en el webview de Tauri: IBM Plex, colores oklch del diseno, tema claro y
+- **Git Rudder Desktop**, en el webview de Tauri: IBM Plex, colores oklch del diseno, tema claro y
   oscuro, filas del grafo de 40 px, elementos de menu de 32 px, iconos de Lucide.
-- **Ramal for VS Code**, en webviews: sigue el tema del editor (incluidos los de alto contraste),
+- **Git Rudder for VS Code**, en webviews: sigue el tema del editor (incluidos los de alto contraste),
   usa la fuente del sistema, filas de 28 px, elementos de menu de 24 px, iconos Codicons, y tiene
   que leer las variables `--vscode-*`, no colores propios.
 
@@ -37,7 +37,7 @@ enero de 2025 y npm lo marca como obsoleto.
 
 ### Un paquete de interfaz tematizado solo con tokens semanticos
 
-`@ramal/ui` contiene tokens, temas, densidades, primitivas y el proveedor de iconos. Los
+`@git-rudder/ui` contiene tokens, temas, densidades, primitivas y el proveedor de iconos. Los
 componentes solo leen tokens semanticos, nunca un color literal:
 
 | Grupo                        | Tokens                                                                                                                                                              |
@@ -53,7 +53,7 @@ componentes solo leen tokens semanticos, nunca un color literal:
 
 Dos ficheros de tema dan valor a esos tokens:
 
-- `themes/ramal.css`: los valores oklch del diseno para `[data-theme="dark"]` y
+- `themes/git-rudder.css`: los valores oklch del diseno para `[data-theme="dark"]` y
   `[data-theme="light"]`. Lo usan escritorio y web; la letra de 14 px y el claro de la web van en
   el mismo fichero bajo `[data-host="web"]`. Los tokens que no cambian con el tema (carriles,
   marcas, `-soft`, alto contraste, densidades) viven en `themes/base.css`.
@@ -66,7 +66,7 @@ Dos ficheros de tema dan valor a esos tokens:
 Los colores de carril son los mismos en todos los temas, como pide el diseno.
 
 **La regla se hace cumplir**: stylelint prohibe colores hexadecimales, nombres de color y
-funciones de color fuera de `packages/ui/src/themes`, y la regla `ramal/no-raw-colors` hace lo
+funciones de color fuera de `packages/ui/src/themes`, y la regla `git-rudder/no-raw-colors` hace lo
 mismo en TypeScript ([ADR 0005](0005-enforcement-automatizado.md)).
 
 ### Dos densidades, sin ramas por host
@@ -74,7 +74,7 @@ mismo en TypeScript ([ADR 0005](0005-enforcement-automatizado.md)).
 `[data-density="comfortable"]` (escritorio y web) y `[data-density="compact"]` (VS Code) cambian
 los tokens de tamano: 40 o 28 px de fila, 32 o 24 px de menu, 30 o 22 px de barra lateral, 62 o
 34 px de barra de herramientas. El SVG del grafo necesita esos numeros en JavaScript, asi que
-`@ramal/ui` exporta `DENSITIES`, y un test parsea el CSS y falla si los dos valores difieren.
+`@git-rudder/ui` exporta `DENSITIES`, y un test parsea el CSS y falla si los dos valores difieren.
 
 Las diferencias entre escritorio y VS Code son tokens, densidad e iconos. **No hay ramas
 `if (vscode)` en los componentes.**
@@ -82,8 +82,8 @@ Las diferencias entre escritorio y VS Code son tokens, densidad e iconos. **No h
 ### Iconos por proveedor
 
 `<Icon name="branch" />` con `IconName` como union cerrada de nombres semanticos. El host elige el
-juego en su composition root: `@ramal/ui/icons/lucide` (escritorio y web) o
-`@ramal/ui/icons/codicons` (VS Code). Cada juego es un `Record<IconName, ...>`, asi que un icono
+juego en su composition root: `@git-rudder/ui/icons/lucide` (escritorio y web) o
+`@git-rudder/ui/icons/codicons` (VS Code). Cada juego es un `Record<IconName, ...>`, asi que un icono
 nuevo sin equivalente en uno de los dos no compila, y al ser subrutas distintas Lucide nunca entra
 en el bundle de VS Code ni Codicons en el de escritorio. Los glifos Unicode del prototipo no se
 usan.
@@ -92,7 +92,7 @@ usan.
 
 Menus contextuales con submenus que se quedan abiertos en la seleccion multiple, dialogos con foco
 atrapado, selects, busqueda por teclado dentro de una lista: escribir eso bien a mano es caro. Las
-primitivas de `@ramal/ui` se construyen sobre **React Aria Components** (`react-aria-components`,
+primitivas de `@git-rudder/ui` se construyen sobre **React Aria Components** (`react-aria-components`,
 de Adobe), que da el comportamiento y la accesibilidad sin estilos.
 
 **Por que React Aria y no Radix.** Los dos son buenos en accesibilidad. La diferencia es la CSP:
@@ -109,8 +109,8 @@ Playwright falla con cualquier violacion de la CSP, asi que si React Aria lo cam
 webviews de VS Code se topan con el mismo bloqueo y su CSP todavia no lleva el hash: alli el
 navegador descarta esa regla.
 
-Solo `@ramal/ui` importa `react-aria-components`; las apps y `@ramal/repo-view` usan las
-primitivas de `@ramal/ui`. La version exacta se fija al montar el paquete, como el resto de
+Solo `@git-rudder/ui` importa `react-aria-components`; las apps y `@git-rudder/repo-view` usan las
+primitivas de `@git-rudder/ui`. La version exacta se fija al montar el paquete, como el resto de
 dependencias de npm.
 
 ### CSS Modules, sin CSS-in-JS en tiempo de ejecucion
@@ -133,16 +133,16 @@ implementan con su API desde el extension host. En React solo va lo que VS Code 
 el grafo, la caja de commit, el resolver de merge como editor personalizado, el formulario de PR y
 las listas de los ajustes.
 
-`@ramal/repo-view` pide esas capacidades al host a traves de un puerto, `RepoViewHost` (confirmar,
+`@git-rudder/repo-view` pide esas capacidades al host a traves de un puerto, `RepoViewHost` (confirmar,
 pedir un texto, elegir de una lista, avisar, abrir un fichero o un diff). En escritorio lo
-implementan modales y toasts de `@ramal/ui`; en VS Code, mensajes al extension host que llama a la
+implementan modales y toasts de `@git-rudder/ui`; en VS Code, mensajes al extension host que llama a la
 API nativa. Como una funcion no cruza `postMessage`, una peticion de texto no lleva una funcion de
 validacion sino un valor declarativo (`"branch-name"`, `"tag-name"`, `"non-empty"`), y cada host
-aplica el validador de `@ramal/domain` que corresponde.
+aplica el validador de `@git-rudder/domain` que corresponde.
 
 ### El puente tipado
 
-`@ramal/bridge` no tiene dependencias en tiempo de ejecucion y contiene:
+`@git-rudder/bridge` no tiene dependencias en tiempo de ejecucion y contiene:
 
 - `Transport`, el puerto: mandar un `RpcRequest`, recibir la respuesta, suscribirse a
   notificaciones.
@@ -166,7 +166,7 @@ El webview nunca envia rutas del sistema de ficheros: en VS Code, el extension h
 repositorio y pasa al webview solo su `repoId`; en escritorio, el comando de Tauri
 `repo_pick_and_open` ensena el dialogo nativo desde Rust y devuelve el `RepoHandle`. Los dos hosts
 filtran lo que el webview puede pedir con una lista de metodos por superficie o por ventana,
-escrita con los nombres que salen de `ramal-protocol` (en VS Code tipada contra la lista generada;
+escrita con los nombres que salen de `git-rudder-protocol` (en VS Code tipada contra la lista generada;
 en escritorio, `surfaces.rs` con los marcadores de `define_methods!`). Los metodos marcados como
 del host (`repo/open`) no se aceptan nunca de un webview, y el motor lo vuelve a comprobar. Ningun metodo acepta rutas absolutas, una ruta relativa con `..` o NUL, o
 que salga del arbol de trabajo despues de seguir enlaces simbolicos, se rechaza, y ninguno
@@ -174,7 +174,7 @@ devuelve material secreto a un webview.
 
 ### Tipos generados desde Rust con ts-rs
 
-- Cada DTO de `ramal-protocol` deriva `Serialize`, `Deserialize` y `TS`. ts-rs 12 respeta los
+- Cada DTO de `git-rudder-protocol` deriva `Serialize`, `Deserialize` y `TS`. ts-rs 12 respeta los
   atributos de serde, asi que el TypeScript coincide con el JSON real.
 - `TS_RS_EXPORT_DIR` apunta a `packages/bridge/src/generated`. ts-rs no genera valores ni el mapa
   de metodos, asi que la macro `define_methods!` declara cada metodo una vez y un test escribe
@@ -185,7 +185,7 @@ devuelve material secreto a un webview.
   texto ISO 8601.
 - **Lo generado se commitea**, para que el TypeScript compile sin cargo. `just protocol-gen`
   regenera y `just protocol-check` regenera y falla si `git diff` no esta limpio; la CI lo corre en
-  cada PR. `@ramal/api-client` sigue el mismo patron con `apps/api/openapi.json` como fuente.
+  cada PR. `@git-rudder/api-client` sigue el mismo patron con `apps/api/openapi.json` como fuente.
 
 ### CSP
 
@@ -229,7 +229,7 @@ los componentes de condiciones; los tokens resuelven lo mismo sin ninguna de las
 **Radix UI.** Ver arriba: la inyeccion de `<style>` en el bloqueo de scroll choca con la CSP.
 
 **Primitivas escritas a mano.** Menus con submenus, foco atrapado y busqueda por teclado son justo
-lo que mas cuesta hacer accesible, y no es donde Ramal aporta nada.
+lo que mas cuesta hacer accesible, y no es donde Git Rudder aporta nada.
 
 **Tailwind v4.** Tambien es de coste cero en ejecucion y podria mapear los tokens. CSS Modules
 encaja mejor con tokens que ya son variables CSS y con las reglas de stylelint sobre CSS normal, y

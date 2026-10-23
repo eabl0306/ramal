@@ -4,7 +4,7 @@
 // una revision de codigo.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Ramal libreria pura",
+  "display": "Git Rudder libreria pura",
   "extends": "./base.json",
   "compilerOptions": {
     "lib": ["ES2023"],

@@ -10,7 +10,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;
 --bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -48,7 +48,7 @@ button:disabled{cursor:default}
     <sc-if value="{{ narrow }}"><button onClick="{{ openDrawer }}" aria-label="{{ t.rsMenu }}" style="width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:grid;place-items:center"><span style="display:flex;flex-direction:column;gap:3px"><span style="width:14px;height:2px;border-radius:1px;background:currentColor"></span><span style="width:14px;height:2px;border-radius:1px;background:currentColor"></span><span style="width:14px;height:2px;border-radius:1px;background:currentColor"></span></span></button></sc-if>
     <div style="display:flex;align-items:center;gap:9px">
       <div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div>
-      <sc-if value="{{ wide }}"><span style="font-weight:600">Ramal</span></sc-if>
+      <sc-if value="{{ wide }}"><span style="font-weight:600">Git Rudder</span></sc-if>
     </div>
     <span style="color:var(--faint)">/</span>
     <button onClick="{{ onOrg }}" style="height:32px;min-width:0;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;gap:8px;font-weight:500"><span style="width:18px;height:18px;flex-shrink:0;border-radius:5px;font-size:9px;font-weight:700;display:grid;place-items:center;background:{{ orgChip.bg }};color:{{ orgChip.color }}">{{ orgChip.ini }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">{{ orgChip.name }}</span><span style="color:var(--faint);font-size:10px">▾</span></button>
@@ -256,7 +256,7 @@ button:disabled{cursor:default}
   <sc-if value="{{ hasDrawer }}">
     <div onClick="{{ closeDrawer }}" style="position:fixed;inset:0;z-index:30;background:oklch(0.1 0.01 230 / 0.5)"></div>
     <nav style="position:fixed;top:0;left:0;bottom:0;z-index:31;width:min(300px,86vw);background:var(--panel);border-right:1px solid var(--border);padding:14px 12px;display:flex;flex-direction:column;gap:2px;overflow:auto">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px"><span style="font-weight:600">Ramal</span><button onClick="{{ closeDrawer }}" aria-label="{{ t.rsClose }}" style="width:32px;height:32px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:18px">×</button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px"><span style="font-weight:600">Git Rudder</span><button onClick="{{ closeDrawer }}" aria-label="{{ t.rsClose }}" style="width:32px;height:32px;border-radius:8px;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:18px">×</button></div>
       <sc-for list="{{ nav }}" as="n"><div onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;cursor:pointer;font-weight:500;background:{{ n.bg }};color:{{ n.color }}"><span style="flex:1">{{ n.label }}</span><span style="font-size:11px;color:var(--faint);font-family:'IBM Plex Mono',monospace">{{ n.count }}</span></div></sc-for>
       <div style="height:1px;background:var(--border);margin:8px 4px"></div>
       <div onClick="{{ goDownloads }}" style="padding:11px 12px;border-radius:9px;cursor:pointer;font-weight:500;color:var(--accent)">↓ {{ t.download }}</div>
@@ -343,14 +343,14 @@ const LX = {
   sWs: ['Workspaces y repositorios', 'Workspaces and repositories'], sAcc: ['Cuentas vinculadas', 'Linked accounts'], sAccD: ['Tokens cifrados de extremo a extremo', 'End-to-end encrypted tokens'], since: ['Conectado desde', 'Connected since'], lastSync: ['Última sincronización', 'Last sync'], sAiPrefs: ['Preferencias de IA', 'AI preferences'], sAiKeys: ['Llaves de IA', 'AI keys'], sGit: ['Preferencias de Git', 'Git preferences'], sLook: ['Apariencia', 'Appearance'],
   shared: ['Compartido con {o}', 'Shared with {o}'], onlyYou: ['Solo tú', 'Only you'], newWs: ['Nuevo workspace', 'New workspace'], cancel: ['Cancelar', 'Cancel'], save: ['Guardar', 'Save'], download: ['Descargar', 'Download'], signOut: ['Cerrar sesión', 'Sign out'],
   personal: ['Personal', 'Personal'], orgNewMenu: ['Nueva organización…', 'New organization…'], aiProvider: ['Proveedor', 'Provider'], devicesT: ['Dispositivos', 'Devices'], name: ['Nombre', 'Name'], email: ['Email', 'Email'], role: ['Rol', 'Role'], copied: ['Copiado: {x}', 'Copied: {x}'], provider: ['Proveedor', 'Provider'], label: ['Etiqueta', 'Label'], apiKey: ['API key', 'API key'], baseUrl: ['URL base', 'Base URL'],
-  colMember: ['Miembro', 'Member'], colFn: ['Función', 'Function'], colKey: ['Llave', 'Key'], dlSub: ['La última versión de Ramal para tus equipos.', 'The latest version of Ramal for your devices.'], allOpts: ['Ver todas las opciones', 'See all options'], yours: ['Tu sistema', 'Your system'],
+  colMember: ['Miembro', 'Member'], colFn: ['Función', 'Function'], colKey: ['Llave', 'Key'], dlSub: ['La última versión de Git Rudder para tus equipos.', 'The latest version of Git Rudder for your devices.'], allOpts: ['Ver todas las opciones', 'See all options'], yours: ['Tu sistema', 'Your system'],
   export: ['Exportar configuración', 'Export settings'], dataT: ['Datos', 'Data'], tz: ['Zona horaria', 'Time zone'], pwRow: ['Contraseña y formas de entrar', 'Password and sign-in methods'], pwRowD: ['Contraseña, GitHub vinculado. Se gestionan en Cuenta › Contraseña y Formas de entrar.', 'Password, GitHub linked. Managed in Account › Password and Sign-in methods.'],
   typeD: ['Escritorio', 'Desktop'], typeV: ['VS Code', 'VS Code'], typeB: ['Navegador', 'Browser'], sysArch: ['Sistema', 'System'], version: ['Versión', 'Version'], typeL: ['Tipo', 'Type'], platAcc: ['Plataforma y cuenta', 'Platform and account'], remoteUrl: ['Remoto', 'Remote'],
   usedOf: ['{used} de {limit}', '{used} of {limit}'], vaultSlot: ['K-10 · tarjeta de bóveda (brief #63)', 'K-10 · vault card (brief #63)'], features: ['Funciones', 'Features'], perDay: ['por miembro y día', 'per member per day'], tokensMonth: ['tokens al mes', 'tokens per month'],
   reauthT: ['Confirma que eres tú', 'Confirm it\'s you'], reauthFor: ['Para eliminar tu cuenta necesitamos confirmar tu identidad.', 'To delete your account, we need to confirm your identity.'], password: ['Contraseña', 'Password'], confirm: ['Confirmar', 'Confirm'], withGoogle: ['Continuar con Google', 'Continue with Google'],
   strongNote: ['Para esta acción no sirven GitHub ni GitLab: no pueden pedirte que vuelvas a entrar.', "GitHub and GitLab don't work for this action: they can't ask you to log in again."], deleting: ['Eliminando…', 'Deleting…'], creating: ['Creando…', 'Creating…'], sending: ['Enviando…', 'Sending…'],
   invited: ['Invitación enviada a {e}', 'Invitation sent to {e}'], removed: ['{name} ya no está en {org}', '{name} is no longer in {org}'], revoked: ['Invitación retirada', 'Invitation withdrawn'], left: ['Saliste de {org}', 'You left {org}'], transferred: ['{name} es ahora titular de {org}', '{name} now owns {org}'], deletedOrg: ['{org} se eliminó', '{org} was deleted'],
-  keyAdded: ['Llave «{label}» guardada', 'Key "{label}" saved'], keyDeleted: ['Llave eliminada', 'Key deleted'], keyRotated: ['Llave rotada', 'Key rotated'], seatsSaved: ['Asientos de {org}: {n}', '{org} seats: {n}'], exported: ['Descarga iniciada: ramal-settings.json', 'Download started: ramal-settings.json'],
+  keyAdded: ['Llave «{label}» guardada', 'Key "{label}" saved'], keyDeleted: ['Llave eliminada', 'Key deleted'], keyRotated: ['Llave rotada', 'Key rotated'], seatsSaved: ['Asientos de {org}: {n}', '{org} seats: {n}'], exported: ['Descarga iniciada: git-rudder-settings.json', 'Download started: git-rudder-settings.json'],
   photoUp: ['Subiendo foto…', 'Uploading photo…'], profileSaved: ['Perfil guardado', 'Profile saved'], dlStarted: ['Descarga iniciada: {file}', 'Download started: {file}']
 };
 const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
@@ -364,7 +364,7 @@ class Component extends DCLogic {
   componentDidMount() {
     this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs);
     this._k = e => { if (e.key === 'Escape') this.setState({ modal: null, menu: null, side: null, drawer: false }); }; window.addEventListener('keydown', this._k);
-    const go = () => window.RAMAL && window.RAMAL.WEB70 ? this.boot() : setTimeout(go, 30); go();
+    const go = () => window.GIT_RUDDER && window.GIT_RUDDER.WEB70 ? this.boot() : setTimeout(go, 30); go();
   }
   componentWillUnmount() { window.removeEventListener('resize', this._rs); window.removeEventListener('keydown', this._k); this.timers.forEach(clearTimeout); }
   componentDidUpdate(pp) {
@@ -381,7 +381,7 @@ class Component extends DCLogic {
   later(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
   get L() { return this.state.lang === 'en' ? 1 : 0; }
   t(k, v) {
-    const R = window.RAMAL, W = R.WEB70, n = v && (v.count ?? v.days);
+    const R = window.GIT_RUDDER, W = R.WEB70, n = v && (v.count ?? v.days);
     const look = key => W[key] || (n != null ? W[key + (n === 1 ? '_one' : '_other')] : null);
     let e = k.startsWith('auth.') && R.WAUTH ? R.WAUTH[k] : null;
     if (e) return fill(e[this.L], v);
@@ -394,7 +394,7 @@ class Component extends DCLogic {
 
   apply(o) {
     this.timers.forEach(clearTimeout); this.timers = [];
-    const R = window.RAMAL, cur = this.state;
+    const R = window.GIT_RUDDER, cur = this.state;
     const screen = SCREENS.includes(o.screen) ? o.screen : (cur.screen || 'W-14');
     const ctx = screen === 'W-13' ? 'personal' : (o.ctx || cur.ctx || 'org');
     const role = o.role || cur.role || 'owner', plan = o.plan || cur.plan || 'trialing';
@@ -412,10 +412,10 @@ class Component extends DCLogic {
       workspaces: R.WS.map((w, i) => ({ ...w, shared: ctx === 'org' && i !== 2, by: ctx === 'org' && i === 1 && role !== 'owner' ? 'Diego León' : (ctx === 'org' && i === 1 && role === 'owner' ? '' : '') })).concat(ctx === 'org' ? [{ id: 'w4', name: 'Diseño', color: 'oklch(0.68 0.21 355)', shared: true, by: 'Aiko Tanaka' }] : []),
       repos: R.REPOS.map(r => ({ ...r })), accounts: R.ACCOUNTS.map(a => ({ ...a })),
       devices: [
-        { id: 'd1', type: 'desktop', name: 'MacBook Pro de Marta', app: 'Ramal Desktop 2.4.0', os: 'macOS 15.1', arch: 'arm64', mins: 2, since: ['12 mar 2026', 'Mar 12, 2026'], sync: 2 },
-        { id: 'd2', type: 'vscode', name: 'ubuntu-dev', app: 'Ramal for VS Code 1.3.0', os: 'Ubuntu 24.04', arch: 'x64', mins: 40, since: ['2 jun 2026', 'Jun 2, 2026'], sync: 40 },
-        { id: 'd3', type: 'desktop', name: 'PC-OFICINA', app: 'Ramal Desktop 2.3.1', os: 'Windows 11', arch: 'x64', mins: 4320, since: ['20 ene 2026', 'Jan 20, 2026'], sync: 4320, update: '2.4.0' },
-        { id: 'd4', type: 'browser', name: 'Firefox en Linux', app: 'ramal.bahoque.com', os: 'Linux', arch: 'x64', mins: 0, since: ['1 oct 2026', 'Oct 1, 2026'], sync: 0, current: true }
+        { id: 'd1', type: 'desktop', name: 'MacBook Pro de Marta', app: 'Git Rudder Desktop 2.4.0', os: 'macOS 15.1', arch: 'arm64', mins: 2, since: ['12 mar 2026', 'Mar 12, 2026'], sync: 2 },
+        { id: 'd2', type: 'vscode', name: 'ubuntu-dev', app: 'Git Rudder for VS Code 1.3.0', os: 'Ubuntu 24.04', arch: 'x64', mins: 40, since: ['2 jun 2026', 'Jun 2, 2026'], sync: 40 },
+        { id: 'd3', type: 'desktop', name: 'PC-OFICINA', app: 'Git Rudder Desktop 2.3.1', os: 'Windows 11', arch: 'x64', mins: 4320, since: ['20 ene 2026', 'Jan 20, 2026'], sync: 4320, update: '2.4.0' },
+        { id: 'd4', type: 'browser', name: 'Firefox en Linux', app: 'git-rudder.com', os: 'Linux', arch: 'x64', mins: 0, since: ['1 oct 2026', 'Oct 1, 2026'], sync: 0, current: true }
       ],
       keys: [
         { id: 'o1', prov: 'openai', label: 'ACME producción', masked: 'sk-proj-…9b1c', def: true, model: 'gpt-5', fn: { commit: 'gpt-5-mini', pr: '', summary: '' }, by: 'Diego León', mins: 12 },
@@ -461,7 +461,7 @@ class Component extends DCLogic {
   confirm(title, info, btn, fn, o = {}) { this.openModal({ kind: 'confirm', title, info, btn, fn, link: o.link, onLink: o.onLink, extra: o.extra }); }
 
   modalView() {
-    const s = this.state, m = s.modal, T = this.t.bind(this), L = this.L, R = window.RAMAL; if (!m) return null;
+    const s = this.state, m = s.modal, T = this.t.bind(this), L = this.L, R = window.GIT_RUDDER; if (!m) return null;
     const box = (kind, text, o = {}) => { const c = { info: 'var(--info)', warn: 'var(--warn)', danger: 'var(--danger)' }[kind]; return { isBox: 1, role: kind === 'danger' ? 'alert' : 'status', text, bg: tint(c, 10), color: c, icon: kind === 'info' ? 'i' : '!', hasLink: !!o.link, link: o.link || '', onLink: o.onLink }; };
     const txt = (label, k, o = {}) => ({ isText: 1, label, type: o.type || 'text', value: m[k] == null ? '' : m[k], onChange: e => this.setM({ [k]: e.target.value, err: '' }), ph: o.ph || '', disabled: !!o.disabled, hasErr: !!o.err, err: o.err || '', border: o.err ? 'var(--danger)' : 'var(--border)', hasHint: !!o.hint && !o.err, hint: o.hint || '', font: o.mono ? "'IBM Plex Mono',monospace" : 'inherit' });
     const sel = (label, value, options, onChange, o = {}) => ({ isSelect: 1, label, value, options, onChange, disabled: !!o.disabled, hasHint: !!o.hint, hint: o.hint || '' });
@@ -533,7 +533,7 @@ class Component extends DCLogic {
     if (m.kind === 'deleteAccount') {
       base.title = T('dzConfirmT'); base.width = 520; base.fields.push(box('danger', T('dzGone')), box('info', T('dzStays')), txt(T('dzType'), 'typed', { type: 'email', ph: 'marta@example.com', disabled: m.busy }));
       danger(); base.submit = m.busy ? T('deleting') : T('dzDeleteB'); lock((m.typed || '').trim() !== 'marta@example.com');
-      base.onSubmit = () => { this.setM({ busy: true }); this.later(900, () => { location.href = './Ramal Web Paginas.dc.html#goodbye'; }); };
+      base.onSubmit = () => { this.setM({ busy: true }); this.later(900, () => { location.href = './Git Rudder Web Paginas.dc.html#goodbye'; }); };
     }
     if (m.kind === 'key' || m.kind === 'editKey') {
       const AP = R.AIPROV, provs = ['anthropic', 'openai', 'google', 'mistral', 'groq', 'openrouter', 'custom'], edit = m.kind === 'editKey', p = m.prov || 'anthropic', models = MODELS[p] || [['custom-model', '']];
@@ -567,7 +567,7 @@ class Component extends DCLogic {
 
   // ---------- sections
   section() {
-    const s = this.state, T = this.t.bind(this), R = window.RAMAL, P = R.PLAT, AP = R.AIPROV, L = this.L, org = s.orgName, adm = this.isAdmin(), own = this.owner(), cnt = this.counts(), ro = this.ro();
+    const s = this.state, T = this.t.bind(this), R = window.GIT_RUDDER, P = R.PLAT, AP = R.AIPROV, L = this.L, org = s.orgName, adm = this.isAdmin(), own = this.owner(), cnt = this.counts(), ro = this.ro();
     const out = { dh: { title: '', sub: '', btns: [] }, items: [], tabs: [] };
     const accById = Object.fromEntries(s.accounts.map(a => [a.id, a])), wsById = Object.fromEntries(s.workspaces.map(w => [w.id, w]));
     const secName = { overview: T('dOverview'), workspaces: T('dWorkspaces'), repos: T('dRepos'), accounts: T('dAccounts'), team: T('dTeam'), orgAi: T('nav.orgAi'), billing: T('nav.billing'), sync: T('dSync'), account: T('nav.account'), downloads: T('download') }[s.sec];
@@ -620,7 +620,7 @@ class Component extends DCLogic {
       out.dh = { title: T('dAccounts'), sub: T('laSub'), btns: [] };
       if (st === 'loading') { out.items.push(rowsSkel(5)); return out; }
       if (st === 'error') { out.items.push(...err()); return out; }
-      out.items.push({ isCallout: 1, title: T('laCallT'), text: T('laCallText'), btns: [this.B(T('laOpenDesk'), () => this.toast('ramal://settings/platforms'), 'primary'), this.B(T('laDownload'), () => this.go('downloads'))] });
+      out.items.push({ isCallout: 1, title: T('laCallT'), text: T('laCallText'), btns: [this.B(T('laOpenDesk'), () => this.toast('git-rudder://settings/platforms'), 'primary'), this.B(T('laDownload'), () => this.go('downloads'))] });
       if (st === 'empty' || !s.accounts.length) { out.items.push(this.empty('@', T('emAccounts'), [])); return out; }
       Object.keys(P).forEach(k => { const list = s.accounts.filter(a => a.platform === k); if (!list.length) return;
         out.items.push(this.card({ abbr: P[k].abbr, badgeBg: P[k].color, title: P[k].label, count: String(list.length), rows: list.map((a, i) => {
@@ -633,7 +633,7 @@ class Component extends DCLogic {
     if (s.sec === 'team') {
       if (!this.isOrg()) {
         out.dh = { title: T('dTeam'), sub: '', btns: [] };
-        out.items.push(this.empty('+', T('pcText'), [this.B(T('orgCreate'), () => this.createOrg(), 'primary', { disabled: !s.verified, tip: s.verified ? '' : T('vNeedTip') })], { title: T('pcTitle'), line: T('pcTrial'), link: T('pcPricing'), onLink: () => { location.href = './Ramal Web Paginas.dc.html#W-17'; } }));
+        out.items.push(this.empty('+', T('pcText'), [this.B(T('orgCreate'), () => this.createOrg(), 'primary', { disabled: !s.verified, tip: s.verified ? '' : T('vNeedTip') })], { title: T('pcTitle'), line: T('pcTrial'), link: T('pcPricing'), onLink: () => { location.href = './Git Rudder Web Paginas.dc.html#W-17'; } }));
         return out;
       }
       out.dh = { title: T('dTeam'), sub: T('teamSub', { o: org }), btns: adm && !ro ? [this.B('+ ' + T('invite'), () => this.openModal({ kind: 'invite', email: '', role: 'member' }), 'primary')] : [] };
@@ -704,9 +704,9 @@ class Component extends DCLogic {
       const seatsLine = T('tmLine', { members: T('tmMembers', { count: cnt.mem }), pending: T('tmPending', { count: cnt.pend }), seats: T('tmSeats', { used: cnt.used, total: seats }) });
       const lines = pl === 'trialing' ? [T('biTrialLine', { date: this.date('trialEnd'), days: td }), seatsLine] : pl === 'active' ? [mon ? T('biMonthlyLine', { seats, date: this.date('renewM') }) : T('biAnnualLine', { seats, date: this.date('renewY') }), seatsLine] : pl === 'past_due' || pl === 'cancel_scheduled' ? [T('biMonthlyLine', { seats, date: this.date('renewM') }), seatsLine] : [seatsLine];
       const price = pl === 'active' ? (mon ? T('biPriceMonth', { total: seats * 10 }) : T('biPriceYear', { total: seats * 96 })) : pl === 'past_due' || pl === 'cancel_scheduled' ? T('biPriceMonth', { total: seats * 10 }) : '';
-      const checkout = () => { location.href = './Ramal Web Paginas.dc.html#W-18'; }, portal = () => this.toast('Paddle · customer portal ↗');
+      const checkout = () => { location.href = './Git Rudder Web Paginas.dc.html#W-18'; }, portal = () => this.toast('Paddle · customer portal ↗');
       const btns = !isOwn ? [] : pl === 'trialing' || pl === 'canceled' || pl === 'inactive' || pl === 'none' ? [this.B(T('biChoose'), checkout, 'primary'), ...(pl === 'trialing' ? [this.B(T('biSeats'), () => this.openModal({ kind: 'seats', n: seats }))] : [])] : pl === 'active' ? [this.B(T('biSeats'), () => this.openModal({ kind: 'seats', n: seats }), 'primary'), this.B(T('biPortal') + ' ↗', portal)] : pl === 'past_due' ? [this.B(T('biUpdatePay') + ' ↗', portal, 'primary')] : [this.B(T('biPortal') + ' ↗', portal)];
-      out.items.push({ isPlan: 1, name: 'Ramal Pro', hasChip: !!CH, chip: CH ? CH[0] : '', chipColor: CH ? CH[1] : '', chipBg: CH ? tint(CH[1], 16) : '', lines, hasPrice: !!price, price, hasBtns: btns.length > 0, btns });
+      out.items.push({ isPlan: 1, name: 'Git Rudder Pro', hasChip: !!CH, chip: CH ? CH[0] : '', chipColor: CH ? CH[1] : '', chipBg: CH ? tint(CH[1], 16) : '', lines, hasPrice: !!price, price, hasBtns: btns.length > 0, btns });
     }
     if (s.sec === 'sync') {
       out.dh = { title: T('dSync'), sub: T('syncSub'), btns: [] };
@@ -740,7 +740,7 @@ class Component extends DCLogic {
         saveNote: s.profNote, saving: s.profNote === T('saving'), saveLabel: T('prfSave'),
         onSave: () => { if (s.profile.user === 'marta') { this.setState({ profErr: 'user' }); return; } if (!/^[a-z0-9-]{3,39}$/.test(s.profile.user)) return; this.setState({ profNote: T('saving') }); this.later(800, () => { this.setState({ profNote: '✓ ' + T('saved') }); this.toast(T('profileSaved')); }); } });
       out.items.push(this.card({ title: T('emCard'), rows: [this.row({ label: 'marta@example.com', chips: [s.verified ? this.chip(T('emVerified'), 'var(--ok)') : this.chip(T('emUnverified'), 'var(--warn)')], subs: s.emailPending ? [{ text: T('emPending', { new: s.emailPending, current: 'marta@example.com' }), color: 'var(--info)' }] : !s.verified ? [{ text: T('emNeedVerify'), color: 'var(--warn)' }] : [], btns: [this.RB(T('emChange'), () => this.openModal({ kind: 'reauth', strong: false, action: 'changeEmail', next: () => this.openModal({ kind: 'email', email: '' }) }), { disabled: !s.verified, tip: s.verified ? '' : T('emNeedVerify') })] })] }));
-      out.items.push(this.card({ title: T('pwRow'), rows: [this.row({ label: T('pwRow'), subs: [{ text: T('pwRowD'), color: 'var(--muted)' }], btns: [this.RB(T('pwChange'), () => { location.href = './Ramal Web Auth.dc.html#W-33'; })] })] }));
+      out.items.push(this.card({ title: T('pwRow'), rows: [this.row({ label: T('pwRow'), subs: [{ text: T('pwRowD'), color: 'var(--muted)' }], btns: [this.RB(T('pwChange'), () => { location.href = './Git Rudder Web Auth.dc.html#W-33'; })] })] }));
       out.items.push(this.card({ id: 'devices', title: T('dsTitle'), headBtn: T('dsOthersOut'), onHeadBtn: () => this.confirm(T('dsOthersT'), T('dsOthersI'), T('dsOthersOut'), () => { const n = s.devices.filter(d => !d.current).length; this.setState(x => ({ devices: x.devices.filter(d => d.current) })); this.toast(T('dsOthersDone', { count: n })); }), rows: s.devices.map(devRow) }));
       const ex = s.exportState;
       out.items.push(this.card({ title: T('dataT'), rows: [this.row({ label: T('export'), subs: [{ text: ex === 'prep' ? T('exPreparing') : ex === 'ready' ? T('exReady') : T('exNoSecrets'), color: ex === 'ready' ? 'var(--ok)' : 'var(--muted)' }], btns: [this.RB(ex === 'ready' ? '↓ JSON' : T('export'), () => { if (ex === 'ready') { this.toast(T('exported')); this.setState({ exportState: 'idle' }); return; } this.setState({ exportState: 'prep' }); this.later(1500, () => this.setState({ exportState: 'ready' })); }, { disabled: ex === 'prep' })] })] }));
@@ -748,14 +748,14 @@ class Component extends DCLogic {
     }
     if (s.sec === 'downloads') {
       out.dh = { title: T('download'), sub: T('dlSub'), btns: [] };
-      const web = () => { location.href = './Ramal Web.dc.html'; };
-      out.items.push({ isDl: 1, cards: [['macOS', L ? 'macOS 12 or later' : 'macOS 12 o posterior', 'Apple Silicon (.dmg)', 'Ramal-2.4.0-arm64.dmg', 1], ['Windows', 'Windows 10 y 11', 'x64 (.exe)', 'Ramal-Setup-2.4.0-x64.exe'], ['Linux', 'Ubuntu 22.04+, Debian 12+', 'Debian / Ubuntu (.deb)', 'ramal_2.4.0_amd64.deb'], ['VS Code', L ? 'VS Code 1.138 or later' : 'VS Code 1.138 o posterior', L ? 'Install extension' : 'Instalar extensión', 'ramal.ramal']].map(([name, req, main, file, yours]) => ({ name, req, main, isYours: !!yours, yours: T('yours'), border: yours ? 'var(--accent)' : 'var(--border)', onMain: () => this.toast(T('dlStarted', { file })), all: T('allOpts'), onAll: web })) });
+      const web = () => { location.href = './Git Rudder Web.dc.html'; };
+      out.items.push({ isDl: 1, cards: [['macOS', L ? 'macOS 12 or later' : 'macOS 12 o posterior', 'Apple Silicon (.dmg)', 'Git-Rudder-2.4.0-arm64.dmg', 1], ['Windows', 'Windows 10 y 11', 'x64 (.exe)', 'Git-Rudder-Setup-2.4.0-x64.exe'], ['Linux', 'Ubuntu 22.04+, Debian 12+', 'Debian / Ubuntu (.deb)', 'git_rudder_2.4.0_amd64.deb'], ['VS Code', L ? 'VS Code 1.138 or later' : 'VS Code 1.138 o posterior', L ? 'Install extension' : 'Instalar extensión', 'git-rudder.git-rudder']].map(([name, req, main, file, yours]) => ({ name, req, main, isYours: !!yours, yours: T('yours'), border: yours ? 'var(--accent)' : 'var(--border)', onMain: () => this.toast(T('dlStarted', { file })), all: T('allOpts'), onAll: web })) });
     }
     return out;
   }
 
   sideView() {
-    const s = this.state, sd = s.side, T = this.t.bind(this), L = this.L, R = window.RAMAL, P = R.PLAT; if (!sd) return null;
+    const s = this.state, sd = s.side, T = this.t.bind(this), L = this.L, R = window.GIT_RUDDER, P = R.PLAT; if (!sd) return null;
     const ch = (label, c) => ({ label, color: c, bg: tint(c, 16) });
     if (sd.kind === 'device') {
       const d = s.devices.find(x => x.id === sd.id); if (!d) return null;
@@ -776,14 +776,14 @@ class Component extends DCLogic {
           { label: T('colWs'), value: wss.length ? '' : '—', font: 'inherit', chips: wss.map(w => ch(w.name, w.color)), hasBtn: true, btn: L ? 'Edit' : 'Editar', onBtn: e => this.openMenu(e, s.workspaces.map(w => ({ label: (r.wss.includes(w.id) ? '✓  ' : '     ') + w.name, run: () => this.setState(x => ({ repos: x.repos.map(z => z.id !== r.id ? z : { ...z, wss: z.wss.includes(w.id) ? z.wss.filter(i => i !== w.id) : [...z.wss, w.id] }) })) })), true) },
           { label: T('colSync'), value: this.ago(r.mins), font: 'inherit', chips: [], hasBtn: false }],
         hasNote: !url, note: T('rdLocalNote'),
-        btns: url ? [{ label: T('rdOpen'), bg: 'var(--accent)', color: 'var(--accent-ink)', border: 'var(--accent)', onClick: () => this.toast('ramal://open?repo=' + encodeURIComponent(url)) }] : [], hasLink: true, link: T('rdNoDesktop'), onLink: () => this.go('downloads') };
+        btns: url ? [{ label: T('rdOpen'), bg: 'var(--accent)', color: 'var(--accent-ink)', border: 'var(--accent)', onClick: () => this.toast('git-rudder://open?repo=' + encodeURIComponent(url)) }] : [], hasLink: true, link: T('rdNoDesktop'), onLink: () => this.go('downloads') };
     }
     return null;
   }
 
   renderVals() {
     const s = this.state;
-    if (!s.ready || !window.RAMAL || !window.RAMAL.WEB70) return { t: {}, proto: [], nav: [], items: [], banners: [], dh: { btns: [] }, orgChip: {}, sd: {}, md: {}, menu: {} };
+    if (!s.ready || !window.GIT_RUDDER || !window.GIT_RUDDER.WEB70) return { t: {}, proto: [], nav: [], items: [], banners: [], dh: { btns: [] }, orgChip: {}, sd: {}, md: {}, menu: {} };
     const T = this.t.bind(this), L = this.L, vw = s.vw || 1280, wide = vw >= 900, org = s.orgName, isOrg = this.isOrg(), adm = this.isAdmin(), own = this.owner();
     const t = {}; ['rsMenu', 'rsClose', 'download', 'retry', 'moreActions'].forEach(k => { t[k] = T(k); });
     const chip = (id, on, onClick) => ({ id, onClick, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', border: on ? 'var(--accent)' : 'var(--border)' });
@@ -807,7 +807,7 @@ class Component extends DCLogic {
     const banners = [];
     const bn = (kind, text, btn, onBtn) => { const c = { info: 'var(--info)', warn: 'var(--warn)', danger: 'var(--danger)' }[kind]; banners.push({ text, color: c, bg: tint(c, 10), border: tint(c, 30), icon: kind === 'info' ? 'i' : '!', hasBtn: !!btn, btn: btn || '', onBtn }); };
     if (isOrg) {
-      const isOwn = s.role === 'owner', ck = () => { location.href = './Ramal Web Paginas.dc.html#W-18'; };
+      const isOwn = s.role === 'owner', ck = () => { location.href = './Git Rudder Web Paginas.dc.html#W-18'; };
       if (s.plan === 'trialing') { const td = s.trialDays || 3; bn(td <= 1 ? 'warn' : 'info', isOwn ? T('bnTrialOwner', { org, days: td }) : T('bnTrialMember', { org, days: td, owner: own.name }), isOwn ? T('biChoose') : '', ck); }
       if (s.plan === 'past_due') bn('warn', isOwn ? T('bnPastOwner', { org }) : T('bnPastMember', { org }), isOwn ? T('biUpdatePay') + ' ↗' : '', () => this.toast('Paddle · customer portal ↗'));
       if (s.plan === 'inactive' || s.plan === 'canceled') bn('danger', T('bnEnded', { org }), isOwn ? T('biChoose') : '', ck);

@@ -9,7 +9,7 @@ export interface MenuActionEntry {
   readonly kind?: 'item';
   readonly id: string;
   readonly label: string;
-  /** Atajo ya formateado con formatShortcut de @ramal/i18n. */
+  /** Atajo ya formateado con formatShortcut de @git-rudder/i18n. */
   readonly hint?: string;
   readonly icon?: IconName;
   /** Acciones destructivas, en el color de peligro. */

@@ -1,5 +1,5 @@
-import '@ramal/ui/themes/ramal.css';
-import '@ramal/ui/themes/fonts';
+import '@git-rudder/ui/themes/git-rudder.css';
+import '@git-rudder/ui/themes/fonts';
 import '../ui/shell/global.css';
 
 import type { ReactElement, ReactNode } from 'react';
@@ -21,7 +21,7 @@ import { container } from './container';
 
 /**
  * El documento entero. El idioma y el tema van en <html> (data-theme y lang)
- * porque los temas de @ramal/ui cuelgan de ahi; data-host="web" sube la letra a
+ * porque los temas de @git-rudder/ui cuelgan de ahi; data-host="web" sube la letra a
  * 14 px. Se renderiza tambien al prerenderizar, con los valores por defecto.
  */
 export function Layout({ children }: { readonly children: ReactNode }): ReactElement {

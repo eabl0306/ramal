@@ -10,7 +10,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;
 --bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -51,7 +51,7 @@ button:disabled{cursor:default}
     <div style="height:64px;display:flex;align-items:center;gap:12px;padding:0 {{ navPad }}px;border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:center;gap:9px">
         <div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div>
-        <span style="font-weight:600;font-size:16px;letter-spacing:-0.01em">Ramal</span>
+        <span style="font-weight:600;font-size:16px;letter-spacing:-0.01em">Git Rudder</span>
       </div>
       <div style="flex:1"></div>
       <div style="display:flex;padding:2px;border-radius:8px;border:1px solid var(--border)">
@@ -170,7 +170,7 @@ button:disabled{cursor:default}
     <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:center;gap:9px">
         <div style="width:26px;height:26px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div>
-        <span style="font-weight:600">Ramal</span>
+        <span style="font-weight:600">Git Rudder</span>
       </div>
       <span style="color:var(--faint)">/</span>
       <span style="height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;font-weight:500;white-space:nowrap"><span style="width:18px;height:18px;border-radius:5px;background:var(--accent);color:var(--accent-ink);font-size:9px;font-weight:700;display:grid;place-items:center">{{ orgIni }}</span>{{ orgName }}</span>
@@ -307,14 +307,14 @@ const SMAP = Object.fromEntries(SCREENS);
 const ROUTES = { 'W-01': '/forgot-password', 'W-02': '/reset-password#token=…', 'W-03': '/verify-email#token=…', 'W-03-cambio-email': '/email-change/confirm#token=…', 'W-03-deshacer-email': '/email-change/revert#token=…', 'W-04-error': '/login?error=…', 'W-04-completar': '/signup/complete', 'W-05': '/authorize/app?client_id=…', 'W-06': '/activate', 'W-07': '/login · /signup', 'W-08': '/connect/error?reason=…', 'W-09': '/login?returnTo=…', 'W-33': '/account#password', 'W-34': '/account#sign-in', 'W-35': '/reauthenticate#token=…', login: '/login', signup: '/signup' };
 const LX = {
   login: ['Iniciar sesión', 'Log in'], signup: ['Crear cuenta', 'Sign up'], openDash: ['Abrir panel', 'Open dashboard'], cancel: ['Cancelar', 'Cancel'],
-  loginTitle: ['Iniciar sesión', 'Log in'], loginSub: ['Accede a tu configuración y a tu equipo.', 'Access your settings and your team.'], signupTitle: ['Crear cuenta', 'Create account'], signupSub: ['Sincroniza Ramal entre tus equipos y trabaja en equipo.', 'Sync Ramal across your machines and work as a team.'],
+  loginTitle: ['Iniciar sesión', 'Log in'], loginSub: ['Accede a tu configuración y a tu equipo.', 'Access your settings and your team.'], signupTitle: ['Crear cuenta', 'Create account'], signupSub: ['Sincroniza Git Rudder entre tus equipos y trabaja en equipo.', 'Sync Git Rudder across your machines and work as a team.'],
   withP: ['Continuar con {p}', 'Continue with {p}'], orEmail: ['o con email', 'or with email'], or: ['o', 'or'], email: ['Email', 'Email'], password: ['Contraseña', 'Password'], forgot: ['¿La olvidaste?', 'Forgot it?'], name: ['Nombre', 'Name'], orgName: ['Organización (opcional)', 'Organization (optional)'],
   pwHint: ['Mínimo 8 caracteres', 'At least 8 characters'], noAccount: ['¿No tienes cuenta?', 'No account yet?'], haveAccount: ['¿Ya tienes cuenta?', 'Already have an account?'],
   errEmail: ['Escribe un email válido.', 'Enter a valid email.'], errTerms: ['Debes aceptar los términos.', 'You must accept the terms.'], pwRequired: ['Escribe tu contraseña.', 'Enter your password.'],
   terms: [['Acepto los ', 'términos del servicio', ' y la ', 'política de privacidad', '.'], ['I accept the ', 'terms of service', ' and ', 'privacy policy', '.']],
   dOverview: ['Resumen', 'Overview'], dWorkspaces: ['Workspaces', 'Workspaces'], dRepos: ['Repositorios', 'Repositories'], dAccounts: ['Cuentas vinculadas', 'Linked accounts'], dTeam: ['Equipo', 'Team'], dSync: ['Configuración en la nube', 'Cloud settings'], dAccount: ['Cuenta', 'Account'],
   hello: ['Hola, {n}', 'Hi, {n}'], ovSub: ['Esto es lo que se sincroniza con tus dispositivos.', 'This is what syncs to your devices.'], newOrg: ['Crear organización…', 'Create organization…'], invite: ['Invitar miembro', 'Invite member'],
-  accSub: ['Tu perfil, cómo entras en Ramal y tus dispositivos.', 'Your profile, how you log in to Ramal, and your devices.']
+  accSub: ['Tu perfil, cómo entras en Git Rudder y tus dispositivos.', 'Your profile, how you log in to Git Rudder, and your devices.']
 };
 const PROV = { github: { label: 'GitHub', abbr: 'GH', color: 'oklch(0.5 0.03 260)' }, gitlab: { label: 'GitLab', abbr: 'GL', color: 'oklch(0.64 0.18 45)' }, google: { label: 'Google', abbr: 'G', color: 'oklch(0.6 0.15 255)' } };
 const tint = (c, p) => `color-mix(in oklch, ${c} ${p}%, transparent)`;
@@ -331,7 +331,7 @@ class Component extends DCLogic {
     this._rs = () => this.setState({ vw: window.innerWidth }); window.addEventListener('resize', this._rs);
     this._k = e => { if (e.key === 'Escape') this.setState({ modal: null, menu: null }); }; window.addEventListener('keydown', this._k);
     this.tick = setInterval(() => this.setState(s => s.sec > 0 ? { sec: s.sec - 1 } : null), 1000);
-    const go = () => window.RAMAL && window.RAMAL.WAUTH ? this.boot() : setTimeout(go, 30); go();
+    const go = () => window.GIT_RUDDER && window.GIT_RUDDER.WAUTH ? this.boot() : setTimeout(go, 30); go();
   }
   componentWillUnmount() { window.removeEventListener('resize', this._rs); window.removeEventListener('keydown', this._k); clearInterval(this.tick); this.clear(); }
   componentDidUpdate(pp) {
@@ -349,9 +349,9 @@ class Component extends DCLogic {
   later(ms, fn) { this.timers.push(setTimeout(fn, ms)); }
   get L() { return this.state.lang === 'en' ? 1 : 0; }
   t(k, v) {
-    const A = window.RAMAL.WAUTH, n = v && (v.count ?? v.minutes ?? v.seconds);
+    const A = window.GIT_RUDDER.WAUTH, n = v && (v.count ?? v.minutes ?? v.seconds);
     let e = A['auth.' + k]; if (!e && n != null) e = A['auth.' + k + (n === 1 ? '_one' : '_other')];
-    if (!e) e = LX[k] || window.RAMAL.D[k]; if (!e) return k;
+    if (!e) e = LX[k] || window.GIT_RUDDER.D[k]; if (!e) return k;
     return typeof e[this.L] === 'string' ? fill(e[this.L], v) : e[this.L];
   }
   toast(text, kind) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind }] })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), 3600); }
@@ -419,7 +419,7 @@ class Component extends DCLogic {
   row(label, value, o = {}) { const p = o.prov && PROV[o.prov]; return { isRow: 1, hasLabel: !!label, label: label || '', value, hasSub: !!o.sub, sub: o.sub || '', hasBadge: !!p, abbr: p ? p.abbr : '', color: p ? p.color : '', hasLink: !!o.link, link: o.link || '', onLink: o.onLink, hasNote: !!o.note, note: o.note || '' }; }
   checkTerms(disabled) { const s = this.state, T = this.t('terms'), err = s.errs.terms, pv = e => e.preventDefault(); return { isCheck: 1, checked: s.f.terms, disabled: !!disabled, onChange: e => this.setF('terms', e.target.checked), pre: T[0], l1: T[1], mid: T[2], l2: T[3], post: T[4], onTerms: pv, onPrivacy: pv, hasErr: !!err, err: err || '' }; }
   spinBlock(text) { return { isSpin: 1, spin: this.spin(28), text }; }
-  clientName() { return this.state.client === 'vscode' ? 'Ramal for VS Code' : 'Ramal Desktop'; }
+  clientName() { return this.state.client === 'vscode' ? 'Git Rudder for VS Code' : 'Git Rudder Desktop'; }
   device() { return this.state.client === 'vscode' ? 'ubuntu-dev (Codespaces)' : 'MacBook Pro de Marta'; }
 
   loginBlocks(o = {}) {
@@ -549,13 +549,13 @@ class Component extends DCLogic {
         b.push(this.text(T('azFoot'), { size: 12, color: 'var(--faint)' }));
       }
       if (st === 'peticion-no-valida') b.push(...bad(T('azBadTitle'), T('azBad')), this.box('danger', 'redirect_uri', { code: 'invalid_redirect_uri' }));
-      if (st === 'vscode-vuelve') b.push(this.head(T('azBackVs'), T('azBackVsText'), { logo: 'vscode' }), this.note('window.location = "vscode://ramal.ramal/auth?code=…&state=…"'));
-      if (st === 'vscode-cancelado') b.push(this.head(T('azCancelled'), '', { logo: 'vscode' }), this.note('window.location = "vscode://ramal.ramal/auth?error=access_denied&state=…"'));
-      if (st === 'escritorio') b.push(this.head(T(s.lcResult === 'success' ? 'lcOkTitle' : 'lcCancelTitle', { client: cl }), '', { logo: 'desktop' }), this.note('302 → http://127.0.0.1:53682/callback?' + (s.lcResult === 'success' ? 'code=…&state=…' : 'error=access_denied'), { link: 'Ramal Local Callback.dc.html →', href: './Ramal Local Callback.dc.html' }));
+      if (st === 'vscode-vuelve') b.push(this.head(T('azBackVs'), T('azBackVsText'), { logo: 'vscode' }), this.note('window.location = "vscode://git-rudder.git-rudder/auth?code=…&state=…"'));
+      if (st === 'vscode-cancelado') b.push(this.head(T('azCancelled'), '', { logo: 'vscode' }), this.note('window.location = "vscode://git-rudder.git-rudder/auth?error=access_denied&state=…"'));
+      if (st === 'escritorio') b.push(this.head(T(s.lcResult === 'success' ? 'lcOkTitle' : 'lcCancelTitle', { client: cl }), '', { logo: 'desktop' }), this.note('302 → http://127.0.0.1:53682/callback?' + (s.lcResult === 'success' ? 'code=…&state=…' : 'error=access_denied'), { link: 'Git Rudder Local Callback.dc.html →', href: './Git Rudder Local Callback.dc.html' }));
     }
     if (sc === 'W-06') {
       loggedIn = st !== 'sin-sesion';
-      const cl = s.client === 'desktop' ? 'Ramal Desktop' : 'Ramal for VS Code';
+      const cl = s.client === 'desktop' ? 'Git Rudder Desktop' : 'Git Rudder for VS Code';
       if (st === 'sin-sesion') { info(T('dcNeedLogin')); b.push(...this.loginBlocks({ after: () => this.go('codigo') })); }
       if (['codigo', 'formato-no-valido', 'buscando', 'no-existe', 'demasiados'].includes(st)) {
         const busy = st === 'buscando', locked = st === 'demasiados', err = s.errs.code;
@@ -664,7 +664,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const s = this.state;
-    if (!s.ready || !window.RAMAL || !window.RAMAL.WAUTH) return { x: {}, isPublic: true, hasCard: true, blocks: [], banners: [], route: '' };
+    if (!s.ready || !window.GIT_RUDDER || !window.GIT_RUDDER.WAUTH) return { x: {}, isPublic: true, hasCard: true, blocks: [], banners: [], route: '' };
     const T = this.t.bind(this), L = this.L, wide = (s.vw || 1280) >= 760;
     const x = {}; for (const k of ['login', 'signup', 'openDash', 'cancel']) x[k] = T(k);
     const chip = (id, on, onClick) => ({ id, onClick, bg: on ? 'var(--accent)' : 'transparent', color: on ? 'var(--accent-ink)' : 'var(--muted)', border: on ? 'var(--accent)' : 'var(--border)' });

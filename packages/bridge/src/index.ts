@@ -1,6 +1,6 @@
 /**
- * @ramal/bridge: el puerto `Transport`, el cliente tipado del motor y los tipos
- * del protocolo generados desde `ramal-protocol` con ts-rs. Cero dependencias en
+ * @git-rudder/bridge: el puerto `Transport`, el cliente tipado del motor y los tipos
+ * del protocolo generados desde `git-rudder-protocol` con ts-rs. Cero dependencias en
  * tiempo de ejecucion: los transportes concretos viven en cada app.
  */
 export {

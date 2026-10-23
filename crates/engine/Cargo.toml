@@ -1,5 +1,5 @@
 [package]
-name = "ramal-engine"
+name = "git-rudder-engine"
 description = "Motor del cliente: dispatch JSON-RPC, mapeo dominio-DTO y composition root compartido."
 version.workspace = true
 edition.workspace = true
@@ -8,17 +8,17 @@ publish.workspace = true
 license.workspace = true
 
 [dependencies]
-ramal-core-application = { workspace = true }
-ramal-core-domain = { workspace = true }
-ramal-git = { workspace = true }
-ramal-protocol = { workspace = true }
+git-rudder-core-application = { workspace = true }
+git-rudder-core-domain = { workspace = true }
+git-rudder-git = { workspace = true }
+git-rudder-protocol = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }
-ramal-core-application = { workspace = true, features = ["testing"] }
+git-rudder-core-application = { workspace = true, features = ["testing"] }
 tempfile = { workspace = true }
 tokio = { workspace = true }
 

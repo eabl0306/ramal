@@ -1,4 +1,4 @@
-import { type PlatformHints, detectPlatform } from '@ramal/domain';
+import { type PlatformHints, detectPlatform } from '@git-rudder/domain';
 
 import {
   UNKNOWN_VISITOR,

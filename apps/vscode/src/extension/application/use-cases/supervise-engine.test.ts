@@ -1,4 +1,4 @@
-import { PROTOCOL_VERSION, type RpcNotification } from '@ramal/bridge';
+import { PROTOCOL_VERSION, type RpcNotification } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { FakeLauncher, fail, infoResponder, ok } from '../../../test/engine-fakes';

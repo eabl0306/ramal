@@ -1,11 +1,11 @@
-import type { PlainKey } from '@ramal/i18n';
+import type { PlainKey } from '@git-rudder/i18n';
 
 import type { ArtifactLabel, DownloadTarget, StoreId } from '../../domain/downloads/release';
 
 /**
  * Las etiquetas visibles de la pagina de descargas. Los datos solo traen claves
  * (ADR 0016: la etiqueta la pone la web, no la base de datos); aqui se cruzan con
- * @ramal/i18n. Al ser Record, una etiqueta nueva sin texto no compila.
+ * @git-rudder/i18n. Al ser Record, una etiqueta nueva sin texto no compila.
  */
 
 export const ARTIFACT_LABELS: Readonly<Record<ArtifactLabel, PlainKey>> = {

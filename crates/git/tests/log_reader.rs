@@ -12,10 +12,10 @@
 
 mod support;
 
+use git_rudder_core_application::{GitReader, LogQuery};
+use git_rudder_core_domain::{CommitRecord, RepoRoot, Sha};
+use git_rudder_git::{GitCliConfig, GitCliReader};
 use pretty_assertions::assert_eq;
-use ramal_core_application::{GitReader, LogQuery};
-use ramal_core_domain::{CommitRecord, RepoRoot, Sha};
-use ramal_git::{GitCliConfig, GitCliReader};
 use support::FixtureRepo;
 
 async fn log(repo: &FixtureRepo, max_count: usize) -> Vec<CommitRecord> {

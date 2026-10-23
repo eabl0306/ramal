@@ -9,7 +9,7 @@
 
 Las reglas de estilo que solo viven en un documento se incumplen. Las que solo comprueba un
 reviewer humano se incumplen mas despacio. La unica regla que se cumple siempre es la que impide
-compilar, commitear o mergear. Gastonomo lo aprendio y lo dejo en su ADR 0005; Ramal parte de
+compilar, commitear o mergear. Gastonomo lo aprendio y lo dejo en su ADR 0005; Git Rudder parte de
 ahi con dos diferencias: hay mas piezas (dos lenguajes en cinco apps y seis paquetes) y varios
 implementadores trabajando en paralelo, asi que la herramienta es la unica forma de que todos
 escriban igual.
@@ -41,10 +41,10 @@ tiene que valer igual para los dos, lo cubren scripts de Node sin dependencias e
 | Anidamiento de 4             | `clippy::excessive_nesting` con su umbral                                                                                                                        | `max-depth`                                                                                           | no aplica                                                                                                                              |
 | Tamano de fichero            | `tools/checks/file-size.mjs`                                                                                                                                     | el mismo script, mas `max-lines`                                                                      | el mismo script                                                                                                                        |
 | Codigo muerto                | `dead_code` y `unused_*` con `-D warnings`, `unused_crate_dependencies`                                                                                          | `no-unused-vars` y knip                                                                               | no aplica                                                                                                                              |
-| Trabajo pendiente con ticket | `tools/checks/todo-without-ticket.mjs`                                                                                                                           | el mismo script, mas la regla `ramal/ticketed-todo`                                                   | el mismo script                                                                                                                        |
+| Trabajo pendiente con ticket | `tools/checks/todo-without-ticket.mjs`                                                                                                                           | el mismo script, mas la regla `git-rudder/ticketed-todo`                                              | el mismo script                                                                                                                        |
 | Tests enfocados o apagados   | `tools/checks/no-focused-tests.mjs` (`#[ignore]` sin motivo)                                                                                                     | el mismo script (`.only`; `skip`, `skipIf`, `runIf`, `todo`, `fixme`, `xit` y `xdescribe` sin motivo) | no aplica                                                                                                                              |
-| Colores escritos a mano      | no aplica                                                                                                                                                        | `ramal/no-raw-colors`                                                                                 | stylelint: `declaration-strict-value`, `color-no-hex`, `color-named` y funciones de color prohibidas fuera de `packages/ui/src/themes` |
-| Texto de interfaz literal    | no aplica                                                                                                                                                        | `ramal/no-jsx-literal-text`                                                                           | no aplica                                                                                                                              |
+| Colores escritos a mano      | no aplica                                                                                                                                                        | `git-rudder/no-raw-colors`                                                                            | stylelint: `declaration-strict-value`, `color-no-hex`, `color-named` y funciones de color prohibidas fuera de `packages/ui/src/themes` |
+| Texto de interfaz literal    | no aplica                                                                                                                                                        | `git-rudder/no-jsx-literal-text`                                                                      | no aplica                                                                                                                              |
 | Capas hexagonales            | Tests de arquitectura sobre `Cargo.lock` y `clippy.toml` por nucleo                                                                                              | `eslint-plugin-boundaries`                                                                            | no aplica                                                                                                                              |
 | Grafo de paquetes            | Tests de cruce de hexagonos                                                                                                                                      | `tools/checks/package-graph.mjs` y project references                                                 | no aplica                                                                                                                              |
 | Crates vetados               | `cargo deny check` (licencias, avisos de seguridad, bans)                                                                                                        | no aplica                                                                                             | no aplica                                                                                                                              |
@@ -96,23 +96,23 @@ Gastonomo comprobo que una funcion con ciclomatica 32 (un `match` plano de 31 ra
 penaliza el anidamiento ni cuenta `&&` y `||`: una funcion con bucles anidados que Sonar puntua
 con 17 pasaba tambien.
 
-Por eso existe `tools/rust-complexity` (crate `ramal-rust-complexity`, miembro del workspace).
+Por eso existe `tools/rust-complexity` (crate `git-rudder-rust-complexity`, miembro del workspace).
 Lee los fuentes con `syn`, sin compilar, y mide cada funcion y cada closure: la cognitiva contada
 como Sonar (hasta 15) y la ciclomatica contada como la regla `complexity` de ESLint (hasta 10).
 `just rust-complexity` la pasa sobre `crates`, `apps` y `tools`; como no compila, cubre tambien
-`ramal-desktop` en maquinas sin webkit2gtk. Corre en `just check`, en `pre-push` y en el job de
+`git-rudder-desktop` en maquinas sin webkit2gtk. Corre en `just check`, en `pre-push` y en el job de
 Rust de la CI. `clippy::cognitive_complexity` sigue denegado con el mismo umbral, como aviso
 temprano en el editor.
 
 Lo que no ve, y se asume: el codigo dentro de las macros (un `tokio::select!`, por ejemplo), igual
-que clippy, y la recursion, que Sonar suma y aqui no. La tabla metodo a handler de `ramal-engine`
+que clippy, y la recursion, que Sonar suma y aqui no. La tabla metodo a handler de `git-rudder-engine`
 se parte por area (`dispatch/graph.rs`, `dispatch/repo.rs`) desde el primer dia, para que no
 crezca un `match` gigante.
 
 ### El toolchain de Rust esta fijado
 
 Gastonomo usa `stable` en `rust-toolchain.toml` y acepta que un clippy nuevo rompa la CI sin
-que nadie toque el codigo. Ramal fija la version exacta (1.98.1) por dos motivos: con varios
+que nadie toque el codigo. Git Rudder fija la version exacta (1.98.1) por dos motivos: con varios
 implementadores en paralelo, un lint nuevo que aparece a mitad de semana rompe el trabajo de
 todos a la vez; y la maquina de desarrollo, la CI y las imagenes de Docker tienen que compilar
 con el mismo rustc. Se sube a mano o con Dependabot, en un PR propio que arregla lo que traigan
@@ -121,7 +121,7 @@ los lints nuevos y mueve a la vez el `ARG RUST_VERSION` de los Dockerfile.
 (`.nvmrc`) y pnpm (`packageManager`): Dependabot sube el fichero y no el `ARG`.
 
 El contexto de la imagen de la API es una lista blanca, y cargo necesita el manifiesto de todos
-los miembros del workspace para resolverlo aunque solo compile `ramal-api`. Un crate nuevo sin su
+los miembros del workspace para resolverlo aunque solo compile `git-rudder-api`. Un crate nuevo sin su
 linea en `apps/api/Dockerfile.dockerignore` pasaba `just check` y rompia la imagen solo en la CI
 (paso con `tools/rust-complexity`). `tools/checks/docker-context.mjs` lo comprueba en `just guard`.
 

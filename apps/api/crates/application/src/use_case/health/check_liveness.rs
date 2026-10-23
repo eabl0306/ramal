@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use ramal_api_domain::{HealthReport, ServiceVersion};
+use git_rudder_api_domain::{HealthReport, ServiceVersion};
 
 use crate::port::Clock;
 

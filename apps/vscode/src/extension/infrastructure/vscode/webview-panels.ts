@@ -49,7 +49,7 @@ function entryOf(surface: Surface): string {
 }
 
 /**
- * Los paneles de webview (`ramal.graph` en el primer corte). Cada panel tiene su
+ * Los paneles de webview (`gitRudder.graph` en el primer corte). Cada panel tiene su
  * canal y su superficie, y solo se escucha lo que llega de los paneles que crea
  * este adaptador (architecture.md 6.7, paso 1). Todo mensaje pasa por el
  * esquema de zod antes de llegar al router.
@@ -115,12 +115,12 @@ export class VsCodeWebviewPanels implements WebviewSurface, vscode.Disposable {
 
   #create(request: ShowSurfaceRequest, key: string): OpenPanel {
     const panel = vscode.window.createWebviewPanel(
-      `ramal.${request.surface}`,
+      `gitRudder.${request.surface}`,
       request.title,
       vscode.ViewColumn.Active,
       { enableScripts: true, localResourceRoots: [this.#webviewRoot] },
     );
-    panel.iconPath = vscode.Uri.joinPath(this.#options.extensionUri, 'media', 'ramal.svg');
+    panel.iconPath = vscode.Uri.joinPath(this.#options.extensionUri, 'media', 'git-rudder.svg');
     this.#nextId += 1;
     const open: OpenPanel = {
       panel,

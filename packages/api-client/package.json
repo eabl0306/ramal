@@ -1,9 +1,9 @@
 {
-  "name": "@ramal/api-client",
+  "name": "@git-rudder/api-client",
   "version": "0.1.0",
   "license": "FSL-1.1-ALv2",
   "private": true,
-  "description": "Cliente HTTP de la Ramal API para la web: tipos generados de apps/api/openapi.json y un envoltorio fino de openapi-fetch.",
+  "description": "Cliente HTTP de la Git Rudder API para la web: tipos generados de apps/api/openapi.json y un envoltorio fino de openapi-fetch.",
   "type": "module",
   "sideEffects": false,
   "exports": {
@@ -21,8 +21,8 @@
     "openapi-fetch": "0.17.0"
   },
   "devDependencies": {
-    "@ramal/eslint-config": "workspace:*",
-    "@ramal/tsconfig": "workspace:*",
+    "@git-rudder/eslint-config": "workspace:*",
+    "@git-rudder/tsconfig": "workspace:*",
     "@types/node": "24.19.2",
     "@vitest/coverage-v8": "5.0.5",
     "eslint": "10.13.0",

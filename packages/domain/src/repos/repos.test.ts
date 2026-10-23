@@ -48,7 +48,7 @@ describe('filterRepos', () => {
   });
 
   it('combina filtros', () => {
-    const filters = { ...EMPTY_REPO_FILTERS, kind: 'remote' as const, query: 'ramal' };
+    const filters = { ...EMPTY_REPO_FILTERS, kind: 'remote' as const, query: 'git-rudder' };
     expect(repoMatchesFilters(REPOS[0]!, filters, CONTEXT)).toBe(true);
     expect(repoMatchesFilters(REPOS[2]!, filters, CONTEXT)).toBe(false);
   });

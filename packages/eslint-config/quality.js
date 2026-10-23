@@ -1,6 +1,6 @@
 import sonarjs from 'eslint-plugin-sonarjs';
 
-import { ramalPlugin } from './rules/plugin.js';
+import { gitRudderPlugin } from './rules/plugin.js';
 
 /** Limites duros del monorepo. Cambiarlos es una decision de equipo, no un ajuste local. */
 export const LIMITS = {
@@ -44,7 +44,7 @@ export function qualityConfig({ files = ['**/*.{js,mjs,cjs,ts,tsx,mts,cts}'] } =
   return [
     {
       files,
-      plugins: { sonarjs, ramal: ramalPlugin },
+      plugins: { sonarjs, 'git-rudder': gitRudderPlugin },
       rules: {
         'max-lines': ['error', { max: LIMITS.maxLines, skipBlankLines: true, skipComments: true }],
         'max-lines-per-function': [
@@ -68,7 +68,7 @@ export function qualityConfig({ files = ['**/*.{js,mjs,cjs,ts,tsx,mts,cts}'] } =
         'no-unused-private-class-members': 'error',
         'no-param-reassign': ['error', { props: true }],
         'no-restricted-syntax': ['error', ...focusedTestSelectors],
-        'ramal/ticketed-todo': 'error',
+        'git-rudder/ticketed-todo': 'error',
         eqeqeq: ['error', 'always', { null: 'ignore' }],
         curly: ['error', 'multi-line'],
         'prefer-const': 'error',

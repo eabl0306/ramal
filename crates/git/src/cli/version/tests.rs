@@ -1,4 +1,4 @@
-use ramal_core_application::GitVersion;
+use git_rudder_core_application::GitVersion;
 
 use super::{capabilities_for, parse_version};
 

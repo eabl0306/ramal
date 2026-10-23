@@ -1,5 +1,5 @@
 [package]
-name = "ramal-api"
+name = "git-rudder-api"
 description = "Binario de la API: composition root que cablea los adaptadores y arranca el servidor."
 version.workspace = true
 edition.workspace = true
@@ -8,14 +8,14 @@ publish.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "ramal-api"
+name = "git-rudder-api"
 path = "src/main.rs"
 
 [dependencies]
-ramal-api-application = { workspace = true }
-ramal-api-domain = { workspace = true }
-ramal-api-http = { workspace = true }
-ramal-api-infrastructure = { workspace = true }
+git-rudder-api-application = { workspace = true }
+git-rudder-api-domain = { workspace = true }
+git-rudder-api-http = { workspace = true }
+git-rudder-api-infrastructure = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }

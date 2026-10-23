@@ -26,13 +26,13 @@ jobs:
       postgres:
         image: postgres:18-alpine
         env:
-          POSTGRES_USER: ramal
-          POSTGRES_PASSWORD: ramal
-          POSTGRES_DB: ramal
+          POSTGRES_USER: git_rudder
+          POSTGRES_PASSWORD: git_rudder
+          POSTGRES_DB: git_rudder
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U ramal -d ramal"
+          --health-cmd "pg_isready -U git-rudder -d git-rudder"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 20
@@ -40,8 +40,8 @@ jobs:
       # Con la base obligatoria, los tests de PostgreSQL no se pueden saltar: si
       # el servicio no arranca, el job se pone en rojo. Puesta para todo el job,
       # la cobertura mide tambien los adaptadores de verdad.
-      RAMAL_TEST_DATABASE_URL: postgres://ramal:ramal@127.0.0.1:5432/ramal
-      RAMAL_TEST_REQUIRE_DATABASE: '1'
+      GIT_RUDDER_TEST_DATABASE_URL: postgres://git_rudder:git_rudder@127.0.0.1:5432/git_rudder
+      GIT_RUDDER_TEST_REQUIRE_DATABASE: '1'
     steps:
       - uses: actions/checkout@v7
 
@@ -72,7 +72,7 @@ jobs:
       - name: Clippy, tests y cobertura (just api-check)
         run: just api-check
 
-      # Usa el servicio de arriba: con RAMAL_TEST_DATABASE_URL puesta, la receta
+      # Usa el servicio de arriba: con GIT_RUDDER_TEST_DATABASE_URL puesta, la receta
       # no levanta compose.
       - name: Tests contra PostgreSQL (just api-test-db)
         run: just api-test-db
@@ -106,7 +106,7 @@ jobs:
           file: apps/api/Dockerfile
           push: false
           load: true
-          tags: ramal-api:ci
+          tags: git-rudder-api:ci
           cache-from: type=gha,scope=api
           cache-to: type=gha,scope=api,mode=max
 
@@ -114,4 +114,4 @@ jobs:
       # PostgreSQL 18 (migra, queda lista, el HEALTHCHECK la marca sana y SIGTERM
       # la para con 0).
       - name: Prueba de humo de la imagen
-        run: bash apps/api/scripts/smoke-image.sh ramal-api:ci
+        run: bash apps/api/scripts/smoke-image.sh git-rudder-api:ci

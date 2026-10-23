@@ -3,7 +3,7 @@
 # Imagen de PRODUCCION de la web: el build estatico de React Router servido por
 # nginx sin root (ADR 0007 y 0015). No lleva node ni codigo fuente.
 #
-#   docker build -f apps/web/Dockerfile -t ramal-web:local .     (just web-docker)
+#   docker build -f apps/web/Dockerfile -t git-rudder-web:local .     (just web-docker)
 #
 # El contexto es la RAIZ del repo, porque el lockfile y los paquetes
 # compartidos viven alli. Que entra lo decide apps/web/Dockerfile.dockerignore.
@@ -34,7 +34,7 @@ RUN mkdir /manifests \
 FROM base AS deps
 COPY --from=manifests /manifests/ ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm install --frozen-lockfile --filter "@ramal/web..."
+    pnpm install --frozen-lockfile --filter "@git-rudder/web..."
 
 FROM deps AS build
 COPY packages/ packages/
@@ -42,7 +42,7 @@ COPY apps/web/ apps/web/
 # Vacia es el mismo origen: el gateway sirve la web y la API juntas.
 ARG VITE_API_URL=
 ENV VITE_API_URL=${VITE_API_URL}
-RUN pnpm --filter @ramal/web build
+RUN pnpm --filter @git-rudder/web build
 
 FROM nginx:alpine AS runtime
 # La configuracion es completa (no un server de conf.d) para correr sin root; el

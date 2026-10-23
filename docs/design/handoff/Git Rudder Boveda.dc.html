@@ -11,7 +11,7 @@
 <meta name="design_doc_mode" content="canvas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;--fs:13px;--row:40px;--btn:34px;--r-sm:6px;--r-ctl:9px;--r-card:12px;--r-panel:14px;--r-modal:16px;
 --canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -40,7 +40,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
 <div style="min-height:100vh;padding:36px 44px 80px;display:flex;flex-direction:column;gap:22px;background:var(--canvas);color:var(--text);font-family:var(--font);font-size:var(--fs)">
 
   <header style="display:flex;flex-direction:column;gap:14px;max-width:1180px">
-    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Ramal</span><span style="font-family:var(--mono);font-size:12px;color:var(--faint)">#63 · K-01 – K-10 · X-03 · X-04</span></div>
+    <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700">R</div><span style="font-weight:600;font-size:15px">Git Rudder</span><span style="font-family:var(--mono);font-size:12px;color:var(--faint)">#63 · K-01 – K-10 · X-03 · X-04</span></div>
     <div><h1 style="margin:0;font-size:26px;font-weight:600;letter-spacing:-0.02em">{{ c.title }}</h1><p style="margin:6px 0 0;max-width:780px;color:var(--muted);line-height:1.5;text-wrap:pretty">{{ c.sub }}</p></div>
     <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end">
       <sc-for list="{{ segs }}" as="g" hint-placeholder-count="3">
@@ -201,7 +201,7 @@ const CH = {
   title: ['Bóveda de secretos', 'Secrets vault'], sub: ['Frase de sincronización, código de recuperación, desbloqueo, estados de las cuentas y reinicio desde la web. Elige pantalla y estado; los flujos se pueden recorrer.', 'Sync passphrase, recovery code, unlock, account states and reset from the web. Pick a screen and state; flows are clickable.'],
   product: ['Producto', 'Product'], theme: ['Tema', 'Theme'], lang: ['Idioma', 'Language'], dark: ['Oscuro', 'Dark'], light: ['Claro', 'Light'],
   session: ['Sesión', 'Session'], platforms: ['Plataformas Git', 'Git platforms'], aiKeys: ['Llaves de IA', 'AI keys'], syncWhat: ['Qué se sincroniza', 'What syncs'], downloads: ['Ir a Descargas', 'Go to Downloads'],
-  setTitle: ['Configuración', 'Settings'], acct: ['Cuenta y equipo', 'Account & team'], vsSet: ['Configuración de Ramal', 'Ramal Settings'], cloud: ['Configuración en la nube', 'Cloud settings'], accLinked: ['Cuentas vinculadas', 'Linked accounts'],
+  setTitle: ['Configuración', 'Settings'], acct: ['Cuenta y equipo', 'Account & team'], vsSet: ['Configuración de Git Rudder', 'Git Rudder Settings'], cloud: ['Configuración en la nube', 'Cloud settings'], accLinked: ['Cuentas vinculadas', 'Linked accounts'],
   vsNative: ['Nativo de VS Code: se especifica, no se dibuja', 'Native to VS Code: specified, not drawn'],
   k9vs: ['Aviso modal nativo (showWarningMessage, modal: true) con el texto de k9Body y dos botones: «Cerrar sesión» y «Cerrar sesión y borrar también las añadidas aquí» (textos signOutKeep y signOutWipe del brief #68). Las demás ventanas sueltan la llave y enseñan otherWindowOut en la barra de estado.', 'Native modal warning (showWarningMessage, modal: true) with the k9Body text and two buttons: "Sign out" and "Sign out and also delete the ones added here" (signOutKeep and signOutWipe from brief #68). Other windows drop the key and show otherWindowOut in the status bar.'],
   pendingTag: ['PENDIENTE DE DECIDIR (ADR 0012)', 'PENDING DECISION (ADR 0012)'], reauth: ['Para restablecer la bóveda, vuelve a confirmar que eres tú (W-35, brief #69).', 'To reset the vault, confirm it is you again (W-35, brief #69).'], reauthBtn: ['Confirmar identidad', 'Confirm identity'],
@@ -226,14 +226,14 @@ const SUBL = {
   unchecked: ['Sin marcar', 'Unchecked'], checked: ['Marcado', 'Checked'], creating: ['Creando', 'Creating'], fail: ['Error al subir', 'Upload error'], done: ['Éxito', 'Success'], leave: ['Salir sin terminar', 'Leave unfinished'], newCode: ['Variante código nuevo', 'New code variant'],
   unlocking: ['Desbloqueando', 'Unlocking'], fetching: ['Descargando', 'Downloading'], wrong: ['Frase incorrecta', 'Wrong passphrase'], many: ['Cinco fallos', 'Five failures'], code: ['Con código', 'With code'], codeShort: ['Código incompleto', 'Incomplete code'], codeWrong: ['Código incorrecto', 'Wrong code'], daily: ['Límite diario (429)', 'Daily limit (429)'], rotated: ['Llave cambiada', 'Key changed'], afterCode: ['Tras usar el código', 'After using the code'],
   one: ['Único', 'Single'], lists: ['Listas mezcladas', 'Mixed lists'], useLocked: ['Al usarla', 'On use'], none: ['Tarjeta: sin configurar', 'Card: not set up'], open: ['Tarjeta: desbloqueada', 'Card: unlocked'], locked: ['Tarjeta: bloqueada', 'Card: locked'], rotate: ['Tarjeta: rotar recomendado', 'Card: rotation advised'], reset: ['Tarjeta: restablecida', 'Card: reset'],
-  signedOut: ['Sin sesión', 'Signed out'], noVault: ['Sin bóveda', 'No vault'], catOff: ['Categoría apagada', 'Category off'], otherUser: ['Otra cuenta de Ramal', 'Other Ramal account'], upload: ['Subir a mi cuenta', 'Upload to my account'],
+  signedOut: ['Sin sesión', 'Signed out'], noVault: ['Sin bóveda', 'No vault'], catOff: ['Categoría apagada', 'Category off'], otherUser: ['Otra cuenta de Git Rudder', 'Other Git Rudder account'], upload: ['Subir a mi cuenta', 'Upload to my account'],
   no: ['Respuesta: no', 'Answer: no'], yes: ['Respuesta: sí', 'Answer: yes'], invalid: ['Validación', 'Validation'], saving: ['Guardando', 'Saving'], conflict: ['Cambió en otro equipo (412)', 'Changed elsewhere (412)'], oldKey: ['Llave antigua (403)', 'Old key (403)'],
   wrongPass: ['Frase incorrecta', 'Wrong passphrase'], generating: ['Generando', 'Generating'], confirm: ['Confirmar', 'Confirm'], progress: ['Progreso', 'Progress'],
   vault: ['Con bóveda', 'With vault'], signingOut: ['Cerrando', 'Signing out'], set: ['Configurada', 'Set up'], modal: ['Modal vacío', 'Empty modal'], typed: ['Texto correcto', 'Text matches'], resetting: ['Restableciendo', 'Resetting'], reauth: ['Reautenticación', 'Re-auth'], limit: ['Límite (429)', 'Limit (429)'], error: ['Error', 'Error'],
   web: ['Web con bóveda', 'Web with vault'], webNoVault: ['Web sin bóveda', 'Web without vault'], desk: ['Desktop con bóveda', 'Desktop with vault'], deskNoVault: ['Desktop sin bóveda', 'Desktop without vault'], deskLocked: ['Desktop bloqueada', 'Desktop locked'], offModal: ['Al apagar', 'Turning off']
 };
 const SEED = {
-  'K-01': { empty: ['', ''], weak: ['ramalramal12', 'ramalramal12'], ok: ['tres perros azules', 'tres perros azules'], strong: ['tres perros azules bailan tango', 'tres perros azules bailan tango'], mismatch: ['tres perros azules', 'tres perros azul'], short: ['gato azul', ''], offline: ['', ''] }
+  'K-01': { empty: ['', ''], weak: ['gitrudder12', 'gitrudder12'], ok: ['tres perros azules', 'tres perros azules'], strong: ['tres perros azules bailan tango', 'tres perros azules bailan tango'], mismatch: ['tres perros azules', 'tres perros azul'], short: ['gato azul', ''], offline: ['', ''] }
 };
 const strength = p => { if (!p) return 0; if (p.length < 12) return 1; if (!/\s/.test(p) && !/[^a-zA-Z0-9]/.test(p)) return 1; if (p.length < 22) return 2; return 3; };
 
@@ -243,7 +243,7 @@ class Component extends DCLogic {
     const p = this.props;
     this.setState({ product: p.product || 'desktop', theme: p.theme || 'dark', lang: p.lang || 'es' });
     if (p.screen) this.goScreen(p.screen);
-    const go = () => (window.RAMAL && window.RAMAL.VAULT) ? this.setState({ ready: true }) : setTimeout(go, 30); go();
+    const go = () => (window.GIT_RUDDER && window.GIT_RUDDER.VAULT) ? this.setState({ ready: true }) : setTimeout(go, 30); go();
     this._k = e => { if (e.key === 'Escape') this.close(); }; window.addEventListener('keydown', this._k);
   }
   componentWillUnmount() { window.removeEventListener('keydown', this._k); clearTimeout(this._t); }
@@ -253,7 +253,7 @@ class Component extends DCLogic {
     document.body.dataset.theme = this.state.theme; document.body.dataset.product = this.isWebScr() ? 'web' : this.state.product;
   }
   isWebScr() { return this.state.scr === 'K-10' || (this.state.scr === 'X-04' && this.state.sub.startsWith('web')) || (this.state.scr === 'X-04' && this.state.sub === 'offModal'); }
-  V(k, vals) { const R = window.RAMAL; const e = (R.VAULT || {})[k] || (R.STATES || {})[k] || (R.D || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (vals) for (const x in vals) s = s.split('{' + x + '}').join(vals[x]); return s; }
+  V(k, vals) { const R = window.GIT_RUDDER; const e = (R.VAULT || {})[k] || (R.STATES || {})[k] || (R.D || {})[k]; if (!e) return k; let s = e[this.state.lang === 'en' ? 1 : 0]; if (vals) for (const x in vals) s = s.split('{' + x + '}').join(vals[x]); return s; }
   C(k) { return CH[k][this.state.lang === 'en' ? 1 : 0]; }
   toast(text, kind = 'ok', act) { const id = Math.random(); this.setState(s => ({ toasts: [...s.toasts, { id, text, kind, act }].slice(-3) })); setTimeout(() => this.setState(s => ({ toasts: s.toasts.filter(x => x.id !== id) })), kind === 'warn' ? 6000 : 3200); }
   goScreen(id) { const sc = SCREENS.find(x => x[0] === id); if (sc) this.setSub(id, sc[2][0]); }
@@ -273,7 +273,7 @@ class Component extends DCLogic {
   };
 
   renderVals() {
-    const st = this.state, R = window.RAMAL;
+    const st = this.state, R = window.GIT_RUDDER;
     if (!st.ready || !R) return { c: {}, v: {}, s: {}, segs: [], nav: [], subs: [], scr: {}, frame: {}, page: {}, vc: { btns: [] }, accs: [], keys: [], xrows: [], wv: {}, m: { blocks: [], btns: [] }, act: {}, toasts: [] };
     const L = st.lang === 'en' ? 1 : 0, V = this.V.bind(this), C = this.C.bind(this);
     const v = {}; for (const k in R.VAULT) v[k] = R.VAULT[k][L];
@@ -294,7 +294,7 @@ class Component extends DCLogic {
     const page = { isAccount: pageType === 'account', isLists: pageType === 'lists', isWeb: pageType === 'web', locked: pageType === 'lists' && scr === 'K-04', hasNote: scr === 'K-05' && (sub === 'noVault' || sub === 'catOff'), note: sub === 'catOff' ? v.accOffD : v.vaultNone, accCols: isVs ? 'minmax(0,1fr)' : 'repeat(2,minmax(0,1fr))',
       hasVsNat: isVs && ((scr === 'K-01' && sub === 'empty') || (scr === 'K-04' && sub === 'useLocked')), vsNatApi: scr === 'K-01' ? 'window.showWarningMessage(…, { modal: true })' : 'window.showWarningMessage(…)', vsNatText: scr === 'K-01' ? v.vsSyncPrompt : v.useLocked, vsNatBtns: scr === 'K-01' ? [v.setUpVault, v.notNow] : [v.unlock], webVault: scr === 'K-10', vsK9: isVs && scr === 'K-09',
       title: pageType === 'web' ? (deskX04 ? c.acct : c.cloud) : pageType === 'lists' ? c.platforms + ' · ' + c.aiKeys : c.acct, hasSub: pageType !== 'lists', sub: deskX04 || pageType === 'account' ? s.syncsWith.replace('{ago}', L ? '2 min ago' : 'hace 2 min') : '' };
-    const frame = { title: pageType === 'web' && !deskX04 ? 'ramal.bahoque.com' : isVs ? 'Visual Studio Code' : 'Ramal', crumb: pageType === 'web' && !deskX04 ? '› ' + c.cloud : isVs ? '› ' + c.vsSet : '› ' + c.setTitle };
+    const frame = { title: pageType === 'web' && !deskX04 ? 'git-rudder.com' : isVs ? 'Visual Studio Code' : 'Git Rudder', crumb: pageType === 'web' && !deskX04 ? '› ' + c.cloud : isVs ? '› ' + c.vsSet : '› ' + c.setTitle };
 
     // vault card (K-04 card subs and account page)
     const cardState = scr === 'K-04' && ['none', 'open', 'locked', 'rotate', 'reset', 'offline'].includes(sub) ? sub : scr === 'K-03' || scr === 'K-08' ? 'locked' : scr === 'K-01' || scr === 'K-02' ? 'none' : 'open';
@@ -319,7 +319,7 @@ class Component extends DCLogic {
     ];
     const accs = accDefs.map(a => {
       const p = P[a.plat], K = a.kind;
-      const st2 = { locked: [v.lockedRow, 'var(--muted)', v.unlock, () => this.setSub('K-03', 'empty')], local: [V('accChecked', { ago: L ? '5 min ago' : 'hace 5 min' }), 'var(--ok)', '', null], noToken: [v.noTokenHere, 'var(--warn)', v.updateCreds, () => this.toast(v.updateCreds, 'info')], mismatch: [v.credsMismatch, 'var(--danger)', v.reconnect, () => this.toast(v.reconnect, 'info')], rotated: [L ? 'The token was rotated on another device. Reconnect to use the new one.' : 'El token se rotó en otro equipo. Reconecta para usar el nuevo.', 'var(--warn)', v.reconnect, () => { location.href = './Ramal Git.dc.html#d14-tarjetas'; }], other: [V('accChecked', { ago: L ? '1 h ago' : 'hace 1 h' }), 'var(--ok)', '', null] }[K];
+      const st2 = { locked: [v.lockedRow, 'var(--muted)', v.unlock, () => this.setSub('K-03', 'empty')], local: [V('accChecked', { ago: L ? '5 min ago' : 'hace 5 min' }), 'var(--ok)', '', null], noToken: [v.noTokenHere, 'var(--warn)', v.updateCreds, () => this.toast(v.updateCreds, 'info')], mismatch: [v.credsMismatch, 'var(--danger)', v.reconnect, () => this.toast(v.reconnect, 'info')], rotated: [L ? 'The token was rotated on another device. Reconnect to use the new one.' : 'El token se rotó en otro equipo. Reconecta para usar el nuevo.', 'var(--warn)', v.reconnect, () => { location.href = './Git Rudder Git.dc.html#d14-tarjetas'; }], other: [V('accChecked', { ago: L ? '1 h ago' : 'hace 1 h' }), 'var(--ok)', '', null] }[K];
       const menuOpen = st.menu === a.id || (k5 && k5 !== 'upload' && ((k5 === 'otherUser' && a.id === 5) || (k5 !== 'otherUser' && a.id === 2)));
       const menu = [{ label: V('mTest'), op: K === 'locked' ? 0.45 : 1, tip: K === 'locked' ? v.testLocked : '' }, ...(K === 'local' && k5 !== 'catOff' ? [syncItem] : []), ...(K === 'local' && k5 === 'catOff' ? [{ label: v.syncThisAcc, op: 0.45, tip: v.accOffD }] : []), ...(K === 'other' && k5 === 'otherUser' ? [{ label: v.upload, onClick: () => this.setSub('K-05', 'upload') }] : []), { label: V('mRemoveAcc'), color: 'var(--danger)' }].map(x => ({ label: x.label, tip: x.tip || '', op: x.op || 1, color: x.color || 'var(--text)', onClick: x.onClick || (() => this.setState({ menu: null })) }));
       return { user: a.user, host: a.host, method: a.method, scopes: a.scopes, usedIn: (L ? 'Used in {n} repos' : 'Usada en {n} repos').replace('{n}', a.repos), abbr: p.abbr, color: p.color, hasChip: K === 'local' || K === 'other', chip: K === 'other' ? v.otherUserChip : v.localChip, chipTip: v.localTip, isLock: K === 'locked', isDot: K !== 'locked', dot: st2[1], status: st2[0], stColor: K === 'locked' ? 'var(--muted)' : st2[1] === 'var(--ok)' ? 'var(--muted)' : st2[1], hasAct: !!st2[2], act: st2[2], onAct: st2[3], menuOpen, menu, onMenu: () => this.setState({ menu: st.menu === a.id ? null : a.id }) };
@@ -406,7 +406,7 @@ class Component extends DCLogic {
       if (scr === 'K-08') m = { w: '580px', hasStep: false, title: v.k8Title, canClose: true, note: '', blocks: [
         { isExit: true, n: '1', title: v.k8Other, text: v.k8OtherD, hasBtn: false },
         { isExit: true, n: '2', title: v.k8Code, text: '', hasBtn: true, btn: v.useCode, onBtn: () => { this.setSub('K-03', 'code'); } },
-        { isExit: true, n: '3', title: v.k8Reset, text: v.k8ResetD, hasBtn: true, btn: v.openWeb + ' ↗', onBtn: () => this.toast('https://ramal.bahoque.com', 'info') }
+        { isExit: true, n: '3', title: v.k8Reset, text: v.k8ResetD, hasBtn: true, btn: v.openWeb + ' ↗', onBtn: () => this.toast('https://git-rudder.com', 'info') }
       ], btns: [B(s.close, () => this.setState({ modalOff: true }))] };
       if (scr === 'K-04' && sub === 'useLocked' && !st._shown) { /* toast-only state */ }
       if (scr === 'K-05' && sub === 'upload') m = { w: '460px', hasStep: true, step: c.pendingTag, title: v.upload, canClose: true, note: c.pendingSoon, blocks: [para(v.otherUserAsk, 'var(--text)'), box(v.x3_9, 'var(--info)', 'i')], btns: [B(s.cancel, () => this.setState({ modalOff: true }), null, { focus: true }), B(v.upload, () => { this.setState({ modalOff: true }); this.toast(s.saved); }, 'p')] };
@@ -472,7 +472,7 @@ class Component extends DCLogic {
     const tl = st.toasts.slice();
     if (scr === 'K-04' && sub === 'useLocked') tl.push({ id: 'ul', text: v.useLocked, kind: 'warn', act: { label: v.unlock, fn: () => this.setSub('K-03', 'empty') } });
     const toasts = tl.map(x => ({ text: x.text, color: x.kind === 'warn' ? 'var(--warn)' : x.kind === 'info' ? 'var(--info)' : 'var(--ok)', hasAct: !!x.act, act: x.act ? x.act.label : '', onAct: () => x.act && x.act.fn() }));
-    return { c, v, s, segs, nav, subs, scr: { id: scr, title: sc[1][L], note: isVs ? (L ? 'VS Code: panel inside the Ramal Settings webview' : 'VS Code: panel dentro del webview Configuración de Ramal') : '' }, frame, page, vc, accs, keys, xrows, wv, hasModal: !!m, m: m || { blocks: [], btns: [] }, act, toasts };
+    return { c, v, s, segs, nav, subs, scr: { id: scr, title: sc[1][L], note: isVs ? (L ? 'VS Code: panel inside the Git Rudder Settings webview' : 'VS Code: panel dentro del webview Configuración de Git Rudder') : '' }, frame, page, vc, accs, keys, xrows, wv, hasModal: !!m, m: m || { blocks: [], btns: [] }, act, toasts };
   }
 }
 </script>

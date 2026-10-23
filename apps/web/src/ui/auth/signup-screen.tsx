@@ -1,5 +1,5 @@
-import { passwordHint } from '@ramal/domain';
-import { useT } from '@ramal/ui';
+import { passwordHint } from '@git-rudder/domain';
+import { useT } from '@git-rudder/ui';
 import { type ReactElement, useState } from 'react';
 
 import { signInWithProvider, signUp } from '../../application/use-cases/authenticate';
@@ -103,7 +103,7 @@ function SignupFieldset({
 
 /**
  * Crear cuenta: nombre, email, contrasena, organizacion opcional y terminos. La
- * validacion es la de @ramal/domain y el envio va al AuthGateway del composition
+ * validacion es la de @git-rudder/domain y el envio va al AuthGateway del composition
  * root.
  */
 export function SignupScreen(): ReactElement {

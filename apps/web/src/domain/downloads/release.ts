@@ -1,4 +1,4 @@
-import type { DesktopOs, DownloadArtifact } from '@ramal/domain';
+import type { DesktopOs, DownloadArtifact } from '@git-rudder/domain';
 
 /**
  * La pagina de descargas: una tarjeta por sistema mas la de VS Code, cada una con
@@ -74,17 +74,17 @@ export interface ReleaseInfo {
 
 /** Los comandos que la landing invita a pegar en una terminal: nunca texto libre (ADR 0016). */
 export const INSTALL_COMMANDS: Readonly<Record<InstallMethod, string>> = {
-  'brew-cask': 'brew install --cask ramal',
-  winget: 'winget install Ramal.Ramal',
-  flatpak: 'flatpak install flathub io.ramal.Ramal',
-  vscode: 'code --install-extension ramal.ramal',
+  'brew-cask': 'brew install --cask git-rudder',
+  winget: 'winget install Git Rudder.Git Rudder',
+  flatpak: 'flatpak install flathub com.gitrudder.GitRudder',
+  vscode: 'code --install-extension git-rudder.git-rudder',
 };
 
 /** Las tiendas son URL fijas del codigo, no datos de una publicacion (ADR 0016). */
 export const STORE_URLS: Readonly<Record<StoreId, string>> = {
-  marketplace: 'https://marketplace.visualstudio.com/items?itemName=ramal.ramal',
-  'open-vsx': 'https://open-vsx.org/extension/ramal/ramal',
-  flathub: 'https://flathub.org/apps/io.ramal.Ramal',
+  marketplace: 'https://marketplace.visualstudio.com/items?itemName=git-rudder.git-rudder',
+  'open-vsx': 'https://open-vsx.org/extension/git-rudder/git-rudder',
+  flathub: 'https://flathub.org/apps/com.gitrudder.GitRudder',
 };
 
 /** Megabytes decimales, como los ensena el diseno ("118 MB"). */

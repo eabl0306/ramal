@@ -1,4 +1,4 @@
-// Vitest de @ramal/bridge. Es JavaScript a proposito: el tsconfig del paquete es
+// Vitest de @git-rudder/bridge. Es JavaScript a proposito: el tsconfig del paquete es
 // una libreria pura (sin tipos de Node) que solo cubre src/, y este fichero corre
 // en Node.
 import { defineConfig } from 'vitest/config';

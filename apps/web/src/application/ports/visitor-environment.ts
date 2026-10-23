@@ -1,4 +1,4 @@
-import type { DetectedPlatform } from '@ramal/domain';
+import type { DetectedPlatform } from '@git-rudder/domain';
 
 import type { Theme } from '../../domain/preferences/preferences';
 

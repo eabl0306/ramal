@@ -100,7 +100,7 @@ fn empty_params() -> serde_json::Value {
 }
 
 /// Lo que la interfaz usa para decidir ante un error. Es una lista cerrada: un
-/// `kind` nuevo sin traduccion en `@ramal/repo-view` no compila.
+/// `kind` nuevo sin traduccion en `@git-rudder/repo-view` no compila.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, TS)]
 #[serde(rename_all = "snake_case")]
 #[ts(export)]

@@ -1,5 +1,5 @@
 [package]
-name = "ramal-git"
+name = "git-rudder-git"
 description = "Adaptador del git CLI: implementa los puertos del motor lanzando git."
 version.workspace = true
 edition.workspace = true
@@ -9,10 +9,10 @@ license.workspace = true
 
 [dependencies]
 # async-trait hace falta para implementar los puertos, que se declaran con
-# #[async_trait] en ramal-core-application.
+# #[async_trait] en git-rudder-core-application.
 async-trait = { workspace = true }
-ramal-core-application = { workspace = true }
-ramal-core-domain = { workspace = true }
+git-rudder-core-application = { workspace = true }
+git-rudder-core-domain = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["process", "io-util", "fs"] }
 tracing = { workspace = true }

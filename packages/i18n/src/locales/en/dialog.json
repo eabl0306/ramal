@@ -1,7 +1,7 @@
 {
   "alias": {
     "title": "Set alias",
-    "hint": "The alias only changes how Ramal displays it; folder and remote stay the same."
+    "hint": "The alias only changes how Git Rudder displays it; folder and remote stay the same."
   },
   "rename": {
     "title": "Rename repository",

@@ -11,7 +11,7 @@
 
 mod support;
 
-use ramal_core_domain::graph::{EdgeKind, GraphEdge, layout};
+use git_rudder_core_domain::graph::{EdgeKind, GraphEdge, layout};
 use support::{nodes, sha};
 
 const fn route(edge: &GraphEdge) -> (usize, usize, usize) {

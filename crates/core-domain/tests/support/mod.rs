@@ -10,8 +10,8 @@
     reason = "test helpers fail loudly on purpose; a panic here is a broken fixture"
 )]
 
-use ramal_core_domain::graph::GraphLayout;
-use ramal_core_domain::{
+use git_rudder_core_domain::graph::GraphLayout;
+use git_rudder_core_domain::{
     CommitNode, CommitRecord, GitRef, GitTime, Head, RefName, RefSnapshot, Sha, ShortSha, Signature,
 };
 

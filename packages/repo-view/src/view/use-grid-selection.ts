@@ -1,4 +1,4 @@
-import type { GraphRow } from '@ramal/bridge';
+import type { GraphRow } from '@git-rudder/bridge';
 import { type KeyboardEvent, type MouseEvent, useCallback, useMemo, useState } from 'react';
 
 import { nextRowIndex } from '../graph/keyboard';

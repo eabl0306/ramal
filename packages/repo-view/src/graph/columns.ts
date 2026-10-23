@@ -1,4 +1,4 @@
-import type { Density } from '@ramal/ui';
+import type { Density } from '@git-rudder/ui';
 
 /** Refs, grafo, mensaje, autor, fecha y sha: las columnas de la tabla. */
 export const COLUMN_COUNT = 6;

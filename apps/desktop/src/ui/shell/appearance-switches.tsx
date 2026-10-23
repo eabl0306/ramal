@@ -1,5 +1,5 @@
-import { LOCALES, type Locale } from '@ramal/i18n';
-import { type SegmentOption, SegmentedControl, useT } from '@ramal/ui';
+import { LOCALES, type Locale } from '@git-rudder/i18n';
+import { type SegmentOption, SegmentedControl, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import type { ThemeName } from '../../application/ports/appearance-store';
@@ -10,7 +10,7 @@ import styles from './title-bar.module.css';
 /**
  * Los dos conmutadores de la derecha de la barra de titulo: idioma (ES/EN) y tema
  * (claro/oscuro). Las siglas del idioma son codigos, no textos que traducir; el
- * nombre accesible de cada grupo si sale de @ramal/i18n.
+ * nombre accesible de cada grupo si sale de @git-rudder/i18n.
  */
 export function AppearanceSwitches(): ReactElement {
   const t = useT();

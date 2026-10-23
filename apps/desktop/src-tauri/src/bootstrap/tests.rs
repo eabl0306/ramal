@@ -2,7 +2,7 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, PoisonError};
 
-use ramal_engine::{Engine, EngineBuilder, EngineConfig};
+use git_rudder_engine::{Engine, EngineBuilder, EngineConfig};
 
 use super::{build_engine, init_tracing, log_engine_info};
 
@@ -58,7 +58,7 @@ fn the_startup_log_says_the_engine_is_ready_when_git_works() {
 #[test]
 fn the_startup_log_warns_when_git_is_missing() {
     let config = EngineConfig {
-        git_path: Some(PathBuf::from("/nonexistent/ramal/git")),
+        git_path: Some(PathBuf::from("/nonexistent/git-rudder/git")),
     };
     let log = startup_log(&EngineBuilder::new(config).build());
     assert!(log.contains("engine started without a usable git"), "{log}");

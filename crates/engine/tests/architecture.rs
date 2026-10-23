@@ -4,8 +4,8 @@
 //! grafo y comprueba: que las dependencias directas de los nucleos son un
 //! subconjunto de su lista blanca, que el cierre transitivo de cada crate no
 //! contiene nada de su lista negra, que los hosts solo hablan con el motor y que
-//! ninguna familia (cliente y API) alcanza a la otra salvo `ramal-ai`. Puede mirar
-//! `ramal-desktop` sin compilar Tauri porque `Cargo.lock` describe a todos los
+//! ninguna familia (cliente y API) alcanza a la otra salvo `git-rudder-ai`. Puede mirar
+//! `git-rudder-desktop` sin compilar Tauri porque `Cargo.lock` describe a todos los
 //! miembros del workspace. Los `clippy.toml` de los nucleos (umbrales y APIs de IO
 //! prohibidas) los vigila tests/core_purity.rs.
 
@@ -26,13 +26,13 @@ type Graph = BTreeMap<String, BTreeSet<String>>;
 
 /// Crates del hexagono del cliente.
 const CLIENT_CRATES: &[&str] = &[
-    "ramal-core-domain",
-    "ramal-core-application",
-    "ramal-protocol",
-    "ramal-git",
-    "ramal-engine",
-    "ramal-vscode-engine",
-    "ramal-desktop",
+    "git-rudder-core-domain",
+    "git-rudder-core-application",
+    "git-rudder-protocol",
+    "git-rudder-git",
+    "git-rudder-engine",
+    "git-rudder-vscode-engine",
+    "git-rudder-desktop",
 ];
 
 /// Lo que ningun nucleo del cliente puede alcanzar. `serde` si entra: su cierre
@@ -54,7 +54,7 @@ const CORE_FORBIDDEN: &[&str] = &[
 ];
 
 const DOMAIN_ALLOWED: &[&str] = &["thiserror"];
-const APPLICATION_ALLOWED: &[&str] = &["ramal-core-domain", "async-trait", "thiserror"];
+const APPLICATION_ALLOWED: &[&str] = &["git-rudder-core-domain", "async-trait", "thiserror"];
 
 fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
@@ -135,7 +135,7 @@ fn is_tauri(name: &str) -> bool {
 }
 
 fn is_api(name: &str) -> bool {
-    name.starts_with("ramal-api")
+    name.starts_with("git-rudder-api")
 }
 
 #[test]
@@ -152,20 +152,20 @@ fn the_lock_file_describes_every_client_crate() {
 #[test]
 fn the_parser_sees_real_edges() {
     let graph = graph();
-    assert!(closure(&graph, "ramal-git").contains("tokio"));
-    assert!(closure(&graph, "ramal-protocol").contains("serde"));
-    assert!(closure(&graph, "ramal-protocol").contains("ts-rs"));
-    assert!(direct(&graph, "ramal-engine").contains("ramal-git"));
-    assert!(direct(&graph, "ramal-vscode-engine").contains("ramal-engine"));
-    assert!(closure(&graph, "ramal-vscode-engine").contains("ramal-core-domain"));
+    assert!(closure(&graph, "git-rudder-git").contains("tokio"));
+    assert!(closure(&graph, "git-rudder-protocol").contains("serde"));
+    assert!(closure(&graph, "git-rudder-protocol").contains("ts-rs"));
+    assert!(direct(&graph, "git-rudder-engine").contains("git-rudder-git"));
+    assert!(direct(&graph, "git-rudder-vscode-engine").contains("git-rudder-engine"));
+    assert!(closure(&graph, "git-rudder-vscode-engine").contains("git-rudder-core-domain"));
 }
 
 #[test]
 fn the_core_only_declares_its_allow_list() {
     let graph = graph();
     for (crate_name, allowed) in [
-        ("ramal-core-domain", DOMAIN_ALLOWED),
-        ("ramal-core-application", APPLICATION_ALLOWED),
+        ("git-rudder-core-domain", DOMAIN_ALLOWED),
+        ("git-rudder-core-application", APPLICATION_ALLOWED),
     ] {
         for dependency in direct(&graph, crate_name) {
             assert!(
@@ -180,20 +180,22 @@ fn the_core_only_declares_its_allow_list() {
 #[test]
 fn the_core_never_reaches_infrastructure() {
     let graph = graph();
-    assert_never_reaches(&graph, "ramal-core-domain", |name| {
-        CORE_FORBIDDEN.contains(&name) || name == "async-trait" || name.starts_with("ramal-")
+    assert_never_reaches(&graph, "git-rudder-core-domain", |name| {
+        CORE_FORBIDDEN.contains(&name) || name == "async-trait" || name.starts_with("git-rudder-")
     });
-    assert_never_reaches(&graph, "ramal-core-application", |name| {
+    assert_never_reaches(&graph, "git-rudder-core-application", |name| {
         CORE_FORBIDDEN.contains(&name)
-            || (name.starts_with("ramal-") && name != "ramal-core-domain")
+            || (name.starts_with("git-rudder-") && name != "git-rudder-core-domain")
     });
 }
 
 #[test]
 fn the_protocol_does_not_know_the_engine() {
     let graph = graph();
-    assert_never_reaches(&graph, "ramal-protocol", |name| {
-        name.starts_with("ramal-") || ["tokio", "salvo", "sqlx"].contains(&name) || is_tauri(name)
+    assert_never_reaches(&graph, "git-rudder-protocol", |name| {
+        name.starts_with("git-rudder-")
+            || ["tokio", "salvo", "sqlx"].contains(&name)
+            || is_tauri(name)
     });
 }
 
@@ -201,12 +203,12 @@ fn the_protocol_does_not_know_the_engine() {
 fn the_git_adapter_does_not_know_the_protocol_or_the_hosts() {
     let graph = graph();
     let forbidden = [
-        "ramal-protocol",
-        "ramal-engine",
-        "ramal-desktop",
-        "ramal-vscode-engine",
+        "git-rudder-protocol",
+        "git-rudder-engine",
+        "git-rudder-desktop",
+        "git-rudder-vscode-engine",
     ];
-    assert_never_reaches(&graph, "ramal-git", |name| {
+    assert_never_reaches(&graph, "git-rudder-git", |name| {
         forbidden.contains(&name)
             || ["salvo", "sqlx", "git2", "libgit2-sys"].contains(&name)
             || is_tauri(name)
@@ -216,7 +218,7 @@ fn the_git_adapter_does_not_know_the_protocol_or_the_hosts() {
 #[test]
 fn the_engine_stays_out_of_hosts_and_the_server() {
     let graph = graph();
-    assert_never_reaches(&graph, "ramal-engine", |name| {
+    assert_never_reaches(&graph, "git-rudder-engine", |name| {
         is_tauri(name) || is_api(name) || ["salvo", "sqlx", "git2", "libgit2-sys"].contains(&name)
     });
 }
@@ -224,10 +226,10 @@ fn the_engine_stays_out_of_hosts_and_the_server() {
 #[test]
 fn the_hosts_only_talk_to_the_engine() {
     let graph = graph();
-    for host in ["ramal-vscode-engine", "ramal-desktop"] {
+    for host in ["git-rudder-vscode-engine", "git-rudder-desktop"] {
         for dependency in direct(&graph, host) {
             assert!(
-                !dependency.starts_with("ramal-core-") && dependency != "ramal-git",
+                !dependency.starts_with("git-rudder-core-") && dependency != "git-rudder-git",
                 "{host} declares `{dependency}`: the host talks to the engine, not to its parts"
             );
         }
@@ -235,7 +237,7 @@ fn the_hosts_only_talk_to_the_engine() {
             ["salvo", "sqlx"].contains(&name) || is_api(name)
         });
     }
-    assert_never_reaches(&graph, "ramal-vscode-engine", is_tauri);
+    assert_never_reaches(&graph, "git-rudder-vscode-engine", is_tauri);
 }
 
 #[test]
@@ -247,7 +249,9 @@ fn the_client_and_the_server_never_reach_each_other() {
     for api_crate in graph.keys().filter(|name| is_api(name)) {
         assert_never_reaches(&graph, api_crate, |name| CLIENT_CRATES.contains(&name));
     }
-    if graph.contains_key("ramal-ai") {
-        assert_never_reaches(&graph, "ramal-ai", |name| name.starts_with("ramal-"));
+    if graph.contains_key("git-rudder-ai") {
+        assert_never_reaches(&graph, "git-rudder-ai", |name| {
+            name.starts_with("git-rudder-")
+        });
     }
 }

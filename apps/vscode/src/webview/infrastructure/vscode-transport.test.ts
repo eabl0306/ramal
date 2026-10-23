@@ -1,4 +1,4 @@
-import { BridgeError, type RpcNotification } from '@ramal/bridge';
+import { BridgeError, type RpcNotification } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { isHostFailure, readHostMessage } from './host-messages';

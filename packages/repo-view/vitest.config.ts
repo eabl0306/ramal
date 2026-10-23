@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 
 /**
  * Componentes con Testing Library sobre jsdom y funciones puras en el mismo
- * proceso. @ramal/repo-view no es nucleo: el umbral es el global del monorepo,
+ * proceso. @git-rudder/repo-view no es nucleo: el umbral es el global del monorepo,
  * 60%. Las funciones puras del grafo estan cerca del 100% por sus propios tests.
  * El indice y los ficheros de solo tipos no tienen logica que medir.
  */

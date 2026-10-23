@@ -6,7 +6,7 @@ import { pluralTemplate } from './plural';
 
 /**
  * El traductor. Es una funcion pura sobre los diccionarios, sin React, para que
- * la usen igual los componentes (a traves de useT en @ramal/ui), el extension
+ * la usen igual los componentes (a traves de useT en @git-rudder/ui), el extension
  * host de VS Code y cualquier script.
  */
 

@@ -7,7 +7,7 @@ import {
   nodeConfig,
   qualityConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
@@ -36,7 +36,7 @@ const policies = [
   {
     from: { element: { type: 'domain' }, file: { categories: 'source' } },
     disallow: { to: { module: { origin: ['external', 'core'] } } },
-    message: '@ramal/domain es puro: sin paquetes de npm ni node:*.',
+    message: '@git-rudder/domain es puro: sin paquetes de npm ni node:*.',
   },
 ];
 

@@ -1,4 +1,4 @@
-import type { BridgeClient, EngineMethod, GraphWindow } from '@ramal/bridge';
+import type { BridgeClient, EngineMethod, GraphWindow } from '@git-rudder/bridge';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 

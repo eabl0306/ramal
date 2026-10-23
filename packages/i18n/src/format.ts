@@ -9,7 +9,7 @@ import type { Locale } from './locale';
 export type RelativeTimeUnit = 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
 
 /**
- * El tramo lo decide relativeTimeBucket de @ramal/domain; aqui solo se escribe.
+ * El tramo lo decide relativeTimeBucket de @git-rudder/domain; aqui solo se escribe.
  * `numeric: 'auto'` da "ahora" para 0 segundos y "ayer" para -1 dia.
  */
 export function formatRelativeTime(value: number, unit: RelativeTimeUnit, locale: Locale): string {

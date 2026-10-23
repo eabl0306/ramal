@@ -1,4 +1,4 @@
-import type { GraphWindow, GraphWindowParams, RpcRequest, RpcResponse } from '@ramal/bridge';
+import type { GraphWindow, GraphWindowParams, RpcRequest, RpcResponse } from '@git-rudder/bridge';
 import { mockIPC } from '@tauri-apps/api/mocks';
 
 import type { E2eCall, E2eScenario } from './scenario';
@@ -7,12 +7,12 @@ import type { E2eCall, E2eScenario } from './scenario';
  * El host de Tauri simulado dentro de la pagina con `mockIPC` de
  * @tauri-apps/api/mocks. Global-setup lo empaqueta como script y cada prueba lo
  * inyecta antes de cargar la app: contesta `repo_pick_and_open` y `rpc` como
- * src-tauri, segun el escenario de window.__RAMAL_E2E__, y apunta cada llamada en
- * window.__RAMAL_E2E_CALLS__ para que la prueba vea que pidio el webview.
+ * src-tauri, segun el escenario de window.__GIT_RUDDER_E2E__, y apunta cada llamada en
+ * window.__GIT_RUDDER_E2E_CALLS__ para que la prueba vea que pidio el webview.
  */
 mockIPC((command, payload) => {
-  const scenario = window.__RAMAL_E2E__;
-  if (scenario === undefined) throw new Error('missing window.__RAMAL_E2E__ scenario');
+  const scenario = window.__GIT_RUDDER_E2E__;
+  if (scenario === undefined) throw new Error('missing window.__GIT_RUDDER_E2E__ scenario');
   const request = (payload as { request?: RpcRequest } | undefined)?.request;
   record({ command, ...(request === undefined ? {} : { method: request.method }) });
   if (command === 'repo_pick_and_open') return pickAndOpen(scenario);
@@ -21,7 +21,7 @@ mockIPC((command, payload) => {
 });
 
 function record(call: E2eCall): void {
-  window.__RAMAL_E2E_CALLS__ = [...(window.__RAMAL_E2E_CALLS__ ?? []), call];
+  window.__GIT_RUDDER_E2E_CALLS__ = [...(window.__GIT_RUDDER_E2E_CALLS__ ?? []), call];
 }
 
 function pickAndOpen({ pick }: E2eScenario): unknown {

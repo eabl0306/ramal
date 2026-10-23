@@ -1,4 +1,4 @@
-import { type ApiClient, createApiClient } from '@ramal/api-client';
+import { type ApiClient, createApiClient } from '@git-rudder/api-client';
 
 import { type HealthGateway, HealthGatewayError } from '../../application/ports/health-gateway';
 
@@ -29,7 +29,7 @@ async function requestReadiness(client: ApiClient, timeoutMs: number) {
 }
 
 /**
- * Adaptador de salida sobre HTTP con @ramal/api-client. Un 503 no es un error de
+ * Adaptador de salida sobre HTTP con @git-rudder/api-client. Un 503 no es un error de
  * transporte: la API usa ese codigo para decir "estoy degradada", asi que su
  * cuerpo tambien se lee.
  */

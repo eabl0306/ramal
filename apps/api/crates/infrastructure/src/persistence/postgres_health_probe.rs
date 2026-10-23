@@ -3,8 +3,8 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
-use ramal_api_application::{HealthProbe, ProbeError};
-use ramal_api_domain::ComponentName;
+use git_rudder_api_application::{HealthProbe, ProbeError};
+use git_rudder_api_domain::ComponentName;
 use sqlx::PgPool;
 use tokio::time::timeout;
 

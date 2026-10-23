@@ -1,10 +1,10 @@
-import '@ramal/ui/themes/vscode.css';
+import '@git-rudder/ui/themes/vscode.css';
 
-import type { BridgeClient } from '@ramal/bridge';
-import type { Locale } from '@ramal/i18n';
-import { GraphView, RepoViewProvider } from '@ramal/repo-view';
-import { I18nProvider, IconProvider } from '@ramal/ui';
-import { codicons } from '@ramal/ui/icons/codicons';
+import type { BridgeClient } from '@git-rudder/bridge';
+import type { Locale } from '@git-rudder/i18n';
+import { GraphView, RepoViewProvider } from '@git-rudder/repo-view';
+import { I18nProvider, IconProvider } from '@git-rudder/ui';
+import { codicons } from '@git-rudder/ui/icons/codicons';
 import type { ReactElement } from 'react';
 
 import styles from './graph-app.module.css';

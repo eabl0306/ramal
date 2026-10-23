@@ -1,6 +1,6 @@
 import type { Buffer } from 'node:buffer';
 
-import type { RpcNotification } from '@ramal/bridge';
+import type { RpcNotification } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { RecordingLogger } from '../../../test/host-fakes';

@@ -4,13 +4,13 @@
 //! rama, ficheros), asi que se trata como un cliente que puede estar comprometido:
 //! una ventana solo llega a los metodos de su lista. Es la misma idea que
 //! `application/surfaces.ts` del extension host de VS Code. Los nombres salen de
-//! los marcadores de `define_methods!` (ramal-protocol), nunca de texto escrito a
+//! los marcadores de `define_methods!` (git-rudder-protocol), nunca de texto escrito a
 //! mano, y los tests comprueban que ninguna lista contiene un metodo del host:
 //! `repo/open` y `engine/info` no estan en ninguna, los llama solo el host.
 
-use ramal_engine::mapping::error::{forbidden_method, method_not_found};
-use ramal_protocol::methods::GraphWindowMethod;
-use ramal_protocol::{MethodInfo, RpcError, RpcMethod as _};
+use git_rudder_engine::mapping::error::{forbidden_method, method_not_found};
+use git_rudder_protocol::methods::GraphWindowMethod;
+use git_rudder_protocol::{MethodInfo, RpcError, RpcMethod as _};
 
 /// Etiqueta de la ventana principal, la de `tauri.conf.json`.
 pub const MAIN_WINDOW: &str = "main";

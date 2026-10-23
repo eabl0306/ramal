@@ -1,6 +1,6 @@
-# @ramal/web
+# @git-rudder/web
 
-Ramal Web: la landing prerenderizada en castellano (`/`) y en ingles (`/en/`), entrar y crear
+Git Rudder Web: la landing prerenderizada en castellano (`/`) y en ingles (`/en/`), entrar y crear
 cuenta, y el estado del servicio (`/status`). React Router 8 en modo framework, sin SSR (ADR 0015).
 
 ```sh
@@ -17,7 +17,7 @@ just web-docker-smoke  # imagen de produccion arrancada y probada
 | -------------------- | ---------------------------------------------------------------------------- |
 | `src/domain`         | Informe de salud, idioma y tema, datos de descarga y que instalador destacar |
 | `src/application`    | Puertos y casos de uso (`checkApiHealth`, `signIn`, `signUp`, `loadRelease`) |
-| `src/infrastructure` | HTTP sobre `@ramal/api-client`, localStorage, navegador, datos fijos         |
+| `src/infrastructure` | HTTP sobre `@git-rudder/api-client`, localStorage, navegador, datos fijos    |
 | `src/ui`             | Pantallas; reciben los puertos por `UiPortsContext`                          |
 | `src/app`            | `root.tsx`, `routes.ts`, modulos de ruta finos y `composition-root.ts`       |
 
@@ -33,6 +33,6 @@ si existe y si no el fallback; el HTML va con `no-store` y `/assets/` con `immut
 ## Primer corte
 
 - El envio de entrar y crear cuenta va a un `AuthGateway` que contesta "no disponible todavia":
-  la API aun no tiene auth. La validacion ya es la de `@ramal/domain`.
+  la API aun no tiene auth. La validacion ya es la de `@git-rudder/domain`.
 - Los datos de descarga son fijos (`infrastructure/releases`). Cuando exista
   `GET /v1/releases/latest`, cambia el adaptador en el composition root.

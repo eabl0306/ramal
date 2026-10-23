@@ -1,5 +1,5 @@
-import type { ErrorKind, RpcError } from '@ramal/bridge';
-import type { PlainKey } from '@ramal/i18n';
+import type { ErrorKind, RpcError } from '@git-rudder/bridge';
+import type { PlainKey } from '@git-rudder/i18n';
 
 import type { HostErrorKind } from '../../shared/messages';
 
@@ -33,7 +33,7 @@ export type HostVisibleErrorKind = ErrorKind | HostErrorKind;
 
 /**
  * El texto de cada tipo de error. Un Record sobre todos: un `ErrorKind` nuevo en
- * el motor no compila hasta que tiene su clave aqui y en @ramal/i18n.
+ * el motor no compila hasta que tiene su clave aqui y en @git-rudder/i18n.
  */
 const ERROR_KEYS: Readonly<Record<HostVisibleErrorKind, PlainKey>> = {
   invalid_params: 'errors.engine.invalid_params',

@@ -1,4 +1,4 @@
-import type { Translate } from '@ramal/i18n';
+import type { Translate } from '@git-rudder/i18n';
 
 import { callEngine } from '../call-engine';
 import { describeError, errorKey, errorKindOf, type HostVisibleErrorKind } from '../engine-errors';
@@ -27,7 +27,7 @@ export type OpenGraphResult =
   | { readonly outcome: 'failed'; readonly kind: HostVisibleErrorKind };
 
 /**
- * "Ramal: Open Graph" (architecture.md 6.2): elige el repositorio (la carpeta
+ * "Git Rudder: Open Graph" (architecture.md 6.2): elige el repositorio (la carpeta
  * del workspace, o un QuickPick si hay varias), lo abre el propio host con
  * `repo/open` y ensena el panel del grafo con el `repoId`. El webview nunca ve
  * ni manda una ruta. Nunca lanza: los fallos se avisan y se devuelven.

@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitest/config';
 
 /**
- * @ramal/api-client no es nucleo: el umbral es el global del monorepo, 60%. Lo
+ * @git-rudder/api-client no es nucleo: el umbral es el global del monorepo, 60%. Lo
  * generado no se mide, porque son solo tipos que escribe openapi-typescript.
  */
 const GLOBAL_THRESHOLD = { lines: 60, statements: 60, branches: 60, functions: 60 };

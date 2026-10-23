@@ -1,4 +1,4 @@
-import { Badge, Button, useT } from '@ramal/ui';
+import { Badge, Button, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import {

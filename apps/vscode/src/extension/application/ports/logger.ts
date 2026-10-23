@@ -1,5 +1,5 @@
 /**
- * Log del extension host. Lo implementa el canal de salida "Ramal"; los mensajes
+ * Log del extension host. Lo implementa el canal de salida "Git Rudder"; los mensajes
  * van en ingles, como los del motor, porque son para diagnosticar.
  */
 export interface Logger {

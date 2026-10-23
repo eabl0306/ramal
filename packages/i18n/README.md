@@ -1,6 +1,6 @@
-# @ramal/i18n
+# @git-rudder/i18n
 
-Unica fuente de textos de interfaz de Ramal, en castellano e ingles. Cero dependencias.
+Unica fuente de textos de interfaz de Git Rudder, en castellano e ingles. Cero dependencias.
 
 ```ts
 const t = createTranslator(resolveLocale(navigator.language));
@@ -17,10 +17,10 @@ t('repos.results', { count: 1 }); // "1 repositorio"
   `Intl.PluralRules` sobre `count`.
 - Nada de glifos ni atajos dentro de los textos: los glifos los pinta el componente y los atajos
   llegan como parametro desde `formatShortcut`.
-- En React se usa a traves de `I18nProvider` y `useT` de `@ramal/ui`.
+- En React se usa a traves de `I18nProvider` y `useT` de `@git-rudder/ui`.
 
 ## Anadir un texto
 
 1. La clave en `src/locales/es/<espacio>.json` y su traduccion en `src/locales/en/`.
-2. Si lleva parametros: `corepack pnpm --filter @ramal/i18n generate`.
-3. `corepack pnpm --filter @ramal/i18n test` comprueba claves, parametros, plurales y glifos.
+2. Si lleva parametros: `corepack pnpm --filter @git-rudder/i18n generate`.
+3. `corepack pnpm --filter @git-rudder/i18n test` comprueba claves, parametros, plurales y glifos.

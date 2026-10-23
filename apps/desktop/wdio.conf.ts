@@ -6,22 +6,22 @@ import { browser } from '@wdio/globals';
 import { type FixtureRepo, createFixtureRepo } from './wdio/support/fixture-repo';
 
 /**
- * E2E nativo: el binario real de Ramal Desktop (motor en proceso, git real,
+ * E2E nativo: el binario real de Git Rudder Desktop (motor en proceso, git real,
  * WebKitGTK en Linux) manejado con WebdriverIO y @wdio/tauri-service.
  *
  * Usa el driver embebido (tauri-plugin-wdio-webdriver), el unico que tambien
  * cubre macOS (ADR 0006). Solo esta en los builds con la feature `e2e`, que es
  * como lo compila `just desktop-e2e-native` antes de lanzar esto. Esa misma
- * feature deja que RAMAL_E2E_FOLDER elija la carpeta en lugar del dialogo
+ * feature deja que GIT_RUDDER_E2E_FOLDER elija la carpeta en lugar del dialogo
  * nativo, que WebDriver no puede manejar.
  */
 const repoRoot = path.resolve(fileURLToPath(new URL('.', import.meta.url)), '../..');
 const targetDir = process.env['CARGO_TARGET_DIR'] ?? path.join(repoRoot, 'target');
-const binaryName = process.platform === 'win32' ? 'ramal-desktop.exe' : 'ramal-desktop';
+const binaryName = process.platform === 'win32' ? 'git-rudder-desktop.exe' : 'git-rudder-desktop';
 const application = path.join(targetDir, 'debug', binaryName);
 
 /** Variable que lee el selector de carpetas del build de E2E (src-tauri/src/bootstrap.rs). */
-const E2E_FOLDER_ENV_VAR = 'RAMAL_E2E_FOLDER';
+const E2E_FOLDER_ENV_VAR = 'GIT_RUDDER_E2E_FOLDER';
 
 let fixture: FixtureRepo | undefined;
 

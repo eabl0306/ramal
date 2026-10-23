@@ -2,17 +2,17 @@
 //! los dos productos.
 //!
 //! La composicion tiene dos niveles. Este es el de dentro: git CLI y, mas
-//! adelante, plataformas, IA y Ramal API. Cada host es la raiz de fuera: lee su
+//! adelante, plataformas, IA y Git Rudder API. Cada host es la raiz de fuera: lee su
 //! configuracion (rutas, binario de git) y aporta lo que solo el sabe construir
 //! (el `SecretStore`, el `EventSink`). Nadie mas construye adaptadores.
 
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use ramal_core_application::{
+use git_rudder_core_application::{
     DescribeEngine, GitReader, LoadGraphWindow, OpenRepositories, OpenRepository,
 };
-use ramal_git::{GitCliConfig, GitCliReader};
+use git_rudder_git::{GitCliConfig, GitCliReader};
 
 use crate::engine::{Engine, UseCases};
 

@@ -8,8 +8,8 @@ describe('resolveApiUrl', () => {
   });
 
   it('recorta la URL configurada', () => {
-    expect(resolveApiUrl({ VITE_API_URL: ' https://api.ramal.bahoque.com ' })).toBe(
-      'https://api.ramal.bahoque.com',
+    expect(resolveApiUrl({ VITE_API_URL: ' https://api.git-rudder.com ' })).toBe(
+      'https://api.git-rudder.com',
     );
   });
 });

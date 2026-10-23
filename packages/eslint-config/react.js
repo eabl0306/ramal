@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
-import { ramalPlugin } from './rules/plugin.js';
+import { gitRudderPlugin } from './rules/plugin.js';
 
 /**
  * @eslint-react trae su propia copia de las reglas de hooks y del compilador.
@@ -73,8 +73,8 @@ export function reactConfig({
     },
     {
       files: componentFiles,
-      plugins: { ramal: ramalPlugin },
-      rules: { 'ramal/no-jsx-literal-text': 'error' },
+      plugins: { 'git-rudder': gitRudderPlugin },
+      rules: { 'git-rudder/no-jsx-literal-text': 'error' },
     },
   ];
 }

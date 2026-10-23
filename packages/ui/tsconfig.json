@@ -1,5 +1,5 @@
 // Solucion del paquete: el codigo (tsconfig.lib.json) y los tests
-// (tsconfig.test.json). Las apps y @ramal/repo-view referencian tsconfig.lib.json.
+// (tsconfig.test.json). Las apps y @git-rudder/repo-view referencian tsconfig.lib.json.
 {
   "files": [],
   "references": [{ "path": "./tsconfig.lib.json" }, { "path": "./tsconfig.test.json" }]

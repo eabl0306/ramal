@@ -1,13 +1,13 @@
 /**
  * Stylelint de todo el monorepo: una sola configuracion para el CSS de las apps y
- * de los paquetes, porque el sistema de diseno es uno solo (@ramal/ui).
+ * de los paquetes, porque el sistema de diseno es uno solo (@git-rudder/ui).
  *
  * La regla que importa: fuera de packages/ui/src/themes ningun CSS escribe un
- * color. Ramal tiene tema claro y oscuro, y un color a mano no cambia con el tema.
+ * color. Git Rudder tiene tema claro y oscuro, y un color a mano no cambia con el tema.
  * Las propiedades de color solo aceptan var(--...) (declaration-strict-value) y,
  * por si el color se cuela en otra propiedad (una sombra, un degradado), se
  * prohiben tambien los hexadecimales, los nombres de color y las funciones de color.
- * Es la misma regla que ramal/no-raw-colors aplica al TypeScript.
+ * Es la misma regla que git-rudder/no-raw-colors aplica al TypeScript.
  */
 const COLOR_FUNCTIONS = ['rgb', 'rgba', 'hsl', 'hsla', 'hwb', 'lab', 'lch', 'oklab', 'oklch'];
 
@@ -45,7 +45,7 @@ export default {
         ignoreFunctions: false,
         expandShorthand: true,
         disableFix: true,
-        message: 'Los colores salen de los tokens de @ramal/ui: usa var(--...).',
+        message: 'Los colores salen de los tokens de @git-rudder/ui: usa var(--...).',
       },
     ],
   },

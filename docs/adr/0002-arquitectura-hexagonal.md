@@ -6,7 +6,7 @@
 
 ## Contexto
 
-Ramal va a crecer en cinco sitios a la vez: la API, el motor Git, el host de escritorio, la
+Git Rudder va a crecer en cinco sitios a la vez: la API, el motor Git, el host de escritorio, la
 extension de VS Code y la web, mas los paquetes TypeScript que comparten. La forma habitual de
 que un proyecto asi se vuelva imposible de cambiar es que la logica acabe mezclada con el
 framework de turno: una regla de negocio dentro de un handler de Salvo, un `git rebase`
@@ -14,7 +14,7 @@ lanzado desde un comando de Tauri, una validacion dentro de un componente de Rea
 pasa, probar obliga a levantar el framework entero y cambiar de framework obliga a reescribir
 el negocio.
 
-Ramal tiene ademas un motivo que Gastonomo no tenia. El mismo motor sirve a dos productos:
+Git Rudder tiene ademas un motivo que Gastonomo no tenia. El mismo motor sirve a dos productos:
 escritorio lo lleva en proceso y VS Code lo lanza como sidecar
 ([ADR 0010](0010-un-motor-para-escritorio-y-vscode.md)). Si una sola regla de Git viviera en
 un comando de Tauri o en el extension host, habria que escribirla dos veces, y el protocolo
@@ -39,41 +39,41 @@ que Gastonomo:
 
 ### Tres familias de hexagonos
 
-| Pieza                                        | Nucleo                                                                                                                                                                                                                                                                                                                                                       | Driving                                                                                                      | Driven                                                                                                                          | Composition root                                                           |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| API (`apps/api`)                             | `ramal-api-domain` y `ramal-api-application`                                                                                                                                                                                                                                                                                                                 | `ramal-api-http` (router, catcher de problem+json y, mas adelante, idempotencia), trabajos periodicos (plan) | `ramal-api-infrastructure` (SQLx; luego cifrado de sobre, correo, OAuth)                                                        | `ramal-api`, en `src/bootstrap`                                            |
-| Motor cliente (`crates/*`)                   | `ramal-core-domain` y `ramal-core-application`                                                                                                                                                                                                                                                                                                               | `ramal-engine` (`dispatch`)                                                                                  | `ramal-git`; mas adelante `ramal-keychain`, `ramal-vault`, `ramal-platforms`, `ramal-cloud-client` y el adaptador de `ramal-ai` | Dos niveles: `EngineBuilder` en `ramal-engine` y el bootstrap de cada host |
-| Host de escritorio (`src-tauri`)             | ninguno propio                                                                                                                                                                                                                                                                                                                                               | los comandos `rpc` y `repo_pick_and_open`                                                                    | el selector de carpetas sobre el dialogo nativo; mas adelante llavero y `EventSink`                                             | `src-tauri/src/bootstrap.rs`                                               |
-| Sidecar (`apps/vscode-engine`)               | ninguno propio                                                                                                                                                                                                                                                                                                                                               | el bucle JSON-RPC                                                                                            | peticiones inversas al extension host (secretos)                                                                                | `src/bootstrap.rs`                                                         |
-| Extension host (`apps/vscode/src/extension`) | `application` (orquesta el sidecar, los webviews y el idioma)                                                                                                                                                                                                                                                                                                | comandos y router de mensajes de webviews                                                                    | `infrastructure` (API de VS Code, proceso del sidecar)                                                                          | `app/composition-root.ts`                                                  |
-| Web (`apps/web/src`)                         | `domain` y `application`                                                                                                                                                                                                                                                                                                                                     | `ui` y los modulos de ruta de `app`                                                                          | `infrastructure` (sobre `@ramal/api-client`)                                                                                    | `app/composition-root.ts`                                                  |
-| Frontend de escritorio y webviews            | sin dominio propio: los casos de uso viven en el motor y la logica de interfaz en `@ramal/domain`. En escritorio, `application` con puertos del host (`RepositoryPicker`, `AppearanceStore`) y el modelo de pestanas, para que la interfaz no importe infraestructura; en VS Code, `src/shared` con los tipos de los mensajes entre webview y extension host | `ui` y `app`                                                                                                 | `infrastructure` (transportes del puente y adaptadores de esos puertos)                                                         | `app/composition-root.ts`                                                  |
+| Pieza                                        | Nucleo                                                                                                                                                                                                                                                                                                                                                            | Driving                                                                                                           | Driven                                                                                                                                                        | Composition root                                                                |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| API (`apps/api`)                             | `git-rudder-api-domain` y `git-rudder-api-application`                                                                                                                                                                                                                                                                                                            | `git-rudder-api-http` (router, catcher de problem+json y, mas adelante, idempotencia), trabajos periodicos (plan) | `git-rudder-api-infrastructure` (SQLx; luego cifrado de sobre, correo, OAuth)                                                                                 | `git-rudder-api`, en `src/bootstrap`                                            |
+| Motor cliente (`crates/*`)                   | `git-rudder-core-domain` y `git-rudder-core-application`                                                                                                                                                                                                                                                                                                          | `git-rudder-engine` (`dispatch`)                                                                                  | `git-rudder-git`; mas adelante `git-rudder-keychain`, `git-rudder-vault`, `git-rudder-platforms`, `git-rudder-cloud-client` y el adaptador de `git-rudder-ai` | Dos niveles: `EngineBuilder` en `git-rudder-engine` y el bootstrap de cada host |
+| Host de escritorio (`src-tauri`)             | ninguno propio                                                                                                                                                                                                                                                                                                                                                    | los comandos `rpc` y `repo_pick_and_open`                                                                         | el selector de carpetas sobre el dialogo nativo; mas adelante llavero y `EventSink`                                                                           | `src-tauri/src/bootstrap.rs`                                                    |
+| Sidecar (`apps/vscode-engine`)               | ninguno propio                                                                                                                                                                                                                                                                                                                                                    | el bucle JSON-RPC                                                                                                 | peticiones inversas al extension host (secretos)                                                                                                              | `src/bootstrap.rs`                                                              |
+| Extension host (`apps/vscode/src/extension`) | `application` (orquesta el sidecar, los webviews y el idioma)                                                                                                                                                                                                                                                                                                     | comandos y router de mensajes de webviews                                                                         | `infrastructure` (API de VS Code, proceso del sidecar)                                                                                                        | `app/composition-root.ts`                                                       |
+| Web (`apps/web/src`)                         | `domain` y `application`                                                                                                                                                                                                                                                                                                                                          | `ui` y los modulos de ruta de `app`                                                                               | `infrastructure` (sobre `@git-rudder/api-client`)                                                                                                             | `app/composition-root.ts`                                                       |
+| Frontend de escritorio y webviews            | sin dominio propio: los casos de uso viven en el motor y la logica de interfaz en `@git-rudder/domain`. En escritorio, `application` con puertos del host (`RepositoryPicker`, `AppearanceStore`) y el modelo de pestanas, para que la interfaz no importe infraestructura; en VS Code, `src/shared` con los tipos de los mensajes entre webview y extension host | `ui` y `app`                                                                                                      | `infrastructure` (transportes del puente y adaptadores de esos puertos)                                                                                       | `app/composition-root.ts`                                                       |
 
-Y los paquetes compartidos tienen tambien un papel fijo: `@ramal/domain` e `@ramal/i18n` son
-nucleo puro, sin dependencias; `@ramal/bridge` declara el puerto `Transport`;
-`@ramal/repo-view` es un adaptador driving que comparten escritorio y VS Code; y
-`@ramal/api-client` es una ayuda para los adaptadores driven de la web y solo lo importa su
+Y los paquetes compartidos tienen tambien un papel fijo: `@git-rudder/domain` e `@git-rudder/i18n` son
+nucleo puro, sin dependencias; `@git-rudder/bridge` declara el puerto `Transport`;
+`@git-rudder/repo-view` es un adaptador driving que comparten escritorio y VS Code; y
+`@git-rudder/api-client` es una ayuda para los adaptadores driven de la web y solo lo importa su
 `infrastructure`.
 
 ### Los dos nucleos de Rust no se conocen
 
 El servidor nunca ve un commit y el cliente no gestiona organizaciones: no hay conceptos de
-negocio que compartan de verdad. Ningun crate `ramal-api-*` alcanza un crate del cliente y
-ningun crate del cliente alcanza un `ramal-api-*`. Lo unico que cruza son dos cosas:
+negocio que compartan de verdad. Ningun crate `git-rudder-api-*` alcanza un crate del cliente y
+ningun crate del cliente alcanza un `git-rudder-api-*`. Lo unico que cruza son dos cosas:
 
-- `ramal-ai` (planificado), una biblioteca neutral que no depende de ningun `ramal-*` y que
-  usan `ramal-engine` y `ramal-api-infrastructure`, para que el prompt de una llave personal y
+- `git-rudder-ai` (planificado), una biblioteca neutral que no depende de ningun `git-rudder-*` y que
+  usan `git-rudder-engine` y `git-rudder-api-infrastructure`, para que el prompt de una llave personal y
   el de una llave de organizacion salgan de las mismas plantillas
   ([ADR 0013](0013-proxy-de-ia-de-organizacion.md)).
-- El contrato HTTP, que cada lado modela con sus propios tipos. `ramal-cloud-client` no
+- El contrato HTTP, que cada lado modela con sus propios tipos. `git-rudder-cloud-client` no
   importa los DTOs de la API: se protege con tests de contrato contra `apps/api/openapi.json`.
 
 ### Los casos de uso del cliente viven en Rust, no en los webviews
 
 Los frontends de escritorio y los webviews de VS Code son casi solo adaptadores driving. Los
-casos de uso de Git, cuentas, IA y sincronizacion estan en `ramal-core-application`, y la
-disposicion del grafo se calcula en `ramal-core-domain`. Lo que si vive en TypeScript es la
-logica pura de estado de interfaz, en `@ramal/domain`: el modelo interactivo del resolver de
+casos de uso de Git, cuentas, IA y sincronizacion estan en `git-rudder-core-application`, y la
+disposicion del grafo se calcula en `git-rudder-core-domain`. Lo que si vive en TypeScript es la
+logica pura de estado de interfaz, en `@git-rudder/domain`: el modelo interactivo del resolver de
 conflictos, el editor de rebase, filtros y agrupaciones, tiempo relativo, reglas del mensaje
 de commit.
 
@@ -84,8 +84,8 @@ de Rust es la que manda; la de TypeScript es comodidad.
 ### Nada de serde en el dominio
 
 El dominio del cliente no depende de serde: no sabe que existe JSON. La forma del JSON la
-decide `ramal-protocol`, que a su vez no depende de ningun otro crate de Ramal, y el mapeo
-entre dominio y DTO vive en `ramal-engine` como funciones libres (la regla de huerfanos de
+decide `git-rudder-protocol`, que a su vez no depende de ningun otro crate de Git Rudder, y el mapeo
+entre dominio y DTO vive en `git-rudder-engine` como funciones libres (la regla de huerfanos de
 Rust no deja implementar `From` entre dos tipos que no son del crate).
 
 En la API, `serde` se controla con la lista blanca de dependencias directas del dominio, igual
@@ -97,8 +97,8 @@ transitivo.
 
 El comando `rpc` de Tauri y el bucle del sidecar deserializan, llaman a `Engine::handle` y
 serializan. No hay un comando de Tauri por metodo: la lista de metodos vive en
-`ramal-protocol`. La composicion del cliente tiene dos niveles: `EngineBuilder` construye lo
-que es igual en los dos productos (git CLI y, mas adelante, plataformas, IA y Ramal API) y
+`git-rudder-protocol`. La composicion del cliente tiene dos niveles: `EngineBuilder` construye lo
+que es igual en los dos productos (git CLI y, mas adelante, plataformas, IA y Git Rudder API) y
 cada host aporta lo que solo el sabe construir, como el `SecretStore` (llavero del sistema en
 escritorio, SecretStorage a traves del extension host en VS Code) o el `EventSink` de las
 notificaciones.
@@ -109,7 +109,7 @@ notificaciones.
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | Capas dentro de una pieza             | Un crate por capa, y el compilador impide nombrar lo que no es dependencia                                        | Una carpeta por capa y `eslint-plugin-boundaries` con `default: "disallow"`                   |
 | Dependencias externas por capa        | Tests de arquitectura que leen `Cargo.lock`: lista blanca directa en los nucleos, lista negra transitiva en todos | Politicas de `boundaries` para origenes externos y del core de Node                           |
-| Dependencias entre piezas             | Los mismos tests comprueban que ninguna familia alcanza a la otra salvo `ramal-ai`                                | `tools/checks/package-graph.mjs` sobre los `package.json`, y project references de TypeScript |
+| Dependencias entre piezas             | Los mismos tests comprueban que ninguna familia alcanza a la otra salvo `git-rudder-ai`                           | `tools/checks/package-graph.mjs` sobre los `package.json`, y project references de TypeScript |
 | APIs estandar prohibidas en el nucleo | `clippy.toml` propio en cada crate de nucleo con `disallowed-methods` y `disallowed-types`                        | `node:*` prohibido en `domain` y `application`                                                |
 | Crates vetados                        | `cargo deny check bans`                                                                                           | no aplica                                                                                     |
 
@@ -117,7 +117,7 @@ Hay dos tests de arquitectura, uno por hexagono, en el crate que hace de composi
 cada uno: `apps/api/crates/api/tests/architecture.rs` y `crates/engine/tests/architecture.rs`.
 Leen el `Cargo.lock` de la raiz linea a linea, sin crate de TOML, como en Gastonomo, y fallan
 con un mensaje que dice que crate alcanza que. El del cliente comprueba ademas que los dos
-hosts (`ramal-desktop` y `ramal-vscode-engine`) solo dependen del motor y del protocolo.
+hosts (`git-rudder-desktop` y `git-rudder-vscode-engine`) solo dependen del motor y del protocolo.
 
 Prohibir `tokio` no basta para que el nucleo no haga IO, porque `std::process::Command` y
 `std::fs` estan en la biblioteca estandar. Por eso cada crate de nucleo tiene su `clippy.toml`
@@ -145,14 +145,14 @@ A favor:
 - El protocolo es identico en escritorio y en VS Code por construccion, porque los dos hosts
   entran por la misma funcion.
 - Cambiar un adaptador es cambiar el composition root. Pasar una lectura concreta del git CLI a
-  `gix` ([ADR 0009](0009-motor-git-hibrido.md)) toca `ramal-git` y `EngineBuilder`, nada mas.
+  `gix` ([ADR 0009](0009-motor-git-hibrido.md)) toca `git-rudder-git` y `EngineBuilder`, nada mas.
 - La conversacion de code review deja de ser "esto deberia ir en otro sitio", porque la
   herramienta lo dice antes.
 
 En contra:
 
 - Mas ficheros y mas indireccion. `GraphWindow` existe tres veces: en el dominio, como DTO de
-  `ramal-protocol` y como tipo generado de TypeScript, con un mapeador entre los dos primeros.
+  `git-rudder-protocol` y como tipo generado de TypeScript, con un mapeador entre los dos primeros.
   A simple vista parece duplicado y no lo es: es lo que permite cambiar un tipo interno sin
   cambiar el contrato.
 - El mapeo con funciones libres es mas verboso que un `impl From`.

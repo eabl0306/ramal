@@ -1,7 +1,7 @@
 // Tests de componentes (Testing Library sobre jsdom), helpers de test y la
 // configuracion de Vitest, que corre en Node.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

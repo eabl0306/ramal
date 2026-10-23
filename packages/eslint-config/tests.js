@@ -13,7 +13,7 @@ export const TEST_FILE_PATTERNS = [
  * tests puede ser largo y un bloque describe no es una funcion de produccion.
  * Lo que NO se relaja: complejidad, tests enfocados y marcadores sin ticket.
  *
- * allowJsxLiteralText apaga ramal/no-jsx-literal-text en los tests. No viene
+ * allowJsxLiteralText apaga git-rudder/no-jsx-literal-text en los tests. No viene
  * encendido por defecto: cada paquete decide si sus tests pueden montar
  * componentes con textos fijos (un fixture) o si tambien deben pasar por i18n.
  *
@@ -34,7 +34,7 @@ export function testsConfig({ files = TEST_FILE_PATTERNS, allowJsxLiteralText = 
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/unbound-method': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
-        ...(allowJsxLiteralText ? { 'ramal/no-jsx-literal-text': 'off' } : {}),
+        ...(allowJsxLiteralText ? { 'git-rudder/no-jsx-literal-text': 'off' } : {}),
       },
     },
   ];

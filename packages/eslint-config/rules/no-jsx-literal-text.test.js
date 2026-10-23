@@ -34,7 +34,7 @@ typescriptRuleTester().run('no-jsx-literal-text', noJsxLiteralText, {
     invalid('const a = <p>{ok ? "Si" : "No"}</p>;', ['literalText', 'literalText']),
     invalid('const a = <p>{name || "Anonimo"}</p>;', ['literalText']),
     invalid('const a = <input placeholder="Buscar" />;', ['literalAttribute']),
-    invalid('const a = <img alt="Logo de Ramal" src={src} />;', ['literalAttribute']),
+    invalid('const a = <img alt="Logo de Git Rudder" src={src} />;', ['literalAttribute']),
     invalid('const a = <button aria-label="Cerrar" />;', ['literalAttribute']),
     invalid('const a = <abbr title={"Titulo"} />;', ['literalAttribute']),
     invalid('const a = <Field label={`Nombre`} />;', ['literalAttribute']),

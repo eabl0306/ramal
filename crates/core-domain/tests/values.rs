@@ -12,7 +12,7 @@
 
 mod support;
 
-use ramal_core_domain::{
+use git_rudder_core_domain::{
     CommitNode, Head, RefError, RefKind, RefName, RefSnapshot, RepoId, RepoRoot, Sha, ShaError,
     ShortSha,
 };
@@ -131,7 +131,7 @@ fn a_snapshot_sorts_refs_by_kind_and_name() {
     );
 }
 
-fn on_main(refs: Vec<ramal_core_domain::GitRef>, remote: Option<&str>) -> RefSnapshot {
+fn on_main(refs: Vec<git_rudder_core_domain::GitRef>, remote: Option<&str>) -> RefSnapshot {
     RefSnapshot::new(
         refs,
         Head::Detached { target: sha(9) },
@@ -186,8 +186,8 @@ fn the_default_branch_falls_back_to_main_then_master() {
 
 #[test]
 fn repo_identities_wrap_their_values() {
-    let root = RepoRoot::new("/work/ramal");
-    assert_eq!(root.as_path(), std::path::Path::new("/work/ramal"));
+    let root = RepoRoot::new("/work/git-rudder");
+    assert_eq!(root.as_path(), std::path::Path::new("/work/git-rudder"));
 
     let id = RepoId::new("repo-1");
     assert_eq!(id.as_str(), "repo-1");

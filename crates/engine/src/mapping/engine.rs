@@ -1,8 +1,8 @@
 //! `EngineDescription` -> `EngineInfo`.
 
-use ramal_core_application::EngineDescription;
-use ramal_protocol::PROTOCOL_VERSION;
-use ramal_protocol::engine as dto;
+use git_rudder_core_application::EngineDescription;
+use git_rudder_protocol::PROTOCOL_VERSION;
+use git_rudder_protocol::engine as dto;
 
 /// Descripcion del motor con la version del protocolo, que no conoce el nucleo.
 #[must_use]

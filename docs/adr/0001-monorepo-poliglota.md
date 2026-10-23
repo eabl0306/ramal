@@ -6,23 +6,23 @@
 
 ## Contexto
 
-Ramal son tres productos (Desktop, VS Code y Web) construidos con cinco piezas de codigo: la
+Git Rudder son tres productos (Desktop, VS Code y Web) construidos con cinco piezas de codigo: la
 API en Rust, el motor Git del cliente en Rust, el host de escritorio con Tauri, la extension
 de VS Code con su sidecar y la web en React. Comparten bastante mas que Gastonomo, que solo
 compartia el contrato HTTP:
 
 - Crates enteros. El motor (`crates/*`) lo compilan dos binarios distintos: el host de Tauri
-  lo lleva dentro y `ramal-vscode-engine` lo expone por stdio.
-- Paquetes de TypeScript que usan las tres apps: tokens y primitivas (`@ramal/ui`), textos
-  (`@ramal/i18n`), logica de interfaz (`@ramal/domain`) y la vista de repositorio
-  (`@ramal/repo-view`), que usan escritorio y VS Code.
+  lo lleva dentro y `git-rudder-vscode-engine` lo expone por stdio.
+- Paquetes de TypeScript que usan las tres apps: tokens y primitivas (`@git-rudder/ui`), textos
+  (`@git-rudder/i18n`), logica de interfaz (`@git-rudder/domain`) y la vista de repositorio
+  (`@git-rudder/repo-view`), que usan escritorio y VS Code.
 - Tipos generados que cruzan de un lenguaje a otro: ts-rs escribe en `packages/bridge` los
   tipos del protocolo del motor, y openapi-typescript lee `apps/api/openapi.json` para
-  generar `@ramal/api-client`.
+  generar `@git-rudder/api-client`.
 
-Un cambio normal cruza lenguajes. Un metodo nuevo del motor toca `ramal-core-application`,
-`ramal-git`, `ramal-protocol`, `ramal-engine`, los tipos generados de `@ramal/bridge` y un
-hook de `@ramal/repo-view`. En repositorios separados eso son cinco PRs que hay que publicar
+Un cambio normal cruza lenguajes. Un metodo nuevo del motor toca `git-rudder-core-application`,
+`git-rudder-git`, `git-rudder-protocol`, `git-rudder-engine`, los tipos generados de `@git-rudder/bridge` y un
+hook de `@git-rudder/repo-view`. En repositorios separados eso son cinco PRs que hay que publicar
 en orden, con versiones intermedias que no compilan juntas.
 
 Hay dos gestores de dependencias (cargo y pnpm) y ninguno sabe nada del otro. Las opciones
@@ -39,9 +39,9 @@ Cargo.toml            workspace unico de Rust (ver abajo)
 pnpm-workspace.yaml   apps/web, apps/desktop, apps/vscode, packages/*, tools/*
 justfile              punto de entrada unico
 apps/api              la API: cinco crates, uno por capa
-apps/desktop          frontend de Vite y src-tauri (crate ramal-desktop)
+apps/desktop          frontend de Vite y src-tauri (crate git-rudder-desktop)
 apps/vscode           extension host y webviews
-apps/vscode-engine    sidecar JSON-RPC (crate ramal-vscode-engine)
+apps/vscode-engine    sidecar JSON-RPC (crate git-rudder-vscode-engine)
 apps/web              React Router
 crates/               el motor cliente, compartido por los dos hosts
 packages/             paquetes TS compartidos, eslint-config y tsconfig
@@ -58,7 +58,7 @@ es el `justfile`, los hooks de git y la CI.
 ### Un solo workspace de Cargo, no uno por app
 
 Gastonomo tiene un workspace de Cargo dentro de `apps/api` porque solo tenia una pieza en
-Rust. Ramal tiene tres binarios (`ramal-api`, `ramal-desktop`, `ramal-vscode-engine`) y
+Rust. Git Rudder tiene tres binarios (`git-rudder-api`, `git-rudder-desktop`, `git-rudder-vscode-engine`) y
 crates compartidos entre dos de ellos. Por eso hay un unico `Cargo.toml` en la raiz:
 
 - `resolver = "3"` y `edition = "2024"` para todos los miembros, con Rust 1.98.1 fijado en
@@ -74,15 +74,15 @@ crates compartidos entre dos de ellos. Por eso hay un unico `Cargo.toml` en la r
 **El crate de Tauri es miembro, pero no esta en `default-members`.** Tauri enlaza con
 webkit2gtk en Linux, y esa libreria no esta en todas las maquinas ni en los runners de la CI
 que no son de escritorio. Con esa lista, `cargo test` y `cargo clippy` a secas compilan todo
-menos `ramal-desktop` y funcionan en cualquier maquina. `cargo build -p ramal-api` no compila
+menos `git-rudder-desktop` y funcionan en cualquier maquina. `cargo build -p git-rudder-api` no compila
 ni una linea de Tauri.
 
 La consecuencia es una regla: **ninguna receta usa `--workspace`**, porque esa bandera pisa
-`default-members`. El crate de escritorio se compila con `-p ramal-desktop` en sus recetas
+`default-members`. El crate de escritorio se compila con `-p git-rudder-desktop` en sus recetas
 (`just desktop-rust-check`, `just desktop-build`) y en su job de la CI, que instala antes las
 librerias de GTK.
 
-Aunque no se compile por defecto, `ramal-desktop` aparece en `Cargo.lock` con todas sus
+Aunque no se compile por defecto, `git-rudder-desktop` aparece en `Cargo.lock` con todas sus
 dependencias. Eso es lo que permite que el test de arquitectura del cliente compruebe sus
 dependencias directas sin compilar Tauri.
 
@@ -140,7 +140,7 @@ A favor:
 - Un metodo nuevo del motor, con su tipo generado y la pantalla que lo usa, se ve en un solo
   commit, y la CI comprueba en ese mismo commit que los tipos generados estan al dia.
 - `cargo test` funciona en una maquina sin webkit2gtk.
-- Cada desarrollador sigue usando los comandos de su ecosistema: `cargo test -p ramal-git`
+- Cada desarrollador sigue usando los comandos de su ecosistema: `cargo test -p git-rudder-git`
   funciona sin saber que existe un justfile.
 - Dos lockfiles (`Cargo.lock` y `pnpm-lock.yaml`), no tres como en Gastonomo, y un flujo de
   Dependabot por ecosistema.
@@ -183,4 +183,4 @@ build incremental propio.
 
 **pnpm 12 desde el principio.** Mezclaria en el primer scaffold una migracion de version mayor
 con todo lo demas. Va en su propio PR cuando se quiera dar el paso, idealmente a la vez en
-Ramal y en Gastonomo.
+Git Rudder y en Gastonomo.

@@ -4,7 +4,7 @@
 // el codigo tiene que poder ejecutarse quitando los tipos, sin transformarlo.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "Ramal base",
+  "display": "Git Rudder base",
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["ES2023"],

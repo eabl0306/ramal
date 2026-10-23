@@ -1,10 +1,10 @@
-# Brief #66: vistas que prometen los menus y diff real (Ramal Desktop)
+# Brief #66: vistas que prometen los menus y diff real (Git Rudder Desktop)
 
 ## Contexto
 
-Solo Ramal Desktop; VS Code reutiliza como webview el grafo, el editor de merge y crear PR. Hoy
+Solo Git Rudder Desktop; VS Code reutiliza como webview el grafo, el editor de merge y crear PR. Hoy
 historial y blame son toasts, "Comparar con" abre un diff fijo, el diff es el mismo para todo y el
-grafo carga 19 commits. Cuelga de la vista de repo de `Ramal.dc.html`: centro intercambiable con
+grafo carga 19 commits. Cuelga de la vista de repo de `Git Rudder.dc.html`: centro intercambiable con
 "← Grafo", barra lateral (LOCAL, REMOTOS, PULL REQUESTS, STASHES, TAGS), panel derecho de staging o
 detalle, diff de `48px | 18px | codigo` con `--add-bg`, `--del-bg` y `--hatch`, resolvedor, tabla de
 PRs del workspace y botones de filtro de Inicio. D-34 y D-39 son P2 y no entran.
@@ -128,7 +128,7 @@ iguales en los dos idiomas (`{branch}`, `{host}`); los contadores usan `{count}`
   - Ya hay un PR abierto para esta rama: aviso con "Ver PR" (D-30).
   - Sin diferencias entre ramas: "Crear" desactivado con motivo.
   - Cargando revisores, etiquetas y plantillas; error de la plataforma; permiso insuficiente.
-  - Exito: pantalla con "Abrir en {platform}", "Ver en Ramal" y "Copiar enlace".
+  - Exito: pantalla con "Abrir en {platform}", "Ver en Git Rudder" y "Copiar enlace".
 - **Solo se muestra lo que la plataforma admite** (etiquetas, asignados, borrador).
 
 | Uso          | Texto                                                                                                                                                                            |
@@ -139,7 +139,7 @@ iguales en los dos idiomas (`{branch}`, `{host}`); los contadores usan `{count}`
 | Ya existe    | "Ya hay un pull request abierto para {branch}: #{number}." / "There's already an open pull request for {branch}: #{number}." · "Ver PR" / "View PR"                              |
 | Sin cambios  | "No hay diferencias entre {source} y {target}." / "There are no differences between {source} and {target}."                                                                      |
 | Derecha      | "{commits} commits · {files} archivos" / "{commits} commits · {files} files"                                                                                                     |
-| Exito        | "Pull request #{number} creado" / "Pull request #{number} created" · "Ver en Ramal" / "View in Ramal"                                                                            |
+| Exito        | "Pull request #{number} creado" / "Pull request #{number} created" · "Ver en Git Rudder" / "View in Git Rudder"                                                                  |
 
 - **Variantes.** Claro y oscuro. Densidad compacta de 28 px, porque VS Code reutiliza este
   formulario como webview.
@@ -351,11 +351,11 @@ iguales en los dos idiomas (`{branch}`, `{host}`); los contadores usan `{count}`
 
 ## Entregable
 
-- Zip `ramal-handoff-66-vistas.zip` con la estructura del original: `README.md` (pantallas nuevas y
-  la correspondencia de sintaxis con los tokens), `Ramal Vistas.dc.html`,
-  `ramal-data.js` (original mas claves y datos de ejemplo: varios diffs distintos, un historial de
+- Zip `git-rudder-handoff-66-vistas.zip` con la estructura del original: `README.md` (pantallas nuevas y
+  la correspondencia de sintaxis con los tokens), `Git Rudder Vistas.dc.html`,
+  `git-rudder-data.js` (original mas claves y datos de ejemplo: varios diffs distintos, un historial de
   archivo, un PR con checks y revisiones) y `support.js`.
-- `Ramal Vistas.dc.html` reutiliza la vista de repositorio de `Ramal.dc.html`. Si D-42 (#67) ya
+- `Git Rudder Vistas.dc.html` reutiliza la vista de repositorio de `Git Rudder.dc.html`. Si D-42 (#67) ya
   existe, usa su barra de titulo.
 - Props: `theme`, `lang`, `density` (`desktop`, `vscode`; aplica a D-31, D-38, D-40 y D-41) y
   `screen`: `d27-historial`, `d28-blame`, `d29-comparar`, `d30-pr-abierto`, `d30-pr-conflictos`,

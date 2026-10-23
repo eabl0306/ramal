@@ -1,5 +1,5 @@
-import type { GraphRow } from '@ramal/bridge';
-import { type Density, useT } from '@ramal/ui';
+import type { GraphRow } from '@git-rudder/bridge';
+import { type Density, useT } from '@git-rudder/ui';
 import type { VirtualItem } from '@tanstack/react-virtual';
 import { type CSSProperties, type ReactElement, useId, useMemo, useRef } from 'react';
 

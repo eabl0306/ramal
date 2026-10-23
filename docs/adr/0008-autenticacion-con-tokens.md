@@ -10,13 +10,13 @@
 
 ## Contexto
 
-Tres productos comparten una cuenta de Ramal, y cada uno inicia sesion en un entorno distinto:
+Tres productos comparten una cuenta de Git Rudder, y cada uno inicia sesion en un entorno distinto:
 
-- **Ramal Web** es un navegador. Registro, login con contrasena y OAuth de identidad con GitHub,
+- **Git Rudder Web** es un navegador. Registro, login con contrasena y OAuth de identidad con GitHub,
   GitLab y Google, recuperacion de contrasena y el panel.
-- **Ramal Desktop** es una app de Tauri. Su webview no debe ver ningun token: las llamadas a la
+- **Git Rudder Desktop** es una app de Tauri. Su webview no debe ver ningun token: las llamadas a la
   API las hace el motor de Rust ([ADR 0010](0010-un-motor-para-escritorio-y-vscode.md)).
-- **Ramal for VS Code** es una extension. El motor corre en un sidecar, los secretos viven en
+- **Git Rudder for VS Code** es una extension. El motor corre en un sidecar, los secretos viven en
   `SecretStorage` y cada ventana de VS Code lanza su propio motor, todos compartiendo el mismo
   almacen.
 
@@ -27,26 +27,26 @@ Lo que el diseno y el contrato imponen:
   web, "Cerrar sesion en este dispositivo" para cada equipo sincronizado.
 - Revocar un dispositivo tiene que cortar ya, no dentro de un rato, el acceso a lo que entrega
   secretos cifrados.
-- Ramal funciona sin cuenta ([ADR 0014](0014-usar-ramal-sin-cuenta.md)): iniciar sesion es algo
+- Git Rudder funciona sin cuenta ([ADR 0014](0014-usar-git-rudder-sin-cuenta.md)): iniciar sesion es algo
   que se hace para sincronizar, nunca una puerta de entrada al producto.
 - La API no tiene mas estado compartido que PostgreSQL. No hay Redis.
 - La arquitectura hexagonal exige que el nucleo no sepa que existen los JWT ni las cookies.
 
 Las opciones eran un proveedor de identidad externo (Auth0, Clerk, Keycloak, Zitadel) o que la
 propia API fuera el servidor de autorizacion; y dentro de lo segundo, sesiones de servidor con
-cookie, un solo token de larga vida, o el par access mas refresh. Gastonomo eligio el par; Ramal
+cookie, un solo token de larga vida, o el par access mas refresh. Gastonomo eligio el par; Git Rudder
 lo hereda y lo amplia en tres sitios: firma asimetrica, cookies en la web e inicio de sesion
 nativo a traves del navegador.
 
 ## Decision
 
-La API de Ramal es el servidor de autorizacion, con endpoints que siguen la forma de OAuth 2.0
+La API de Git Rudder es el servidor de autorizacion, con endpoints que siguen la forma de OAuth 2.0
 para que un proveedor externo pudiera sustituirla mas adelante sin rehacer los clientes. Todos
 los endpoints estan en [api-surface.md](../api-surface.md); aqui va el porque.
 
 ### El access token es un JWT Ed25519 de 15 minutos
 
-- Lleva `iss` (`https://api.ramal.bahoque.com`), `aud` (`ramal-api`), `sub` (usuario), `sid`
+- Lleva `iss` (`https://api.git-rudder.com`), `aud` (`git-rudder-api`), `sub` (usuario), `sid`
   (sesion), `cli` (`web`, `desktop` o `vscode`), `auth_time` (ultimo inicio de sesion real), `iat`
   y `exp`. No lleva roles: los roles son por organizacion, cambian, y se leen de la base en cada
   peticion que los necesita. `iss` y `aud` se comprueban desde el primer dia: cuando haya un
@@ -54,12 +54,12 @@ los endpoints estan en [api-surface.md](../api-surface.md); aqui va el porque.
 - Se firma con Ed25519 y lleva `kid` y `typ: at+jwt` en la cabecera. El verificador solo acepta
   `alg: EdDSA` con un `kid` que conozca y `typ: at+jwt`; cualquier otra combinacion es 401, sin
   intentar otro algoritmo. Las llaves llegan por configuracion
-  (`RAMAL__AUTH__SIGNING_KEYS`, un mapa de `kid` a llave privada, y
-  `RAMAL__AUTH__ACTIVE_SIGNING_KEY`). Firma la activa y verifican todas: rotar es anadir una
+  (`GIT_RUDDER__AUTH__SIGNING_KEYS`, un mapa de `kid` a llave privada, y
+  `GIT_RUDDER__AUTH__ACTIVE_SIGNING_KEY`). Firma la activa y verifican todas: rotar es anadir una
   llave nueva, activarla y retirar la vieja pasados 15 minutos, sin cerrar ninguna sesion.
 - **Por que Ed25519 y no HS256 como Gastonomo.** El ADR 0008 de Gastonomo lo dejaba escrito: con
   un secreto simetrico, cualquier proceso que valide tokens puede firmarlos, y el dia que haya
-  mas de un servicio toca cambiar. En Ramal ese dia se ve venir (el gateway o un servicio de
+  mas de un servicio toca cambiar. En Git Rudder ese dia se ve venir (el gateway o un servicio de
   publicaciones podrian validar), y cambiar el algoritmo con clientes que viven meses en el
   campo es mas caro que empezar bien. Ed25519 da firmas cortas, verificacion rapida y ninguna
   dependencia de RSA.
@@ -67,16 +67,16 @@ los endpoints estan en [api-surface.md](../api-surface.md); aqui va el porque.
   `rust_crypto` arrastra `rsa`, que tiene RUSTSEC-2023-0071 sin parche y tumbaria `cargo deny`,
   y el de `aws_lc_rs` necesita cmake y un compilador de C. El proveedor Ed25519 se escribe con
   `ed25519-dalek`, igual que Gastonomo escribio su HS256 con `hmac` y `sha2`, y se anade a la
-  lista de dependencias permitidas de `ramal-api-infrastructure`.
+  lista de dependencias permitidas de `git-rudder-api-infrastructure`.
 - **Validarlo no toca PostgreSQL.** Es lo que permite que una peticion protegida no cueste una
   consulta extra.
 - **Salvo en los endpoints marcados como vivos.** Los que entregan secretos cifrados, el feed de
   cambios y el proxy de IA comprueban ademas que la sesion `sid` no este revocada, con una
   lectura por clave primaria. Es el compromiso: revocacion instantanea donde importa y ninguna
   consulta en el resto.
-- Lo valida un middleware de `ramal-api-http` que deja en el `Depot` el usuario, la sesion y el
-  cliente. El puerto es `TokenIssuer`, en `ramal-api-application`; que sea un JWT Ed25519 lo
-  decide el adaptador de `ramal-api-infrastructure`, y los tests de los casos de uso usan un
+- Lo valida un middleware de `git-rudder-api-http` que deja en el `Depot` el usuario, la sesion y el
+  cliente. El puerto es `TokenIssuer`, en `git-rudder-api-application`; que sea un JWT Ed25519 lo
+  decide el adaptador de `git-rudder-api-infrastructure`, y los tests de los casos de uso usan un
   emisor falso que no firma nada.
 
 ### El refresh token es opaco y rota en cada uso
@@ -113,13 +113,13 @@ los endpoints estan en [api-surface.md](../api-surface.md); aqui va el porque.
 
 ### La web usa cookies HttpOnly con proteccion CSRF
 
-| Cookie                | Contenido                                           | Atributos                                                       |
-| --------------------- | --------------------------------------------------- | --------------------------------------------------------------- |
-| `__Host-ramal_at`     | Access token                                        | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, 15 minutos      |
-| `__Secure-ramal_rt`   | Refresh token                                       | `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/v1/auth`        |
-| `__Host-ramal_csrf`   | Token CSRF                                          | Legible desde JavaScript, `Secure`, `SameSite=Strict`, `Path=/` |
-| `__Host-ramal_oauth`  | Valor aleatorio que ata un flujo OAuth al navegador | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age=600`   |
-| `__Host-ramal_signup` | Ticket de un alta por OAuth a medias                | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age=900`   |
+| Cookie                     | Contenido                                           | Atributos                                                       |
+| -------------------------- | --------------------------------------------------- | --------------------------------------------------------------- |
+| `__Host-git_rudder_at`     | Access token                                        | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, 15 minutos      |
+| `__Secure-git_rudder_rt`   | Refresh token                                       | `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/v1/auth`        |
+| `__Host-git_rudder_csrf`   | Token CSRF                                          | Legible desde JavaScript, `Secure`, `SameSite=Strict`, `Path=/` |
+| `__Host-git_rudder_oauth`  | Valor aleatorio que ata un flujo OAuth al navegador | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age=600`   |
+| `__Host-git_rudder_signup` | Ticket de un alta por OAuth a medias                | `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, `Max-Age=900`   |
 
 - Ningun token de sesion es legible desde JavaScript. Eso no hace inofensivo un XSS: un script
   inyectado no se lleva los tokens, pero actua con ellos mientras la pagina esta abierta, y sin
@@ -144,15 +144,15 @@ los endpoints estan en [api-surface.md](../api-surface.md); aqui va el porque.
 Desktop y VS Code **nunca envian una contrasena a la API** ni tienen formulario de contrasena. El
 motor abre el navegador del sistema en la pagina `/authorize/app` de la web con Authorization
 Code y PKCE (S256), siguiendo RFC 7636 y las recomendaciones de RFC 8252 para apps nativas. La
-pagina reutiliza el login normal (contrasena o cualquier OAuth), ensena "Autorizar Ramal Desktop
+pagina reutiliza el login normal (contrasena o cualquier OAuth), ensena "Autorizar Git Rudder Desktop
 en este equipo" y redirige con un codigo de un solo uso que caduca en 60 segundos. El motor lo
 canjea en `POST /v1/auth/app/token` con su verificador, y en ese canje se registra el
 dispositivo.
 
-| Cliente         | Redireccion                                                                                                                                                                   |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ramal-desktop` | Exactamente `http://127.0.0.1:{puerto}/callback` o `http://[::1]:{puerto}/callback`, con un receptor que el motor abre en un puerto aleatorio de loopback (1024 a 65535)      |
-| `ramal-vscode`  | Exactamente `{esquema}://ramal.ramal/auth-callback`, recibida por el `UriHandler` de la extension, con esquema `vscode`, `vscode-insiders`, `vscodium`, `cursor` o `windsurf` |
+| Cliente              | Redireccion                                                                                                                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `git-rudder-desktop` | Exactamente `http://127.0.0.1:{puerto}/callback` o `http://[::1]:{puerto}/callback`, con un receptor que el motor abre en un puerto aleatorio de loopback (1024 a 65535)                |
+| `git-rudder-vscode`  | Exactamente `{esquema}://git-rudder.git-rudder/auth-callback`, recibida por el `UriHandler` de la extension, con esquema `vscode`, `vscode-insiders`, `vscodium`, `cursor` o `windsurf` |
 
 - Los clientes estan registrados en configuracion, no en la base.
 - **La redireccion se valida analizandola, no comparando un prefijo.** Un prefijo como
@@ -162,7 +162,7 @@ dispositivo.
   `url` (WHATWG) y exige esquema `http`, host exactamente `127.0.0.1` o `[::1]`, usuario y
   contrasena vacios, puerto explicito entre 1024 y 65535, ruta exactamente `/callback`, sin query
   ni fragmento, y que la URL vuelta a serializar sea identica a la recibida. Para VS Code, el
-  esquema de la lista, host `ramal.ramal`, ruta `/auth-callback` y nada mas. La redireccion se
+  esquema de la lista, host `git-rudder.git-rudder`, ruta `/auth-callback` y nada mas. La redireccion se
   construye desde la URL ya analizada, anadiendo `code` y `state` con la API de `url`, nunca
   concatenando texto.
 - Con un `redirect_uri` que no valida, la pagina **nunca redirige**: ensena el error. Redirigir un
@@ -176,7 +176,7 @@ dispositivo.
   real es anterior. Una sesion web robada o un XSS no aprueban nada sin esa confirmacion.
 - **Los endpoints que entregan tokens a una app no aceptan nada de un navegador.** `app/token`,
   `device/code` y el refresco con el token en el cuerpo rechazan cualquier peticion que traiga
-  cabecera `Origin` o cookies de Ramal. Un motor de Rust no manda ninguna de las dos; un `fetch`
+  cabecera `Origin` o cookies de Git Rudder. Un motor de Rust no manda ninguna de las dos; un `fetch`
   de un navegador siempre manda `Origin` en un `POST`.
 - **Una sesion nativa hereda el `auth_time` de la sesion web que la aprobo**, y nunca cuenta como
   reautenticacion reciente: las acciones marcadas con reautenticacion solo se aceptan desde la web.
@@ -189,9 +189,9 @@ dispositivo.
   dispositivos para revocarlo.
 - Si un codigo ya usado se presenta otra vez, se revoca ademas la sesion que se emitio con el:
   segun RFC 6749 es la senal de que alguien intercepto el codigo.
-- **Por que loopback en Desktop y no un esquema `ramal://`.** Los deep links de Tauri necesitan
+- **Por que loopback en Desktop y no un esquema `git-rudder://`.** Los deep links de Tauri necesitan
   el plugin de instancia unica en Windows y Linux, solo funcionan con la app instalada y en macOS
-  solo desde `/Applications`. Como canal de login son fragiles. `ramal://` queda para abrir un
+  solo desde `/Applications`. Como canal de login son fragiles. `git-rudder://` queda para abrir un
   repositorio desde la web o desde VS Code, y cada deep link se valida como entrada no confiable.
 - **Por que una lista de esquemas en VS Code y no la URL que devuelva `asExternalUri`.** En VS
   Code en el navegador (Codespaces web), `asExternalUri` devuelve una URL `https` de un dominio
@@ -262,7 +262,7 @@ en VS Code, `connect-src 'none'` ([ADR 0011](0011-ui-compartida-y-puente-tipado.
 - GitHub, GitLab.com y Google, con los scopes minimos de perfil y correo. El token del proveedor
   se usa para leer el perfil y se descarta en la misma peticion. Es una cosa distinta de conectar
   una cuenta de plataforma para Git ([ADR 0018](0018-cuentas-de-plataformas-git.md)).
-- Una cookie `__Host-ramal_oauth` ata el flujo al navegador que lo empezo, contra el login CSRF.
+- Una cookie `__Host-git_rudder_oauth` ata el flujo al navegador que lo empezo, contra el login CSRF.
 - Solo se vincula automaticamente una identidad con una cuenta existente si los dos lados tienen
   el correo verificado. Vincular con una cuenta sin verificar es el ataque de preapropiacion.
 - **Un correo es verificado solo si el proveedor lo dice.** GitHub: el principal y verificado de
@@ -388,7 +388,7 @@ token al alcance de JavaScript. Con cookies HttpOnly y doble envio, ninguno de l
 **Formulario de login dentro de Desktop o VS Code.** Es el sitio mas facil para capturar una
 contrasena, y no sirve para los usuarios que entran solo con OAuth.
 
-**Deep link `ramal://` como canal de login en Desktop.** Ver arriba: fragil segun el sistema y el
+**Deep link `git-rudder://` como canal de login en Desktop.** Ver arriba: fragil segun el sistema y el
 modo de instalacion.
 
 **Plugin Stronghold de Tauri para guardar tokens.** Tauri lo da por no recomendado y lo retira en

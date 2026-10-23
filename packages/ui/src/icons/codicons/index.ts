@@ -1,5 +1,5 @@
 // Juego de iconos de los webviews de VS Code: la fuente Codicons del propio
-// editor. Es una subruta propia (@ramal/ui/icons/codicons) para que no entre en
+// editor. Es una subruta propia (@git-rudder/ui/icons/codicons) para que no entre en
 // el bundle de escritorio ni de la web.
 import '@vscode/codicons/dist/codicon.css';
 

@@ -1,5 +1,5 @@
-import type { BridgeClient, GraphRow } from '@ramal/bridge';
-import { type Density, useT } from '@ramal/ui';
+import type { BridgeClient, GraphRow } from '@git-rudder/bridge';
+import { type Density, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import { engineErrorKey } from '../data/engine-error';
@@ -28,7 +28,7 @@ export interface GraphViewProps {
 /**
  * El grafo de commits de un repositorio: la misma vista en escritorio y en VS
  * Code, que solo cambian el cliente del motor, la densidad, el tema y los iconos.
- * Necesita por encima I18nProvider e IconProvider de @ramal/ui y RepoViewProvider.
+ * Necesita por encima I18nProvider e IconProvider de @git-rudder/ui y RepoViewProvider.
  */
 export function GraphView({
   client,

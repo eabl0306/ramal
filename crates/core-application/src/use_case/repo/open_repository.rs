@@ -8,7 +8,7 @@
 use std::path::Path;
 use std::sync::Arc;
 
-use ramal_core_domain::{RefSnapshot, RepoId, RepoRoot};
+use git_rudder_core_domain::{RefSnapshot, RepoId, RepoRoot};
 
 use crate::error::EngineError;
 use crate::port::git_reader::{GitReader, MINIMUM_GIT_VERSION};

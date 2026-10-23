@@ -1,8 +1,8 @@
 //! Ventana del grafo del dominio -> DTO.
 
-use ramal_core_domain::graph::{EdgeKind, GraphEdge, GraphWindow, WindowRow};
-use ramal_core_domain::{RefKind, RefLabel, RepoId};
-use ramal_protocol::graph as dto;
+use git_rudder_core_domain::graph::{EdgeKind, GraphEdge, GraphWindow, WindowRow};
+use git_rudder_core_domain::{RefKind, RefLabel, RepoId};
+use git_rudder_protocol::graph as dto;
 
 use super::to_u32;
 

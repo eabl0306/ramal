@@ -12,7 +12,7 @@ use super::server_config::ServerConfig;
 use super::telemetry_config::TelemetryConfig;
 
 /// Prefijo de todas las variables de entorno del servicio.
-pub const ENV_PREFIX: &str = "RAMAL__";
+pub const ENV_PREFIX: &str = "GIT_RUDDER__";
 
 /// Separador de niveles dentro del nombre de la variable.
 const ENV_SEPARATOR: &str = "__";
@@ -39,7 +39,7 @@ pub enum ConfigError {
 
 /// Configuracion completa del servicio.
 ///
-/// Rechaza las claves que no conoce: una variable `RAMAL__` mal escrita hace
+/// Rechaza las claves que no conoce: una variable `GIT_RUDDER__` mal escrita hace
 /// fallar el arranque en vez de ignorarse en silencio con su valor por defecto.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields, default)]

@@ -5,8 +5,8 @@ mod engine;
 mod graph;
 mod repo;
 
-use ramal_protocol::methods::{EngineInfoMethod, GraphWindowMethod, RepoOpenMethod};
-use ramal_protocol::{MethodInfo, RpcError, RpcMethod};
+use git_rudder_protocol::methods::{EngineInfoMethod, GraphWindowMethod, RepoOpenMethod};
+use git_rudder_protocol::{MethodInfo, RpcError, RpcMethod};
 use serde::Serialize;
 
 use crate::engine::{CallContext, CallOrigin, UseCases};

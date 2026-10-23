@@ -1,8 +1,8 @@
 //! El binario de punta a punta: escucha, responde las sondas y para con SIGTERM.
 //!
-//! El caso con base de datos se salta sin `RAMAL_TEST_DATABASE_URL` y falla sin
-//! ella si `RAMAL_TEST_REQUIRE_DATABASE=1`; vive aqui y no en los tests de
-//! `ramal-api-http` porque necesita los adaptadores reales, y el adaptador HTTP
+//! El caso con base de datos se salta sin `GIT_RUDDER_TEST_DATABASE_URL` y falla sin
+//! ella si `GIT_RUDDER_TEST_REQUIRE_DATABASE=1`; vive aqui y no en los tests de
+//! `git-rudder-api-http` porque necesita los adaptadores reales, y el adaptador HTTP
 //! no puede depender de la infraestructura ni en sus tests.
 
 #![allow(
@@ -54,7 +54,7 @@ fn without_a_database_the_api_is_alive_but_not_ready() {
             .contains("content-type: application/problem+json")
     );
 
-    // Sin RAMAL__SERVER__SWAGGER_UI, como arranca la imagen de produccion.
+    // Sin GIT_RUDDER__SERVER__SWAGGER_UI, como arranca la imagen de produccion.
     let swagger = get(api.port(), "/swagger-ui/").expect("the api answers");
     assert_eq!(swagger.status, 404);
 
@@ -68,7 +68,7 @@ fn without_a_database_the_api_is_alive_but_not_ready() {
 fn swagger_ui_is_served_only_when_the_environment_asks_for_it() {
     let api = ApiProcess::start_with(
         UNREACHABLE_DATABASE,
-        &[("RAMAL__SERVER__SWAGGER_UI", "true")],
+        &[("GIT_RUDDER__SERVER__SWAGGER_UI", "true")],
     );
 
     let swagger = get(api.port(), "/swagger-ui/").expect("the api answers");

@@ -1,4 +1,4 @@
-import type { RpcNotification, RpcResponse } from '@ramal/bridge';
+import type { RpcNotification, RpcResponse } from '@git-rudder/bridge';
 
 import type { IdentifiedRpcRequest } from '../../../shared/messages';
 

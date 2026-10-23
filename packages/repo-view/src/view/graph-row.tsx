@@ -1,6 +1,6 @@
-import type { GraphRow } from '@ramal/bridge';
-import { formatDate } from '@ramal/i18n';
-import { laneColor, useLocale } from '@ramal/ui';
+import type { GraphRow } from '@git-rudder/bridge';
+import { formatDate } from '@git-rudder/i18n';
+import { laneColor, useLocale } from '@git-rudder/ui';
 import { type ReactElement, memo } from 'react';
 
 import { authorInitials } from '../graph/initials';

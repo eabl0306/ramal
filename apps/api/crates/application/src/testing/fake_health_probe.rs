@@ -3,7 +3,7 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use async_trait::async_trait;
-use ramal_api_domain::ComponentName;
+use git_rudder_api_domain::ComponentName;
 
 use crate::port::{HealthProbe, ProbeError};
 

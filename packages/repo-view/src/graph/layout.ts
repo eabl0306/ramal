@@ -1,4 +1,4 @@
-import type { GraphRow } from '@ramal/bridge';
+import type { GraphRow } from '@git-rudder/bridge';
 
 import { type EdgeSpan, edgePath } from './edge-path';
 import { type GraphMetrics, laneX, rowY } from './geometry';

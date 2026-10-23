@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use ramal_core_domain::{CommitNode, CommitRecord, GitTime, Sha, ShortSha, Signature};
+use git_rudder_core_domain::{CommitNode, CommitRecord, GitTime, Sha, ShortSha, Signature};
 
 use crate::port::git_reader::{GitCapabilities, GitVersion, GitVersionInfo};
 

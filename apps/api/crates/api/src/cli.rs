@@ -9,9 +9,9 @@ use thiserror::Error;
 
 /// Ayuda que se imprime con `--help` o ante un argumento desconocido.
 pub const USAGE: &str = "usage:
-  ramal-api                    start the server (configuration from RAMAL__* variables)
-  ramal-api --openapi <path>   write the OpenAPI document to <path> and exit
-  ramal-api --help             show this help";
+  git-rudder-api                    start the server (configuration from GIT_RUDDER__* variables)
+  git-rudder-api --openapi <path>   write the OpenAPI document to <path> and exit
+  git-rudder-api --help             show this help";
 
 /// Lo que se pide al binario.
 #[derive(Debug, Clone, PartialEq, Eq)]

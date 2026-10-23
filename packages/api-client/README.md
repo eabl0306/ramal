@@ -1,6 +1,6 @@
-# @ramal/api-client
+# @git-rudder/api-client
 
-Cliente HTTP de la Ramal API para la web. Solo lo importa `apps/web/src/infrastructure`.
+Cliente HTTP de la Git Rudder API para la web. Solo lo importa `apps/web/src/infrastructure`.
 
 ```ts
 const client = createApiClient(); // mismo origen: el gateway sirve web y API juntas
@@ -15,5 +15,5 @@ const { data, error, response } = await client.GET('/health/ready');
 
 ```sh
 just api-client                                        # regenera los tipos
-corepack pnpm --filter @ramal/api-client test:coverage # 60% minimo
+corepack pnpm --filter @git-rudder/api-client test:coverage # 60% minimo
 ```

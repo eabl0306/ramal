@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@vscode/codicons@0.0.36/dist/codicon.css" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-size:13px;
 --bg:#1f1f1f;--side:#181818;--bar:#181818;--border:#2b2b2b;--fg:#cccccc;--fg2:#9d9d9d;--fg3:#7a7a7a;--accent:#0078d4;--accent-fg:#ffffff;
@@ -43,7 +43,7 @@ button:disabled{cursor:default}
 
         <div style="width:clamp(230px,24vw,300px);flex-shrink:0;display:flex;flex-direction:column;min-height:0;background:var(--side);border-right:1px solid var(--border)">
           <div style="height:22px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:0 8px;border-bottom:1px dashed var(--fg3);font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--fg3)">
-            <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ x.native }} · ramal.changes · {{ V.view.changes }}</span><span>refresh · git-commit · gear</span>
+            <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ x.native }} · gitRudder.changes · {{ V.view.changes }}</span><span>refresh · git-commit · gear</span>
           </div>
           <div style="flex:1;min-height:0;overflow:auto">
             <sc-if value="{{ engineRestarting }}"><div role="status" style="display:flex;align-items:center;gap:6px;padding:4px 12px;font-size:12px;background:color-mix(in oklch, var(--info) 14%, transparent);border-bottom:1px solid var(--border)"><i class="codicon codicon-sync codicon-modifier-spin" style="font-size:13px"></i><span>{{ V.engine.bannerReconnect }}</span></div></sc-if>
@@ -300,10 +300,10 @@ button:disabled{cursor:default}
                       <sc-if value="{{ signedIn }}">
                         <div style="display:flex;align-items:center;gap:10px;padding:8px 10px">
                           <span style="width:26px;height:26px;flex-shrink:0;border-radius:6px;display:grid;place-items:center;font-size:9px;font-weight:700;color:white;background:oklch(0.68 0.2 300)">MR</span>
-                          <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:600">Marta Ruiz</span> <span style="color:var(--fg2)">· marta@example.com</span></div><div style="font-size:12px;color:var(--fg3)">ACME Studio · Ramal Pro</div></div>
+                          <div style="flex:1;min-width:0"><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="font-weight:600">Marta Ruiz</span> <span style="color:var(--fg2)">· marta@example.com</span></div><div style="font-size:12px;color:var(--fg3)">ACME Studio · Git Rudder Pro</div></div>
                         </div>
                         <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                          <div><span style="color:var(--fg2)">Ramal › {{ t.sAccount }}: </span><span style="font-weight:600">{{ V.settings.cfgCloud }}</span></div>
+                          <div><span style="color:var(--fg2)">Git Rudder › {{ t.sAccount }}: </span><span style="font-weight:600">{{ V.settings.cfgCloud }}</span></div>
                           <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2);line-height:1.45"><input type="checkbox" checked="{{ cfg.cloud }}" onChange="{{ onCloud }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ V.settings.cfgCloudD }}</span></label>
                         </div>
                         <div style="display:flex;gap:8px;padding:8px 10px;flex-wrap:wrap">
@@ -345,7 +345,7 @@ button:disabled{cursor:default}
                       <div style="padding:8px 10px 4px;font-size:12px;color:var(--fg2);line-height:1.5;text-wrap:pretty">{{ V.settings.aiHint }}</div>
                       <sc-for list="{{ fnRows }}" as="f">
                         <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                          <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onToggle }}" style="margin:0;accent-color:var(--accent)"><span><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ f.title }}</span></span></label>
+                          <label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" checked="{{ f.checked }}" onChange="{{ f.onToggle }}" style="margin:0;accent-color:var(--accent)"><span><span style="color:var(--fg2)">Git Rudder › {{ t.sAI }}: </span><span style="font-weight:600">{{ f.title }}</span></span></label>
                           <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;padding-left:21px">
                             <label style="display:flex;flex-direction:column;gap:3px;flex:1 1 200px;min-width:0"><span style="font-size:11px;color:var(--fg2)">{{ x.key }}</span><select value="{{ f.keyVal }}" onChange="{{ f.onKey }}" style="height:26px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ f.keyOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
                             <label style="display:flex;flex-direction:column;gap:3px;flex:1 1 220px;min-width:0"><span style="font-size:11px;color:var(--fg2)">{{ t.model }}</span><select value="{{ f.modelVal }}" onChange="{{ f.onModel }}" disabled="{{ f.modelDisabled }}" style="height:26px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);opacity:{{ f.modelOpacity }}"><sc-for list="{{ f.modelOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select></label>
@@ -353,20 +353,20 @@ button:disabled{cursor:default}
                         </div>
                       </sc-for>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.language }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.language }}</span></div>
                         <select value="{{ cfg.aiLang }}" onChange="{{ onAiLang }}" style="margin-top:8px;height:26px;min-width:240px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ langOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
                       </div>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.conventional }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.conventional }}</span></div>
                         <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2)"><input type="checkbox" checked="{{ cfg.conventional }}" onChange="{{ onConventional }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ t.conventionalD }}</span></label>
                       </div>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ V.settings.excludeLabel }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › {{ t.sAI }}: </span><span style="font-weight:600">{{ V.settings.excludeLabel }}</span></div>
                         <div style="color:var(--fg2);margin-top:4px">{{ V.settings.excludeD }}</div>
                         <input value="{{ cfg.exclude }}" onChange="{{ onExclude }}" style="margin-top:8px;width:100%;max-width:480px;height:26px;padding:0 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;font-family:'IBM Plex Mono',Menlo,monospace;font-size:12px">
                       </div>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.instructions }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › {{ t.sAI }}: </span><span style="font-weight:600">{{ t.instructions }}</span></div>
                         <textarea value="{{ cfg.instr }}" onChange="{{ onInstr }}" rows="3" style="margin-top:8px;width:100%;max-width:560px;padding:6px 8px;border-radius:2px;border:1px solid var(--input-b);background:var(--input);outline:0;resize:vertical;line-height:1.4;display:block"></textarea>
                       </div>
                     </div>
@@ -374,19 +374,19 @@ button:disabled{cursor:default}
                     <div style="margin-bottom:22px">
                       <div style="font-size:15px;font-weight:600;padding:6px 0 8px;border-bottom:1px solid var(--border);margin-bottom:6px">{{ t.sGit }}</div>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.autoFetch }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › Git: </span><span style="font-weight:600">{{ t.autoFetch }}</span></div>
                         <select value="{{ cfg.autoFetch }}" onChange="{{ onAutoFetch }}" style="margin-top:8px;height:26px;min-width:240px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ fetchOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
                       </div>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.pullDefault }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › Git: </span><span style="font-weight:600">{{ t.pullDefault }}</span></div>
                         <select value="{{ cfg.pull }}" onChange="{{ onPullMode }}" style="margin-top:8px;height:26px;min-width:240px;padding:0 6px;border-radius:2px;border:1px solid var(--input-b);background:var(--input)"><sc-for list="{{ pullOpts }}" as="o"><option value="{{ o.value }}">{{ o.label }}</option></sc-for></select>
                       </div>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.signCommits }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › Git: </span><span style="font-weight:600">{{ t.signCommits }}</span></div>
                         <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2)"><input type="checkbox" checked="{{ cfg.sign }}" onChange="{{ onSign }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ t.signCommitsD }}</span></label>
                       </div>
                       <div style="padding:10px 10px 12px;border-radius:3px" style-hover="background:var(--hover)">
-                        <div><span style="color:var(--fg2)">Ramal › Git: </span><span style="font-weight:600">{{ t.prune }}</span></div>
+                        <div><span style="color:var(--fg2)">Git Rudder › Git: </span><span style="font-weight:600">{{ t.prune }}</span></div>
                         <label style="display:flex;align-items:flex-start;gap:8px;margin-top:6px;cursor:pointer;color:var(--fg2)"><input type="checkbox" checked="{{ cfg.prune }}" onChange="{{ onPrune }}" style="margin:2px 0 0;accent-color:var(--accent)"><span>{{ x.pruneD }}</span></label>
                       </div>
                     </div>
@@ -459,19 +459,19 @@ const X = {
 class Component extends DCLogic {
   state = { ready: false };
   msgRef = React.createRef();
-  componentDidMount() { const go = () => window.RAMAL && window.RAMAL.VS ? this.setup(this.curState()) : setTimeout(go, 30); go(); }
+  componentDidMount() { const go = () => window.GIT_RUDDER && window.GIT_RUDDER.VS ? this.setup(this.curState()) : setTimeout(go, 30); go(); }
   componentDidUpdate(pp) {
     document.body.dataset.vs = this.props.vsTheme === 'light' ? 'light' : 'dark';
     if (pp.state !== this.props.state && this.state.ready) this.setState({ stOverride: null }, () => this.setup(this.curState()));
   }
   curState() { const s = this.state.stOverride || this.props.state || 'normal'; return STATES.includes(s) ? s : 'normal'; }
   get L() { return this.props.vsLanguage === 'es' ? 0 : 1; }
-  tr(k, v) { const R = window.RAMAL, e = R.D[k] || (R.STATES || {})[k]; return e ? fill(e[this.L], v) : k; }
-  v(k, vars) { const VS = window.RAMAL.VS; let key = 'vscode.' + k; if (vars && vars.count != null && VS[key + '_one']) key += vars.count === 1 ? '_one' : '_other'; const e = VS[key]; return e ? fill(e[this.L], vars) : k; }
+  tr(k, v) { const R = window.GIT_RUDDER, e = R.D[k] || (R.STATES || {})[k]; return e ? fill(e[this.L], v) : k; }
+  v(k, vars) { const VS = window.GIT_RUDDER.VS; let key = 'vscode.' + k; if (vars && vars.count != null && VS[key + '_one']) key += vars.count === 1 ? '_one' : '_other'; const e = VS[key]; return e ? fill(e[this.L], vars) : k; }
   x(k, v) { return fill(X[k][this.L], v); }
 
   setup(st) {
-    const R = window.RAMAL;
+    const R = window.GIT_RUDDER;
     document.body.dataset.vs = this.props.vsTheme === 'light' ? 'light' : 'dark';
     const b = { ready: true, st, commits: R.mkCommits(), ahead: 2, current: 'feature/graph-ui', unstaged: R.UNSTAGED.slice(), staged: R.STAGED.slice(), msg: '',
       conflict: null, aiSum: {}, tabs: ['graph'], active: 'graph', sel: null, aiBusy: false, aiErr: null, signedIn: true, signingIn: false, engine: 'ready',
@@ -508,7 +508,7 @@ class Component extends DCLogic {
   pick(title, items, step) { this.nat({ kind: 'quickPick', api: 'showQuickPick' + (step ? ' · ' + step : ''), title, items }); }
   input(title, ph, onOk, opts) { this.nat({ kind: 'inputBox', api: 'showInputBox' + (opts && opts.step ? ' · ' + opts.step : ''), title, ph, input: true, value: (opts && opts.value) || '', password: opts && opts.password, validate: opts && opts.validate, onOk }); }
   copy(x) { try { navigator.clipboard.writeText(x).catch(() => {}); } catch (e) {} this.sb(this.tr('copied', { x })); }
-  showLog() { this.nat({ kind: 'command', api: 'OutputChannel.show()', title: 'Ramal Engine' }); }
+  showLog() { this.nat({ kind: 'command', api: 'OutputChannel.show()', title: 'Git Rudder Engine' }); }
   head() { return this.state.commits.find(c => c.refs.some(r => r.head)) || this.state.commits[0]; }
   openHistory(f) { const isNew = f.st === 'A' || f.st === 'U' || f.status === 'A' || f.status === 'U'; this.setState(s => ({ tabs: s.tabs.includes('history') ? s.tabs : [...s.tabs, 'history'], active: 'history', hist: { path: f.path, st: 'loading' }, sel: null })); setTimeout(() => this.setState(s => ({ hist: { ...s.hist, st: isNew ? 'none' : 'list' } })), 700); }
   openTab(id) { this.setState(s => ({ tabs: s.tabs.includes(id) ? s.tabs : [...s.tabs, id], active: id })); }
@@ -544,7 +544,7 @@ class Component extends DCLogic {
     }
     this.doCheckout(name);
   }
-  pop(i = 0, drop = true) { const st = this.state.stashes[i]; if (!st) return; const files = st.files || window.RAMAL.UNSTAGED.slice(0, 2); this.setState(s => ({ unstaged: [...s.unstaged, ...files.filter(f => !s.unstaged.some(x => x.path === f.path))], stashes: drop ? s.stashes.filter((_, j) => j !== i) : s.stashes })); this.sb(this.tr('poppedT')); }
+  pop(i = 0, drop = true) { const st = this.state.stashes[i]; if (!st) return; const files = st.files || window.GIT_RUDDER.UNSTAGED.slice(0, 2); this.setState(s => ({ unstaged: [...s.unstaged, ...files.filter(f => !s.unstaged.some(x => x.path === f.path))], stashes: drop ? s.stashes.filter((_, j) => j !== i) : s.stashes })); this.sb(this.tr('poppedT')); }
   validRef(n) { if (!n.trim()) return this.v('quickInput.branchBad', { reason: this.L ? 'empty' : 'vacío' }); if (/\s/.test(n)) return this.v('quickInput.branchBad', { reason: this.L ? 'no spaces' : 'sin espacios' }); if (/\.\.|~|\^|:|\\|\/$|\.lock$/.test(n)) return this.v('quickInput.branchBad', { reason: this.L ? 'contains a character Git does not allow' : 'tiene un carácter que Git no admite' }); return ''; }
   newBranch(c) {
     const base = c || this.head(); if (!base) return;
@@ -571,7 +571,7 @@ class Component extends DCLogic {
   }
   aiKeyFor(fn) { const s = this.state, id = s.cfg['key' + fn]; return s.aiKeys.find(k => k.id === id) || s.aiKeys.find(k => k.def) || s.aiKeys[0]; }
   aiCommit = () => {
-    const s = this.state, AP = window.RAMAL.AIPROV;
+    const s = this.state, AP = window.GIT_RUDDER.AIPROV;
     if (s.st === 'V-16-ia') { const i = AI_ERRS.indexOf(s.aiErr); this.setState({ aiErr: AI_ERRS[(i + 1) % AI_ERRS.length] }); return; }
     if (!s.cfg.aiCommit || !s.staged.length) return;
     const k = this.aiKeyFor('Commit'); if (!k) { this.setState({ aiErr: 'noKey' }); return; }
@@ -592,7 +592,7 @@ class Component extends DCLogic {
     }]), '1/4');
   }
   addKey() {
-    const AP = window.RAMAL.AIPROV;
+    const AP = window.GIT_RUDDER.AIPROV;
     this.pick(this.x('addKey').replace('…', ''), Object.keys(AP).map(id => [AP[id].label, () => {
       const modelStep = () => this.pick(this.tr('model'), (MODELS[id] || [[AP[id].model || 'model', 'fast']]).map(([m, tier]) => [m + (tier === 'fast' ? ' · ' + this.v('errors.recFast') : tier === 'balanced' ? ' · ' + this.v('errors.recBalanced') : ''), () => this.input(this.v('account.labelOpt'), '', () => this.sb(this.tr('keyAddedT', { p: AP[id].label })), { step: '5/5' })]), '4/5');
       const keyStep = () => id === 'ollama' ? modelStep() : this.input(this.tr('apiKey'), AP[id].ph, modelStep, { step: '3/5', password: true });
@@ -606,14 +606,14 @@ class Component extends DCLogic {
   }
   signOut() { this.modal(this.v('auth.signOutTitle'), this.v('auth.signOutDetail'), [[this.v('auth.signOutKeep'), () => this.setState(s => ({ signedIn: false, aiKeys: s.aiKeys.filter(k => k.scope !== 'org') }))], [this.v('auth.signOutWipe'), () => this.setState(s => ({ signedIn: false, aiKeys: s.aiKeys.filter(k => k.scope !== 'org') }))]]); }
 
-  initChoices() { const o = {}; window.RAMAL.CF.forEach((file, i) => { o[i] = file.segs.filter(sg => sg.h).map(sg => ({ ours: sg.h[0].map(() => false), theirs: sg.h[1].map(() => false), empty: false })); }); return o; }
+  initChoices() { const o = {}; window.GIT_RUDDER.CF.forEach((file, i) => { o[i] = file.segs.filter(sg => sg.h).map(sg => ({ ours: sg.h[0].map(() => false), theirs: sg.h[1].map(() => false), empty: false })); }); return o; }
   updHunks(fn) { this.setState(s => { const cf = s.conflict; return { conflict: { ...cf, choices: { ...cf.choices, [cf.file]: fn(cf.choices[cf.file].map(h => ({ ours: h.ours.slice(), theirs: h.theirs.slice(), empty: !!h.empty }))) } } }; }); }
   pickBlock(hi, side) { this.updHunks(hs => { const a = hs[hi][side]; const all = a.every(Boolean); hs[hi][side] = a.map(() => !all); hs[hi].empty = false; return hs; }); }
   pickLine(hi, side, li) { this.updHunks(hs => { hs[hi][side][li] = !hs[hi][side][li]; hs[hi].empty = false; return hs; }); }
   leaveEmpty(hi) { this.updHunks(hs => { const e = !hs[hi].empty; hs[hi] = { ours: hs[hi].ours.map(() => false), theirs: hs[hi].theirs.map(() => false), empty: e }; return hs; }); }
   takeAll(side) { const o = side === 'ours' ? 'theirs' : 'ours'; this.updHunks(hs => hs.map(h => ({ [side]: h[side].map(() => true), [o]: h[o].map(() => false), empty: false }))); }
   cfResolved(i) { return this.state.conflict.choices[i].every(h => h.empty || h.ours.some(Boolean) || h.theirs.some(Boolean)); }
-  allResolved() { return window.RAMAL.CF.every((_, i) => this.cfResolved(i)); }
+  allResolved() { return window.GIT_RUDDER.CF.every((_, i) => this.cfResolved(i)); }
   opName(op) { return this.v('operation.name.' + op); }
   continueOp(skip) {
     const cf = this.state.conflict; if (!cf) return; if (!skip && !this.allResolved()) return;
@@ -637,7 +637,7 @@ class Component extends DCLogic {
       it(this.tr('mCherry', { b: cur }), () => { this.addCommit(c.msg); this.sb(this.tr('cherryT', { s: c.sha })); }), it(this.tr('mRevert'), () => { this.addCommit(`Revert "${c.msg}"`); this.sb(this.tr('revertT', { s: c.sha })); }),
       it(this.tr('mReset', { b: cur }), null, { hint: '›' }), it(this.tr('rSoft'), () => this.sb(this.tr('resetT', { m: '--soft', s: c.sha })), { sub: 1 }), it(this.tr('rMixed'), () => this.sb(this.tr('resetT', { m: '--mixed', s: c.sha })), { sub: 1 }),
       it(this.tr('rHard'), () => this.modal(this.v('confirm.resetHard.message', { sha: c.sha }), this.v('confirm.resetHard.detail'), [[this.v('confirm.resetHard.button'), () => this.sb(this.tr('resetT', { m: '--hard', s: c.sha }))]]), { sub: 1, danger: 1 }),
-      { sep: 1 }, it(this.tr('mCopySha'), () => this.copy(c.sha)), it(this.tr('mCopyMsg'), () => this.copy(c.msg)), it(this.v('command.openInDesktop'), () => this.nat({ kind: 'warning', api: 'showWarningMessage', title: this.v('desktop.noDesktop'), detail: 'env.openExternal("ramal://open?repo=…") → false', buttons: [[this.v('desktop.getDesktop'), null]] }))];
+      { sep: 1 }, it(this.tr('mCopySha'), () => this.copy(c.sha)), it(this.tr('mCopyMsg'), () => this.copy(c.msg)), it(this.v('command.openInDesktop'), () => this.nat({ kind: 'warning', api: 'showWarningMessage', title: this.v('desktop.noDesktop'), detail: 'env.openExternal("git-rudder://open?repo=…") → false', buttons: [[this.v('desktop.getDesktop'), null]] }))];
   }
   branchMenu(name, type) {
     const cur = this.state.current, isCur = type === 'local' && name === cur, it = (label, fn, o) => ({ label, run: fn, ...o });
@@ -655,14 +655,14 @@ class Component extends DCLogic {
   fileMenu(f, staged) {
     const it = (label, fn, o) => ({ label, run: fn, ...o });
     return [it(this.tr('mViewDiff'), () => this.diffTab(f, staged)), it(this.v('menu.openFile'), () => this.nat({ kind: 'editor', api: 'window.showTextDocument', title: f.path })), it(staged ? this.tr('mUnstage') : this.tr('mStage'), () => staged ? this.unstage(f.path) : this.stage(f.path)), { sep: 1 },
-      it(this.v('menu.fileHistory'), () => this.openHistory(f) || this.nat({ kind: 'command', api: 'ramal.fileHistory', title: this.v('history.historyTab', { file: f.path.split('/').pop() }), detail: this.v('history.followsRenames') })), it(this.tr('mCopyPath'), () => this.copy(f.path)), { sep: 1 },
+      it(this.v('menu.fileHistory'), () => this.openHistory(f) || this.nat({ kind: 'command', api: 'gitRudder.fileHistory', title: this.v('history.historyTab', { file: f.path.split('/').pop() }), detail: this.v('history.followsRenames') })), it(this.tr('mCopyPath'), () => this.copy(f.path)), { sep: 1 },
       it(this.tr('mDiscard'), () => this.modal(this.v('confirm.discard.message', { file: f.path }), this.v('confirm.discard.detail'), [[this.v('confirm.discard.button'), () => this.setState(s => ({ unstaged: s.unstaged.filter(x => x.path !== f.path), staged: s.staged.filter(x => x.path !== f.path) }))]]), { danger: 1 })];
   }
 
   renderVals() {
     const s = this.state;
-    if (!s.ready || !window.RAMAL || !window.RAMAL.VS) return { t: {}, V: { view: {}, engine: {}, graph: {}, command: {}, operation: {}, account: {}, settings: {}, auth: {} }, x: {}, isGraph: true, showWebviews: true, hasRows: true };
-    const R = window.RAMAL, LANE = R.LANE, P = R.PLAT, AP = R.AIPROV, L = this.L, tr = this.tr.bind(this), v = this.v.bind(this), xx = this.x.bind(this);
+    if (!s.ready || !window.GIT_RUDDER || !window.GIT_RUDDER.VS) return { t: {}, V: { view: {}, engine: {}, graph: {}, command: {}, operation: {}, account: {}, settings: {}, auth: {} }, x: {}, isGraph: true, showWebviews: true, hasRows: true };
+    const R = window.GIT_RUDDER, LANE = R.LANE, P = R.PLAT, AP = R.AIPROV, L = this.L, tr = this.tr.bind(this), v = this.v.bind(this), xx = this.x.bind(this);
     const t = {}; for (const k in (R.STATES || {})) t[k] = R.STATES[k][L]; for (const k in R.D) t[k] = R.D[k][L];
     const V = {}; for (const k in R.VS) { const parts = k.replace(/^vscode\./, '').split('.'); let o = V; parts.slice(0, -1).forEach(p => { o = o[p] = o[p] || {}; }); o[parts[parts.length - 1]] = R.VS[k][L]; }
     const x = {}; for (const k in X) x[k] = X[k][L];
@@ -671,7 +671,7 @@ class Component extends DCLogic {
     base.chips = STATES.map(id => ({ id, bg: id === st ? 'var(--accent)' : 'transparent', color: id === st ? 'var(--accent-fg)' : 'var(--fg2)', border: id === st ? 'var(--accent)' : 'var(--border)', onClick: () => this.setState({ stOverride: id }, () => this.setup(id)) }));
     Object.assign(base, { engineRestarting: s.engine === 'restarting', engineStopped: s.engine === 'stopped', showWebviews: s.engine !== 'stopped', events: s.engine === 'restarting' ? 'none' : 'auto', dim: s.engine === 'restarting' ? 0.55 : 1,
       onRetryEngine: () => this.setState({ engine: 'ready' }), onShowLog: () => this.showLog() });
-    base.trees = ['ramal.branches · ' + V.view.branches, 'ramal.remotes · ' + V.view.remotes, 'ramal.pullRequests · ' + V.view.pullRequests + (s.prNoAcc ? ' · viewsWelcome' : ''), 'ramal.stashes · ' + V.view.stashes, 'ramal.tags · ' + V.view.tags].map(l => s.multi ? l + ' — ' + s.repo : l);
+    base.trees = ['gitRudder.branches · ' + V.view.branches, 'gitRudder.remotes · ' + V.view.remotes, 'gitRudder.pullRequests · ' + V.view.pullRequests + (s.prNoAcc ? ' · viewsWelcome' : ''), 'gitRudder.stashes · ' + V.view.stashes, 'gitRudder.tags · ' + V.view.tags].map(l => s.multi ? l + ' — ' + s.repo : l);
 
     const cf = s.conflict, file = cf ? R.CF[cf.file] : null;
     base.hasOp = !!cf; base.isDetached = s.detached;
@@ -778,7 +778,7 @@ class Component extends DCLogic {
       const cfg = s.cfg, setC = (k, val) => this.setState(y => ({ cfg: { ...y.cfg, [k]: val } }));
       const ago = m => m < 60 ? m + ' min' : m < 1440 ? Math.round(m / 60) + ' h' : Math.round(m / 1440) + ' d';
       Object.assign(base, { cfg, syncIcon: s.signedIn && cfg.cloud ? 'cloud' : 'device-desktop', syncLine: s.signedIn && cfg.cloud ? tr('syncsWith', { ago: L ? '2 min ago' : 'hace 2 min' }) : V.settings.cfgLocal,
-        onCloud: e => setC('cloud', e.target.checked), onDashboard: () => this.nat({ kind: 'command', api: 'env.openExternal', title: 'https://ramal.bahoque.com/app' }), onSignOut: () => this.signOut(), onSignIn: () => this.signIn(),
+        onCloud: e => setC('cloud', e.target.checked), onDashboard: () => this.nat({ kind: 'command', api: 'env.openExternal', title: 'https://git-rudder.com/app' }), onSignOut: () => this.signOut(), onSignIn: () => this.signIn(),
         onAddAccount: () => this.addAccount(), onAddKey: () => this.addKey(), onAiLang: e => setC('aiLang', e.target.value), onConventional: e => setC('conventional', e.target.checked), onExclude: e => setC('exclude', e.target.value), onInstr: e => setC('instr', e.target.value),
         onAutoFetch: e => setC('autoFetch', e.target.value), onPullMode: e => setC('pull', e.target.value), onSign: e => setC('sign', e.target.checked), onPrune: e => setC('prune', e.target.checked),
         langOpts: [['vscode', V.settings.matchVs], ['en', 'English'], ['es', 'Español']].map(([value, label]) => ({ value, label })),
@@ -812,7 +812,7 @@ class Component extends DCLogic {
     if (s.cfg.aiCommit || s.cfg.aiPR || s.cfg.aiSummary) R1.push(ka ? stItem('$(sparkle) ' + AP[ka.prov].label, v('status.aiTip', { provider: AP[ka.prov].label, model: s.cfg.modelCommit || ka.model, label: ka.label })) : stItem('$(sparkle) ' + v('status.aiNoKey')));
     if (s.engine === 'restarting') R1.push(stItem('$(sync~spin) ' + v('status.restarting'), ''));
     if (s.engine === 'stopped') R1.push(stItem('$(error) ' + v('status.stopped'), 'statusBarItem.errorBackground', { border: 'var(--err)', color: 'var(--err)' }));
-    R1.push(!s.signedIn ? stItem('$(account) ' + v('status.signedOut'), v('status.signedOutTip')) : !s.cfg.cloud ? stItem('$(account) Ramal', v('status.cloudOffTip')) : stItem('$(cloud) Ramal', v('status.signedInTip', { name: 'Marta Ruiz', email: 'marta@example.com', ago: L ? '2 min ago' : 'hace 2 min' })));
+    R1.push(!s.signedIn ? stItem('$(account) ' + v('status.signedOut'), v('status.signedOutTip')) : !s.cfg.cloud ? stItem('$(account) Git Rudder', v('status.cloudOffTip')) : stItem('$(cloud) Git Rudder', v('status.signedInTip', { name: 'Marta Ruiz', email: 'marta@example.com', ago: L ? '2 min ago' : 'hace 2 min' })));
     base.statusR = R1;
 
     const KC = { menu: 'var(--info)', modal: 'var(--warn)', quickPick: 'var(--accent)', inputBox: 'var(--accent)', status: 'var(--add)', error: 'var(--err)', warning: 'var(--warn)', info: 'var(--info)', progress: 'var(--info)', editor: 'var(--fg2)', command: 'var(--fg2)' };

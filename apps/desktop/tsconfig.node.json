@@ -2,7 +2,7 @@
 // Playwright. Lleva la lib DOM porque el E2E prepara el IPC simulado dentro de la
 // pagina.
 {
-  "extends": "@ramal/tsconfig/base.json",
+  "extends": "@git-rudder/tsconfig/base.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

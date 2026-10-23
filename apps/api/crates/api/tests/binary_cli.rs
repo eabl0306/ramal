@@ -24,7 +24,7 @@ fn the_openapi_flag_writes_the_committed_document_without_a_database() {
 
     // La base apunta a un puerto cerrado: si el flag tocara la base, fallaria.
     let output = process::command()
-        .env("RAMAL__DATABASE__URL", UNREACHABLE_DATABASE)
+        .env("GIT_RUDDER__DATABASE__URL", UNREACHABLE_DATABASE)
         .args(["--openapi", target.to_str().expect("utf-8 path")])
         .output()
         .expect("the binary should start");
@@ -70,7 +70,7 @@ fn an_unknown_argument_exits_with_2_and_the_usage() {
 #[test]
 fn an_invalid_configuration_stops_the_start() {
     let output = process::command()
-        .env("RAMAL__SERVER__PORT", "not-a-port")
+        .env("GIT_RUDDER__SERVER__PORT", "not-a-port")
         .output()
         .expect("the binary should start");
 
@@ -83,9 +83,9 @@ fn a_port_already_in_use_stops_the_start() {
     let port = taken.local_addr().expect("a local address").port();
 
     let output = process::command()
-        .env("RAMAL__SERVER__HOST", "127.0.0.1")
-        .env("RAMAL__SERVER__PORT", port.to_string())
-        .env("RAMAL__DATABASE__URL", UNREACHABLE_DATABASE)
+        .env("GIT_RUDDER__SERVER__HOST", "127.0.0.1")
+        .env("GIT_RUDDER__SERVER__PORT", port.to_string())
+        .env("GIT_RUDDER__DATABASE__URL", UNREACHABLE_DATABASE)
         .output()
         .expect("the binary should start");
 

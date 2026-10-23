@@ -11,7 +11,7 @@
 <meta name="design_doc_mode" content="canvas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="./ramal-data.js"></script>
+<script src="./git-rudder-data.js"></script>
 <style>
 body{margin:0;--font:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',monospace;--fs:13px;--row:40px;--menu:32px;--sbh:30px;--bar:62px;--btn:34px;--r-sm:6px;--r-ctl:9px;--r-card:12px;--r-panel:14px;--r-modal:16px;
 --canvas:oklch(0.16 0.008 230);--bg:oklch(0.185 0.008 230);--panel:oklch(0.21 0.009 230);--surface:oklch(0.24 0.01 230);--surface2:oklch(0.285 0.012 230);--border:oklch(0.315 0.012 230);
@@ -43,7 +43,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
   <header style="display:flex;flex-direction:column;gap:18px;max-width:1240px">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:28px;height:28px;border-radius:var(--r-ctl);background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:14px">R</div>
-      <span style="font-weight:600;font-size:15px">Ramal</span>
+      <span style="font-weight:600;font-size:15px">Git Rudder</span>
       <span style="font-family:var(--mono);font-size:12px;color:var(--faint)">#62 · C-01 – C-10 · B-61</span>
     </div>
     <div>
@@ -219,7 +219,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit
             <sc-if value="{{ dlgOpen }}">
               <div style="border:1px solid var(--border);border-radius:var(--r-ctl);background:var(--bg);overflow:hidden">
                 <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.detail }}</span><button onClick="{{ copyDetail }}" style="height:26px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer">{{ copyLabel }}</button></div>
-                <pre style="margin:0;padding:10px 12px;font-family:var(--mono);font-size:12px;line-height:18px;white-space:pre-wrap;max-height:240px;overflow:auto;color:var(--text)">PATCH https://api.ramal.bahoque.com/v1/me/settings
+                <pre style="margin:0;padding:10px 12px;font-family:var(--mono);font-size:12px;line-height:18px;white-space:pre-wrap;max-height:240px;overflow:auto;color:var(--text)">PATCH https://api.git-rudder.com/v1/me/settings
 status: 500
 code: internal
 detail: The settings write could not be completed.
@@ -243,7 +243,7 @@ request_id: req_8f2c91d04a</pre>
               <div style="display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.detail }}</span><button onClick="{{ copyDetail }}" style="height:26px;padding:0 10px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;cursor:pointer">{{ copyLabel }}</button></div>
               <pre style="margin:0;padding:10px 12px;font-family:var(--mono);font-size:12px;line-height:18px;white-space:pre-wrap;max-height:240px;overflow:auto;color:var(--text)">$ git push origin feature/graph-ui
 husky - pre-push hook
-&gt; ramal@2.4.0 lint
+&gt; git-rudder@2.4.0 lint
 &gt; eslint . --max-warnings 0
 
 src/graph/lanes.ts
@@ -255,7 +255,7 @@ src/graph/GraphView.tsx
 
 ✖ 4 problems (3 errors, 1 warning)
 husky - pre-push script failed (code 1)
-error: failed to push some refs to 'github.com:acme/ramal.git'</pre>
+error: failed to push some refs to 'github.com:acme/git-rudder.git'</pre>
             </div>
           </div>
           <div style="padding:6px 22px 20px;display:flex;justify-content:flex-end;gap:8px">
@@ -344,7 +344,7 @@ error: failed to push some refs to 'github.com:acme/ramal.git'</pre>
           <div style="padding:14px 22px;display:flex;flex-direction:column;gap:14px">
             <div style="display:flex;flex-direction:column;gap:6px">
               <span style="font-size:12px;font-weight:600;color:var(--muted)">{{ s.cloneUrl }}</span>
-              <div aria-invalid="true" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--danger);background:var(--bg);font-family:var(--mono);display:flex;align-items:center">htps//github.com/acme/ramal</div>
+              <div aria-invalid="true" style="height:36px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--danger);background:var(--bg);font-family:var(--mono);display:flex;align-items:center">htps//github.com/acme/git-rudder</div>
               <span style="display:flex;gap:6px;align-items:flex-start;color:var(--danger);font-size:12px;line-height:1.4"><span aria-hidden="true">⚠</span><span>{{ s.badUrl }}</span></span>
             </div>
             <div style="display:flex;flex-direction:column;gap:6px">
@@ -498,7 +498,7 @@ error: failed to push some refs to 'github.com:acme/ramal.git'</pre>
         <div style="display:flex;align-items:center;gap:12px"><div style="flex:1;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">{{ s.vTitleBar }}</div><button onClick="{{ resetNet }}" style="border:0;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;font-weight:500;padding:0">{{ s.reset }}</button></div>
         <div style="height:380px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden;position:relative">
           <div style="height:46px;display:flex;align-items:stretch;gap:4px;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border)">
-            <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Ramal</span></div>
+            <div style="display:flex;align-items:center;gap:8px;padding-right:14px"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:13px">R</div><span style="font-weight:600;font-size:14px">Git Rudder</span></div>
             <div style="display:flex;align-items:center;padding:0 16px;margin-top:6px;border-radius:9px 9px 0 0;background:var(--bg);box-shadow:inset 0 2px 0 var(--accent);font-weight:500">{{ s.home }}</div>
             <div style="flex:1"></div>
             <div style="display:flex;align-items:center;gap:10px;position:relative">
@@ -537,7 +537,7 @@ error: failed to push some refs to 'github.com:acme/ramal.git'</pre>
             <div style="font-weight:600;font-size:14px">{{ s.apiDown }}</div>
             <div style="color:var(--muted);line-height:1.5;font-size:12.5px">{{ s.apiDownD }}</div>
             <div style="display:flex;align-items:center;gap:8px;font-size:12.5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--warn)"></span>{{ f.pending1 }}</div>
-            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button style="height:30px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);font-weight:500">{{ s.retryNow }}</button><a href="https://ramal.bahoque.com/status" style="font-size:12.5px;font-weight:500">{{ s.statusLink }} ↗</a></div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><button style="height:30px;padding:0 12px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--bg);font-weight:500">{{ s.retryNow }}</button><a href="https://git-rudder.com/status" style="font-size:12.5px;font-weight:500">{{ s.statusLink }} ↗</a></div>
           </div>
         </div>
       </div>
@@ -560,11 +560,11 @@ error: failed to push some refs to 'github.com:acme/ramal.git'</pre>
         <div style="display:flex;flex-direction:column;gap:14px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel)">
           <div role="status" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--warn) 12%, transparent);border:1px solid color-mix(in oklch, var(--warn) 40%, var(--border));font-size:13px">
             <span style="width:12px;height:12px;border-radius:50%;border:2px solid var(--warn);border-right-color:transparent;animation:spin .8s linear infinite"></span>
-            <span style="font-weight:600">{{ s.apiDown }}</span><span style="color:var(--muted)">{{ s.reconnecting }}</span><span style="flex:1"></span><a href="https://ramal.bahoque.com/status" style="font-weight:500">{{ s.statusLink }} ↗</a>
+            <span style="font-weight:600">{{ s.apiDown }}</span><span style="color:var(--muted)">{{ s.reconnecting }}</span><span style="flex:1"></span><a href="https://git-rudder.com/status" style="font-weight:500">{{ s.statusLink }} ↗</a>
           </div>
           <div style="align-self:center;width:360px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:18px;display:flex;flex-direction:column;gap:12px">
             <div style="font-size:18px;font-weight:600;letter-spacing:-0.01em">{{ s.login }}</div>
-            <div role="alert" style="padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--danger) 10%, transparent);border:1px solid color-mix(in oklch, var(--danger) 45%, var(--border));color:var(--danger);font-size:13px;line-height:1.45">{{ s.loginNoApi }} <a href="https://ramal.bahoque.com/status" style="color:inherit;font-weight:600">{{ s.statusLink }}</a></div>
+            <div role="alert" style="padding:10px 12px;border-radius:var(--r-ctl);background:color-mix(in oklch, var(--danger) 10%, transparent);border:1px solid color-mix(in oklch, var(--danger) 45%, var(--border));color:var(--danger);font-size:13px;line-height:1.45">{{ s.loginNoApi }} <a href="https://git-rudder.com/status" style="color:inherit;font-weight:600">{{ s.statusLink }}</a></div>
             <div style="height:40px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;color:var(--muted)">marta@example.com</div>
             <div style="height:40px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--border);background:var(--bg);display:flex;align-items:center;color:var(--muted);letter-spacing:.2em">••••••••••</div>
             <button style="height:42px;border-radius:var(--r-ctl);border:0;background:var(--accent);color:var(--accent-ink);font-weight:600">{{ s.signIn }}</button>
@@ -839,7 +839,7 @@ error: failed to push some refs to 'github.com:acme/ramal.git'</pre>
         <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)">Web · {{ s.skipContent }}</div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--r-panel);overflow:hidden;position:relative">
           <a href="#C-10" style="position:absolute;left:16px;top:12px;z-index:1;padding:8px 14px;border-radius:var(--r-ctl);background:var(--accent);color:var(--accent-ink);font-weight:600;text-decoration:none;outline:2px solid var(--focus);outline-offset:2px">{{ s.skipContent }}</a>
-          <div style="height:64px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid var(--border);opacity:.4"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent)"></div><span style="font-weight:600">Ramal</span></div>
+          <div style="height:64px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid var(--border);opacity:.4"><div style="width:24px;height:24px;border-radius:8px;background:var(--accent)"></div><span style="font-weight:600">Git Rudder</span></div>
           <div style="padding:24px 20px;display:flex;flex-direction:column;gap:10px;opacity:.4"><span style="height:16px;width:60%;border-radius:var(--r-sm);background:var(--surface2)"></span><span style="height:10px;width:40%;border-radius:var(--r-sm);background:var(--surface2)"></span></div>
         </div>
       </div>
@@ -861,7 +861,7 @@ class Component extends DCLogic {
   componentDidMount() {
     const p = this.props;
     this.setState({ product: p.product || 'desktop', theme: p.theme || 'dark', lang: p.lang || 'es', sel: p.state || 'all' });
-    const go = () => (window.RAMAL && window.RAMAL.STATES) ? this.setState({ ready: true }) : setTimeout(go, 30);
+    const go = () => (window.GIT_RUDDER && window.GIT_RUDDER.STATES) ? this.setState({ ready: true }) : setTimeout(go, 30);
     go();
     this.syncBody();
   }
@@ -915,7 +915,7 @@ class Component extends DCLogic {
 
   renderVals() {
     const st = this.state;
-    const R = window.RAMAL;
+    const R = window.GIT_RUDDER;
     const L = st.lang === 'en' ? 1 : 0;
     const s = {};
     if (R && R.STATES) for (const k in R.STATES) s[k] = R.STATES[k][L];
@@ -1004,7 +1004,7 @@ class Component extends DCLogic {
       ['kInput', { text: 'feature/login', w: '160px', bg: 'var(--bg)', fg: 'var(--text)', bd: 'var(--border)', input: 1, hovBd: 'var(--faint)', ff: 'var(--mono)' }],
       ['kTab', { text: s.home, h: '34px', r: '9px 9px 0 0', bg: 'transparent', fg: 'var(--muted)', bd: 'transparent', fw: 500, ctl: 1, hovFg: 'var(--text)', prs: 'var(--bg)', prsShadow: 'inset 0 2px 0 var(--accent)' }],
       ['kRow', { text: 'feature/graph-ui', w: '100%', h: 'var(--sbh)', r: 'var(--r-sm)', bg: 'transparent', fg: 'var(--text)', bd: 'transparent', inset: 1, hov: 'var(--surface2)', prs: 'color-mix(in oklch, var(--surface2) 80%, var(--text))', ff: 'var(--mono)' }],
-      ['kCard', { text: 'ramal-desktop', w: '100%', h: '48px', r: 'var(--r-card)', bg: 'var(--surface)', fg: 'var(--text)', bd: 'var(--border)', fw: 600, inset: 1, hovBd: 'var(--accent)', prs: 'var(--surface2)' }],
+      ['kCard', { text: 'git-rudder-desktop', w: '100%', h: '48px', r: 'var(--r-card)', bg: 'var(--surface)', fg: 'var(--text)', bd: 'var(--border)', fw: 600, inset: 1, hovBd: 'var(--accent)', prs: 'var(--surface2)' }],
       ['kMenu', { text: 'Checkout', w: '100%', h: 'var(--menu)', r: 'var(--r-sm)', bg: 'transparent', fg: 'var(--text)', bd: 'transparent', inset: 1, hov: 'var(--surface2)', prs: 'color-mix(in oklch, var(--surface2) 80%, var(--text))' }],
       ['kGraph', { text: 'Fix login redirect loop', node: 1, w: '100%', h: 'var(--row)', r: '0', bg: 'transparent', fg: 'var(--text)', bd: 'transparent', inset: 1, hov: 'var(--surface2)', prs: 'var(--accent-soft)' }]
     ];

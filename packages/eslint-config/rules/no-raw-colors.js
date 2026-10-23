@@ -1,7 +1,7 @@
 /**
- * Regla local: los colores salen de los tokens de @ramal/ui, nunca de un literal.
+ * Regla local: los colores salen de los tokens de @git-rudder/ui, nunca de un literal.
  *
- * Ramal tiene tema claro y oscuro, y el grafo de ramas usa una paleta propia. Un
+ * Git Rudder tiene tema claro y oscuro, y el grafo de ramas usa una paleta propia. Un
  * color escrito a mano en un componente no cambia con el tema y rompe el contraste
  * en uno de los dos. La unica carpeta que puede escribir colores es la que define
  * los temas (packages/ui/src/themes); el resto usa var(--...) o los tokens.
@@ -43,7 +43,7 @@ function isAllowedFile(filename, allow) {
 export const noRawColors = {
   meta: {
     type: 'problem',
-    docs: { description: 'Prohibe colores escritos a mano fuera de los temas de @ramal/ui.' },
+    docs: { description: 'Prohibe colores escritos a mano fuera de los temas de @git-rudder/ui.' },
     schema: [
       {
         type: 'object',
@@ -52,7 +52,7 @@ export const noRawColors = {
       },
     ],
     messages: {
-      rawColor: 'Color escrito a mano. Los colores salen de los tokens de @ramal/ui.',
+      rawColor: 'Color escrito a mano. Los colores salen de los tokens de @git-rudder/ui.',
     },
   },
   create(context) {

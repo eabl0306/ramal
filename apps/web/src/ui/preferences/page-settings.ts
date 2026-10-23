@@ -1,4 +1,4 @@
-import { resolveLocale } from '@ramal/i18n';
+import { resolveLocale } from '@git-rudder/i18n';
 import { useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router';
 

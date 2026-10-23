@@ -1,4 +1,4 @@
-import type { DetectedPlatform } from '@ramal/domain';
+import type { DetectedPlatform } from '@git-rudder/domain';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -35,12 +35,12 @@ describe('LandingScreen', () => {
     expect(screen.getByTestId('download-card-mac')).toHaveAttribute('data-highlighted', 'false');
   });
 
-  it('en un movil no destaca ninguna tarjeta y avisa de que Ramal es de escritorio', () => {
+  it('en un movil no destaca ninguna tarjeta y avisa de que Git Rudder es de escritorio', () => {
     renderLanding({ os: 'ios', arch: 'unknown' });
 
     expect(screen.queryByText('Tu sistema')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Descargar para/u })).not.toBeInTheDocument();
-    expect(screen.getByRole('note')).toHaveTextContent('Ramal es una app de escritorio');
+    expect(screen.getByRole('note')).toHaveTextContent('Git Rudder es una app de escritorio');
   });
 
   it('avisa del fichero que se descarga y copia los comandos de instalacion', async () => {
@@ -48,10 +48,12 @@ describe('LandingScreen', () => {
     const { clipboard } = renderLanding({ os: 'linux', arch: 'x64' });
 
     await user.click(screen.getByRole('button', { name: 'Descargar para Linux' }));
-    expect(await screen.findByText('Descarga iniciada: ramal_2.4.0_amd64.deb')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Descarga iniciada: git_rudder_2.4.0_amd64.deb'),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /flatpak install flathub/u }));
-    expect(clipboard.copied).toEqual(['flatpak install flathub io.ramal.Ramal']);
+    expect(clipboard.copied).toEqual(['flatpak install flathub com.gitrudder.GitRudder']);
     expect(await screen.findByText(/Copiado: flatpak/u)).toBeInTheDocument();
   });
 
@@ -62,10 +64,12 @@ describe('LandingScreen', () => {
     const card = screen.getByTestId('download-card-mac');
     await user.click(within(card).getByRole('button', { name: /Intel \(\.dmg\)/u }));
     expect(within(card).getByText('118 MB')).toBeInTheDocument();
-    expect(await screen.findByText('Descarga iniciada: Ramal-2.4.0-x64.dmg')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Descarga iniciada: Git-Rudder-2.4.0-x64.dmg'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /^Flathub/u })).toHaveAttribute(
       'href',
-      'https://flathub.org/apps/io.ramal.Ramal',
+      'https://flathub.org/apps/com.gitrudder.GitRudder',
     );
   });
 

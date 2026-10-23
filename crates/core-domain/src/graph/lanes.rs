@@ -1,6 +1,6 @@
 //! Asignacion de carriles con puntas fijadas y reutilizacion de huecos.
 //!
-//! Corrige el algoritmo del ejemplo `DIFF` de `ramal-data.js`, que pierde huecos
+//! Corrige el algoritmo del ejemplo `DIFF` de `git-rudder-data.js`, que pierde huecos
 //! y no reproduce el diseno:
 //!
 //! - Cada hueco guarda el commit al que espera (o nada si esta libre).

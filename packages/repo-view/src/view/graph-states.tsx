@@ -1,4 +1,4 @@
-import { Button, type Density, useT } from '@ramal/ui';
+import { Button, type Density, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import { moduleClasses } from './css';

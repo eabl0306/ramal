@@ -1,5 +1,5 @@
-import type { JsonValue, RequestId, RpcError, RpcResponse } from '@ramal/bridge';
-import type { Locale } from '@ramal/i18n';
+import type { JsonValue, RequestId, RpcError, RpcResponse } from '@git-rudder/bridge';
+import type { Locale } from '@git-rudder/i18n';
 
 import type {
   HostFailureResponse,
@@ -123,7 +123,7 @@ class Router implements WebviewRouter {
       this.#deps.logger.warn(`panel ${panel.id} claims surface ${surface}; dropped`);
       return;
     }
-    // `Locale` de @ramal/i18n tiene que caber en el `WebviewLocale` de shared:
+    // `Locale` de @git-rudder/i18n tiene que caber en el `WebviewLocale` de shared:
     // si uno de los dos cambia, esta asignacion deja de compilar.
     const locale: WebviewLocale = this.#deps.locale;
     panel.post({

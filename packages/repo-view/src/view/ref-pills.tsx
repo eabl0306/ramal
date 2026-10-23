@@ -1,5 +1,5 @@
-import type { RefLabel } from '@ramal/bridge';
-import { Icon, useT } from '@ramal/ui';
+import type { RefLabel } from '@git-rudder/bridge';
+import { Icon, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import { refColor, refIcon, splitRefs } from '../graph/refs';

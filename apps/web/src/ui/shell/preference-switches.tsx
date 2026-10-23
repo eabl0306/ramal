@@ -1,4 +1,4 @@
-import { type SegmentOption, SegmentedControl, useLocale, useT } from '@ramal/ui';
+import { type SegmentOption, SegmentedControl, useLocale, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 

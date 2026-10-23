@@ -5,19 +5,19 @@
 
 ## Contexto
 
-Ramal cobra desde la primera version publica: las organizaciones, el equipo, los asientos y la
-facturacion entran en el MVP, y Ramal Pro es un plan por asiento de una organizacion
+Git Rudder cobra desde la primera version publica: las organizaciones, el equipo, los asientos y la
+facturacion entran en el MVP, y Git Rudder Pro es un plan por asiento de una organizacion
 ([ADR 0026](0026-planes-y-precios.md)). Hay que elegir con quien se cobra.
 
 Lo que condiciona la eleccion:
 
-- **Ramal lo lleva una sola persona** y vende a clientes de cualquier pais. Vender software por
+- **Git Rudder lo lleva una sola persona** y vende a clientes de cualquier pais. Vender software por
   suscripcion obliga a cobrar el IVA de la UE desde el primer euro vendido a un particular, el
   IVA del Reino Unido y el impuesto de ventas de cada estado de EE. UU. donde se pase el umbral.
 - Hay dos familias de proveedores. Un **comerciante registrado** (merchant of record, MoR) es el
-  vendedor ante el cliente: cobra, calcula, declara y paga los impuestos de cada pais, y a Ramal
+  vendedor ante el cliente: cobra, calcula, declara y paga los impuestos de cada pais, y a Git Rudder
   le paga lo que queda. Un **procesador** (Stripe con Stripe Billing y Stripe Tax) solo mueve el
-  dinero: el vendedor es Ramal y declarar es cosa suya.
+  dinero: el vendedor es Git Rudder y declarar es cosa suya.
 - **El pais desde el que factura Ezequiel no esta confirmado.** Se confirma al abrir la cuenta
   del proveedor. La eleccion tiene que valer para cualquier pais no sancionado.
 - El contrato ya tenia la forma de la facturacion (checkout, asientos con prorrateo, portal del
@@ -52,7 +52,7 @@ asi que cambiar de proveedor es escribir otro adaptador.
 
 ### El puerto `BillingProvider`
 
-Vive en `ramal-api-application`, como cualquier otro puerto
+Vive en `git-rudder-api-application`, como cualquier otro puerto
 ([ADR 0002](0002-arquitectura-hexagonal.md)). El nucleo habla de organizaciones, planes,
 asientos y estados de suscripcion, nunca de Paddle:
 
@@ -64,7 +64,7 @@ asientos y estados de suscripcion, nunca de Paddle:
 - `verify_webhook(cabeceras, cuerpo)`: comprueba la firma y traduce el evento a un hecho del
   dominio (suscripcion creada, actualizada, con pago atrasado, cancelada).
 
-`PaddleBillingProvider` lo implementa en `ramal-api-infrastructure` sobre la API de Paddle Billing
+`PaddleBillingProvider` lo implementa en `git-rudder-api-infrastructure` sobre la API de Paddle Billing
 con `reqwest`. Un adaptador falso sirve a los tests de los casos de uso. Polar, o Stripe el dia que
 compense, seria otro adaptador del mismo puerto.
 
@@ -76,7 +76,7 @@ compense, seria otro adaptador del mismo puerto.
   aplicado a esa suscripcion, porque los webhooks pueden llegar desordenados. La fuente de verdad
   del numero de asientos y del estado es Paddle; la API guarda la copia que le llega por aqui.
 - **El checkout es una pagina de la web.** La API devuelve una URL de
-  `https://ramal.bahoque.com` que carga Paddle.js y abre el pago de Paddle. **La CSP de la web se
+  `https://git-rudder.com` que carga Paddle.js y abre el pago de Paddle. **La CSP de la web se
   abre a los dominios de Paddle solo en esa pagina**: el resto de la web, con las paginas de
   autorizar una app y de activar un codigo, sigue sin cargar codigo de terceros. Desktop y
   VS Code abren esa pagina en el navegador del sistema y no tocan su CSP. La API nunca ve una
@@ -86,7 +86,7 @@ compense, seria otro adaptador del mismo puerto.
 - **Los ids de Paddle se guardan en la organizacion**: el del cliente y el de la suscripcion van en
   la fila de `subscriptions`, que es una por organizacion y tiene `organization_id` como clave
   primaria ([data-model.md](../data-model.md#f5-facturacion)).
-- **La prueba de 14 dias la lleva Ramal, no Paddle.** Al crear una organizacion la API apunta
+- **La prueba de 14 dias la lleva Git Rudder, no Paddle.** Al crear una organizacion la API apunta
   cuando acaba la prueba; mientras dura no hay nada en Paddle ni se pide tarjeta. Paddle entra en
   el checkout. Asi la prueba sin tarjeta no depende de lo que permita cada proveedor.
 - **E2E contra el sandbox de Paddle**, con sus tarjetas de prueba y un webhook de sandbox. Las
@@ -96,7 +96,7 @@ compense, seria otro adaptador del mismo puerto.
 
 Paddle revisa el dominio y el producto antes de activar los pagos. Pide una landing con precios,
 terminos del servicio, politica de privacidad y politica de reembolso publicados en
-`ramal.bahoque.com`. La aprobacion puede tardar dias, asi que la cuenta se abre en cuanto esas
+`git-rudder.com`. La aprobacion puede tardar dias, asi que la cuenta se abre en cuanto esas
 paginas existan. Al abrirla se confirma el pais y la forma (persona fisica o empresa) desde la que
 factura Ezequiel; segun el pais puede haber tramites locales (por ejemplo, inscribirse como
 exportador de servicios), que se consultan con un asesor fiscal y no cambian esta decision.
@@ -130,7 +130,7 @@ En contra:
 ## Alternativas descartadas
 
 **Stripe Billing con Stripe Tax (vender directamente).** Lo mas barato en cobros domesticos de
-EE. UU. y lo mas flexible, pero el vendedor es Ramal: Stripe Tax calcula, y declarar y pagar el IVA
+EE. UU. y lo mas flexible, pero el vendedor es Git Rudder: Stripe Tax calcula, y declarar y pagar el IVA
 de la UE, el del Reino Unido y el impuesto de ventas de EE. UU. es trabajo propio desde la primera
 venta a un particular. Ademas Stripe solo opera en algunos paises; desde muchos otros haria falta
 una sociedad en EE. UU. (Stripe Atlas) con sus declaraciones. Se revisa cuando haya una empresa en

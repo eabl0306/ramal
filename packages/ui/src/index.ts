@@ -1,4 +1,4 @@
-// API publica de @ramal/ui. Los juegos de iconos y los temas van en subrutas
+// API publica de @git-rudder/ui. Los juegos de iconos y los temas van en subrutas
 // propias (icons/lucide, icons/codicons, themes/*.css, themes/fonts) para que
 // cada host solo cargue lo suyo.
 

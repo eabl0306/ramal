@@ -2,7 +2,7 @@
 // de Playwright (Node que maneja un navegador) y los tests de integracion, que
 // corren con mocha dentro de un VS Code de verdad.
 {
-  "extends": "@ramal/tsconfig/base.json",
+  "extends": "@git-rudder/tsconfig/base.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

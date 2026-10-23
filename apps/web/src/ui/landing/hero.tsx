@@ -1,5 +1,5 @@
-import { type DetectedPlatform, highlightedDownloadOs } from '@ramal/domain';
-import { Button, useT } from '@ramal/ui';
+import { type DetectedPlatform, highlightedDownloadOs } from '@git-rudder/domain';
+import { Button, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import { recommendedFile } from '../../domain/downloads/recommend';

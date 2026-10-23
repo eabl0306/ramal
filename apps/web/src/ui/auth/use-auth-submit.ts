@@ -1,5 +1,5 @@
-import type { PlainKey } from '@ramal/i18n';
-import { useLocale, useT, useToast } from '@ramal/ui';
+import type { PlainKey } from '@git-rudder/i18n';
+import { useLocale, useT, useToast } from '@git-rudder/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 

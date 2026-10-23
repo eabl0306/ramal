@@ -1,4 +1,4 @@
-//! Host de Ramal Desktop sobre Tauri 2: adaptador driving del motor de Git y raiz
+//! Host de Git Rudder Desktop sobre Tauri 2: adaptador driving del motor de Git y raiz
 //! de composicion exterior del cliente de escritorio.
 //!
 //! El motor vive en este mismo proceso y el webview solo llega a el por el comando

@@ -1,6 +1,6 @@
 // Solucion del paquete: reune el codigo (tsconfig.lib.json, puro, sin DOM ni
 // Node) y los tests con el script generador (tsconfig.test.json). Las apps y
-// @ramal/ui referencian tsconfig.lib.json.
+// @git-rudder/ui referencian tsconfig.lib.json.
 {
   "files": [],
   "references": [{ "path": "./tsconfig.lib.json" }, { "path": "./tsconfig.test.json" }]

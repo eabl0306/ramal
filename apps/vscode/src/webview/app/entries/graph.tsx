@@ -6,7 +6,7 @@ import { vsCodeApi } from '../../infrastructure/vscode-api';
 import { GraphApp } from '../../ui/graph-app';
 
 /**
- * Entrada del webview `ramal.graph`. Pide el `init` al host y monta el grafo con
+ * Entrada del webview `gitRudder.graph`. Pide el `init` al host y monta el grafo con
  * el idioma y el repositorio que este le da; hasta entonces no pinta nada.
  */
 const root = document.getElementById('root');

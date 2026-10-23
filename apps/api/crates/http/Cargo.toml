@@ -1,5 +1,5 @@
 [package]
-name = "ramal-api-http"
+name = "git-rudder-api-http"
 description = "Adaptador HTTP de la API con Salvo: rutas, handlers, DTOs y OpenAPI."
 version.workspace = true
 edition.workspace = true
@@ -8,8 +8,8 @@ publish.workspace = true
 license.workspace = true
 
 [dependencies]
-ramal-api-application = { workspace = true }
-ramal-api-domain = { workspace = true }
+git-rudder-api-application = { workspace = true }
+git-rudder-api-domain = { workspace = true }
 salvo = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -21,7 +21,7 @@ tracing = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
-ramal-api-application = { workspace = true, features = ["testing"] }
+git-rudder-api-application = { workspace = true, features = ["testing"] }
 
 [lints]
 workspace = true

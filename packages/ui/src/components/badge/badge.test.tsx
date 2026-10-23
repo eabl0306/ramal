@@ -24,7 +24,7 @@ describe('PlatformBadge', () => {
 });
 
 describe('PrStateBadge', () => {
-  it('traduce el estado con @ramal/i18n', () => {
+  it('traduce el estado con @git-rudder/i18n', () => {
     renderWithProviders(<PrStateBadge state="changes" />);
     expect(screen.getByText('Cambios solicitados')).toHaveAttribute('data-pr-state', 'changes');
   });

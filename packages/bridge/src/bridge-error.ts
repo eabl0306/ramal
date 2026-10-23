@@ -3,7 +3,7 @@ import type { ErrorKind, RpcError } from './generated';
 /**
  * Tipo de error que ve la interfaz: el `ErrorKind` cerrado del motor mas los tres
  * que anaden el puente y el extension host. La interfaz traduce cada uno con
- * `@ramal/i18n`; el `message` es solo para el log.
+ * `@git-rudder/i18n`; el `message` es solo para el log.
  */
 export type BridgeErrorKind = ErrorKind | 'transport' | 'timeout' | 'engine_unavailable';
 

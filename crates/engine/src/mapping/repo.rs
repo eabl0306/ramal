@@ -1,8 +1,8 @@
 //! `OpenedRepository` -> `RepoHandle`.
 
-use ramal_core_application::OpenedRepository;
-use ramal_core_domain::Sha;
-use ramal_protocol::repo as dto;
+use git_rudder_core_application::OpenedRepository;
+use git_rudder_core_domain::Sha;
+use git_rudder_protocol::repo as dto;
 
 /// Repositorio abierto tal como lo ve el host.
 #[must_use]

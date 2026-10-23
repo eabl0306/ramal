@@ -1,4 +1,4 @@
-import { useT, useToast } from '@ramal/ui';
+import { useT, useToast } from '@git-rudder/ui';
 
 import type { DownloadFile } from '../../domain/downloads/release';
 import { useUiPorts } from '../ports/ui-ports';

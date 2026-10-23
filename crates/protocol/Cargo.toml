@@ -1,5 +1,5 @@
 [package]
-name = "ramal-protocol"
+name = "git-rudder-protocol"
 description = "Contrato del motor: metodos, DTOs y sobre JSON-RPC, exportados a TypeScript con ts-rs."
 version.workspace = true
 edition.workspace = true

@@ -23,8 +23,8 @@ use std::collections::BTreeMap;
 use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 
-use ramal_protocol::methods::{MethodVisitor, PROTOCOL_VERSION, RpcMethod, visit_methods};
-use ramal_protocol::{RpcNotification, RpcRequest, RpcResponse};
+use git_rudder_protocol::methods::{MethodVisitor, PROTOCOL_VERSION, RpcMethod, visit_methods};
+use git_rudder_protocol::{RpcNotification, RpcRequest, RpcResponse};
 use ts_rs::{Config, TS, TypeVisitor};
 
 const NOTE: &str = "// Generado por crates/protocol/tests/export_bindings.rs (just protocol-gen). \

@@ -1,6 +1,6 @@
 /**
  * Preferencias de presentacion que la web recuerda en el navegador: idioma y
- * tema. Los idiomas son los mismos que los de @ramal/i18n, que la capa de
+ * tema. Los idiomas son los mismos que los de @git-rudder/i18n, que la capa de
  * aplicacion no puede importar (architecture.md 5.2), por eso se nombran aqui.
  */
 

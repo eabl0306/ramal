@@ -1,7 +1,7 @@
 # Arquitectura
 
-Ramal son tres productos que comparten una cuenta: Ramal Desktop, Ramal for VS Code y
-Ramal Web. Por debajo hay cinco piezas de codigo con vida propia: la API (Rust, Salvo,
+Git Rudder son tres productos que comparten una cuenta: Git Rudder Desktop, Git Rudder for VS Code y
+Git Rudder Web. Por debajo hay cinco piezas de codigo con vida propia: la API (Rust, Salvo,
 PostgreSQL), el motor Git del cliente (Rust, compartido por escritorio y VS Code), el host
 de escritorio (Tauri 2 con React), la extension de VS Code (extension host en TypeScript,
 webviews en React y el motor empaquetado como sidecar) y la web (React Router). Este
@@ -30,16 +30,16 @@ esta en la [seccion 10](#10-primer-corte-y-lo-planificado).
 No se reabren aqui: cada una tiene o tendra su ADR. Se listan porque condicionan la forma
 de todo lo demas.
 
-| Decision                                                        | Lo que implica para la arquitectura                                                                                                                                                                                                                                                                                                                                           |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Un solo motor Git en Rust                                       | Desktop lo usa en proceso desde el host de Tauri. VS Code lo lleva como binario sidecar `ramal-vscode-engine` (JSON-RPC por stdio) dentro de VSIX por plataforma, el modelo de rust-analyzer. El extension host se queda fino.                                                                                                                                                |
-| Motor hibrido, primero el git CLI                               | Todo va por el git CLI: escrituras, red, hooks, firma, LFS y credenciales. `gix` entra mas tarde y solo en lecturas calientes, detras del mismo puerto y cuando un benchmark lo justifique. Nada de libgit2 ni `git2`. Git minimo 2.34 con deteccion de capacidades.                                                                                                          |
-| Secretos de cuentas de plataforma cifrados de extremo a extremo | El servidor nunca puede descifrarlos. No existen cuentas de plataforma compartidas con el equipo. La web no puede "probar conexion": solo ve metadatos y puede quitar una cuenta. Anadir o editar un token se hace en Desktop o en VS Code. Las llaves de IA personales, si el usuario activa su sincronizacion (apagada por defecto), usan la misma boveda.                  |
-| Llaves de IA de organizacion en el servidor                     | Cifradas en reposo con cifrado de sobre (AES-256-GCM, KEK con identificador para rotar). Nunca salen del servidor: la API hace de proxy de la generacion. Las llaves personales se llaman desde el motor del dispositivo, que es la unica forma de que funcione Ollama.                                                                                                       |
-| Funciona sin cuenta de Ramal                                    | Todo lo que es Git local funciona sin iniciar sesion. Sincronizacion, equipos, llaves de IA de organizacion, dispositivos y el panel web piden sesion.                                                                                                                                                                                                                        |
-| Gratis para cada persona, de pago para los equipos              | Todo lo personal es gratis, sincronizacion incluida. Ramal Pro es el plan de una organizacion por asiento, cobrado con Paddle detras del puerto `BillingProvider`. Equipos, IA de organizacion y facturacion salen en la primera version publica ([ADR 0026](adr/0026-planes-y-precios.md), [ADR 0022](adr/0022-proveedor-de-pagos.md)).                                      |
-| Monorepo pnpm + un workspace de Cargo + just                    | pnpm 11.18.0 por corepack con versiones exactas, un unico `Cargo.toml` raiz (resolver 3, edicion 2024, Rust 1.99.1 fijado en `rust-toolchain.toml`), `just` como punto de entrada unico, lefthook y commitlint. Sin Turborepo ni Nx. El crate de Tauri es miembro del workspace pero no esta en `default-members`, para que `cargo` funcione en maquinas sin webkit2gtk.      |
-| Web y API en el mismo origen                                    | Un gateway sirve la web estatica y enruta los prefijos de la API. La API no envia CORS. Desktop y VS Code nunca llaman a la API desde el webview: lo hace el motor en Rust. En produccion la web esta en `ramal.bahoque.com` (con la API bajo su mismo origen) y los clientes nativos usan `api.ramal.bahoque.com` ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)). |
+| Decision                                                        | Lo que implica para la arquitectura                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Un solo motor Git en Rust                                       | Desktop lo usa en proceso desde el host de Tauri. VS Code lo lleva como binario sidecar `git-rudder-vscode-engine` (JSON-RPC por stdio) dentro de VSIX por plataforma, el modelo de rust-analyzer. El extension host se queda fino.                                                                                                                                      |
+| Motor hibrido, primero el git CLI                               | Todo va por el git CLI: escrituras, red, hooks, firma, LFS y credenciales. `gix` entra mas tarde y solo en lecturas calientes, detras del mismo puerto y cuando un benchmark lo justifique. Nada de libgit2 ni `git2`. Git minimo 2.34 con deteccion de capacidades.                                                                                                     |
+| Secretos de cuentas de plataforma cifrados de extremo a extremo | El servidor nunca puede descifrarlos. No existen cuentas de plataforma compartidas con el equipo. La web no puede "probar conexion": solo ve metadatos y puede quitar una cuenta. Anadir o editar un token se hace en Desktop o en VS Code. Las llaves de IA personales, si el usuario activa su sincronizacion (apagada por defecto), usan la misma boveda.             |
+| Llaves de IA de organizacion en el servidor                     | Cifradas en reposo con cifrado de sobre (AES-256-GCM, KEK con identificador para rotar). Nunca salen del servidor: la API hace de proxy de la generacion. Las llaves personales se llaman desde el motor del dispositivo, que es la unica forma de que funcione Ollama.                                                                                                  |
+| Funciona sin cuenta de Git Rudder                               | Todo lo que es Git local funciona sin iniciar sesion. Sincronizacion, equipos, llaves de IA de organizacion, dispositivos y el panel web piden sesion.                                                                                                                                                                                                                   |
+| Gratis para cada persona, de pago para los equipos              | Todo lo personal es gratis, sincronizacion incluida. Git Rudder Pro es el plan de una organizacion por asiento, cobrado con Paddle detras del puerto `BillingProvider`. Equipos, IA de organizacion y facturacion salen en la primera version publica ([ADR 0026](adr/0026-planes-y-precios.md), [ADR 0022](adr/0022-proveedor-de-pagos.md)).                            |
+| Monorepo pnpm + un workspace de Cargo + just                    | pnpm 11.18.0 por corepack con versiones exactas, un unico `Cargo.toml` raiz (resolver 3, edicion 2024, Rust 1.99.1 fijado en `rust-toolchain.toml`), `just` como punto de entrada unico, lefthook y commitlint. Sin Turborepo ni Nx. El crate de Tauri es miembro del workspace pero no esta en `default-members`, para que `cargo` funcione en maquinas sin webkit2gtk. |
+| Web y API en el mismo origen                                    | Un gateway sirve la web estatica y enruta los prefijos de la API. La API no envia CORS. Desktop y VS Code nunca llaman a la API desde el webview: lo hace el motor en Rust. En produccion la web esta en `git-rudder.com` (con la API bajo su mismo origen) y los clientes nativos usan `api.git-rudder.com` ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)).  |
 
 ## 1. La idea en un parrafo
 
@@ -49,54 +49,54 @@ Cuando necesita algo de fuera declara una interfaz, que es el puerto. Quien sabe
 el exterior implementa ese puerto, y eso es el adaptador. La direccion de las dependencias
 siempre apunta hacia dentro: el nucleo no importa a nadie.
 
-Ramal tiene tres familias de hexagonos, y conviene tenerlas separadas en la cabeza:
+Git Rudder tiene tres familias de hexagonos, y conviene tenerlas separadas en la cabeza:
 
-- **El hexagono del servidor** (`apps/api`). Su nucleo es `ramal-api-domain` mas
-  `ramal-api-application`: cuentas, sesiones, organizaciones, documentos sincronizados,
+- **El hexagono del servidor** (`apps/api`). Su nucleo es `git-rudder-api-domain` mas
+  `git-rudder-api-application`: cuentas, sesiones, organizaciones, documentos sincronizados,
   boveda opaca, llaves de IA de organizacion.
-- **El hexagono del cliente** (`crates/*`). Su nucleo es `ramal-core-domain` mas
-  `ramal-core-application`: commits, refs, estado del arbol de trabajo, disposicion del
+- **El hexagono del cliente** (`crates/*`). Su nucleo es `git-rudder-core-domain` mas
+  `git-rudder-core-application`: commits, refs, estado del arbol de trabajo, disposicion del
   grafo, conflictos, rebase, y mas adelante cuentas de plataforma, IA personal y
   sincronizacion. Lo usan dos hosts, el de Tauri y el sidecar de VS Code, y los dos entran
-  por la misma funcion de `ramal-engine`. Por eso el protocolo es identico en ambos
+  por la misma funcion de `git-rudder-engine`. Por eso el protocolo es identico en ambos
   productos.
 - **Los hexagonos de TypeScript.** La web sigue el molde de Gastonomo (cinco carpetas). El
   extension host de VS Code tiene nucleo propio porque orquesta cosas de VS Code (webviews,
   proceso del sidecar, idioma). Los frontends de escritorio y los webviews son casi solo
   adaptadores driving: sus casos de uso viven en el motor de Rust, y la logica pura de
   estado de interfaz (resolver de conflictos interactivo, editor de rebase, filtros) vive en
-  el paquete `@ramal/domain`.
+  el paquete `@git-rudder/domain`.
 
 Los dos nucleos de Rust no se conocen. No hay conceptos de negocio que compartan de verdad:
 el servidor nunca ve un commit y el cliente no gestiona organizaciones. Lo unico que cruzara
 de un hexagono a otro son bibliotecas neutrales que no dependen de ninguno de los dos (la
-unica prevista es `ramal-ai`, planificada), y el contrato HTTP, que cada lado modela con sus
+unica prevista es `git-rudder-ai`, planificada), y el contrato HTTP, que cada lado modela con sus
 propios tipos.
 
 ## 2. Mapa del sistema
 
 ```mermaid
 flowchart LR
-    subgraph desk["Ramal Desktop (un proceso)"]
-        dweb["Webview React<br/>@ramal/repo-view + @ramal/bridge"]
-        dhost["Host Tauri<br/>ramal-desktop"]
-        deng["ramal-engine<br/>en proceso"]
+    subgraph desk["Git Rudder Desktop (un proceso)"]
+        dweb["Webview React<br/>@git-rudder/repo-view + @git-rudder/bridge"]
+        dhost["Host Tauri<br/>git-rudder-desktop"]
+        deng["git-rudder-engine<br/>en proceso"]
         dweb -->|"invoke rpc"| dhost --> deng
     end
 
-    subgraph vsc["Ramal for VS Code"]
-        vweb["Webviews React<br/>@ramal/repo-view + @ramal/bridge"]
+    subgraph vsc["Git Rudder for VS Code"]
+        vweb["Webviews React<br/>@git-rudder/repo-view + @git-rudder/bridge"]
         vhost["Extension host Node<br/>apps/vscode"]
-        vside["Proceso hijo<br/>ramal-vscode-engine"]
+        vside["Proceso hijo<br/>git-rudder-vscode-engine"]
         vweb -->|"postMessage"| vhost -->|"JSON-RPC por stdio"| vside
     end
 
     subgraph browser["Navegador"]
-        web["Ramal Web<br/>React Router"]
+        web["Git Rudder Web<br/>React Router"]
     end
 
     gw["Gateway<br/>mismo origen"]
-    api["ramal-api<br/>Salvo"]
+    api["git-rudder-api<br/>Salvo"]
     pg[("PostgreSQL")]
     git["git CLI 2.34 o mas"]
     keys["Llavero del SO<br/>o SecretStorage"]
@@ -117,20 +117,20 @@ flowchart LR
     api -.->|"solo llaves de organizacion"| llm
 ```
 
-| Proceso                   | Que corre dentro                                                                                               | Con quien habla                                                                                                                                                                         |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ramal Desktop             | Un proceso de Tauri: el webview (React) y el host Rust `ramal-desktop`, que contiene `ramal-engine` en proceso | git CLI (procesos hijos), llavero del SO, APIs de plataformas, proveedores de IA, Ramal API                                                                                             |
-| Extension host de VS Code | Node, el bundle `apps/vscode/dist/extension.cjs`                                                               | API de VS Code, sus webviews (postMessage), el sidecar (stdio)                                                                                                                          |
-| Webviews de VS Code       | React, un webview por superficie (grafo, cambios, merge, ajustes)                                              | Solo el extension host: su CSP lleva `connect-src 'none'`                                                                                                                               |
-| Sidecar de VS Code        | `ramal-vscode-engine`, que contiene `ramal-engine`                                                             | git CLI, APIs de plataformas, proveedores de IA, Ramal API; SecretStorage a traves del extension host                                                                                   |
-| Navegador                 | Ramal Web: landing prerenderizada mas SPA                                                                      | Gateway del mismo origen                                                                                                                                                                |
-| Servidor                  | Gateway (nginx), `ramal-api`, PostgreSQL, en la instancia compartida `apps-01` detras de su Caddy              | Proveedores OAuth de inicio de sesion, correo (Resend por SMTP), Paddle (facturacion), proveedores de IA (solo llaves de organizacion), Bitbucket (solo el intercambio de codigo OAuth) |
+| Proceso                   | Que corre dentro                                                                                                         | Con quien habla                                                                                                                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Git Rudder Desktop        | Un proceso de Tauri: el webview (React) y el host Rust `git-rudder-desktop`, que contiene `git-rudder-engine` en proceso | git CLI (procesos hijos), llavero del SO, APIs de plataformas, proveedores de IA, Git Rudder API                                                                                        |
+| Extension host de VS Code | Node, el bundle `apps/vscode/dist/extension.cjs`                                                                         | API de VS Code, sus webviews (postMessage), el sidecar (stdio)                                                                                                                          |
+| Webviews de VS Code       | React, un webview por superficie (grafo, cambios, merge, ajustes)                                                        | Solo el extension host: su CSP lleva `connect-src 'none'`                                                                                                                               |
+| Sidecar de VS Code        | `git-rudder-vscode-engine`, que contiene `git-rudder-engine`                                                             | git CLI, APIs de plataformas, proveedores de IA, Git Rudder API; SecretStorage a traves del extension host                                                                              |
+| Navegador                 | Git Rudder Web: landing prerenderizada mas SPA                                                                           | Gateway del mismo origen                                                                                                                                                                |
+| Servidor                  | Gateway (nginx), `git-rudder-api`, PostgreSQL, en la instancia compartida `apps-01` detras de su Caddy                   | Proveedores OAuth de inicio de sesion, correo (Resend por SMTP), Paddle (facturacion), proveedores de IA (solo llaves de organizacion), Bitbucket (solo el intercambio de codigo OAuth) |
 
 **Donde corre la nube** ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)). En `apps-01`, la
 instancia de Lightsail que ya sirve Gastonomo y Grimdex, con su propio proyecto de compose, su
-PostgreSQL y su `.env`. Caddy termina TLS para `ramal.bahoque.com` (la web, con la API bajo su
-mismo origen) y `api.ramal.bahoque.com` (la API para los motores, el actualizador, la CI y los
-webhooks), y manda los dos al gateway de Ramal. Las imagenes se construyen en la CI, se despliegan
+PostgreSQL y su `.env`. Caddy termina TLS para `git-rudder.com` (la web, con la API bajo su
+mismo origen) y `api.git-rudder.com` (la API para los motores, el actualizador, la CI y los
+webhooks), y manda los dos al gateway de Git Rudder. Las imagenes se construyen en la CI, se despliegan
 por el SHA del commit y vuelven solas a la anterior si la comprobacion desde fuera falla. El correo
 sale por Resend ([ADR 0024](adr/0024-correo-transaccional-con-resend.md)).
 
@@ -140,7 +140,7 @@ Primeros dos o tres niveles, una linea por entrada. Lo marcado con `(plan)` no e
 primer corte pero ya tiene sitio reservado, para que nadie lo invente en otro lugar.
 
 ```
-Cargo.toml                  Workspace unico: members, default-members (sin ramal-desktop), dependencias y lints comunes
+Cargo.toml                  Workspace unico: members, default-members (sin git-rudder-desktop), dependencias y lints comunes
 Cargo.lock                  Un solo lockfile de Rust; lo leen los tests de arquitectura
 rust-toolchain.toml         Rust 1.99.1 fijado, con clippy, rustfmt y llvm-tools-preview
 clippy.toml                 Umbrales comunes: cognitiva 15, 50 lineas, 5 parametros, anidamiento 4
@@ -157,7 +157,7 @@ lefthook.yml                pre-commit rapido, pre-push caro, commit-msg con com
 commitlint.config.mjs
 .editorconfig  .prettierrc.json  .prettierignore  .gitignore  .gitattributes  .nvmrc
 stylelint.config.mjs  knip.json  .dockerignore
-.env.example                Variables RAMAL__ de la API con sus valores por defecto
+.env.example                Variables GIT_RUDDER__ de la API con sus valores por defecto
 compose.yaml                Pila de desarrollo: postgres y, con el perfil full, api, web, gateway y mailpit
 docker/                     gateway.dev.conf: un location por prefijo de la API; (plan) gateway.prod.conf
 .github/workflows/          ci.yml (unica entrada y check all-green) y un workflow por pieza
@@ -168,34 +168,34 @@ docs/
     data-model.md           Modelo de datos de la API
     backlog.md              Epicas e issues, con el hito de cada una
     adr/                    Decisiones, NNNN-slug-en-castellano.md
-    design/handoff/         Diseno: prototipos *.dc.html, ramal-data.js y README
+    design/handoff/         Diseno: prototipos *.dc.html, git-rudder-data.js y README
     design/gaps.md          Huecos del diseno y lo que cambia cada uno
 apps/
-    api/                    Ramal API: Salvo 1.x + PostgreSQL (SQLx)
-        crates/domain/          ramal-api-domain: entidades y reglas del servidor
-        crates/application/     ramal-api-application: puertos, casos de uso y fakes (feature testing)
-        crates/infrastructure/  ramal-api-infrastructure: config, telemetria, SQLx y reloj; (plan) cifrado, correo, OAuth
-        crates/http/            ramal-api-http: router, handlers, DTOs, problem+json, OpenAPI
-        crates/api/             ramal-api: binario; composition root en src/bootstrap.rs + src/bootstrap/
+    api/                    Git Rudder API: Salvo 1.x + PostgreSQL (SQLx)
+        crates/domain/          git-rudder-api-domain: entidades y reglas del servidor
+        crates/application/     git-rudder-api-application: puertos, casos de uso y fakes (feature testing)
+        crates/infrastructure/  git-rudder-api-infrastructure: config, telemetria, SQLx y reloj; (plan) cifrado, correo, OAuth
+        crates/http/            git-rudder-api-http: router, handlers, DTOs, problem+json, OpenAPI
+        crates/api/             git-rudder-api: binario; composition root en src/bootstrap.rs + src/bootstrap/
         migrations/             SQL solo hacia delante, aplicado al arrancar en segundo plano
-        openapi.json            Documento OpenAPI versionado; fuente de @ramal/api-client
+        openapi.json            Documento OpenAPI versionado; fuente de @git-rudder/api-client
         Dockerfile  Dockerfile.dev
         scripts/smoke-image.sh  Arranca la imagen de produccion y la prueba
-    desktop/                Ramal Desktop (paquete @ramal/desktop)
+    desktop/                Git Rudder Desktop (paquete @git-rudder/desktop)
         src/application/        Puertos del host (RepositoryPicker, AppearanceStore) y el modelo de pestanas
         src/infrastructure/     TauriTransport, el selector sobre repo_pick_and_open y localStorage
         src/ui/                 Pantallas propias: barra de titulo con pestanas, inicio y vista del repositorio
         src/app/                Composition root, providers y entrada
         e2e/                    Playwright contra el build de Vite con mockIPC
         wdio/  wdio.conf.ts     E2E nativo con WebdriverIO y @wdio/tauri-service contra la app real
-        src-tauri/              Crate ramal-desktop, el host Tauri
+        src-tauri/              Crate git-rudder-desktop, el host Tauri
             Cargo.toml              Fuera de default-members; feature e2e para el E2E nativo
             build.rs                tauri-build con AppManifest (permiso explicito por comando)
             tauri.conf.json         Ventana, CSP, bundle y (plan) updater
             capabilities/           Permisos minimos: solo rpc y repo_pick_and_open
             src/                    lib.rs, main.rs, bootstrap.rs, commands.rs, surfaces.rs, picker.rs
             tests/                  tauri::test sobre el runtime simulado
-    vscode/                 Ramal for VS Code (paquete ramal, extension ramal.ramal)
+    vscode/                 Git Rudder for VS Code (paquete git-rudder, extension git-rudder.git-rudder)
         package.json            Manifiesto: contributes, activationEvents, engines.vscode
         package.nls.json  package.nls.es.json   Textos del manifiesto (ingles por defecto, espanol)
         src/shared/             Tipos de los mensajes entre webview y extension host, sin dependencias
@@ -209,40 +209,40 @@ apps/
             app/                    Una entrada por superficie: graph; (plan) changes, merge, settings
         test/integration/       @vscode/test-cli (bajo xvfb en Linux sin pantalla)
         e2e/                    Playwright contra el bundle de webviews con acquireVsCodeApi falso
-        dist/                   Artefactos: extension.cjs, webview/, bin/ramal-vscode-engine (ignorado en git)
-    vscode-engine/          Crate ramal-vscode-engine: sidecar JSON-RPC 2.0 por stdio
+        dist/                   Artefactos: extension.cjs, webview/, bin/git-rudder-vscode-engine (ignorado en git)
+    vscode-engine/          Crate git-rudder-vscode-engine: sidecar JSON-RPC 2.0 por stdio
         src/                    main.rs, lib.rs, args.rs, bootstrap.rs, framing.rs, message.rs, server.rs
-    web/                    Ramal Web (paquete @ramal/web)
+    web/                    Git Rudder Web (paquete @git-rudder/web)
         react-router.config.ts  appDirectory src/app, ssr false, prerender de la landing
-        src/domain/             Modelos propios de la web (salud, preferencias, descargas); sin imports externos salvo @ramal/domain
+        src/domain/             Modelos propios de la web (salud, preferencias, descargas); sin imports externos salvo @git-rudder/domain
         src/application/        Puertos (AuthGateway, HealthGateway, PreferencesStore, ReleaseCatalog...) y casos de uso
-        src/infrastructure/     HTTP sobre @ramal/api-client, navegador, localStorage y datos fijos de descarga
+        src/infrastructure/     HTTP sobre @git-rudder/api-client, navegador, localStorage y datos fijos de descarga
         src/ui/                 Componentes y pantallas; reciben los puertos por contexto
         src/app/                root.tsx, routes.ts, routes/, composition-root.ts
         e2e/                    Playwright con red simulada y, aparte, contra la pila Docker
 crates/
-    core-domain/            ramal-core-domain: dominio puro del cliente (commits, refs, grafo; luego conflictos y rebase)
-    core-application/       ramal-core-application: puertos, casos de uso y fakes en el modulo testing
-    protocol/               ramal-protocol: metodos y DTOs del motor (serde + ts-rs), sin logica
-    git/                    ramal-git: adaptador del git CLI (GitCliReader; GitWriter despues)
-    engine/                 ramal-engine: dispatch, mapeo dominio-DTO y composition root del cliente
-    vault/                  (plan) ramal-vault: criptografia de la boveda E2E
-    keychain/               (plan) ramal-keychain: SecretStore sobre keyring-core
-    platforms/              (plan) ramal-platforms: GitHub, GitLab, Bitbucket, Gitea, Azure DevOps
-    ai/                     (plan) ramal-ai: proveedores, plantillas y filtro de ficheros sensibles
-    cloud-client/           (plan) ramal-cloud-client: cliente de la Ramal API para el motor
+    core-domain/            git-rudder-core-domain: dominio puro del cliente (commits, refs, grafo; luego conflictos y rebase)
+    core-application/       git-rudder-core-application: puertos, casos de uso y fakes en el modulo testing
+    protocol/               git-rudder-protocol: metodos y DTOs del motor (serde + ts-rs), sin logica
+    git/                    git-rudder-git: adaptador del git CLI (GitCliReader; GitWriter despues)
+    engine/                 git-rudder-engine: dispatch, mapeo dominio-DTO y composition root del cliente
+    vault/                  (plan) git-rudder-vault: criptografia de la boveda E2E
+    keychain/               (plan) git-rudder-keychain: SecretStore sobre keyring-core
+    platforms/              (plan) git-rudder-platforms: GitHub, GitLab, Bitbucket, Gitea, Azure DevOps
+    ai/                     (plan) git-rudder-ai: proveedores, plantillas y filtro de ficheros sensibles
+    cloud-client/           (plan) git-rudder-cloud-client: cliente de la Git Rudder API para el motor
 packages/
-    domain/                 @ramal/domain: logica pura de estado de interfaz, cero dependencias
-    i18n/                   @ramal/i18n: diccionario ES/EN con claves tipadas, cero dependencias
-    ui/                     @ramal/ui: tokens, temas, densidades, primitivas, proveedor de iconos
-    repo-view/              @ramal/repo-view: vista de repositorio compartida por escritorio y VS Code
-    bridge/                 @ramal/bridge: tipos generados del protocolo y cliente tipado sobre Transport
-    api-client/             @ramal/api-client: cliente generado del OpenAPI de la API, solo para la web
-    eslint-config/          @ramal/eslint-config: base, calidad, React, tests y boundaries
-    tsconfig/               @ramal/tsconfig: base.json, library.json, react.json, node.json
+    domain/                 @git-rudder/domain: logica pura de estado de interfaz, cero dependencias
+    i18n/                   @git-rudder/i18n: diccionario ES/EN con claves tipadas, cero dependencias
+    ui/                     @git-rudder/ui: tokens, temas, densidades, primitivas, proveedor de iconos
+    repo-view/              @git-rudder/repo-view: vista de repositorio compartida por escritorio y VS Code
+    bridge/                 @git-rudder/bridge: tipos generados del protocolo y cliente tipado sobre Transport
+    api-client/             @git-rudder/api-client: cliente generado del OpenAPI de la API, solo para la web
+    eslint-config/          @git-rudder/eslint-config: base, calidad, React, tests y boundaries
+    tsconfig/               @git-rudder/tsconfig: base.json, library.json, react.json, node.json
 tools/
-    checks/                 @ramal/checks: las reglas comunes a todos los lenguajes (ver 5.3), Node sin dependencias
-    rust-complexity/        ramal-rust-complexity: cognitiva y ciclomatica de cada funcion de Rust (syn)
+    checks/                 @git-rudder/checks: las reglas comunes a todos los lenguajes (ver 5.3), Node sin dependencias
+    rust-complexity/        git-rudder-rust-complexity: cognitiva y ciclomatica de cada funcion de Rust (syn)
     docker/                 tauri-linux.Dockerfile: Ubuntu 22.04 con los requisitos de Tauri
     scripts/                scan-staged.sh y smoke-stack.sh
 ```
@@ -255,14 +255,14 @@ Convenciones que valen en todo el arbol:
   sin `mod.rs` salvo `tests/support/mod.rs`), docs `//!` y `///` en castellano, mensajes de
   `Display` y de `tracing` en ingles. Los tests unitarios van en su propio fichero
   (`#[cfg(test)] mod tests;` mas `<modulo>/tests.rs`), nunca en linea.
-- Nombres: paquetes npm `@ramal/*`, crates `ramal-*`, variables de entorno de la API con
-  prefijo `RAMAL__`, tickets `RAM-123`.
+- Nombres: paquetes npm `@git-rudder/*`, crates `git-rudder-*`, variables de entorno de la API con
+  prefijo `GIT_RUDDER__`, tickets `RAM-123`.
 
 ## 4. Los hexagonos, pieza por pieza
 
 ### 4.1 Vocabulario
 
-| Termino           | Que es en Ramal                                                                  | Regla que no se negocia                                                                                        |
+| Termino           | Que es en Git Rudder                                                             | Regla que no se negocia                                                                                        |
 | ----------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Dominio           | Tipos y reglas puras                                                             | Sin IO, sin reloj, sin aleatoriedad, sin serde                                                                 |
 | Puerto            | Un trait de Rust o una interface de TypeScript que declara la capa de aplicacion | Lo consume un caso de uso y lo implementa un adaptador driven                                                  |
@@ -276,21 +276,21 @@ Convenciones que valen en todo el arbol:
 ```mermaid
 flowchart LR
     subgraph driving["Driving"]
-        disp["ramal-engine<br/>dispatch por area"]
+        disp["git-rudder-engine<br/>dispatch por area"]
     end
     subgraph core["Nucleo del cliente"]
-        uc["ramal-core-application<br/>casos de uso"]
+        uc["git-rudder-core-application<br/>casos de uso"]
         port["Puertos<br/>GitReader, GitWriter, SecretStore,<br/>CloudClient, PlatformClient, AiClient, Clock"]
-        dom["ramal-core-domain<br/>Commit, Ref, grafo, conflicto, rebase"]
+        dom["git-rudder-core-domain<br/>Commit, Ref, grafo, conflicto, rebase"]
         uc --> dom
         uc --> port
     end
     subgraph driven["Driven"]
-        gitc["ramal-git<br/>GitCliReader"]
-        plan["plan: ramal-keychain, ramal-vault,<br/>ramal-platforms, ramal-cloud-client,<br/>adaptador de ramal-ai"]
+        gitc["git-rudder-git<br/>GitCliReader"]
+        plan["plan: git-rudder-keychain, git-rudder-vault,<br/>git-rudder-platforms, git-rudder-cloud-client,<br/>adaptador de git-rudder-ai"]
         fake["Fakes del modulo testing"]
     end
-    hosts["Hosts: ramal-desktop<br/>y ramal-vscode-engine"] --> disp
+    hosts["Hosts: git-rudder-desktop<br/>y git-rudder-vscode-engine"] --> disp
     disp --> uc
     port -.->|"implementado por"| gitc
     port -.->|"implementado por"| plan
@@ -298,10 +298,10 @@ flowchart LR
     gitc --> gitcli["git CLI"]
 ```
 
-#### ramal-core-domain
+#### git-rudder-core-domain
 
 Dominio puro del cliente. Depende solo de `thiserror`. No lleva serde: el dominio no sabe
-que existe JSON, y la forma del JSON la decide `ramal-protocol`.
+que existe JSON, y la forma del JSON la decide `git-rudder-protocol`.
 
 ```
 src/sha.rs            Sha (40 hex validado) y la forma corta que da git (%h)
@@ -321,7 +321,7 @@ src/graph/window.rs   Recorte de la disposicion a una ventana [offset, offset + 
 (plan) ref_format.rs  Validacion de nombres de rama y tag (reglas de git check-ref-format)
 ```
 
-El algoritmo de carriles corrige el del ejemplo `DIFF` de `ramal-data.js`, que pierde huecos
+El algoritmo de carriles corrige el del ejemplo `DIFF` de `git-rudder-data.js`, que pierde huecos
 y no reproduce el diseno: puntas fijadas al principio (la rama por defecto primero), el primer
 padre hereda el hueco, un hueco solo se reutiliza cuando queda libre, los padres extra de un
 merge ocupan el primer hueco libre, y se recortan los huecos vacios del final. Ademas cada arista guarda el carril por el
@@ -336,9 +336,9 @@ antes del primer pintado. El motor calcula la disposicion y devuelve solo la ven
 con carriles y aristas ya resueltos. En VS Code, ademas, es la unica opcion coherente con un
 motor unico.
 
-#### ramal-core-application
+#### git-rudder-core-application
 
-Puertos, casos de uso y estado del motor. Depende de `ramal-core-domain`, `async-trait` y
+Puertos, casos de uso y estado del motor. Depende de `git-rudder-core-domain`, `async-trait` y
 `thiserror`. No depende de tokio: los puertos son asincronos con `#[async_trait]` y
 `Send + Sync`, y quien los ejecuta es el runtime del host.
 
@@ -347,7 +347,7 @@ src/port.rs                           Declaracion de modulos de puertos
 src/port/git_reader.rs                GitReader (primer corte)
 (plan) src/port/git_writer.rs         GitWriter: todo lo que escribe o toca la red
 (plan) src/port/secret_store.rs       SecretStore: llavero o SecretStorage
-(plan) src/port/cloud_client.rs       CloudClient: Ramal API
+(plan) src/port/cloud_client.rs       CloudClient: Git Rudder API
 (plan) src/port/platform_client.rs    PlatformClient: PRs, checks, reviews, OAuth de dispositivo
 (plan) src/port/ai_client.rs          AiClient: generacion con llave personal
 (plan) src/port/vault_cipher.rs       VaultCipher: derivar, envolver, sellar y abrir
@@ -396,13 +396,13 @@ El git minimo (2.34) se aplica en `OpenRepository`, antes de tocar un repositori
 no falla con un git viejo: lo informa con `supported: false` para que la interfaz explique que
 hacer.
 
-#### ramal-protocol
+#### git-rudder-protocol
 
 El contrato entre la interfaz y el motor: nombres de metodo, DTOs de parametros y
 resultados, y el sobre JSON-RPC. Depende de `serde`, `serde_json` y `ts-rs`. No depende de
-ningun otro crate de Ramal, a proposito: si importara el dominio, cambiar un tipo interno
+ningun otro crate de Git Rudder, a proposito: si importara el dominio, cambiar un tipo interno
 cambiaria el contrato sin que nadie lo viera. El mapeo entre dominio y DTO vive en
-`ramal-engine`.
+`git-rudder-engine`.
 
 ```
 src/envelope.rs      RpcRequest, RpcResponse, RpcError, ErrorKind, RpcNotification, codigos JSON-RPC
@@ -415,12 +415,12 @@ tests/methods.rs           La tabla de metodos y sus marcas de host
 ```
 
 Los tipos no llevan sufijo `Dto`: son exactamente los nombres que vera TypeScript. En
-`ramal-engine` se importan con alias (`use ramal_protocol::graph as dto;`).
+`git-rudder-engine` se importan con alias (`use git_rudder_protocol::graph as dto;`).
 
-#### ramal-git
+#### git-rudder-git
 
 Adaptador driven del git CLI. Implementa `GitReader` en el primer corte y `GitWriter`
-despues. Depende de `ramal-core-domain`, `ramal-core-application`, `async-trait` (para
+despues. Depende de `git-rudder-core-domain`, `git-rudder-core-application`, `async-trait` (para
 implementar los puertos), `tokio` (process, io-util, fs), `thiserror` y `tracing`.
 
 ```
@@ -477,7 +477,7 @@ para lo que llega despues de las lecturas del primer corte:
 - SSH por cuenta con `GIT_SSH` apuntando al helper, que recibe argv y lanza ssh sin shell, nunca
   con `core.sshCommand`. El helper de credenciales solo entrega un token si el protocolo es
   `https` y el host coincide exactamente (tras IDNA) con el de la cuenta ligada.
-- **Confianza (planificada).** Antes del primer comando en un repositorio que Ramal no clono, el motor lee
+- **Confianza (planificada).** Antes del primer comando en un repositorio que Git Rudder no clono, el motor lee
   `git config --local --list --show-origin` (no ejecuta nada) y mira `.git/hooks`. Si hay claves
   que lanzan comandos (`core.fsmonitor`, `core.hooksPath`, `core.sshCommand`, `core.pager`,
   `core.editor`, `sequence.editor`, `diff.external`, `diff.*.textconv`, `diff.*.command`,
@@ -493,7 +493,7 @@ para lo que llega despues de las lecturas del primer corte:
 como respaldo. Por eso `GitReader` y `GitWriter` son dos puertos: las escrituras no se
 tocaran nunca.
 
-#### ramal-engine
+#### git-rudder-engine
 
 Adaptador driving y composition root compartido del cliente. Es lo unico que los hosts ven.
 
@@ -507,7 +507,7 @@ src/dispatch/graph.rs   graph/window
 src/mapping.rs          Funciones de mapeo dominio -> DTO y EngineError -> RpcError
 src/mapping/engine.rs  src/mapping/repo.rs  src/mapping/graph.rs  src/mapping/error.rs
 (plan) src/host_ports.rs     Reexporta los puertos que implementan los hosts (SecretStore) y EventSink
-(plan) src/adapters/ai.rs    Envoltorio fino que implementa AiClient sobre ramal-ai
+(plan) src/adapters/ai.rs    Envoltorio fino que implementa AiClient sobre git-rudder-ai
 tests/architecture.rs   Reglas de dependencia del hexagono del cliente (lee Cargo.lock)
 tests/core_purity.rs    Los clippy.toml de los cuatro nucleos y que su codigo no nombra el IO
 tests/envelope.rs       handle y los errores estables del protocolo, con el lector de git falso
@@ -544,7 +544,7 @@ Detalles que conviene saber antes de escribir un handler:
   no `impl From`: ni el tipo de dominio ni el DTO son de este crate, y la regla de huerfanos
   de Rust no deja implementar `From` entre dos tipos ajenos.
 - **La composicion tiene dos niveles.** `EngineBuilder` construye los adaptadores que son
-  iguales en los dos productos (git CLI y, mas adelante, plataformas, IA y Ramal API). Cada
+  iguales en los dos productos (git CLI y, mas adelante, plataformas, IA y Git Rudder API). Cada
   host es la raiz de fuera: lee su configuracion (rutas, binario de git) y aporta los
   adaptadores que solo el sabe construir, como el `SecretStore` (llavero en escritorio,
   SecretStorage a traves del extension host en VS Code) o el `EventSink` para las
@@ -554,11 +554,11 @@ Detalles que conviene saber antes de escribir un handler:
 
 Tiene dos mitades en dos lenguajes, y cada una es una capa concreta del hexagono.
 
-**Lado Rust: `apps/desktop/src-tauri`, crate `ramal-desktop`.** Es un adaptador driving mas
+**Lado Rust: `apps/desktop/src-tauri`, crate `git-rudder-desktop`.** Es un adaptador driving mas
 la raiz de composicion exterior del cliente de escritorio.
 
 ```
-src/main.rs          Llama a ramal_desktop::run y traduce el resultado a un codigo de salida
+src/main.rs          Llama a git_rudder_desktop::run y traduce el resultado a un codigo de salida
 src/lib.rs           La biblioteca: todo el arranque vive aqui para que los tests lo cubran
 src/bootstrap.rs     Composition root: tracing, EngineBuilder, plugins, estado gestionado y comandos
 src/commands.rs      Comandos de Tauri: rpc, repo_pick_and_open y (plan) rpc_subscribe. Delegan en Engine
@@ -569,7 +569,7 @@ src/picker.rs        FolderPicker: el dialogo nativo de carpetas, o una carpeta 
 
 - Un comando de negocio, `rpc`, que recibe un `RpcRequest` y devuelve un
   `Option<RpcResponse>`. No hay un comando de Tauri por metodo: el protocolo es el mismo que
-  el del sidecar y la lista de metodos vive en `ramal-protocol`, no en `commands.rs`.
+  el del sidecar y la lista de metodos vive en `git-rudder-protocol`, no en `commands.rs`.
 - **El webview es un cliente que puede estar comprometido**: pinta mensajes de commit, nombres
   de rama y ficheros que no son de fiar. Por eso `rpc` no deja pasar todo al motor: comprueba la
   lista de la ventana que llama (`surfaces.rs`; la principal solo puede pedir `graph/window`) y
@@ -589,28 +589,28 @@ src/picker.rs        FolderPicker: el dialogo nativo de carpetas, o una carpeta 
   URL `https:` desde el webview, sin `open-path`; revelar en el explorador lo hara el host con un
   `repoId`), updater, deep-link y single-instance. Tauri no lanza git ni hace HTTP de negocio: eso
   es trabajo del motor.
-- Con la feature `e2e`, la variable `RAMAL_E2E_FOLDER` sustituye el dialogo por una carpeta fija,
+- Con la feature `e2e`, la variable `GIT_RUDDER_E2E_FOLDER` sustituye el dialogo por una carpeta fija,
   porque WebDriver no puede manejar un dialogo del sistema. El binario que se publica no lleva
   nada de esto.
-- El log va a stderr; `RAMAL_LOG` fija el filtro (por defecto `info`).
+- El log va a stderr; `GIT_RUDDER_LOG` fija el filtro (por defecto `info`).
 - `build.rs` declara los comandos con
   `tauri_build::AppManifest::commands(&["rpc", "repo_pick_and_open"])` (y `rpc_subscribe` cuando
   exista), asi cada comando necesita un permiso explicito en `capabilities/default.json` y
   ninguna ventana puede invocar algo que no se le haya concedido.
 
 **Lado TypeScript: `apps/desktop/src`.** No tiene `domain` propio: el dominio del cliente
-esta en Rust y la logica pura de interfaz en `@ramal/domain`.
+esta en Rust y la logica pura de interfaz en `@git-rudder/domain`.
 
 ```
 src/application/ports/     Puertos propios del host de escritorio: RepositoryPicker (elegir y abrir
                            un repositorio) y AppearanceStore (tema e idioma guardados); luego
                            UpdateChecker. Solo interfaces.
 src/application/workspace/ El modelo de pestanas de la ventana y de Inicio, sin dependencias
-src/infrastructure/        tauri/tauri-transport.ts (Transport de @ramal/bridge sobre invoke),
+src/infrastructure/        tauri/tauri-transport.ts (Transport de @git-rudder/bridge sobre invoke),
                            tauri/tauri-repository-picker.ts (invoke de repo_pick_and_open),
                            storage/local-appearance-store.ts (localStorage); (plan) RepoViewHost
 src/ui/                    Barra de titulo con pestanas, inicio y la vista del repositorio, que es la
-                           de @ramal/repo-view. El nombre "Ramal" es una constante (ui/shell/brand.ts),
+                           de @git-rudder/repo-view. El nombre "Git Rudder" es una constante (ui/shell/brand.ts),
                            no una clave de i18n
 src/app/                   composition-root.ts (createContainer), app.tsx (providers), main.tsx
 ```
@@ -653,15 +653,15 @@ app/composition-root.ts     Construye adaptadores y casos de uso
 `application` no importa `vscode` ni nada de `node:`. Por eso se prueba con Vitest sin
 arrancar VS Code; solo `infrastructure` y `app` tocan la API real, y eso lo cubren los tests
 de integracion (bajo xvfb en Linux sin pantalla). No hay puerto de configuracion: los dos
-ajustes del motor (`ramal.engine.path` y `ramal.engine.logLevel`) los lee la infraestructura al
+ajustes del motor (`gitRudder.engine.path` y `gitRudder.engine.logLevel`) los lee la infraestructura al
 lanzar el sidecar. Son ajustes de esta maquina y pasan a `scope: "machine"` para que Settings Sync
 no los lleve a otros equipos (issue de seguimiento #301; hoy son `application`). Lo que comparte con
-Desktop (preferencias de Git e IA) vive en la nube de Ramal y se edita en la pagina de ajustes de
-Ramal, no en `settings.json`
+Desktop (preferencias de Git e IA) vive en la nube de Git Rudder y se edita en la pagina de ajustes de
+Git Rudder, no en `settings.json`
 ([ADR 0010](adr/0010-un-motor-para-escritorio-y-vscode.md#ajustes-y-sincronizacion)).
 
 **Webviews, `apps/vscode/src/webview`.** Mismo papel que el frontend de escritorio:
-adaptadores driving que montan `@ramal/repo-view` con otra densidad, otro tema y otro
+adaptadores driving que montan `@git-rudder/repo-view` con otra densidad, otro tema y otro
 transporte.
 
 ```
@@ -676,12 +676,12 @@ Si un webview necesita un puerto propio, aparece `src/webview/application/ports`
 escritorio.
 
 **Mensajes compartidos, `apps/vscode/src/shared`.** Tipos de los mensajes entre webview y
-extension host, sin dependencias salvo los tipos de `@ramal/bridge`. Los dos lados los
+extension host, sin dependencias salvo los tipos de `@git-rudder/bridge`. Los dos lados los
 importan; nadie mas. Del webview al host: `webview/ready { surface }`,
 `rpc/request { request }` y `host/request { id, method, params }`. Del host al webview:
 `init { locale, surface, repoId, protocolVersion }`, `rpc/response { response }`,
 `rpc/notification { notification }` y `host/response { id, result | error }`. `request`,
-`response` y `notification` son los tipos del sobre generados desde `ramal-protocol`. El unico
+`response` y `notification` son los tipos del sobre generados desde `git-rudder-protocol`. El unico
 metodo nativo del primer corte es `clipboard/writeText`; los dialogos llegan con `RepoViewHost`.
 Un `rpc/request` lleva siempre id: un webview no manda notificaciones, asi que `$/cancel` no se
 reenvia todavia.
@@ -693,7 +693,7 @@ arbol (ramas, remotos, PRs, stashes, tags), el diff (`vscode.diff`) y los ajuste
 host. En React solo hay lo que VS Code no puede dibujar: grafo, caja de commit, resolver de
 merge (editor personalizado), formulario de PR y la parte de listas de los ajustes.
 
-**Sidecar, `apps/vscode-engine`, crate `ramal-vscode-engine`.** Adaptador driving (bucle
+**Sidecar, `apps/vscode-engine`, crate `git-rudder-vscode-engine`.** Adaptador driving (bucle
 JSON-RPC) y raiz de composicion exterior del cliente de VS Code.
 
 ```
@@ -708,7 +708,7 @@ src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en s
 ```
 
 - **stdout es solo protocolo.** Todo el log va a stderr con `tracing-subscriber`, y el
-  extension host lo vuelca en el canal de salida "Ramal Engine". Un `println!` rompe el
+  extension host lo vuelca en el canal de salida "Git Rudder Engine". Un `println!` rompe el
   protocolo, y por eso `print_stdout` esta denegado en clippy en todo el workspace.
 - El sidecar termina cuando se cierra su stdin. El extension host lo arranca la primera
   vez que hace falta y compara `PROTOCOL_VERSION` (con `engine/info`) cada vez que arranca un
@@ -725,11 +725,11 @@ src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en s
   host vuelve a abrir con `repo/open` la raiz de cada panel (`reopenRepositories`). Como el
   `repoId` sale de la raiz, el panel conserva el suyo. Si la carpeta ya no es un repositorio,
   cierra sus paneles y avisa. Los webviews reciben los tipos de error del motor tal cual.
-- Ruta del binario: en produccion siempre `dist/bin/ramal-vscode-engine` (con `.exe` en
+- Ruta del binario: en produccion siempre `dist/bin/git-rudder-vscode-engine` (con `.exe` en
   Windows) dentro de la VSIX de su plataforma; `just vscode-package` lo copia ahi. Solo fuera de
   produccion (desarrollo y tests de integracion) se acepta, por este orden, el ajuste de usuario
-  `ramal.engine.path` (hoy de ambito aplicacion, pasara a `machine`), la variable
-  `RAMAL_ENGINE_PATH` o lo que haya compilado cargo en `target/` del monorepo. Un ajuste de workspace nunca puede elegir que
+  `gitRudder.engine.path` (hoy de ambito aplicacion, pasara a `machine`), la variable
+  `GIT_RUDDER_ENGINE_PATH` o lo que haya compilado cargo en `target/` del monorepo. Un ajuste de workspace nunca puede elegir que
   binario se ejecuta: seria ejecucion de codigo con abrir una carpeta.
 - El binario de git llega del `git.path` de la extension `vscode.git` (`--git-path`), que se
   lee al activar la extension.
@@ -738,24 +738,24 @@ src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en s
   `capabilities.untrustedWorkspaces.supported: false`, porque ejecutar git en una carpeta
   no confiable puede ejecutar hooks y configuracion del repo. Un repositorio que se abra fuera
   de las carpetas de confianza del workspace pasara por la misma comprobacion de confianza que en
-  escritorio (planificada, ver `ramal-git`).
+  escritorio (planificada, ver `git-rudder-git`).
 
 ### 4.5 La API (`apps/api`)
 
 Cinco crates, uno por capa, con el mismo molde que Gastonomo.
 
 ```
-crates/domain          ramal-api-domain. Entidades y value objects. thiserror y chrono. Sin serde.
-crates/application     ramal-api-application. Puertos (HealthProbe, Clock) y casos de uso, AppError,
+crates/domain          git-rudder-api-domain. Entidades y value objects. thiserror y chrono. Sin serde.
+crates/application     git-rudder-api-application. Puertos (HealthProbe, Clock) y casos de uso, AppError,
                        fakes en testing.
-crates/infrastructure  ramal-api-infrastructure. Config (figment, RAMAL__), telemetria, SQLx y la sonda
+crates/infrastructure  git-rudder-api-infrastructure. Config (figment, GIT_RUDDER__), telemetria, SQLx y la sonda
                        de PostgreSQL, reloj del sistema. (plan) Cifrado de sobre, hash de contrasenas,
-                       correo, clientes OAuth y el adaptador de ramal-ai.
-crates/http            ramal-api-http. Router, handlers, DTOs, problem+json, catcher, OpenAPI, el
+                       correo, clientes OAuth y el adaptador de git-rudder-ai.
+crates/http            git-rudder-api-http. Router, handlers, DTOs, problem+json, catcher, OpenAPI, el
                        middleware de request id y el arranque del servidor (serve). (plan) Limite de
                        ritmo e idempotencia.
-crates/api             ramal-api. Binario y composition root: src/bootstrap.rs + src/bootstrap/<contexto>.rs
-                       (hoy health, migrations y wiring). No depende de Salvo: llama a ramal_api_http::serve.
+crates/api             git-rudder-api. Binario y composition root: src/bootstrap.rs + src/bootstrap/<contexto>.rs
+                       (hoy health, migrations y wiring). No depende de Salvo: llama a git_rudder_api_http::serve.
 ```
 
 - **Contextos.** Primer corte: `health`. Planificados, cada uno con su modulo en las cinco
@@ -777,26 +777,26 @@ crates/api             ramal-api. Binario y composition root: src/bootstrap.rs +
   paginacion por cursor; errores `application/problem+json` (RFC 9457) con `title`,
   `detail` y `errors[].message` en castellano y ademas un `code` estable en todo problema
   (`route_not_found`, `method_not_allowed`, `validation_failed`...) y en cada `errors[]`, que
-  es lo que traducen los clientes con `@ramal/i18n` cuando la interfaz esta en ingles; un recurso de otra cuenta responde 404, nunca 403 (lo decide el caso de
+  es lo que traducen los clientes con `@git-rudder/i18n` cuando la interfaz esta en ingles; un recurso de otra cuenta responde 404, nunca 403 (lo decide el caso de
   uso con `AppError::NotFound`); `Idempotency-Key` donde un reintento podria duplicar algo;
   concurrencia optimista (`ETag` e `If-Match`) en los documentos sincronizados; limite de
   ritmo; `x-request-id` en cada respuesta, tambien en los 404 y 405; salud en `/health/live` y
   `/health/ready`, con `checkedAt` (la hora sale del puerto `Clock`) y sin el detalle de un
   fallo, que solo va al log; OpenAPI 3.1 en `/openapi.json`, publico; y Swagger UI en
-  `/swagger-ui/` solo con `RAMAL__SERVER__SWAGGER_UI=true`. Va apagada por defecto, que es como
+  `/swagger-ui/` solo con `GIT_RUDDER__SERVER__SWAGGER_UI=true`. Va apagada por defecto, que es como
   arranca la imagen de produccion; la encienden `compose.yaml` y `just api-run`. Sin la bandera
   la ruta es un 404 como cualquier otra, asi que produccion no depende de que el gateway no la
   reenvie ([ADR 0007](adr/0007-docker-desarrollo-y-produccion.md)).
-- **Configuracion.** figment desde el entorno con prefijo `RAMAL__` y `__` como separador
-  (`RAMAL__DATABASE__URL`). Todo tiene valor por defecto y una clave desconocida hace fallar el
+- **Configuracion.** figment desde el entorno con prefijo `GIT_RUDDER__` y `__` como separador
+  (`GIT_RUDDER__DATABASE__URL`). Todo tiene valor por defecto y una clave desconocida hace fallar el
   arranque (`deny_unknown_fields`), por eso `.env.example` deja comentadas las que aun no se
   leen. La API escucha por defecto solo en `127.0.0.1`; los contenedores ponen `0.0.0.0`.
 - **OpenAPI.** Se genera con la feature `oapi` de Salvo (salvo-oapi 1.0) desde el propio
   router, en lugar de construirlo a mano con utoipa como en Gastonomo: con Salvo 1.0 es
-  nativo y el documento no puede desincronizarse de las rutas. Un test de `ramal-api-http`
+  nativo y el documento no puede desincronizarse de las rutas. Un test de `git-rudder-api-http`
   compara el documento con `apps/api/openapi.json` y falla si difieren
   (`just api-openapi` lo reescribe, como dice [ADR 0003](adr/0003-rust-con-salvo.md)). Ese fichero
-  es la fuente de `@ramal/api-client`.
+  es la fuente de `@git-rudder/api-client`.
 - **Migraciones.** `apps/api/migrations/<YYYYMMDDHHMMSS>_<nombre>.sql`, solo hacia delante,
   embebidas con `sqlx::migrate!` y aplicadas al arrancar, en segundo plano: el servidor escucha
   desde el primer segundo y un fallo se reintenta cada 10 segundos hasta que sale bien. Mientras
@@ -812,12 +812,12 @@ Router 8 en modo framework: `react-router.config.ts` fija `appDirectory: "src/ap
 
 ```
 src/domain           Modelos propios de la web: informe de salud, preferencias (idioma y tema) y
-                     datos de descarga. Sin imports externos salvo @ramal/domain.
+                     datos de descarga. Sin imports externos salvo @git-rudder/domain.
 src/application      Puertos (HealthGateway, AuthGateway, PreferencesStore, ReleaseCatalog,
                      VisitorEnvironment, Clipboard) y casos de uso como funciones que reciben sus
                      puertos y devuelven una union de resultados (checkApiHealth, signIn, signUp,
                      loadRelease).
-src/infrastructure   HTTP sobre @ramal/api-client (createHttpHealthGateway), el AuthGateway que
+src/infrastructure   HTTP sobre @git-rudder/api-client (createHttpHealthGateway), el AuthGateway que
                      responde "no disponible todavia", navegador, localStorage y datos fijos de
                      descarga. Planificados: auth real y almacenamiento de sesion.
 src/ui               Componentes y pantallas. Reciben los puertos por contexto; nunca construyen adaptadores.
@@ -841,23 +841,23 @@ src/app              root.tsx, routes.ts, routes/<ruta>.tsx, composition-root.ts
 Todos se consumen como codigo fuente (`exports` apunta a `.ts`), asi que no hay paso de
 build que orquestar: los transpila Vite o Vitest y los comprueba `tsc -b`.
 
-| Paquete             | Papel en el hexagono                                   | Contenido                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `@ramal/domain`     | Dominio puro de interfaz, compartido por las tres apps | Modelo interactivo del resolver de conflictos (elecciones por linea, tomar bloque, todo A o todo B, salida, edicion manual, regla de resuelto), modelo del editor de rebase (reordenar, cambiar accion, reword, resumen, validacion inmediata), filtros y agrupacion de repos, agregacion de PRs, tiempo relativo, enmascarado de llaves, reglas del mensaje de commit (72 caracteres, Conventional Commits), validacion de nombres de rama para prompts, validacion de formularios de auth, deteccion del SO para descargas. Cero dependencias. |
-| `@ramal/i18n`       | Biblioteca pura                                        | Diccionario ES/EN en JSON por espacios de nombres con claves tipadas y parametros generados, traductor, plurales con `Intl.PluralRules`, formatos de fecha y tiempo relativo, `resolveLocale`. Cero dependencias (ver seccion 7).                                                                                                                                                                                                                                                                                                                |
-| `@ramal/bridge`     | Puerto de transporte y cliente del motor               | `Transport` (el puerto), `createBridgeClient(transport)`, `BridgeError`, y en `src/generated/` los tipos de `ramal-protocol` generados con ts-rs mas el mapa de metodos. Cero dependencias en tiempo de ejecucion. Los transportes concretos viven en cada app.                                                                                                                                                                                                                                                                                  |
-| `@ramal/ui`         | Primitivas de interfaz, sin puertos                    | Tokens semanticos, `themes/ramal.css`, `themes/vscode.css`, densidades, primitivas (boton, boton de icono, insignias, chip, toggle, segmentado, campo de texto, modal, menu contextual con submenus, toast), proveedor de iconos y el enlace React de `@ramal/i18n` (`I18nProvider`, `useT`).                                                                                                                                                                                                                                                    |
-| `@ramal/repo-view`  | Adaptador driving compartido                           | Hoy, el grafo: filas virtualizadas, carriles en SVG a partir de la ventana del motor, pildoras de refs, seleccion con teclado y paginas de `graph/window` con su `snapshot`. Planificado: fila WIP, detalle de commit, diff, resolver de conflictos, editor de rebase y el puerto `RepoViewHost`. Habla con el motor por el cliente de `@ramal/bridge`. `@tanstack/react-query` es `peerDependency`: el host aporta la instancia (o la crea `RepoViewProvider`).                                                                                 |
-| `@ramal/api-client` | Ayuda para adaptadores driven de la web                | Tipos generados de `apps/api/openapi.json` con openapi-typescript y un cliente openapi-fetch. Solo lo importa `apps/web/src/infrastructure`.                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Paquete                  | Papel en el hexagono                                   | Contenido                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@git-rudder/domain`     | Dominio puro de interfaz, compartido por las tres apps | Modelo interactivo del resolver de conflictos (elecciones por linea, tomar bloque, todo A o todo B, salida, edicion manual, regla de resuelto), modelo del editor de rebase (reordenar, cambiar accion, reword, resumen, validacion inmediata), filtros y agrupacion de repos, agregacion de PRs, tiempo relativo, enmascarado de llaves, reglas del mensaje de commit (72 caracteres, Conventional Commits), validacion de nombres de rama para prompts, validacion de formularios de auth, deteccion del SO para descargas. Cero dependencias. |
+| `@git-rudder/i18n`       | Biblioteca pura                                        | Diccionario ES/EN en JSON por espacios de nombres con claves tipadas y parametros generados, traductor, plurales con `Intl.PluralRules`, formatos de fecha y tiempo relativo, `resolveLocale`. Cero dependencias (ver seccion 7).                                                                                                                                                                                                                                                                                                                |
+| `@git-rudder/bridge`     | Puerto de transporte y cliente del motor               | `Transport` (el puerto), `createBridgeClient(transport)`, `BridgeError`, y en `src/generated/` los tipos de `git-rudder-protocol` generados con ts-rs mas el mapa de metodos. Cero dependencias en tiempo de ejecucion. Los transportes concretos viven en cada app.                                                                                                                                                                                                                                                                             |
+| `@git-rudder/ui`         | Primitivas de interfaz, sin puertos                    | Tokens semanticos, `themes/git-rudder.css`, `themes/vscode.css`, densidades, primitivas (boton, boton de icono, insignias, chip, toggle, segmentado, campo de texto, modal, menu contextual con submenus, toast), proveedor de iconos y el enlace React de `@git-rudder/i18n` (`I18nProvider`, `useT`).                                                                                                                                                                                                                                          |
+| `@git-rudder/repo-view`  | Adaptador driving compartido                           | Hoy, el grafo: filas virtualizadas, carriles en SVG a partir de la ventana del motor, pildoras de refs, seleccion con teclado y paginas de `graph/window` con su `snapshot`. Planificado: fila WIP, detalle de commit, diff, resolver de conflictos, editor de rebase y el puerto `RepoViewHost`. Habla con el motor por el cliente de `@git-rudder/bridge`. `@tanstack/react-query` es `peerDependency`: el host aporta la instancia (o la crea `RepoViewProvider`).                                                                            |
+| `@git-rudder/api-client` | Ayuda para adaptadores driven de la web                | Tipos generados de `apps/api/openapi.json` con openapi-typescript y un cliente openapi-fetch. Solo lo importa `apps/web/src/infrastructure`.                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 **`RepoViewHost` (planificado, el grafo del primer corte no lo necesita)** es el puerto de las
 capacidades que dependen del host: confirmar, pedir un texto, elegir de una lista, avisar,
 copiar, abrir un fichero en el editor, abrir un diff, abrir una URL. En escritorio lo
-implementan modales y toasts de `@ramal/ui` mas plugins de Tauri; en VS Code, mensajes al
+implementan modales y toasts de `@git-rudder/ui` mas plugins de Tauri; en VS Code, mensajes al
 extension host que llama a la API nativa. Una restriccion sale de ahi: una peticion de texto
 no puede llevar una funcion de validacion, porque no cruza `postMessage`. Lleva un valor
 declarativo (`validation: "branch-name" | "tag-name" | "non-empty" | "none"`) y cada host
-aplica el validador correspondiente de `@ramal/domain`.
+aplica el validador correspondiente de `@git-rudder/domain`.
 
 **Duplicacion aceptada con el motor.** El editor de rebase valida el plan en TypeScript para
 responder al instante, y el motor lo vuelve a validar antes de ejecutarlo. La validacion de
@@ -867,18 +867,18 @@ y el motor comprueba que no quedan marcadores antes de completar el merge.
 
 ### 4.8 Donde vive cada test
 
-| Capa                                         | Herramienta                                                                                                             | Donde                                                                                                                                                                                      |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Dominio y aplicacion de Rust (cliente y API) | `cargo test` con fakes y `block_on`, sin tokio                                                                          | `<modulo>/tests.rs` (`#[cfg(test)] mod tests;`) o `tests/` de cada crate; nunca `mod tests { }` en linea                                                                                   |
-| `ramal-git`                                  | `cargo test` contra repos reales creados con git en un tempdir                                                          | `crates/git/tests/`                                                                                                                                                                        |
-| Motor de punta a punta                       | `cargo test` de `dispatch` contra repos de prueba (el constructor de `crates/git/tests/support` por `#[path]`)          | `crates/engine/tests/`                                                                                                                                                                     |
-| Framing y ciclo de vida del sidecar          | `cargo test`                                                                                                            | `apps/vscode-engine/tests/`                                                                                                                                                                |
-| Host de Tauri                                | `tauri::test` (feature `test`): comandos registrados y serializan                                                       | `apps/desktop/src-tauri/tests/`                                                                                                                                                            |
-| Endpoints de la API sin base de datos        | `cargo test` con los fakes de `ramal-api-application` y el cliente de test de Salvo                                     | `apps/api/crates/http/tests/`                                                                                                                                                              |
-| API contra PostgreSQL                        | `cargo test` con `RAMAL_TEST_DATABASE_URL`; `RAMAL_TEST_REQUIRE_DATABASE=1` impide que se salten solos                  | `apps/api/crates/infrastructure/tests/` y, de punta a punta con el binario real, `apps/api/crates/api/tests/`. No en `http/tests`: `ramal-api-http` no puede alcanzar SQLx ni en sus tests |
-| Paquetes TS y capas puras de las apps        | Vitest                                                                                                                  | Colocalizados, `*.test.ts(x)`                                                                                                                                                              |
-| Flujos de interfaz                           | Playwright contra builds de Vite con hosts simulados (mockIPC, acquireVsCodeApi falso, red simulada)                    | `apps/*/e2e/`                                                                                                                                                                              |
-| E2E real, pocos                              | WebdriverIO + @wdio/tauri-service, @vscode/test-cli (bajo xvfb en Linux sin pantalla), Playwright contra la pila Docker | `apps/desktop/wdio/`, `apps/vscode/test/integration/`, `apps/web/e2e/`                                                                                                                     |
+| Capa                                         | Herramienta                                                                                                             | Donde                                                                                                                                                                                           |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dominio y aplicacion de Rust (cliente y API) | `cargo test` con fakes y `block_on`, sin tokio                                                                          | `<modulo>/tests.rs` (`#[cfg(test)] mod tests;`) o `tests/` de cada crate; nunca `mod tests { }` en linea                                                                                        |
+| `git-rudder-git`                             | `cargo test` contra repos reales creados con git en un tempdir                                                          | `crates/git/tests/`                                                                                                                                                                             |
+| Motor de punta a punta                       | `cargo test` de `dispatch` contra repos de prueba (el constructor de `crates/git/tests/support` por `#[path]`)          | `crates/engine/tests/`                                                                                                                                                                          |
+| Framing y ciclo de vida del sidecar          | `cargo test`                                                                                                            | `apps/vscode-engine/tests/`                                                                                                                                                                     |
+| Host de Tauri                                | `tauri::test` (feature `test`): comandos registrados y serializan                                                       | `apps/desktop/src-tauri/tests/`                                                                                                                                                                 |
+| Endpoints de la API sin base de datos        | `cargo test` con los fakes de `git-rudder-api-application` y el cliente de test de Salvo                                | `apps/api/crates/http/tests/`                                                                                                                                                                   |
+| API contra PostgreSQL                        | `cargo test` con `GIT_RUDDER_TEST_DATABASE_URL`; `GIT_RUDDER_TEST_REQUIRE_DATABASE=1` impide que se salten solos        | `apps/api/crates/infrastructure/tests/` y, de punta a punta con el binario real, `apps/api/crates/api/tests/`. No en `http/tests`: `git-rudder-api-http` no puede alcanzar SQLx ni en sus tests |
+| Paquetes TS y capas puras de las apps        | Vitest                                                                                                                  | Colocalizados, `*.test.ts(x)`                                                                                                                                                                   |
+| Flujos de interfaz                           | Playwright contra builds de Vite con hosts simulados (mockIPC, acquireVsCodeApi falso, red simulada)                    | `apps/*/e2e/`                                                                                                                                                                                   |
+| E2E real, pocos                              | WebdriverIO + @wdio/tauri-service, @vscode/test-cli (bajo xvfb en Linux sin pantalla), Playwright contra la pila Docker | `apps/desktop/wdio/`, `apps/vscode/test/integration/`, `apps/web/e2e/`                                                                                                                          |
 
 El detalle de la piramide y de que corre en cada momento esta en el ADR de testing.
 
@@ -894,66 +894,66 @@ En los crates de nucleo la regla es de lista blanca: sus dependencias directas d
 subconjunto exacto de la columna "externos permitidos". En los adaptadores la regla es de
 lista negra sobre el cierre transitivo, y la columna dice lo que usan hoy mas lo planificado.
 
-| Crate                       | Papel                                  | Workspace permitido                                                                                                                                     | Externos permitidos (directos)                                                                                                                                                                                                                                                                                                                                                          | Prohibido                                                                                                                                                                                                                                                                               |
-| --------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ramal-core-domain`         | Dominio del cliente                    | ninguno                                                                                                                                                 | `thiserror`                                                                                                                                                                                                                                                                                                                                                                             | En el cierre transitivo: `serde`, `serde_json`, `ts-rs`, `tokio`, `async-trait`, `reqwest`, `hyper`, `sqlx`, `salvo`, `tauri`, `gix`, `git2`, `libgit2-sys`, `keyring-core`, cualquier `ramal-*`. En el codigo: lanzar procesos, sistema de ficheros, red, variables de entorno, reloj. |
-| `ramal-core-application`    | Puertos y casos de uso del cliente     | `ramal-core-domain`                                                                                                                                     | `async-trait`, `thiserror`                                                                                                                                                                                                                                                                                                                                                              | Lo mismo que el dominio, salvo `async-trait` y `ramal-core-domain`.                                                                                                                                                                                                                     |
-| `ramal-protocol`            | Contrato del motor                     | ninguno                                                                                                                                                 | `serde`, `serde_json`, `ts-rs`                                                                                                                                                                                                                                                                                                                                                          | Cualquier `ramal-*`, `tokio`, `tauri`, `salvo`, `sqlx`.                                                                                                                                                                                                                                 |
-| `ramal-git`                 | Driven                                 | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `async-trait` (para implementar los puertos), `tokio`, `thiserror`, `tracing`; dev: `tempfile`, `pretty_assertions`                                                                                                                                                                                                                                                                     | `ramal-protocol`, `ramal-engine`, hosts, `tauri`, `salvo`, `sqlx`, `git2`, `libgit2-sys`.                                                                                                                                                                                               |
-| `ramal-engine`              | Driving y composition root del cliente | `ramal-core-domain`, `ramal-core-application`, `ramal-protocol`, `ramal-git`; (plan) `ramal-vault`, `ramal-platforms`, `ramal-ai`, `ramal-cloud-client` | `serde`, `serde_json`, `tracing`; dev: `tokio`, `tempfile`, `pretty_assertions`                                                                                                                                                                                                                                                                                                         | En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`, `git2`, `libgit2-sys`, cualquier `ramal-api-*`.                                                                                                                                                                                      |
-| `ramal-desktop`             | Host de escritorio                     | Solo `ramal-engine` y `ramal-protocol`; (plan) `ramal-keychain`                                                                                         | `tauri`, `tauri-build`, `tauri-plugin-dialog`, `tauri-plugin-wdio-webdriver` (opcional, feature `e2e`), `serde_json`, `tokio`, `tracing`, `tracing-subscriber`; (plan) otros `tauri-plugin-*`                                                                                                                                                                                           | Dependencia directa de `ramal-core-*` o `ramal-git`: el host habla con el motor, no con sus piezas. `salvo`, `sqlx`, `ramal-api-*`.                                                                                                                                                     |
-| `ramal-vscode-engine`       | Host de VS Code                        | Solo `ramal-engine` y `ramal-protocol`                                                                                                                  | `tokio`, `serde_json`, `thiserror`, `tracing`, `tracing-subscriber`                                                                                                                                                                                                                                                                                                                     | Dependencia directa de `ramal-core-*` o `ramal-git`. En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`.                                                                                                                                                                                 |
-| `ramal-api-domain`          | Dominio del servidor                   | ninguno                                                                                                                                                 | `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                                                                                                                                           | Directos: `serde`. En el cierre: `tokio`, `sqlx`, `salvo`, `salvo-oapi`, `reqwest`, `hyper`, `figment`, `argon2`, `jsonwebtoken`, `lettre`, `aes-gcm`, cualquier crate del cliente. En el codigo: procesos, ficheros, red, entorno, reloj.                                              |
-| `ramal-api-application`     | Puertos y casos de uso del servidor    | `ramal-api-domain`                                                                                                                                      | `async-trait`, `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                                                                                                                            | Lo mismo que `ramal-api-domain`.                                                                                                                                                                                                                                                        |
-| `ramal-api-infrastructure`  | Driven                                 | `ramal-api-domain`, `ramal-api-application`; (plan) `ramal-ai`                                                                                          | Hoy: `async-trait`, `chrono`, `figment`, `serde`, `sqlx`, `thiserror`, `tokio`, `tracing`, `tracing-subscriber`. Planificados: `serde_json`, `argon2`, `jsonwebtoken`, `ed25519-dalek` (proveedor EdDSA de ADR 0008), `hmac`, `sha2`, `aes-gcm`, `secrecy`, `zeroize`, `rand`, `base64`, `reqwest`, `lettre`, (plan) `image` (foto de perfil), `tokio`, `tracing`, `tracing-subscriber` | `salvo`, `ramal-api-http`, cualquier crate del cliente salvo `ramal-ai`.                                                                                                                                                                                                                |
-| `ramal-api-http`            | Driving                                | `ramal-api-domain`, `ramal-api-application`                                                                                                             | `salvo` (con `oapi`), `serde`, `serde_json`, `thiserror`, `tokio`, `tracing`, `uuid` (request id); (plan) `url` (validar redirecciones de loopback y `returnTo`)                                                                                                                                                                                                                        | `sqlx`, `ramal-api-infrastructure`, cualquier crate del cliente.                                                                                                                                                                                                                        |
-| `ramal-api`                 | Composition root del servidor          | Todos los `ramal-api-*`                                                                                                                                 | `thiserror`, `tokio`, `tracing`. No depende de `salvo`: el servidor arranca dentro de `ramal-api-http`                                                                                                                                                                                                                                                                                  | Cualquier crate del cliente.                                                                                                                                                                                                                                                            |
-| `ramal-vault` (plan)        | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `argon2`, `chacha20poly1305`, `hkdf`, `hmac`, `sha2`, `rand`, `zeroize`, `thiserror`                                                                                                                                                                                                                                                                                                    | Red, `tokio`, cualquier `ramal-api-*`.                                                                                                                                                                                                                                                  |
-| `ramal-keychain` (plan)     | Driven del cliente                     | `ramal-core-application`                                                                                                                                | `keyring-core` y sus almacenes por SO, `thiserror`                                                                                                                                                                                                                                                                                                                                      | `tauri`, cualquier `ramal-api-*`.                                                                                                                                                                                                                                                       |
-| `ramal-platforms` (plan)    | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `ramal-api-*`.                                                                                                                                                                                                                                                                |
-| `ramal-cloud-client` (plan) | Driven del cliente                     | `ramal-core-domain`, `ramal-core-application`                                                                                                           | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `ramal-api-*`: modela el contrato HTTP con sus propios tipos y lo protege con tests de contrato contra `apps/api/openapi.json`.                                                                                                                                               |
-| `ramal-ai` (plan)           | Biblioteca neutral                     | ninguno                                                                                                                                                 | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `ramal-*`. Es la unica pieza que usan los dos hexagonos, y solo puede serlo si no depende de ninguno.                                                                                                                                                                         |
+| Crate                            | Papel                                  | Workspace permitido                                                                                                                                                                             | Externos permitidos (directos)                                                                                                                                                                                                                                                                                                                                                          | Prohibido                                                                                                                                                                                                                                                                                    |
+| -------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `git-rudder-core-domain`         | Dominio del cliente                    | ninguno                                                                                                                                                                                         | `thiserror`                                                                                                                                                                                                                                                                                                                                                                             | En el cierre transitivo: `serde`, `serde_json`, `ts-rs`, `tokio`, `async-trait`, `reqwest`, `hyper`, `sqlx`, `salvo`, `tauri`, `gix`, `git2`, `libgit2-sys`, `keyring-core`, cualquier `git-rudder-*`. En el codigo: lanzar procesos, sistema de ficheros, red, variables de entorno, reloj. |
+| `git-rudder-core-application`    | Puertos y casos de uso del cliente     | `git-rudder-core-domain`                                                                                                                                                                        | `async-trait`, `thiserror`                                                                                                                                                                                                                                                                                                                                                              | Lo mismo que el dominio, salvo `async-trait` y `git-rudder-core-domain`.                                                                                                                                                                                                                     |
+| `git-rudder-protocol`            | Contrato del motor                     | ninguno                                                                                                                                                                                         | `serde`, `serde_json`, `ts-rs`                                                                                                                                                                                                                                                                                                                                                          | Cualquier `git-rudder-*`, `tokio`, `tauri`, `salvo`, `sqlx`.                                                                                                                                                                                                                                 |
+| `git-rudder-git`                 | Driven                                 | `git-rudder-core-domain`, `git-rudder-core-application`                                                                                                                                         | `async-trait` (para implementar los puertos), `tokio`, `thiserror`, `tracing`; dev: `tempfile`, `pretty_assertions`                                                                                                                                                                                                                                                                     | `git-rudder-protocol`, `git-rudder-engine`, hosts, `tauri`, `salvo`, `sqlx`, `git2`, `libgit2-sys`.                                                                                                                                                                                          |
+| `git-rudder-engine`              | Driving y composition root del cliente | `git-rudder-core-domain`, `git-rudder-core-application`, `git-rudder-protocol`, `git-rudder-git`; (plan) `git-rudder-vault`, `git-rudder-platforms`, `git-rudder-ai`, `git-rudder-cloud-client` | `serde`, `serde_json`, `tracing`; dev: `tokio`, `tempfile`, `pretty_assertions`                                                                                                                                                                                                                                                                                                         | En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`, `git2`, `libgit2-sys`, cualquier `git-rudder-api-*`.                                                                                                                                                                                      |
+| `git-rudder-desktop`             | Host de escritorio                     | Solo `git-rudder-engine` y `git-rudder-protocol`; (plan) `git-rudder-keychain`                                                                                                                  | `tauri`, `tauri-build`, `tauri-plugin-dialog`, `tauri-plugin-wdio-webdriver` (opcional, feature `e2e`), `serde_json`, `tokio`, `tracing`, `tracing-subscriber`; (plan) otros `tauri-plugin-*`                                                                                                                                                                                           | Dependencia directa de `git-rudder-core-*` o `git-rudder-git`: el host habla con el motor, no con sus piezas. `salvo`, `sqlx`, `git-rudder-api-*`.                                                                                                                                           |
+| `git-rudder-vscode-engine`       | Host de VS Code                        | Solo `git-rudder-engine` y `git-rudder-protocol`                                                                                                                                                | `tokio`, `serde_json`, `thiserror`, `tracing`, `tracing-subscriber`                                                                                                                                                                                                                                                                                                                     | Dependencia directa de `git-rudder-core-*` o `git-rudder-git`. En el cierre: `tauri`, `tauri-*`, `salvo`, `sqlx`.                                                                                                                                                                            |
+| `git-rudder-api-domain`          | Dominio del servidor                   | ninguno                                                                                                                                                                                         | `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                                                                                                                                           | Directos: `serde`. En el cierre: `tokio`, `sqlx`, `salvo`, `salvo-oapi`, `reqwest`, `hyper`, `figment`, `argon2`, `jsonwebtoken`, `lettre`, `aes-gcm`, cualquier crate del cliente. En el codigo: procesos, ficheros, red, entorno, reloj.                                                   |
+| `git-rudder-api-application`     | Puertos y casos de uso del servidor    | `git-rudder-api-domain`                                                                                                                                                                         | `async-trait`, `thiserror`, `uuid`, `chrono`                                                                                                                                                                                                                                                                                                                                            | Lo mismo que `git-rudder-api-domain`.                                                                                                                                                                                                                                                        |
+| `git-rudder-api-infrastructure`  | Driven                                 | `git-rudder-api-domain`, `git-rudder-api-application`; (plan) `git-rudder-ai`                                                                                                                   | Hoy: `async-trait`, `chrono`, `figment`, `serde`, `sqlx`, `thiserror`, `tokio`, `tracing`, `tracing-subscriber`. Planificados: `serde_json`, `argon2`, `jsonwebtoken`, `ed25519-dalek` (proveedor EdDSA de ADR 0008), `hmac`, `sha2`, `aes-gcm`, `secrecy`, `zeroize`, `rand`, `base64`, `reqwest`, `lettre`, (plan) `image` (foto de perfil), `tokio`, `tracing`, `tracing-subscriber` | `salvo`, `git-rudder-api-http`, cualquier crate del cliente salvo `git-rudder-ai`.                                                                                                                                                                                                           |
+| `git-rudder-api-http`            | Driving                                | `git-rudder-api-domain`, `git-rudder-api-application`                                                                                                                                           | `salvo` (con `oapi`), `serde`, `serde_json`, `thiserror`, `tokio`, `tracing`, `uuid` (request id); (plan) `url` (validar redirecciones de loopback y `returnTo`)                                                                                                                                                                                                                        | `sqlx`, `git-rudder-api-infrastructure`, cualquier crate del cliente.                                                                                                                                                                                                                        |
+| `git-rudder-api`                 | Composition root del servidor          | Todos los `git-rudder-api-*`                                                                                                                                                                    | `thiserror`, `tokio`, `tracing`. No depende de `salvo`: el servidor arranca dentro de `git-rudder-api-http`                                                                                                                                                                                                                                                                             | Cualquier crate del cliente.                                                                                                                                                                                                                                                                 |
+| `git-rudder-vault` (plan)        | Driven del cliente                     | `git-rudder-core-domain`, `git-rudder-core-application`                                                                                                                                         | `argon2`, `chacha20poly1305`, `hkdf`, `hmac`, `sha2`, `rand`, `zeroize`, `thiserror`                                                                                                                                                                                                                                                                                                    | Red, `tokio`, cualquier `git-rudder-api-*`.                                                                                                                                                                                                                                                  |
+| `git-rudder-keychain` (plan)     | Driven del cliente                     | `git-rudder-core-application`                                                                                                                                                                   | `keyring-core` y sus almacenes por SO, `thiserror`                                                                                                                                                                                                                                                                                                                                      | `tauri`, cualquier `git-rudder-api-*`.                                                                                                                                                                                                                                                       |
+| `git-rudder-platforms` (plan)    | Driven del cliente                     | `git-rudder-core-domain`, `git-rudder-core-application`                                                                                                                                         | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `git-rudder-api-*`.                                                                                                                                                                                                                                                                |
+| `git-rudder-cloud-client` (plan) | Driven del cliente                     | `git-rudder-core-domain`, `git-rudder-core-application`                                                                                                                                         | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `git-rudder-api-*`: modela el contrato HTTP con sus propios tipos y lo protege con tests de contrato contra `apps/api/openapi.json`.                                                                                                                                               |
+| `git-rudder-ai` (plan)           | Biblioteca neutral                     | ninguno                                                                                                                                                                                         | `reqwest`, `serde`, `serde_json`, `tokio`, `thiserror`, `tracing`                                                                                                                                                                                                                                                                                                                       | Cualquier `git-rudder-*`. Es la unica pieza que usan los dos hexagonos, y solo puede serlo si no depende de ninguno.                                                                                                                                                                         |
 
 Reglas transversales:
 
-- Ningun crate `ramal-api-*` alcanza un crate del cliente (`ramal-core-*`, `ramal-protocol`,
-  `ramal-git`, `ramal-engine`, hosts), y ningun crate del cliente alcanza un `ramal-api-*`.
-  La unica arista permitida entre familias es hacia `ramal-ai`, desde
-  `ramal-api-infrastructure` y `ramal-engine`.
+- Ningun crate `git-rudder-api-*` alcanza un crate del cliente (`git-rudder-core-*`, `git-rudder-protocol`,
+  `git-rudder-git`, `git-rudder-engine`, hosts), y ningun crate del cliente alcanza un `git-rudder-api-*`.
+  La unica arista permitida entre familias es hacia `git-rudder-ai`, desde
+  `git-rudder-api-infrastructure` y `git-rudder-engine`.
 - `git2` y `libgit2-sys` estan vetados en todo el workspace (`deny.toml`).
 - `unsafe_code = "forbid"` en todo el workspace.
 
 ### 5.2 Paquetes y carpetas de TypeScript
 
-| Paquete o carpeta                          | Puede importar del workspace                                                                                           | Puede importar de npm                                                                                                                                                                                                                                            | Prohibido que conviene recordar                                                     |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| `@ramal/domain`                            | nada                                                                                                                   | nada, ni `node:*`                                                                                                                                                                                                                                                | Todo                                                                                |
-| `@ramal/i18n`                              | nada                                                                                                                   | nada                                                                                                                                                                                                                                                             | `react`: el enlace React vive en `@ramal/ui`                                        |
-| `@ramal/bridge`                            | nada                                                                                                                   | nada                                                                                                                                                                                                                                                             | `@tauri-apps/*`, `vscode`, `acquireVsCodeApi`: los transportes viven en las apps    |
-| `@ramal/ui`                                | `@ramal/i18n`                                                                                                          | `react` y `react-dom` (peer), `react-aria-components` ([ADR 0011](adr/0011-ui-compartida-y-puente-tipado.md)), `lucide-react` (solo en `icons/lucide`), `@vscode/codicons` (solo en `icons/codicons`), `@fontsource/ibm-plex-sans` y `-mono` (solo en `themes/`) | `@ramal/bridge`, `@ramal/repo-view`, `@ramal/api-client`, `@tauri-apps/*`, `vscode` |
-| `@ramal/repo-view`                         | `@ramal/ui`, `@ramal/domain` (hoy no lo usa), `@ramal/i18n`, `@ramal/bridge`                                           | `react` y `@tanstack/react-query` (peer: la instancia la pone el host), `@tanstack/react-virtual`                                                                                                                                                                | `@tauri-apps/*`, `vscode`, `@ramal/api-client`, `fetch` o cualquier red             |
-| `@ramal/api-client`                        | nada                                                                                                                   | `openapi-fetch`                                                                                                                                                                                                                                                  | Todo lo demas                                                                       |
-| `apps/web/src/domain`                      | `src/domain`, `@ramal/domain`                                                                                          | nada                                                                                                                                                                                                                                                             |                                                                                     |
-| `apps/web/src/application`                 | `src/domain`, `src/application`, `@ramal/domain`                                                                       | nada: ni `react` ni `zod`                                                                                                                                                                                                                                        |                                                                                     |
-| `apps/web/src/infrastructure`              | `src/domain`, `src/application`, `src/infrastructure`, `@ramal/api-client`, `@ramal/domain`                            | `zod`                                                                                                                                                                                                                                                            | `src/ui`, `src/app`, `react`                                                        |
-| `apps/web/src/ui`                          | `src/domain`, `src/application`, `src/ui`, `@ramal/ui`, `@ramal/i18n`, `@ramal/domain`                                 | `react`, `react-router`                                                                                                                                                                                                                                          | `src/infrastructure`, `src/app`, `@ramal/api-client`, `zod`                         |
-| `apps/web/src/app`                         | Todas las capas y paquetes de arriba                                                                                   | `react`, `react-dom`, `react-router`                                                                                                                                                                                                                             |                                                                                     |
-| `apps/desktop/src/application`             | `src/application`, `@ramal/domain`, tipos de `@ramal/bridge`                                                           | nada                                                                                                                                                                                                                                                             |                                                                                     |
-| `apps/desktop/src/infrastructure`          | `src/application`, `src/infrastructure`, `@ramal/bridge`, `@ramal/domain`                                              | `@tauri-apps/api`; (plan) `@tauri-apps/plugin-*`                                                                                                                                                                                                                 | `src/ui`, `src/app`, `react`                                                        |
-| `apps/desktop/src/ui`                      | `src/application`, `src/ui`, `@ramal/ui`, `@ramal/repo-view`, `@ramal/i18n`, `@ramal/domain`, tipos de `@ramal/bridge` | `react`                                                                                                                                                                                                                                                          | `src/infrastructure`, `src/app`, `@tauri-apps/*`                                    |
-| `apps/desktop/src/app`                     | Todo lo anterior                                                                                                       | `react`, `react-dom`, `@tanstack/react-query`                                                                                                                                                                                                                    |                                                                                     |
-| `apps/vscode/src/shared`                   | tipos de `@ramal/bridge`                                                                                               | nada                                                                                                                                                                                                                                                             |                                                                                     |
-| `apps/vscode/src/extension/application`    | `src/shared`, `@ramal/i18n`, `@ramal/bridge` (tipos y la lista generada de metodos)                                    | nada                                                                                                                                                                                                                                                             | `vscode`, `node:*`, `src/webview`                                                   |
-| `apps/vscode/src/extension/infrastructure` | `extension/application`, `extension/infrastructure`, `src/shared`, `@ramal/bridge`                                     | `vscode`, `node:*`, `zod`                                                                                                                                                                                                                                        | `react`, `src/webview`                                                              |
-| `apps/vscode/src/extension/app`            | `src/extension/*`, `src/shared`                                                                                        | `vscode`                                                                                                                                                                                                                                                         | `src/webview`                                                                       |
-| `apps/vscode/src/webview/infrastructure`   | `src/shared`, `@ramal/bridge`, `@ramal/domain`                                                                         | nada (usa el global `acquireVsCodeApi`)                                                                                                                                                                                                                          | `vscode`, `node:*`, `@tauri-apps/*`                                                 |
-| `apps/vscode/src/webview/ui`               | `webview/ui`, `@ramal/ui`, `@ramal/repo-view`, `@ramal/i18n`, `@ramal/domain`, tipos de `@ramal/bridge`                | `react`                                                                                                                                                                                                                                                          | `webview/infrastructure`, `webview/app`, `src/extension`                            |
-| `apps/vscode/src/webview/app`              | `src/webview/*`, `src/shared`                                                                                          | `react`, `react-dom`, `@tanstack/react-query`                                                                                                                                                                                                                    | `src/extension`                                                                     |
+| Paquete o carpeta                          | Puede importar del workspace                                                                                                                    | Puede importar de npm                                                                                                                                                                                                                                            | Prohibido que conviene recordar                                                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `@git-rudder/domain`                       | nada                                                                                                                                            | nada, ni `node:*`                                                                                                                                                                                                                                                | Todo                                                                                               |
+| `@git-rudder/i18n`                         | nada                                                                                                                                            | nada                                                                                                                                                                                                                                                             | `react`: el enlace React vive en `@git-rudder/ui`                                                  |
+| `@git-rudder/bridge`                       | nada                                                                                                                                            | nada                                                                                                                                                                                                                                                             | `@tauri-apps/*`, `vscode`, `acquireVsCodeApi`: los transportes viven en las apps                   |
+| `@git-rudder/ui`                           | `@git-rudder/i18n`                                                                                                                              | `react` y `react-dom` (peer), `react-aria-components` ([ADR 0011](adr/0011-ui-compartida-y-puente-tipado.md)), `lucide-react` (solo en `icons/lucide`), `@vscode/codicons` (solo en `icons/codicons`), `@fontsource/ibm-plex-sans` y `-mono` (solo en `themes/`) | `@git-rudder/bridge`, `@git-rudder/repo-view`, `@git-rudder/api-client`, `@tauri-apps/*`, `vscode` |
+| `@git-rudder/repo-view`                    | `@git-rudder/ui`, `@git-rudder/domain` (hoy no lo usa), `@git-rudder/i18n`, `@git-rudder/bridge`                                                | `react` y `@tanstack/react-query` (peer: la instancia la pone el host), `@tanstack/react-virtual`                                                                                                                                                                | `@tauri-apps/*`, `vscode`, `@git-rudder/api-client`, `fetch` o cualquier red                       |
+| `@git-rudder/api-client`                   | nada                                                                                                                                            | `openapi-fetch`                                                                                                                                                                                                                                                  | Todo lo demas                                                                                      |
+| `apps/web/src/domain`                      | `src/domain`, `@git-rudder/domain`                                                                                                              | nada                                                                                                                                                                                                                                                             |                                                                                                    |
+| `apps/web/src/application`                 | `src/domain`, `src/application`, `@git-rudder/domain`                                                                                           | nada: ni `react` ni `zod`                                                                                                                                                                                                                                        |                                                                                                    |
+| `apps/web/src/infrastructure`              | `src/domain`, `src/application`, `src/infrastructure`, `@git-rudder/api-client`, `@git-rudder/domain`                                           | `zod`                                                                                                                                                                                                                                                            | `src/ui`, `src/app`, `react`                                                                       |
+| `apps/web/src/ui`                          | `src/domain`, `src/application`, `src/ui`, `@git-rudder/ui`, `@git-rudder/i18n`, `@git-rudder/domain`                                           | `react`, `react-router`                                                                                                                                                                                                                                          | `src/infrastructure`, `src/app`, `@git-rudder/api-client`, `zod`                                   |
+| `apps/web/src/app`                         | Todas las capas y paquetes de arriba                                                                                                            | `react`, `react-dom`, `react-router`                                                                                                                                                                                                                             |                                                                                                    |
+| `apps/desktop/src/application`             | `src/application`, `@git-rudder/domain`, tipos de `@git-rudder/bridge`                                                                          | nada                                                                                                                                                                                                                                                             |                                                                                                    |
+| `apps/desktop/src/infrastructure`          | `src/application`, `src/infrastructure`, `@git-rudder/bridge`, `@git-rudder/domain`                                                             | `@tauri-apps/api`; (plan) `@tauri-apps/plugin-*`                                                                                                                                                                                                                 | `src/ui`, `src/app`, `react`                                                                       |
+| `apps/desktop/src/ui`                      | `src/application`, `src/ui`, `@git-rudder/ui`, `@git-rudder/repo-view`, `@git-rudder/i18n`, `@git-rudder/domain`, tipos de `@git-rudder/bridge` | `react`                                                                                                                                                                                                                                                          | `src/infrastructure`, `src/app`, `@tauri-apps/*`                                                   |
+| `apps/desktop/src/app`                     | Todo lo anterior                                                                                                                                | `react`, `react-dom`, `@tanstack/react-query`                                                                                                                                                                                                                    |                                                                                                    |
+| `apps/vscode/src/shared`                   | tipos de `@git-rudder/bridge`                                                                                                                   | nada                                                                                                                                                                                                                                                             |                                                                                                    |
+| `apps/vscode/src/extension/application`    | `src/shared`, `@git-rudder/i18n`, `@git-rudder/bridge` (tipos y la lista generada de metodos)                                                   | nada                                                                                                                                                                                                                                                             | `vscode`, `node:*`, `src/webview`                                                                  |
+| `apps/vscode/src/extension/infrastructure` | `extension/application`, `extension/infrastructure`, `src/shared`, `@git-rudder/bridge`                                                         | `vscode`, `node:*`, `zod`                                                                                                                                                                                                                                        | `react`, `src/webview`                                                                             |
+| `apps/vscode/src/extension/app`            | `src/extension/*`, `src/shared`                                                                                                                 | `vscode`                                                                                                                                                                                                                                                         | `src/webview`                                                                                      |
+| `apps/vscode/src/webview/infrastructure`   | `src/shared`, `@git-rudder/bridge`, `@git-rudder/domain`                                                                                        | nada (usa el global `acquireVsCodeApi`)                                                                                                                                                                                                                          | `vscode`, `node:*`, `@tauri-apps/*`                                                                |
+| `apps/vscode/src/webview/ui`               | `webview/ui`, `@git-rudder/ui`, `@git-rudder/repo-view`, `@git-rudder/i18n`, `@git-rudder/domain`, tipos de `@git-rudder/bridge`                | `react`                                                                                                                                                                                                                                                          | `webview/infrastructure`, `webview/app`, `src/extension`                                           |
+| `apps/vscode/src/webview/app`              | `src/webview/*`, `src/shared`                                                                                                                   | `react`, `react-dom`, `@tanstack/react-query`                                                                                                                                                                                                                    | `src/extension`                                                                                    |
 
 Reglas entre paquetes: un paquete nunca depende de una app, una app nunca depende de otra
-app, todo `@ramal/*` se declara con `workspace:*` y `@ramal/eslint-config` y `@ramal/tsconfig`
-solo van en `devDependencies`. La web no importa `@ramal/bridge` ni
-`@ramal/repo-view` mientras no exista la vista previa del producto en la landing
+app, todo `@git-rudder/*` se declara con `workspace:*` y `@git-rudder/eslint-config` y `@git-rudder/tsconfig`
+solo van en `devDependencies`. La web no importa `@git-rudder/bridge` ni
+`@git-rudder/repo-view` mientras no exista la vista previa del producto en la landing
 (planificada, con un transporte en memoria y datos de demostracion); cuando llegue, se amplia
 la lista blanca del guardian en el mismo PR.
 
@@ -980,12 +980,12 @@ Los dos leen el `Cargo.lock` de la raiz linea a linea, sin crate de TOML, como e
 construyen el grafo de dependencias y comprueban tres cosas: las dependencias directas de los
 crates de nucleo son un subconjunto de su lista blanca; el cierre transitivo de cada crate no
 contiene nada de su lista negra; y ningun crate de una familia alcanza a la otra salvo
-`ramal-ai`. El del cliente comprueba tambien que los dos hosts (`ramal-desktop` y
-`ramal-vscode-engine`) no declaran `ramal-core-*` ni `ramal-git`, y puede mirar `ramal-desktop`
+`git-rudder-ai`. El del cliente comprueba tambien que los dos hosts (`git-rudder-desktop` y
+`git-rudder-vscode-engine`) no declaran `git-rudder-core-*` ni `git-rudder-git`, y puede mirar `git-rudder-desktop`
 sin compilar Tauri porque `Cargo.lock` describe a todos los miembros del workspace, esten o no en
 `default-members`. `Cargo.lock` incluye las dev-dependencies, asi que las reglas cubren tambien
-los tests: por eso los tests de endpoint de `ramal-api-http` no pueden usar PostgreSQL. Un test de cordura verifica que el parser ve
-aristas reales (que `ramal-git` alcanza `tokio`, que `ramal-api-http` alcanza `salvo`). El
+los tests: por eso los tests de endpoint de `git-rudder-api-http` no pueden usar PostgreSQL. Un test de cordura verifica que el parser ve
+aristas reales (que `git-rudder-git` alcanza `tokio`, que `git-rudder-api-http` alcanza `salvo`). El
 mensaje de fallo dice que crate alcanza que y termina con "the hexagon leaks: move that code
 to an adapter".
 
@@ -996,8 +996,8 @@ nucleo de la API no se puede: `Cargo.lock` lista la dependencia opcional de `chr
 controla con la lista blanca directa, igual que en Gastonomo.
 
 **Sin procesos ni IO en el nucleo.** Prohibir `tokio` no basta, porque `std::process::Command`
-esta en la biblioteca estandar. Cada crate de nucleo (`ramal-core-domain`,
-`ramal-core-application`, `ramal-api-domain`, `ramal-api-application`) tiene su propio
+esta en la biblioteca estandar. Cada crate de nucleo (`git-rudder-core-domain`,
+`git-rudder-core-application`, `git-rudder-api-domain`, `git-rudder-api-application`) tiene su propio
 `clippy.toml` con `disallowed-types` y `disallowed-methods` que cubren cada puerta de entrada,
 no solo la mas comun (con solo `fs::read` y `File`, un `OpenOptions`, un `fs::read_dir` o un
 `path.exists()` pasaban clippy limpios): `Command` y `Command::new`, `process::exit` y `abort`,
@@ -1016,10 +1016,10 @@ de los nucleos no nombra los modulos de IO.
 **El guardian del grafo de paquetes.** `tools/checks/package-graph.mjs` (Node, sin
 dependencias, como el resto de `tools/checks`) recorre los paquetes del workspace, lee cada
 `package.json` y compara sus `dependencies`, `devDependencies`, `peerDependencies` y
-`optionalDependencies` sobre `@ramal/*` con la matriz de 5.2, que vive como constante
+`optionalDependencies` sobre `@git-rudder/*` con la matriz de 5.2, que vive como constante
 (`MATRIX`) en el propio script. Falla si aparece un paquete del workspace que no esta en la
-matriz o vive en otra carpeta, si `@ramal/domain`, `@ramal/i18n` o `@ramal/bridge` declaran una
-dependencia de npm en tiempo de ejecucion, si una app depende de otra app, si un `@ramal/*` no
+matriz o vive en otra carpeta, si `@git-rudder/domain`, `@git-rudder/i18n` o `@git-rudder/bridge` declaran una
+dependencia de npm en tiempo de ejecucion, si una app depende de otra app, si un `@git-rudder/*` no
 usa `workspace:*`, si la configuracion compartida no va en `devDependencies`, o si
 `ts_package_dirs` del `justfile` no nombra exactamente los paquetes compartidos de `packages/`
 (sin `eslint-config` ni `tsconfig`): `just packages-check`, lo unico que corre `packages.yml`,
@@ -1041,9 +1041,9 @@ lineas y de test de 400, cognitiva 15 y ciclomatica 10 (en TypeScript con ESLint
 [ADR 0005](adr/0005-enforcement-automatizado.md)), funcion de 50 lineas, 5 parametros,
 anidamiento 4, nada de codigo muerto, TODO solo con ticket (`TODO(RAM-123)` o `TODO(#123)`),
 nada de tests enfocados ni apagados sin motivo, ningun limite apagado en linea
-(`tools/checks/no-limit-suppressions.mjs`), cobertura del 80% en los nucleos (`ramal-core-*`,
-`ramal-api-domain` y `ramal-api-application`, cada crate por separado; `@ramal/domain`,
-`@ramal/i18n`, `@ramal/bridge`, `domain` y `application` de la web, y `application` del
+(`tools/checks/no-limit-suppressions.mjs`), cobertura del 80% en los nucleos (`git-rudder-core-*`,
+`git-rudder-api-domain` y `git-rudder-api-application`, cada crate por separado; `@git-rudder/domain`,
+`@git-rudder/i18n`, `@git-rudder/bridge`, `domain` y `application` de la web, y `application` del
 escritorio y del extension host) y del 60% global, tambien en el host de Tauri. Los avisos son
 errores (`-D warnings`, `--max-warnings 0`). Se aplican en local (`just check`), en cada commit (lefthook) y en cada
 PR (`all-green`). Condicionan el diseno: por eso los modulos de este documento estan partidos
@@ -1055,13 +1055,13 @@ en ficheros pequenos desde el principio.
 
 ```mermaid
 sequenceDiagram
-    participant C as Grafo<br/>@ramal/repo-view
-    participant B as Cliente<br/>@ramal/bridge
+    participant C as Grafo<br/>@git-rudder/repo-view
+    participant B as Cliente<br/>@git-rudder/bridge
     participant T as TauriTransport<br/>apps/desktop
-    participant H as Comando rpc<br/>ramal-desktop
-    participant E as Engine<br/>ramal-engine
+    participant H as Comando rpc<br/>git-rudder-desktop
+    participant E as Engine<br/>git-rudder-engine
     participant U as LoadGraphWindow<br/>core-application
-    participant G as GitCliReader<br/>ramal-git
+    participant G as GitCliReader<br/>git-rudder-git
     C->>B: call graph/window con repoId, offset y limit
     B->>T: request con un RpcRequest
     T->>H: invoke rpc
@@ -1090,11 +1090,11 @@ y registrado con `invoke("rpc_subscribe", { channel })`.
 
 ```mermaid
 sequenceDiagram
-    participant W as Webview graph<br/>@ramal/repo-view
+    participant W as Webview graph<br/>@git-rudder/repo-view
     participant T as VsCodeTransport<br/>webview/infrastructure
     participant X as Extension host<br/>routeWebviewMessage
-    participant S as Sidecar<br/>ramal-vscode-engine
-    participant E as Engine<br/>ramal-engine
+    participant S as Sidecar<br/>git-rudder-vscode-engine
+    participant E as Engine<br/>git-rudder-engine
     W->>T: call graph/window
     T->>X: postMessage rpc/request con id del webview
     X->>X: valida forma, tamano, metodo, superficie y repoId del panel
@@ -1108,7 +1108,7 @@ sequenceDiagram
     T-->>W: GraphWindow tipado
 ```
 
-Antes de todo eso, cuando el usuario ejecuta "Ramal: Open Graph", el extension host elige el
+Antes de todo eso, cuando el usuario ejecuta "Git Rudder: Open Graph", el extension host elige el
 repositorio (la carpeta del workspace, o un QuickPick si hay varias), llama el mismo a
 `repo/open` y pasa el `repoId` al webview en el mensaje `init`. El webview nunca envia rutas
 del sistema de ficheros.
@@ -1126,9 +1126,9 @@ sequenceDiagram
     participant UC as checkApiHealth<br/>src/application
     participant A as createHttpHealthGateway<br/>src/infrastructure
     participant GW as Gateway
-    participant HT as Router Salvo<br/>ramal-api-http
-    participant CR as CheckReadiness<br/>ramal-api-application
-    participant PG as PostgresHealthProbe<br/>ramal-api-infrastructure
+    participant HT as Router Salvo<br/>git-rudder-api-http
+    participant CR as CheckReadiness<br/>git-rudder-api-application
+    participant PG as PostgresHealthProbe<br/>git-rudder-api-infrastructure
     R->>UC: clientLoader con el HealthGateway del contenedor
     UC->>A: check
     A->>GW: GET /health/ready con openapi-fetch, mismo origen
@@ -1152,19 +1152,19 @@ del gateway: no hay prefijo `/api` que se quite por el camino
 `tools/scripts/smoke-stack.sh`: en Gastonomo un prefijo olvidado mando 25 rutas a la SPA con
 todos los tests en verde.
 
-### 6.4 Del motor a la Ramal API y a las plataformas (planificado)
+### 6.4 Del motor a la Git Rudder API y a las plataformas (planificado)
 
 El motor es el unico que habla con el exterior en Desktop y en VS Code:
 
-- Ramal API: `ramal-cloud-client` implementa `CloudClient` con `reqwest` contra
-  `https://api.ramal.bahoque.com`. El token de acceso vive en memoria del motor y el refresh token
+- Git Rudder API: `git-rudder-cloud-client` implementa `CloudClient` con `reqwest` contra
+  `https://api.git-rudder.com`. El token de acceso vive en memoria del motor y el refresh token
   en el `SecretStore`. La API no necesita CORS porque ningun navegador hace estas peticiones.
 - Modelos de IA recomendados: el motor pide `GET /v1/ai/model-recommendations` (publico, tambien sin
   cuenta), lo guarda con su `ETag` y lo cruza con la lista viva de cada proveedor
   ([ADR 0025](adr/0025-recomendacion-de-modelos-de-ia.md)).
-- Plataformas Git: `ramal-platforms` implementa `PlatformClient` y llama directamente a
+- Plataformas Git: `git-rudder-platforms` implementa `PlatformClient` y llama directamente a
   GitHub, GitLab, Bitbucket, Gitea y Azure DevOps con el token de la cuenta ligada al repo.
-- IA personal: el adaptador de `ramal-ai` en `ramal-engine` llama al proveedor con la llave
+- IA personal: el adaptador de `git-rudder-ai` en `git-rudder-engine` llama al proveedor con la llave
   del `SecretStore`.
 
 El webview no ve nunca un token. En escritorio lo asegura que la CSP solo permite IPC; en
@@ -1176,7 +1176,7 @@ Es JSON-RPC 2.0, el mismo en los dos productos. Cambia solo el transporte: `invo
 escritorio, marcos `Content-Length` por stdio en VS Code (con `postMessage` de por medio entre
 webview y extension host).
 
-**Sobre.** Los tipos viven en `ramal-protocol/src/envelope.rs`:
+**Sobre.** Los tipos viven en `git-rudder-protocol/src/envelope.rs`:
 
 ```jsonc
 // Peticion
@@ -1198,7 +1198,7 @@ webview y extension host).
 - `id` es un entero no negativo menor que 2^31, para que sea un `number` seguro en
   TypeScript. No se admiten ids de texto.
 - `repoId` es opaco para la interfaz: hoy es `repo-` mas 16 cifras hexadecimales que salen de la
-  raiz del repositorio (ver `ramal-core-application`).
+  raiz del repositorio (ver `git-rudder-core-application`).
 - `params` es siempre un objeto; los metodos sin parametros reciben `{}`.
 - Nombres de metodo `<area>/<verbo>` en camelCase (`graph/window`, `repo/open`,
   `engine/info`). Notificaciones de control con prefijo `$/` (`$/cancel`, `$/progress`,
@@ -1217,7 +1217,7 @@ webview y extension host).
   `invalid_params`, `repo_not_open`, `not_a_repository`, `git_not_found`,
   `git_version_unsupported`, `git_failed`, `stale_window`, `internal`, y mas adelante
   `cancelled` y `not_signed_in`. `message` esta en ingles y es para el log; la interfaz traduce
-  el `kind` con `@ramal/i18n`.
+  el `kind` con `@git-rudder/i18n`.
 - Un metodo que no existe (-32601), un JSON roto (-32700) y un sobre invalido (-32600) llevan
   `kind: internal`: la interfaz solo llama a los metodos del mapa generado, asi que son fallos de
   empaquetado. Un metodo del host pedido desde un webview se responde igual que uno que no
@@ -1228,7 +1228,7 @@ webview y extension host).
   arrancar (`git_not_found`, por ejemplo), reenvia ese error al webview con su tipo en vez de
   `engine_unavailable`. Cancelar una llamada con `signal` rechaza con `signal.reason`, como
   `fetch`; todavia no hay tipo `cancelled`.
-- Version: `PROTOCOL_VERSION` es una constante de `ramal-protocol` (hoy 2). `engine/info` la
+- Version: `PROTOCOL_VERSION` es una constante de `git-rudder-protocol` (hoy 2). `engine/info` la
   devuelve y el extension host la compara cada vez que arranca un proceso del sidecar con la
   que trae generada; como viajan en la misma VSIX, una diferencia es un fallo de empaquetado y
   se muestra como tal. En escritorio no puede haber diferencia: se compila todo junto.
@@ -1258,7 +1258,7 @@ webview y extension host).
 | -------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `engine/info`  | `{}`                                                           | `EngineInfo { engineVersion, protocolVersion, git: GitInfo { path, version, supported } }` | Host de escritorio (lo deja en el log) y extension host, al arrancar cada proceso                            |
 | `repo/open`    | `{ path }`                                                     | `RepoHandle { repoId, root, headRef?, headSha?, isDetached, isEmpty }`                     | Solo los hosts: el comando `repo_pick_and_open` en escritorio y el extension host en VS Code. Ningun webview |
-| `graph/window` | `{ repoId, offset, limit, snapshot? }`, `limit` entre 1 y 1000 | `GraphWindow { repoId, offset, rows, hasMore, laneCount, snapshot }`                       | `@ramal/repo-view`                                                                                           |
+| `graph/window` | `{ repoId, offset, limit, snapshot? }`, `limit` entre 1 y 1000 | `GraphWindow { repoId, offset, rows, hasMore, laneCount, snapshot }`                       | `@git-rudder/repo-view`                                                                                      |
 
 ```
 GraphRow  { sha, shortSha, parents: string[], lane, edges: GraphEdge[], summary,
@@ -1291,13 +1291,13 @@ Otros detalles de los resultados:
 
 ### 6.6 Tipos de TypeScript generados con ts-rs
 
-- Cada DTO de `ramal-protocol` deriva `Serialize`, `Deserialize` y `TS` con `#[ts(export)]`.
+- Cada DTO de `git-rudder-protocol` deriva `Serialize`, `Deserialize` y `TS` con `#[ts(export)]`.
   ts-rs 12 respeta los atributos de serde, asi que el TypeScript coincide con el JSON real. El
   campo `params` del sobre es un `serde_json::Value`, que ts-rs traduce con su feature
   `serde-json-impl`.
 - `.cargo/config.toml` fija `TS_RS_EXPORT_DIR` (relativo a la raiz) en
   `packages/bridge/src/generated`. ts-rs escribe un fichero por tipo al correr
-  `cargo test -p ramal-protocol`.
+  `cargo test -p git-rudder-protocol`.
 - ts-rs no genera valores ni el mapa de metodos, asi que la macro `define_methods!` de
   `src/methods.rs` declara cada metodo una vez (`"graph/window" => GraphWindowParams -> GraphWindow`)
   y el test `tests/export_bindings.rs` escribe dos ficheros mas: `methods.ts`, con el tipo
@@ -1312,7 +1312,7 @@ Otros detalles de los resultados:
   `git diff --exit-code -- packages/bridge/src/generated` no esta limpio o hay ficheros sin
   seguimiento en esa carpeta. La CI corre `just protocol-check`. Si alguien cambia un DTO y no regenera, la CI falla con el diff
   a la vista.
-- `@ramal/api-client` sigue el mismo patron con otra fuente: `just api-client` genera
+- `@git-rudder/api-client` sigue el mismo patron con otra fuente: `just api-client` genera
   `packages/api-client/src/generated/schema.ts` desde `apps/api/openapi.json` con
   openapi-typescript, y CI comprueba que no hay diff.
 
@@ -1408,10 +1408,10 @@ es `'unsafe-inline'` en `script-src`. Ademas:
   boveda y eliminar la cuenta no se pueden cargar dentro de un marco ajeno.
 - `require-trusted-types-for 'script'` con una politica que no crea HTML a partir de texto. Si
   una dependencia lo impide, la excepcion se documenta en el despliegue.
-- **La pagina de pago es la unica excepcion.** Carga Paddle.js para el checkout de Ramal Pro, asi
+- **La pagina de pago es la unica excepcion.** Carga Paddle.js para el checkout de Git Rudder Pro, asi
   que su CSP abre los dominios de Paddle en `script-src` y `frame-src`, y solo esa ruta
   ([ADR 0022](adr/0022-proveedor-de-pagos.md)). El resto de la web no carga codigo de terceros.
-- Un XSS en `ramal.bahoque.com` es la puerta para aprobar sesiones nativas, asi que en las tres
+- Un XSS en `git-rudder.com` es la puerta para aprobar sesiones nativas, asi que en las tres
   interfaces React esta prohibido `dangerouslySetInnerHTML` (regla `react/no-danger` de ESLint) y
   el Markdown (notas de version, descripciones de PR) se pinta sin HTML crudo.
 
@@ -1440,7 +1440,7 @@ Los componentes solo leen tokens semanticos, nunca un color literal:
 La lista exacta vive en `packages/ui/src/tokens/tokens.ts` y un test comprueba que los dos temas
 dan valor a todos.
 
-- `packages/ui/src/themes/ramal.css`: los valores oklch del handoff para
+- `packages/ui/src/themes/git-rudder.css`: los valores oklch del handoff para
   `[data-theme="dark"]` y `[data-theme="light"]` sobre `<html>`. Lo usan escritorio y web. La
   web pone ademas `data-host="web"`, y el mismo fichero sube con `[data-host="web"]`
   `--r-font-size-base` de 13 a 14 px y aplica los matices del claro de su prototipo: no hay hoja
@@ -1476,9 +1476,9 @@ dan valor a todos.
 | `--r-toolbar-h`              | 62px        | 34px    |
 
 El SVG del grafo necesita numeros en JavaScript (alto de fila, origen X, radio de nodo,
-puntos de control de las curvas). `@ramal/ui` exporta `DENSITIES` con esos valores por
-densidad y `@ramal/repo-view` los lee segun la densidad que le pasa el host; un test de
-Vitest en `@ramal/ui` parsea el CSS y falla si un valor del CSS y de `DENSITIES` difieren. Las
+puntos de control de las curvas). `@git-rudder/ui` exporta `DENSITIES` con esos valores por
+densidad y `@git-rudder/repo-view` los lee segun la densidad que le pasa el host; un test de
+Vitest en `@git-rudder/ui` parsea el CSS y falla si un valor del CSS y de `DENSITIES` difieren. Las
 diferencias entre escritorio y VS Code son tokens y densidad, no ramas `if (vscode)` en los
 componentes.
 
@@ -1489,8 +1489,8 @@ componentes.
 `pr-draft`, `pr-merged`, `check`, `more`, `close`...). El host elige el juego en su
 composition root con `<IconProvider icons={...}>`:
 
-- `@ramal/ui/icons/lucide`: `Record<IconName, componente de lucide-react>`, para escritorio y web.
-- `@ramal/ui/icons/codicons`: `Record<IconName, clase de @vscode/codicons>`, para los webviews.
+- `@git-rudder/ui/icons/lucide`: `Record<IconName, componente de lucide-react>`, para escritorio y web.
+- `@git-rudder/ui/icons/codicons`: `Record<IconName, clase de @vscode/codicons>`, para los webviews.
 
 Al ser `Record<IconName, ...>`, un icono nuevo sin equivalente en uno de los dos juegos no
 compila. Y al ser subrutas distintas, Lucide nunca entra en el bundle de VS Code ni Codicons
@@ -1498,15 +1498,15 @@ en el de escritorio. Los glifos Unicode del prototipo no se usan.
 
 ### 7.4 Quien pone tema, densidad e iconos
 
-| Host                | Tema                                                    | Densidad    | Iconos   | Fuente                      |
-| ------------------- | ------------------------------------------------------- | ----------- | -------- | --------------------------- |
-| Escritorio          | `ramal.css`, `data-theme` desde el ajuste de apariencia | comfortable | Lucide   | IBM Plex empaquetada, 13 px |
-| Web                 | `ramal.css`, `data-theme` desde el conmutador           | comfortable | Lucide   | IBM Plex empaquetada, 14 px |
-| Webviews de VS Code | `vscode.css`, sigue el tema del editor                  | compact     | Codicons | La de VS Code               |
+| Host                | Tema                                                         | Densidad    | Iconos   | Fuente                      |
+| ------------------- | ------------------------------------------------------------ | ----------- | -------- | --------------------------- |
+| Escritorio          | `git-rudder.css`, `data-theme` desde el ajuste de apariencia | comfortable | Lucide   | IBM Plex empaquetada, 13 px |
+| Web                 | `git-rudder.css`, `data-theme` desde el conmutador           | comfortable | Lucide   | IBM Plex empaquetada, 14 px |
+| Webviews de VS Code | `vscode.css`, sigue el tema del editor                       | compact     | Codicons | La de VS Code               |
 
 ### 7.5 i18n
 
-`@ramal/i18n` es la unica fuente de textos de interfaz de las tres apps.
+`@git-rudder/i18n` es la unica fuente de textos de interfaz de las tres apps.
 
 ```
 src/locales/es/<espacio>.json  Fuente de verdad: common, repos, graph, staging, diff, conflict,
@@ -1525,7 +1525,7 @@ test/parity.test.ts            Paridad de claves, de parametros y de plurales en
 - Los textos van en JSON, no en TypeScript: TypeScript tipa las claves de un JSON importado pero
   no ve dentro de sus textos, asi que los parametros los genera `just i18n-gen` en
   `src/generated/params.ts`, y el test de paridad falla si no esta al dia.
-- Semilla: el diccionario `D` de `ramal-data.js` (466 claves) y el `W` de la web (148) pasaron
+- Semilla: el diccionario `D` de `git-rudder-data.js` (466 claves) y el `W` de la web (148) pasaron
   a espacios de nombres con una conversion de un solo uso que no se conserva; `W` va entero a
   `web.*` porque 8 de sus claves chocan en texto con `D`. Los parametros de una letra se
   renombraron a nombres descriptivos (`{count}`, `{branch}`, `{sha}`...), los recuentos pasaron
@@ -1536,11 +1536,11 @@ test/parity.test.ts            Paridad de claves, de parametros y de plurales en
   fecha del grafo (el `MM-DD HH:mm` de los prototipos en el orden de cada idioma, con hora de 24
   horas para que quepa en la columna de VS Code).
 - `t("toast.pushed", { branch: "main" })` compila; sin `branch`, o con otro nombre, no.
-- El enlace con React (`I18nProvider`, `useT`) vive en `@ramal/ui` para que `@ramal/i18n`
+- El enlace con React (`I18nProvider`, `useT`) vive en `@git-rudder/ui` para que `@git-rudder/i18n`
   siga sin dependencias; el extension host usa el traductor directamente.
 - **Rust no devuelve textos traducidos.** El motor devuelve `ErrorKind` y la interfaz lo
   traduce con `errors.engine.<kind>`; la correspondencia es un `Record<BridgeErrorKind, clave>`
-  (`ENGINE_ERROR_KEYS` en `@ramal/repo-view`, y otro en el extension host para sus avisos), asi
+  (`ENGINE_ERROR_KEYS` en `@git-rudder/repo-view`, y otro en el extension host para sus avisos), asi
   que un `kind` nuevo sin traduccion no compila. La API devuelve
   problem+json con mensajes en castellano y un `code` estable; la web traduce el `code` con
   `errors.api.<code>` y usa el mensaje en castellano solo si no conoce el codigo.
@@ -1553,7 +1553,7 @@ idioma es `es` (`es`, `es-ES`, `es-419`) y `"en"` en cualquier otro caso.
   el idioma de VS Code exige reiniciarlo de todos modos. El ajuste de IA "igual que VS Code"
   usa la misma funcion. Los textos del manifiesto van en `package.nls.json` (ingles, el de
   reserva de VS Code) y `package.nls.es.json`, generados desde el espacio `vscode.manifest`
-  de `@ramal/i18n` (planificado; en el primer corte se escriben a mano).
+  de `@git-rudder/i18n` (planificado; en el primer corte se escriben a mano).
 - Escritorio: el ajuste de apariencia (espanol o ingles); en el primer arranque,
   `resolveLocale` sobre el idioma del SO.
 - Web: el conmutador ES/EN; la landing prerenderizada ya viene en su idioma por URL.
@@ -1593,21 +1593,21 @@ personales si el usuario lo activa) sin poder leerlos jamas.
 flowchart TB
     subgraph device["Dispositivo: Desktop o VS Code"]
         ui["Ajustes<br/>frase de sincronizacion y codigo de recuperacion"]
-        uc["Casos de uso de boveda<br/>ramal-core-application"]
-        vc["ramal-vault<br/>Argon2id, HKDF-SHA256, XChaCha20-Poly1305"]
-        ss["SecretStore<br/>ramal-keychain o SecretStorage"]
-        cc["ramal-cloud-client"]
+        uc["Casos de uso de boveda<br/>git-rudder-core-application"]
+        vc["git-rudder-vault<br/>Argon2id, HKDF-SHA256, XChaCha20-Poly1305"]
+        ss["SecretStore<br/>git-rudder-keychain o SecretStorage"]
+        cc["git-rudder-cloud-client"]
         ui --> uc
         uc --> vc
         uc --> ss
         uc --> cc
     end
-    subgraph server["Ramal API"]
-        http["ramal-api-http<br/>/v1/vault y /v1/linked-accounts"]
+    subgraph server["Git Rudder API"]
+        http["git-rudder-api-http<br/>/v1/vault y /v1/linked-accounts"]
         db[("vaults<br/>linked_accounts y ai_keys<br/>metadatos y secret_*")]
         http --> db
     end
-    web["Ramal Web"]
+    web["Git Rudder Web"]
     cc -->|"claves envueltas y blobs opacos"| http
     web -->|"lee metadatos y borra"| http
 ```
@@ -1618,25 +1618,25 @@ los mismos nombres. Este resumen no lo sustituye:
 
 - **VK:** 256 bits aleatorios por usuario, generados en el primer dispositivo que activa la
   boveda. No se usa directamente: de ella salen con HKDF-SHA256 `K_seal`
-  (`"ramal:vault:v1:seal"`), que sella los secretos, y `K_check` (`"ramal:vault:v1:check"`), que
+  (`"git-rudder:vault:v1:seal"`), que sella los secretos, y `K_check` (`"git-rudder:vault:v1:check"`), que
   calcula el comprobante.
 - **Envoltura por frase:** `KEK_p = Argon2id(frase en NFKC, sal de 16 bytes)` con 64 MiB, 3 pasadas
   y 4 carriles por defecto. Los parametros se guardan junto a la envoltura; el cliente nunca
-  envuelve por debajo del minimo que lleva compilado en `ramal-vault`, diga lo que diga el
+  envuelve por debajo del minimo que lleva compilado en `git-rudder-vault`, diga lo que diga el
   servidor.
 - **Envoltura por codigo de recuperacion:** 160 bits aleatorios, ensenados una vez como 32
   caracteres de base32 de Crockford en grupos de cuatro. `KEK_r = HKDF-SHA256(codigo, sal,
-"ramal:vault:v1:recovery")`: con entropia completa, Argon2id no anade nada.
+"git-rudder:vault:v1:recovery")`: con entropia completa, Argon2id no anade nada.
 - **Envolver la VK:** XChaCha20-Poly1305 con nonce aleatorio de 24 bytes y datos asociados
-  `ramal:vault:v1:wrap:{userId}:{tipo}:{keyVersion}`, con tipo `passphrase` o `recovery`.
+  `git-rudder:vault:v1:wrap:{userId}:{tipo}:{keyVersion}`, con tipo `passphrase` o `recovery`.
 - **Sellar un secreto:** XChaCha20-Poly1305 con `K_seal`, nonce aleatorio de 24 bytes y datos
-  asociados `ramal:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}`, con `kind`
+  asociados `git-rudder:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}`, con `kind`
   `platform_credential` o `ai_key`. El `recordId` es el id de la cuenta o de la llave, generado por
   el cliente antes de hablar con la API. El contenido sellado es un JSON versionado que lleva,
   ademas del secreto, los metadatos que deciden a donde se envia (plataforma, host, usuario y
   metodo de una cuenta; proveedor y URL base de una llave). El motor los compara con la fila al
   abrir y no usa el secreto si no coinciden.
-- **Comprobante:** `keyCheck = HMAC-SHA256(K_check, "ramal:vault:key-check:v1:{userId}:{keyVersion}")`.
+- **Comprobante:** `keyCheck = HMAC-SHA256(K_check, "git-rudder:vault:key-check:v1:{userId}:{keyVersion}")`.
   El servidor guarda su SHA-256 y lo compara antes de aceptar un cambio de envoltura o una
   rotacion.
 - **En el cable**, cada secreto viaja como campos separados (`keyVersion`, `alg`, `nonce`,
@@ -1649,14 +1649,14 @@ los mismos nombres. Este resumen no lo sustituye:
 
 **Que hace cada pieza.**
 
-| Pieza                            | Responsabilidad                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ramal-vault`                    | Implementa el puerto `VaultCipher`: derivar KEK y subllaves, envolver y desenvolver la VK, sellar y abrir secretos, calcular el comprobante. Limpia de memoria las claves (`zeroize`). No conoce la red ni el llavero.                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `ramal-core-application`         | Casos de uso: `SetupVault` (genera VK y codigo de recuperacion, ensena el codigo y exige confirmarlo antes de subir), `UnlockVault` (baja la cabecera, deriva, desenvuelve y guarda la VK en el `SecretStore`), `UnlockWithRecoveryCode`, `ChangeSyncPassphrase` (solo reenvuelve), `RegenerateRecoveryCode`, `RotateVaultKey` (pide la frase, genera VK y codigo nuevos, ensena el codigo, vuelve a sellar todos los secretos y lo sube en una peticion), `PushSecret`, `PullSecrets`, `LockVault`. No hay reinicio en el dispositivo: reiniciar es `DELETE /v1/vault`, solo desde la web, porque es el camino de quien ya no tiene la VK. |
-| `ramal-keychain` y SecretStorage | Guardan en el dispositivo la VK desenvuelta (entrada `ramal/vault-key/<user_id>`), el refresh token de Ramal, el secreto del dispositivo y la copia local de cada token y llave. Cerrar sesion, o recibir al refrescar un 401 con `session_ended`, borra la VK y las copias de secretos que llegaron de otros equipos (lo sabe por una marca local de origen por secreto); la casilla "Borrar también las añadidas en este equipo", apagada por defecto, borra tambien las locales. En VS Code, el sidecar pide los secretos al extension host por peticion inversa y este usa `context.secrets`.                                           |
-| `ramal-cloud-client`             | Sube y baja envolturas y secretos sellados. Nunca ve una clave en claro.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| API, contexto `vault`            | Guarda y sirve bytes que no entiende, con concurrencia optimista por `version` en la cabecera y `FOR SHARE`/`FOR UPDATE` sobre la fila de la boveda para que una escritura de secreto no se cruce con una rotacion. Borra el secreto al borrar su cuenta o su llave, y no deja reutilizar su id.                                                                                                                                                                                                                                                                                                                                            |
-| Web                              | Lista metadatos de cuentas ligadas y puede quitarlas (borra metadatos y secreto). Ve la mascara de las llaves personales, que esta en claro porque la calcula el dispositivo antes de subirla. No puede anadir, editar ni probar un token. Es el unico sitio con el reinicio de la boveda.                                                                                                                                                                                                                                                                                                                                                  |
+| Pieza                                 | Responsabilidad                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `git-rudder-vault`                    | Implementa el puerto `VaultCipher`: derivar KEK y subllaves, envolver y desenvolver la VK, sellar y abrir secretos, calcular el comprobante. Limpia de memoria las claves (`zeroize`). No conoce la red ni el llavero.                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `git-rudder-core-application`         | Casos de uso: `SetupVault` (genera VK y codigo de recuperacion, ensena el codigo y exige confirmarlo antes de subir), `UnlockVault` (baja la cabecera, deriva, desenvuelve y guarda la VK en el `SecretStore`), `UnlockWithRecoveryCode`, `ChangeSyncPassphrase` (solo reenvuelve), `RegenerateRecoveryCode`, `RotateVaultKey` (pide la frase, genera VK y codigo nuevos, ensena el codigo, vuelve a sellar todos los secretos y lo sube en una peticion), `PushSecret`, `PullSecrets`, `LockVault`. No hay reinicio en el dispositivo: reiniciar es `DELETE /v1/vault`, solo desde la web, porque es el camino de quien ya no tiene la VK. |
+| `git-rudder-keychain` y SecretStorage | Guardan en el dispositivo la VK desenvuelta (entrada `git-rudder/vault-key/<user_id>`), el refresh token de Git Rudder, el secreto del dispositivo y la copia local de cada token y llave. Cerrar sesion, o recibir al refrescar un 401 con `session_ended`, borra la VK y las copias de secretos que llegaron de otros equipos (lo sabe por una marca local de origen por secreto); la casilla "Borrar también las añadidas en este equipo", apagada por defecto, borra tambien las locales. En VS Code, el sidecar pide los secretos al extension host por peticion inversa y este usa `context.secrets`.                                 |
+| `git-rudder-cloud-client`             | Sube y baja envolturas y secretos sellados. Nunca ve una clave en claro.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| API, contexto `vault`                 | Guarda y sirve bytes que no entiende, con concurrencia optimista por `version` en la cabecera y `FOR SHARE`/`FOR UPDATE` sobre la fila de la boveda para que una escritura de secreto no se cruce con una rotacion. Borra el secreto al borrar su cuenta o su llave, y no deja reutilizar su id.                                                                                                                                                                                                                                                                                                                                            |
+| Web                                   | Lista metadatos de cuentas ligadas y puede quitarlas (borra metadatos y secreto). Ve la mascara de las llaves personales, que esta en claro porque la calcula el dispositivo antes de subirla. No puede anadir, editar ni probar un token. Es el unico sitio con el reinicio de la boveda.                                                                                                                                                                                                                                                                                                                                                  |
 
 **Que guarda el servidor.** Las tablas exactas estan en [data-model.md](data-model.md):
 
@@ -1692,36 +1692,36 @@ sube.
 Estas no son E2E: el servidor las necesita en claro para llamar al proveedor, y por eso
 nunca salen de el.
 
-- **Almacenamiento:** cifrado de sobre en `ramal-api-infrastructure`
+- **Almacenamiento:** cifrado de sobre en `git-rudder-api-infrastructure`
   ([ADR 0013](adr/0013-proxy-de-ia-de-organizacion.md)). Por llave, una DEK de 256 bits aleatoria
   cifra el secreto con AES-256-GCM y nonce aleatorio de 96 bits, con datos asociados
-  `ramal:org-ai-key:v1:{orgId}:{keyId}`. La DEK se envuelve con la KEK activa (AES-256-GCM) con
-  datos asociados `ramal:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`: el `kekId` va en la envoltura y
+  `git-rudder:org-ai-key:v1:{orgId}:{keyId}`. La DEK se envuelve con la KEK activa (AES-256-GCM) con
+  datos asociados `git-rudder:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`: el `kekId` va en la envoltura y
   no en el secreto, para que rotar la KEK no deje los secretos sin poder descifrarse. Se guardan
   `ciphertext`, `nonce`, `wrapped_dek`, `dek_nonce`, `kek_id` y `alg`, ademas de los metadatos
   (proveedor, etiqueta, modelo por defecto y modelo por funcion, que fija el admin, URL base,
   enmascarado). Las KEK llegan por configuracion
-  (`RAMAL__SECRETS__KEKS`, mapa de id a clave en base64, y `RAMAL__SECRETS__ACTIVE_KEK`), nunca
+  (`GIT_RUDDER__SECRETS__KEKS`, mapa de id a clave en base64, y `GIT_RUDDER__SECRETS__ACTIVE_KEK`), nunca
   desde la base de datos. Rotar es cambiar la KEK activa; un trabajo periodico reenvuelve las DEK
   de la anterior y esa KEK se retira cuando ninguna fila la usa. Un test rota y vuelve a
-  descifrar. En produccion la KEK va en el `.env` de Ramal en `apps-01`, compartida con otras dos
+  descifrar. En produccion la KEK va en el `.env` de Git Rudder en `apps-01`, compartida con otras dos
   aplicaciones: 0600, solo el contenedor de la API la recibe, y KMS mas adelante por el mismo
   puerto ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)).
 - **Salida a los proveedores:** los proveedores conocidos tienen el host fijo y solo `custom` (si
   el despliegue lo permite) elige URL base. El cliente HTTP comprueba en cada conexion, con un
   resolvedor propio, que la direccion no es privada, de loopback ni de enlace local, sin seguir
   redirecciones ni usar el proxy del entorno.
-- **Piezas:** `ramal-api-domain` (llave de organizacion como metadatos, funciones de IA,
-  reglas de cuota), `ramal-api-application` (puertos `OrgAiKeyRepository`, `KeyEnvelope`,
+- **Piezas:** `git-rudder-api-domain` (llave de organizacion como metadatos, funciones de IA,
+  reglas de cuota), `git-rudder-api-application` (puertos `OrgAiKeyRepository`, `KeyEnvelope`,
   `AiGenerator`, `UsageMeter`; caso de uso `GenerateWithOrgKey`: comprueba pertenencia y
   politica, cuota, abre la DEK, construye el prompt y llama al proveedor),
-  `ramal-api-infrastructure` (`AesGcmKeyEnvelope`, repositorio en PostgreSQL y
-  `ProviderAiGenerator` sobre `ramal-ai`), `ramal-api-http` (el endpoint de generacion, que
+  `git-rudder-api-infrastructure` (`AesGcmKeyEnvelope`, repositorio en PostgreSQL y
+  `ProviderAiGenerator` sobre `git-rudder-ai`), `git-rudder-api-http` (el endpoint de generacion, que
   responde con SSE; su ruta exacta la fija api-surface.md).
-- **Camino:** el boton de IA de `@ramal/repo-view` llama a `ai/generateCommitMessage`. El caso
+- **Camino:** el boton de IA de `@git-rudder/repo-view` llama a `ai/generateCommitMessage`. El caso
   de uso del motor arma una entrada estructurada (diff preparado ya filtrado de ficheros
-  sensibles por `ramal-ai`, truncado, rama, opciones), nunca un prompt libre. Si la llave
-  elegida es personal, el adaptador de `ramal-ai` llama al proveedor desde el dispositivo. Si
+  sensibles por `git-rudder-ai`, truncado, rama, opciones), nunca un prompt libre. Si la llave
+  elegida es personal, el adaptador de `git-rudder-ai` llama al proveedor desde el dispositivo. Si
   es de organizacion, `CloudClient` llama a la API, que vuelve a filtrar (defensa en
   profundidad), reserva la cuota en la base antes de llamar (fila de contadores de la
   organizacion con `FOR UPDATE`), genera con un tope de tokens de salida por funcion y devuelve
@@ -1733,7 +1733,7 @@ nunca salen de el.
   instrucciones extra y los parches son texto libre); lo que acota el abuso son el tope de salida,
   las cuotas reservadas y la concurrencia por usuario.
 
-### 8.4 Sesion de Ramal en los clientes (planificado)
+### 8.4 Sesion de Git Rudder en los clientes (planificado)
 
 El motor guarda el refresh token y el secreto del dispositivo en el `SecretStore` y el token de
 acceso en memoria. El inicio de sesion es Authorization Code con PKCE contra la pagina web: en
@@ -1778,32 +1778,32 @@ te lo va a decir antes que el reviewer. Recetas concretas por pieza:
    `apps/desktop/src-tauri/src/surfaces.rs` (escrita a mano con el marcador del metodo). Si lleva
    rutas absolutas o devuelve algo secreto, se marca `host_only = true` en `define_methods!` y no
    entra en ninguna lista.
-8. Interfaz: un hook en `@ramal/repo-view` sobre `client.call("stash/list", ...)` con
+8. Interfaz: un hook en `@git-rudder/repo-view` sobre `client.call("stash/list", ...)` con
    TanStack Query, y la clave de i18n de cualquier `kind` de error nuevo.
 
 ### 9.2 Un endpoint nuevo de la API
 
-1. `ramal-api-domain`: entidad o value object con sus reglas.
-2. `ramal-api-application`: puerto (por ejemplo un repositorio) y fake en `testing/`.
+1. `git-rudder-api-domain`: entidad o value object con sus reglas.
+2. `git-rudder-api-application`: puerto (por ejemplo un repositorio) y fake en `testing/`.
 3. Caso de uso en `use_case/<contexto>/<verbo_nombre>.rs`, probado con el fake y `block_on`.
-4. `ramal-api-infrastructure`: adaptador de PostgreSQL con su migracion nueva y su test contra
+4. `git-rudder-api-infrastructure`: adaptador de PostgreSQL con su migracion nueva y su test contra
    base de datos real.
-5. `ramal-api-http`: DTO, handler con `#[endpoint]`, ruta en `router/<contexto>.rs` y su test de
+5. `git-rudder-api-http`: DTO, handler con `#[endpoint]`, ruta en `router/<contexto>.rs` y su test de
    endpoint con fakes en `http/tests/`. El de punta a punta contra PostgreSQL va en
    `crates/api/tests/`. Regenera `apps/api/openapi.json` (`just api-openapi`) y
-   `@ramal/api-client` (`just api-client`).
-6. `ramal-api`: `bootstrap/<contexto>.rs` construye las dependencias del contexto.
+   `@git-rudder/api-client` (`just api-client`).
+6. `git-rudder-api`: `bootstrap/<contexto>.rs` construye las dependencias del contexto.
 7. Si es un prefijo nuevo: `location` en `docker/gateway.dev.conf` (y en el de produccion
    cuando exista) y sonda en `tools/scripts/smoke-stack.sh`. Y el endpoint documentado en
    api-surface.md.
 
 ### 9.3 Una pantalla o funcion nueva en la web
 
-1. `src/domain` (o `@ramal/domain` si otra app la necesita).
+1. `src/domain` (o `@git-rudder/domain` si otra app la necesita).
 2. Puerto en `src/application/ports/`.
 3. Caso de uso en `src/application/use-cases/`, que devuelve una union de resultados y nunca
    lanza, con test sobre un puerto escrito a mano.
-4. Adaptador en `src/infrastructure/http/` sobre `@ramal/api-client` (o en la carpeta de su
+4. Adaptador en `src/infrastructure/http/` sobre `@git-rudder/api-client` (o en la carpeta de su
    tecnologia: `storage/`, `browser/`...).
 5. Pantalla en `src/ui/<funcion>/` que recibe el puerto por contexto (`UiPortsContext`); test de
    componente con un puerto falso o el adaptador local.
@@ -1830,10 +1830,10 @@ capacidad toca rutas o abre algo del sistema, se resuelve con un comando de Rust
 
 ### 9.6 Una pieza de interfaz compartida
 
-- Primitiva sin conocimiento de Git (un selector, un menu): `@ramal/ui`, solo con tokens.
-- Pieza de la vista de repositorio: `@ramal/repo-view`. Si necesita algo del host, se anade al
+- Primitiva sin conocimiento de Git (un selector, un menu): `@git-rudder/ui`, solo con tokens.
+- Pieza de la vista de repositorio: `@git-rudder/repo-view`. Si necesita algo del host, se anade al
   puerto `RepoViewHost` y se implementa en los dos hosts en el mismo PR.
-- Logica pura que la pieza necesita: `@ramal/domain`, con sus tests.
+- Logica pura que la pieza necesita: `@git-rudder/domain`, con sus tests.
 
 ### 9.7 Un texto nuevo
 
@@ -1861,15 +1861,15 @@ extremo en el cliente, el grafo, y el minimo de la API para arrancar. No hay ent
 inventadas: cuando llegue el dominio real, los huecos estan a la vista y ya tienen sitio. Esta
 tabla dice lo que hay en `main`, no lo que se pidio.
 
-| Pieza      | Primer corte, en `main`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Planificado                                                                                                                                                                                                                                                                                                                                                           |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Monorepo   | Workspace de Cargo, pnpm 11.18 por corepack, `justfile`, lefthook, commitlint, `tools/checks` (tamano de fichero, tests enfocados o apagados, TODO con ticket, grafo de paquetes, limites apagados en linea, lints heredados por crate, `eslint.config.js` por paquete, tests de Rust en su fichero y versiones de los Dockerfile), `tools/rust-complexity`, `scan-staged.sh`, `smoke-stack.sh`, la imagen de Linux con los requisitos de Tauri (`tools/docker`), `ci.yml` con filtros por pieza y `all-green`                                                                                                                               | Workflow de release (Tauri, VSIX por plataforma, imagen de la API), construir la imagen de Tauri en la CI                                                                                                                                                                                                                                                             |
-| API        | `/health/live` y `/health/ready` con `checkedAt` y una sonda de PostgreSQL que compara el esquema con la ultima migracion, `/openapi.json` (OpenAPI 3.1), `/swagger-ui/` solo con `RAMAL__SERVER__SWAGGER_UI=true`, problem+json con `code` en todo problema y catcher de 404 y 405, request id, configuracion `RAMAL__`, migraciones en segundo plano con reintento cada 10 segundos y la primera (`schema_metadata`), apagado ordenado, test de arquitectura, `openapi.json` versionado, imagen de produccion con su prueba de humo                                                                                                        | Auth, sesiones y dispositivos, organizaciones, workspaces y repositorios, documentos de ajustes, boveda, cuentas ligadas, llaves de IA de organizacion y proxy, broker OAuth de Bitbucket, releases y manifiesto del updater, limite de ritmo, idempotencia, limite de cuerpo, el check `secrets` de readiness, el gateway de produccion (`docker/gateway.prod.conf`) |
-| Motor      | `ramal-core-domain` (sha, repo, refs con su huella, commit, time, graph), `ramal-core-application` (`GitReader`, `DescribeEngine`, `OpenRepository` con el git minimo, `LoadGraphWindow` con `snapshot` y `stale_window`, registro de repos con ids derivados de la raiz, fakes), `ramal-git` (version y capacidades, descubrimiento, refs, log), `ramal-protocol` (sobre, `engine/info`, `repo/open`, `graph/window`, marca `host_only`, exportacion ts-rs, version 2), `ramal-engine` (builder, dispatch con `CallContext`, mapeo, tests de arquitectura y de pureza del nucleo); la suite corre en la CI con git 2.34 y con el del runner | `GitWriter` y todas las escrituras, estado y staging, diff, conflictos, rebase, diario de deshacer, vigilancia de cambios, cancelacion (atender `$/cancel`, tipo `cancelled`) y progreso, cache de disposicion por HEAD, confianza de repositorios, `gix` en lecturas si un benchmark lo pide, crates `vault`, `keychain`, `platforms`, `ai`, `cloud-client`          |
-| Escritorio | `ramal-desktop` con `rpc`, `repo_pick_and_open`, la lista de metodos por ventana, la CSP de 6.8 (con el hash del `<style>` de React Aria) y cobertura minima del 60%; frontend con `TauriTransport`, `RepositoryPicker`, barra de titulo con pestanas, Inicio, apariencia (tema e idioma) y la vista del repositorio de `@ramal/repo-view`; Playwright con mockIPC que falla con cualquier violacion de la CSP; E2E nativo con WebdriverIO y la feature `e2e`, que la CI corre en Linux                                                                                                                                                      | Ajustes, `rpc_subscribe` y notificaciones, confianza de repositorios, plugin opener, updater, deep links, single-instance, empaquetado (.deb, .rpm, .AppImage, .dmg, instaladores de Windows), E2E en Windows y macOS                                                                                                                                                 |
-| VS Code    | Extension host con el comando "Ramal: Open Graph" y la vista de bienvenida, supervision del sidecar (reinicios con espera creciente, version del protocolo en cada arranque, error de git sin bucle de reinicios, reapertura de los repos de los paneles), validacion de mensajes con el `repoId` de cada panel, panel `ramal.graph` con la CSP de 6.8, `clipboard/writeText`; `ramal-vscode-engine` con framing, mensajes y servidor; Playwright con acquireVsCodeApi falso; tests de integracion en un VS Code real; la VSIX de `linux-x64` en la CI                                                                                       | Vistas de arbol, vista Cambios, merge como editor personalizado, ajustes, barra de estado, `AuthenticationProvider`, peticiones inversas de secretos, reenviar `$/cancel`, el hash de React Aria en la CSP de los webviews, `package.nls*.json` generados desde `@ramal/i18n`, VSIX del resto de plataformas y publicacion                                            |
-| Web        | Landing prerenderizada en ES y EN con descargas (datos fijos) y preferencias de idioma y tema, pantallas de login y registro con la validacion de `@ramal/domain` (el envio va a un `AuthGateway` que responde "no disponible todavia"), ruta `/status` con `checkApiHealth`, imagen de produccion (nginx) con su prueba de humo, Playwright con la red simulada y contra la pila                                                                                                                                                                                                                                                            | Auth real, panel (resumen, workspaces, repositorios, cuentas ligadas, equipo, ajustes en la nube), vista previa del producto en la landing, datos de descarga desde la API, la CSP de la web en el gateway de produccion                                                                                                                                              |
-| Paquetes   | `@ramal/ui` con tokens, los dos temas, las dos densidades, `DENSITIES`, iconos y primitivas; `@ramal/i18n` con la semilla de `D` y `W` en JSON y los parametros generados; `@ramal/bridge` con cliente y tipos generados; `@ramal/repo-view` con el grafo; `@ramal/domain` con auth, descargas, resolver de conflictos, rebase, filtros y grupos de repos, PRs, tiempo relativo, llaves, commits, nombres de ref y plataformas; `@ramal/api-client` generado; `@ramal/eslint-config` (con sus reglas propias) y `@ramal/tsconfig`                                                                                                            | El resto de `@ramal/repo-view` (fila WIP, detalle, diff, resolver, rebase) y el puerto `RepoViewHost`                                                                                                                                                                                                                                                                 |
+| Pieza      | Primer corte, en `main`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Planificado                                                                                                                                                                                                                                                                                                                                                           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monorepo   | Workspace de Cargo, pnpm 11.18 por corepack, `justfile`, lefthook, commitlint, `tools/checks` (tamano de fichero, tests enfocados o apagados, TODO con ticket, grafo de paquetes, limites apagados en linea, lints heredados por crate, `eslint.config.js` por paquete, tests de Rust en su fichero y versiones de los Dockerfile), `tools/rust-complexity`, `scan-staged.sh`, `smoke-stack.sh`, la imagen de Linux con los requisitos de Tauri (`tools/docker`), `ci.yml` con filtros por pieza y `all-green`                                                                                                                                                        | Workflow de release (Tauri, VSIX por plataforma, imagen de la API), construir la imagen de Tauri en la CI                                                                                                                                                                                                                                                             |
+| API        | `/health/live` y `/health/ready` con `checkedAt` y una sonda de PostgreSQL que compara el esquema con la ultima migracion, `/openapi.json` (OpenAPI 3.1), `/swagger-ui/` solo con `GIT_RUDDER__SERVER__SWAGGER_UI=true`, problem+json con `code` en todo problema y catcher de 404 y 405, request id, configuracion `GIT_RUDDER__`, migraciones en segundo plano con reintento cada 10 segundos y la primera (`schema_metadata`), apagado ordenado, test de arquitectura, `openapi.json` versionado, imagen de produccion con su prueba de humo                                                                                                                       | Auth, sesiones y dispositivos, organizaciones, workspaces y repositorios, documentos de ajustes, boveda, cuentas ligadas, llaves de IA de organizacion y proxy, broker OAuth de Bitbucket, releases y manifiesto del updater, limite de ritmo, idempotencia, limite de cuerpo, el check `secrets` de readiness, el gateway de produccion (`docker/gateway.prod.conf`) |
+| Motor      | `git-rudder-core-domain` (sha, repo, refs con su huella, commit, time, graph), `git-rudder-core-application` (`GitReader`, `DescribeEngine`, `OpenRepository` con el git minimo, `LoadGraphWindow` con `snapshot` y `stale_window`, registro de repos con ids derivados de la raiz, fakes), `git-rudder-git` (version y capacidades, descubrimiento, refs, log), `git-rudder-protocol` (sobre, `engine/info`, `repo/open`, `graph/window`, marca `host_only`, exportacion ts-rs, version 2), `git-rudder-engine` (builder, dispatch con `CallContext`, mapeo, tests de arquitectura y de pureza del nucleo); la suite corre en la CI con git 2.34 y con el del runner | `GitWriter` y todas las escrituras, estado y staging, diff, conflictos, rebase, diario de deshacer, vigilancia de cambios, cancelacion (atender `$/cancel`, tipo `cancelled`) y progreso, cache de disposicion por HEAD, confianza de repositorios, `gix` en lecturas si un benchmark lo pide, crates `vault`, `keychain`, `platforms`, `ai`, `cloud-client`          |
+| Escritorio | `git-rudder-desktop` con `rpc`, `repo_pick_and_open`, la lista de metodos por ventana, la CSP de 6.8 (con el hash del `<style>` de React Aria) y cobertura minima del 60%; frontend con `TauriTransport`, `RepositoryPicker`, barra de titulo con pestanas, Inicio, apariencia (tema e idioma) y la vista del repositorio de `@git-rudder/repo-view`; Playwright con mockIPC que falla con cualquier violacion de la CSP; E2E nativo con WebdriverIO y la feature `e2e`, que la CI corre en Linux                                                                                                                                                                     | Ajustes, `rpc_subscribe` y notificaciones, confianza de repositorios, plugin opener, updater, deep links, single-instance, empaquetado (.deb, .rpm, .AppImage, .dmg, instaladores de Windows), E2E en Windows y macOS                                                                                                                                                 |
+| VS Code    | Extension host con el comando "Git Rudder: Open Graph" y la vista de bienvenida, supervision del sidecar (reinicios con espera creciente, version del protocolo en cada arranque, error de git sin bucle de reinicios, reapertura de los repos de los paneles), validacion de mensajes con el `repoId` de cada panel, panel `gitRudder.graph` con la CSP de 6.8, `clipboard/writeText`; `git-rudder-vscode-engine` con framing, mensajes y servidor; Playwright con acquireVsCodeApi falso; tests de integracion en un VS Code real; la VSIX de `linux-x64` en la CI                                                                                                  | Vistas de arbol, vista Cambios, merge como editor personalizado, ajustes, barra de estado, `AuthenticationProvider`, peticiones inversas de secretos, reenviar `$/cancel`, el hash de React Aria en la CSP de los webviews, `package.nls*.json` generados desde `@git-rudder/i18n`, VSIX del resto de plataformas y publicacion                                       |
+| Web        | Landing prerenderizada en ES y EN con descargas (datos fijos) y preferencias de idioma y tema, pantallas de login y registro con la validacion de `@git-rudder/domain` (el envio va a un `AuthGateway` que responde "no disponible todavia"), ruta `/status` con `checkApiHealth`, imagen de produccion (nginx) con su prueba de humo, Playwright con la red simulada y contra la pila                                                                                                                                                                                                                                                                                | Auth real, panel (resumen, workspaces, repositorios, cuentas ligadas, equipo, ajustes en la nube), vista previa del producto en la landing, datos de descarga desde la API, la CSP de la web en el gateway de produccion                                                                                                                                              |
+| Paquetes   | `@git-rudder/ui` con tokens, los dos temas, las dos densidades, `DENSITIES`, iconos y primitivas; `@git-rudder/i18n` con la semilla de `D` y `W` en JSON y los parametros generados; `@git-rudder/bridge` con cliente y tipos generados; `@git-rudder/repo-view` con el grafo; `@git-rudder/domain` con auth, descargas, resolver de conflictos, rebase, filtros y grupos de repos, PRs, tiempo relativo, llaves, commits, nombres de ref y plataformas; `@git-rudder/api-client` generado; `@git-rudder/eslint-config` (con sus reglas propias) y `@git-rudder/tsconfig`                                                                                             | El resto de `@git-rudder/repo-view` (fila WIP, detalle, diff, resolver, rebase) y el puerto `RepoViewHost`                                                                                                                                                                                                                                                            |
 
 **Que se verifico al cerrar el primer corte** (2026-10-01, en Linux, sobre `main` en `ff84876`):
 
@@ -1907,7 +1907,7 @@ licencia ya esta decidida ([ADR 0021](adr/0021-licencia-fsl.md)).
   `git diff --exit-code` limpio tras regenerar `packages/bridge/src/generated` y
   `packages/api-client/src/generated`.
 - En escritorio, elegir una carpeta con un repo real muestra su grafo con carriles calculados
-  por el motor. En VS Code, "Ramal: Open Graph" muestra el grafo del repo del workspace. Las
+  por el motor. En VS Code, "Git Rudder: Open Graph" muestra el grafo del repo del workspace. Las
   dos vistas salen del mismo componente y de la misma llamada `graph/window`.
 - La web sirve la landing prerenderizada y su ruta de estado muestra lo que responde
   `/health/ready` a traves del gateway, verificado por `smoke-stack.sh`.
@@ -1918,32 +1918,33 @@ El porque de cada decision de partida y de cada eleccion tecnica de este documen
 de [adr/](adr/). Un ADR aceptado no se edita para cambiar de opinion: se escribe otro que lo
 sustituye y se enlaza desde el viejo.
 
-| ADR                                                   | Decision                                                                                                                                                                      |
-| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [0001](adr/0001-monorepo-poliglota.md)                | Monorepo con pnpm, un solo workspace de Cargo y just, sin orquestador; el crate de Tauri fuera de `default-members`                                                           |
-| [0002](adr/0002-arquitectura-hexagonal.md)            | Arquitectura hexagonal en la API, el motor, los hosts, la web y los paquetes TS, forzada con tests de arquitectura y boundaries                                               |
-| [0003](adr/0003-rust-con-salvo.md)                    | API en Rust con Salvo 1.0 y el documento OpenAPI generado con salvo-oapi desde el router                                                                                      |
-| [0004](adr/0004-postgresql-con-sqlx.md)               | PostgreSQL 18 con SQLx sin macros de consulta, migraciones solo hacia delante y tests contra una base real                                                                    |
-| [0005](adr/0005-enforcement-automatizado.md)          | Limites de calidad bloqueantes en local, en cada commit y en la CI; avisos como errores y toolchain de Rust fijado                                                            |
-| [0006](adr/0006-estrategia-de-testing.md)             | Piramide de tests por app, repositorios de prueba dorados, Playwright con hosts simulados y una capa fina de E2E reales                                                       |
-| [0007](adr/0007-docker-desarrollo-y-produccion.md)    | Docker para desarrollo y produccion, gateway del mismo origen por prefijos y la pila probada entrando por la puerta                                                           |
-| [0008](adr/0008-autenticacion-con-tokens.md)          | JWT Ed25519 de 15 minutos, refresh opaco rotatorio, cookies con CSRF en la web y PKCE o device flow en las apps nativas                                                       |
-| [0009](adr/0009-motor-git-hibrido.md)                 | Motor Git hibrido: la CLI de git para todo, gix mas tarde solo en lecturas, sin libgit2, git 2.34 como minimo y credenciales por repositorio                                  |
-| [0010](adr/0010-un-motor-para-escritorio-y-vscode.md) | Un solo motor en Rust: en proceso en escritorio y como sidecar JSON-RPC en VSIX por plataforma en VS Code                                                                     |
-| [0011](adr/0011-ui-compartida-y-puente-tipado.md)     | Interfaz compartida por tokens semanticos, dos temas y dos densidades, React Aria, puente tipado con transportes y tipos de ts-rs                                             |
-| [0012](adr/0012-boveda-de-extremo-a-extremo.md)       | Boveda de secretos de extremo a extremo: frase de sincronizacion, codigo de recuperacion y nada que el servidor pueda abrir                                                   |
-| [0013](adr/0013-proxy-de-ia-de-organizacion.md)       | Llaves de IA de organizacion con cifrado de sobre y proxy en la API; llaves personales usadas desde el dispositivo                                                            |
-| [0014](adr/0014-usar-ramal-sin-cuenta.md)             | Todo lo que es Git local funciona sin cuenta de Ramal; la nube pide sesion en el punto concreto                                                                               |
-| [0015](adr/0015-framework-web-con-prerender.md)       | React Router 8 en modo framework sin SSR, con la landing prerenderizada en dos idiomas y el panel como SPA                                                                    |
-| [0016](adr/0016-actualizaciones-y-descargas.md)       | Actualizador de Tauri con artefactos en GitHub Releases de `eabl0306/ramal` y manifiesto servido por la API con `{{bundle_type}}`, con canales, despliegue gradual y retirada |
-| [0017](adr/0017-internacionalizacion-compartida.md)   | Un solo paquete de textos con claves tipadas y plurales; regla de idioma comun y manifiesto de VS Code con `package.nls`                                                      |
-| [0018](adr/0018-cuentas-de-plataformas-git.md)        | Cuentas de plataformas con clientes OAuth publicos primero, broker solo para Bitbucket, PAT donde no hay OAuth y PRs pedidos desde el motor                                   |
-| [0021](adr/0021-licencia-fsl.md)                      | Todo el repositorio con la FSL 1.1 y Apache 2.0 como licencia futura (`FSL-1.1-ALv2`)                                                                                         |
-| [0022](adr/0022-proveedor-de-pagos.md)                | Paddle como comerciante registrado (plan B Polar), detras de un puerto `BillingProvider`; checkout en una pagina de la web y prueba llevada por Ramal                         |
-| [0023](adr/0023-despliegue-en-apps-01-y-dominio.md)   | Despliegue en la instancia compartida `apps-01` con el patron de Gastonomo; web en `ramal.bahoque.com` y API en `api.ramal.bahoque.com`                                       |
-| [0024](adr/0024-correo-transaccional-con-resend.md)   | Correo transaccional por SMTP con Resend, en un equipo propio, remitente verificado en un subdominio y DMARC por etapas                                                       |
-| [0025](adr/0025-recomendacion-de-modelos-de-ia.md)    | Modelos de IA recomendados desde un fichero publico de la API, por nivel y por funcion, con el modelo de las llaves de organizacion fijado por el admin                       |
-| [0026](adr/0026-planes-y-precios.md)                  | Gratis para cada persona; Ramal Pro por asiento para organizaciones (8 USD en anual, 10 en mensual, 14 dias de prueba); todo en la primera version                            |
+| ADR                                                   | Decision                                                                                                                                                                           |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [0001](adr/0001-monorepo-poliglota.md)                | Monorepo con pnpm, un solo workspace de Cargo y just, sin orquestador; el crate de Tauri fuera de `default-members`                                                                |
+| [0002](adr/0002-arquitectura-hexagonal.md)            | Arquitectura hexagonal en la API, el motor, los hosts, la web y los paquetes TS, forzada con tests de arquitectura y boundaries                                                    |
+| [0003](adr/0003-rust-con-salvo.md)                    | API en Rust con Salvo 1.0 y el documento OpenAPI generado con salvo-oapi desde el router                                                                                           |
+| [0004](adr/0004-postgresql-con-sqlx.md)               | PostgreSQL 18 con SQLx sin macros de consulta, migraciones solo hacia delante y tests contra una base real                                                                         |
+| [0005](adr/0005-enforcement-automatizado.md)          | Limites de calidad bloqueantes en local, en cada commit y en la CI; avisos como errores y toolchain de Rust fijado                                                                 |
+| [0006](adr/0006-estrategia-de-testing.md)             | Piramide de tests por app, repositorios de prueba dorados, Playwright con hosts simulados y una capa fina de E2E reales                                                            |
+| [0007](adr/0007-docker-desarrollo-y-produccion.md)    | Docker para desarrollo y produccion, gateway del mismo origen por prefijos y la pila probada entrando por la puerta                                                                |
+| [0008](adr/0008-autenticacion-con-tokens.md)          | JWT Ed25519 de 15 minutos, refresh opaco rotatorio, cookies con CSRF en la web y PKCE o device flow en las apps nativas                                                            |
+| [0009](adr/0009-motor-git-hibrido.md)                 | Motor Git hibrido: la CLI de git para todo, gix mas tarde solo en lecturas, sin libgit2, git 2.34 como minimo y credenciales por repositorio                                       |
+| [0010](adr/0010-un-motor-para-escritorio-y-vscode.md) | Un solo motor en Rust: en proceso en escritorio y como sidecar JSON-RPC en VSIX por plataforma en VS Code                                                                          |
+| [0011](adr/0011-ui-compartida-y-puente-tipado.md)     | Interfaz compartida por tokens semanticos, dos temas y dos densidades, React Aria, puente tipado con transportes y tipos de ts-rs                                                  |
+| [0012](adr/0012-boveda-de-extremo-a-extremo.md)       | Boveda de secretos de extremo a extremo: frase de sincronizacion, codigo de recuperacion y nada que el servidor pueda abrir                                                        |
+| [0013](adr/0013-proxy-de-ia-de-organizacion.md)       | Llaves de IA de organizacion con cifrado de sobre y proxy en la API; llaves personales usadas desde el dispositivo                                                                 |
+| [0014](adr/0014-usar-git-rudder-sin-cuenta.md)        | Todo lo que es Git local funciona sin cuenta de Git Rudder; la nube pide sesion en el punto concreto                                                                               |
+| [0015](adr/0015-framework-web-con-prerender.md)       | React Router 8 en modo framework sin SSR, con la landing prerenderizada en dos idiomas y el panel como SPA                                                                         |
+| [0016](adr/0016-actualizaciones-y-descargas.md)       | Actualizador de Tauri con artefactos en GitHub Releases de `eabl0306/git-rudder` y manifiesto servido por la API con `{{bundle_type}}`, con canales, despliegue gradual y retirada |
+| [0017](adr/0017-internacionalizacion-compartida.md)   | Un solo paquete de textos con claves tipadas y plurales; regla de idioma comun y manifiesto de VS Code con `package.nls`                                                           |
+| [0018](adr/0018-cuentas-de-plataformas-git.md)        | Cuentas de plataformas con clientes OAuth publicos primero, broker solo para Bitbucket, PAT donde no hay OAuth y PRs pedidos desde el motor                                        |
+| [0021](adr/0021-licencia-fsl.md)                      | Todo el repositorio con la FSL 1.1 y Apache 2.0 como licencia futura (`FSL-1.1-ALv2`)                                                                                              |
+| [0022](adr/0022-proveedor-de-pagos.md)                | Paddle como comerciante registrado (plan B Polar), detras de un puerto `BillingProvider`; checkout en una pagina de la web y prueba llevada por Git Rudder                         |
+| [0023](adr/0023-despliegue-en-apps-01-y-dominio.md)   | Despliegue en la instancia compartida `apps-01` con el patron de Gastonomo; web en `git-rudder.com` y API en `api.git-rudder.com`                                                  |
+| [0024](adr/0024-correo-transaccional-con-resend.md)   | Correo transaccional por SMTP con Resend, en un equipo propio, remitente verificado en un subdominio y DMARC por etapas                                                            |
+| [0025](adr/0025-recomendacion-de-modelos-de-ia.md)    | Modelos de IA recomendados desde un fichero publico de la API, por nivel y por funcion, con el modelo de las llaves de organizacion fijado por el admin                            |
+| [0026](adr/0026-planes-y-precios.md)                  | Gratis para cada persona; Git Rudder Pro por asiento para organizaciones (8 USD en anual, 10 en mensual, 14 dias de prueba); todo en la primera version                            |
+| [0027](adr/0027-renombrado-a-git-rudder.md)           | El producto se llama Git Rudder, con una forma de identificador por convencion (`git-rudder`, `git_rudder`, `gitRudder`, `GIT_RUDDER`) y dominio propio `git-rudder.com`           |
 
 Pendientes de escribir, con su issue en el backlog (epica E02):
 

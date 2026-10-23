@@ -19,7 +19,7 @@ export default async function globalSetup(): Promise<void> {
       lib: {
         entry: new URL('./support/ipc-mock.ts', import.meta.url).pathname,
         formats: ['iife'],
-        name: 'RamalIpcMock',
+        name: 'GitRudderIpcMock',
         fileName: () => IPC_MOCK_FILE,
       },
     },

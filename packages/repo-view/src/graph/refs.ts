@@ -1,5 +1,5 @@
-import type { RefLabel } from '@ramal/bridge';
-import { type IconName, cssVar, laneColor } from '@ramal/ui';
+import type { RefLabel } from '@git-rudder/bridge';
+import { type IconName, cssVar, laneColor } from '@git-rudder/ui';
 
 /** Pildoras visibles por fila; el resto se resume en "+n" (diseno de la vista de repositorio). */
 export const MAX_VISIBLE_REFS = 2;
@@ -17,7 +17,7 @@ export function splitRefs(refs: readonly RefLabel[], max: number = MAX_VISIBLE_R
 /**
  * Icono de cada pildora: el del prototipo (comprobado para HEAD, flechas para
  * una rama remota, rombo para un tag, rama para una local) traducido a nombres
- * semanticos de @ramal/ui. El juego concreto (Lucide o Codicons) lo pone el host.
+ * semanticos de @git-rudder/ui. El juego concreto (Lucide o Codicons) lo pone el host.
  */
 export function refIcon(ref: RefLabel): IconName {
   if (ref.isHead) return 'check';

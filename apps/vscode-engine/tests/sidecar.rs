@@ -20,11 +20,11 @@ use std::io::{BufRead, BufReader, Read, Write};
 use std::process::{Child, ChildStdin, ChildStdout, Command, ExitStatus, Stdio};
 
 use fixture::{FixtureRepo, path_text};
+use git_rudder_protocol::{PROTOCOL_VERSION, error_code};
 use pretty_assertions::assert_eq;
-use ramal_protocol::{PROTOCOL_VERSION, error_code};
 use serde_json::{Value, json};
 
-const BINARY: &str = env!("CARGO_BIN_EXE_ramal-vscode-engine");
+const BINARY: &str = env!("CARGO_BIN_EXE_git-rudder-vscode-engine");
 
 struct Sidecar {
     child: Child,
@@ -181,7 +181,7 @@ fn the_version_flag_prints_the_version() {
     let text = String::from_utf8(output.stdout).unwrap();
     assert_eq!(
         text,
-        format!("ramal-vscode-engine {}\n", env!("CARGO_PKG_VERSION"))
+        format!("git-rudder-vscode-engine {}\n", env!("CARGO_PKG_VERSION"))
     );
 }
 

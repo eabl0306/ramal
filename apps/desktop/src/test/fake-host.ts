@@ -4,7 +4,7 @@ import type {
   RepoHandle,
   RpcRequest,
   RpcResponse,
-} from '@ramal/bridge';
+} from '@git-rudder/bridge';
 
 import type { Invoke } from '../infrastructure/tauri/invoke';
 
@@ -26,9 +26,9 @@ export function graphRow(index: number, summary: string): GraphRow {
   };
 }
 
-export const RAMAL_REPO: RepoHandle = {
+export const GIT_RUDDER_REPO: RepoHandle = {
   repoId: 'repo-1',
-  root: '/home/ana/code/ramal',
+  root: '/home/ana/code/git-rudder',
   headRef: 'main',
   headSha: 'a'.repeat(40),
   isDetached: false,
@@ -45,7 +45,7 @@ export type PickAnswer = RepoHandle | null | { readonly reject: unknown };
  */
 export class FakeTauriHost {
   readonly requests: RpcRequest[] = [];
-  pick: PickAnswer = RAMAL_REPO;
+  pick: PickAnswer = GIT_RUDDER_REPO;
   readonly #rows: readonly GraphRow[];
 
   constructor(rows: readonly GraphRow[]) {

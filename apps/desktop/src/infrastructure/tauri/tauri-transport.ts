@@ -4,7 +4,7 @@ import type {
   RpcResponse,
   Transport,
   Unsubscribe,
-} from '@ramal/bridge';
+} from '@git-rudder/bridge';
 
 import { type Invoke, tauriIpc } from './invoke';
 
@@ -12,7 +12,7 @@ import { type Invoke, tauriIpc } from './invoke';
 export const RPC_COMMAND = 'rpc';
 
 /**
- * El `Transport` de @ramal/bridge sobre el comando `rpc` del host. `invoke` solo
+ * El `Transport` de @git-rudder/bridge sobre el comando `rpc` del host. `invoke` solo
  * rechaza por fallos de transporte: un error del motor llega como respuesta con
  * `error` y el cliente del bridge lo convierte en `BridgeError`.
  *

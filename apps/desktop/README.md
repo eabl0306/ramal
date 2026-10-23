@@ -1,11 +1,11 @@
-# Ramal Desktop
+# Git Rudder Desktop
 
 La app de escritorio sobre Tauri 2. El primer corte abre una carpeta con un repositorio y pinta
-su grafo con `@ramal/repo-view`, con el motor de Git en el mismo proceso.
+su grafo con `@git-rudder/repo-view`, con el motor de Git en el mismo proceso.
 
 ## Como esta hecho
 
-- `src-tauri/` es el crate `ramal-desktop`, el host. Tiene dos comandos:
+- `src-tauri/` es el crate `git-rudder-desktop`, el host. Tiene dos comandos:
   - `rpc`: lleva el sobre JSON-RPC al motor, el mismo que usa el sidecar de VS Code. Solo deja
     pasar los metodos de la lista de la ventana (`surfaces.rs`); la ventana principal solo puede
     pedir `graph/window`.
@@ -48,13 +48,13 @@ ruta dentro del contenedor.
   `<style>` propio (el `touch-action` de lo pulsable): se permite ese texto exacto por su hash,
   nunca con `'unsafe-inline'`. Si React Aria lo cambia, el E2E lo dice.
 - **E2E nativo.** Usa el driver embebido de `@wdio/tauri-service`, que solo entra con la feature
-  `e2e` del crate. Esa feature tambien deja que `RAMAL_E2E_FOLDER` elija la carpeta, porque
+  `e2e` del crate. Esa feature tambien deja que `GIT_RUDDER_E2E_FOLDER` elija la carpeta, porque
   WebDriver no puede manejar el dialogo del sistema. El binario normal no lleva nada de esto.
 - **knip.** No entiende el `runner` ni los `services` de WebdriverIO, por eso
   `@wdio/local-runner` y `@wdio/tauri-service` estan en su `ignoreDependencies`.
 - **wdio y la ventana.** `@wdio/tauri-service` intenta reenfocar la ventana con la API global de
   Tauri, que esta app no lleva (`withGlobalTauri: false`). `wdio.conf.ts` elige la ventana a mano
   con `switchToWindow` y asi no espera 5 s en cada busqueda.
-- **Log.** El host escribe en stderr; `RAMAL_LOG=debug` sube el detalle.
+- **Log.** El host escribe en stderr; `GIT_RUDDER_LOG=debug` sube el detalle.
 - **Sin verificar todavia:** Windows y macOS, el empaquetado (`desktop-build` usa `--no-bundle`)
   y `tauri dev` en una maquina sin webkit2gtk (las recetas de Docker no lo cubren).

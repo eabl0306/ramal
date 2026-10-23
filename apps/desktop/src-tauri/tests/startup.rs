@@ -14,9 +14,9 @@
 
 use std::sync::{Arc, Mutex, PoisonError};
 
-use ramal_desktop::bootstrap::{assemble, build_engine};
-use ramal_desktop::picker::{DialogFolderPicker, FolderPicker};
-use ramal_engine::Engine;
+use git_rudder_desktop::bootstrap::{assemble, build_engine};
+use git_rudder_desktop::picker::{DialogFolderPicker, FolderPicker};
+use git_rudder_engine::Engine;
 use tauri::test::{MockRuntime, mock_builder};
 use tauri::{AppHandle, Manager as _, RunEvent};
 
@@ -39,7 +39,7 @@ fn inspect(handle: &AppHandle<MockRuntime>) -> Started {
 #[test]
 fn the_setup_registers_the_native_folder_picker_and_opens_the_main_window() {
     let app = assemble(mock_builder(), Arc::new(build_engine()))
-        .build(ramal_desktop::context())
+        .build(git_rudder_desktop::context())
         .expect("the app must build with the mock runtime");
     let seen = Arc::new(Mutex::new(None));
     let record = Arc::clone(&seen);
@@ -65,7 +65,7 @@ fn the_setup_registers_the_native_folder_picker_and_opens_the_main_window() {
 #[test]
 fn the_native_picker_debug_output_hides_the_app_handle() {
     let app = mock_builder()
-        .build(ramal_desktop::context())
+        .build(git_rudder_desktop::context())
         .expect("the app must build with the mock runtime");
 
     let picker = DialogFolderPicker::new(app.handle().clone());

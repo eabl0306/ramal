@@ -1,4 +1,4 @@
-import { type RpcResponse, createBridgeClient } from '@ramal/bridge';
+import { type RpcResponse, createBridgeClient } from '@git-rudder/bridge';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Invoke } from './invoke';

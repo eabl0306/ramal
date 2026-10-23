@@ -30,9 +30,9 @@ const devProxy = Object.fromEntries(
  * con pnpm no estan en los node_modules de la web.
  */
 const PREBUNDLED = [
-  '@ramal/ui > react-aria-components',
-  '@ramal/ui > lucide-react',
-  '@ramal/api-client > openapi-fetch',
+  '@git-rudder/ui > react-aria-components',
+  '@git-rudder/ui > lucide-react',
+  '@git-rudder/api-client > openapi-fetch',
   'zod',
 ];
 

@@ -1,4 +1,4 @@
-import { DENSITIES, type Density } from '@ramal/ui';
+import { DENSITIES, type Density } from '@git-rudder/ui';
 
 import { COLUMN_LAYOUTS, type ColumnLayout, gridTemplate } from './columns';
 import { type GraphMetrics, graphColumnWidth } from './geometry';
@@ -14,7 +14,7 @@ export interface ViewMetrics {
 }
 
 /**
- * Los numeros salen de `DENSITIES` de @ramal/ui, que un test compara con los
+ * Los numeros salen de `DENSITIES` de @git-rudder/ui, que un test compara con los
  * tokens CSS: el alto de fila del SVG y el de las filas no pueden separarse. La
  * densidad la pasa el host (comfortable en escritorio, compact en VS Code); no
  * hay ramas por host en los componentes.

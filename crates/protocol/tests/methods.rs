@@ -9,12 +9,12 @@
     reason = "tests fail loudly on purpose; a panic here is a failed assertion"
 )]
 
+use git_rudder_protocol::engine::{EngineInfo, EngineInfoParams, GitInfo};
+use git_rudder_protocol::graph::{EdgeKind, GraphEdge, GraphWindowParams, RefKind, RefLabel};
+use git_rudder_protocol::methods::{GraphWindowMethod, RepoOpenMethod};
+use git_rudder_protocol::repo::{OpenRepoParams, RepoHandle};
+use git_rudder_protocol::{METHODS, MethodInfo, RpcMethod};
 use pretty_assertions::assert_eq;
-use ramal_protocol::engine::{EngineInfo, EngineInfoParams, GitInfo};
-use ramal_protocol::graph::{EdgeKind, GraphEdge, GraphWindowParams, RefKind, RefLabel};
-use ramal_protocol::methods::{GraphWindowMethod, RepoOpenMethod};
-use ramal_protocol::repo::{OpenRepoParams, RepoHandle};
-use ramal_protocol::{METHODS, MethodInfo, RpcMethod};
 use serde_json::json;
 
 #[test]
@@ -93,7 +93,7 @@ fn the_window_snapshot_is_optional_in_params_and_omitted_when_missing() {
 fn a_repo_handle_omits_missing_head_fields() {
     let detached = RepoHandle {
         repo_id: "repo-1".to_owned(),
-        root: "/work/ramal".to_owned(),
+        root: "/work/git-rudder".to_owned(),
         head_ref: None,
         head_sha: Some("a".repeat(40)),
         is_detached: true,
@@ -103,7 +103,7 @@ fn a_repo_handle_omits_missing_head_fields() {
     assert_eq!(
         serde_json::to_value(&detached).unwrap(),
         json!({
-            "repoId": "repo-1", "root": "/work/ramal", "headSha": "a".repeat(40),
+            "repoId": "repo-1", "root": "/work/git-rudder", "headSha": "a".repeat(40),
             "isDetached": true, "isEmpty": false
         })
     );

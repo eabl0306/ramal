@@ -1,5 +1,5 @@
-import '@ramal/ui/themes/ramal.css';
-import '@ramal/ui/themes/fonts';
+import '@git-rudder/ui/themes/git-rudder.css';
+import '@git-rudder/ui/themes/fonts';
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

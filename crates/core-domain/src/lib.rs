@@ -1,7 +1,7 @@
 //! Nucleo de dominio del cliente de Git: commits, refs, tiempo de git y la
 //! disposicion del grafo. Codigo puro: sin IO, sin reloj, sin runtime asincrono y
-//! sin serde. La forma del JSON la decide `ramal-protocol` y el mapeo vive en
-//! `ramal-engine`.
+//! sin serde. La forma del JSON la decide `git-rudder-protocol` y el mapeo vive en
+//! `git-rudder-engine`.
 
 pub mod commit;
 pub mod graph;

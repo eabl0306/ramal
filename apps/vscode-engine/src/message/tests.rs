@@ -4,9 +4,9 @@
     reason = "tests fail loudly on purpose; a panic here is a failed assertion"
 )]
 
+use git_rudder_engine::{EngineBuilder, EngineConfig};
+use git_rudder_protocol::{RequestId, RpcOutcome, RpcResponse, error_code};
 use pretty_assertions::assert_eq;
-use ramal_engine::{EngineBuilder, EngineConfig};
-use ramal_protocol::{RequestId, RpcOutcome, RpcResponse, error_code};
 use serde_json::{Value, json};
 
 use super::{EngineHandler, respond};

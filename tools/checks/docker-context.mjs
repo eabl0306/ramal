@@ -11,7 +11,7 @@ import { collectFiles } from './lib/scan.mjs';
  * Cargo, `just check` paso en verde y la imagen de la API dejo de construir en
  * la CI. Su contexto es una lista blanca (apps/api/Dockerfile.dockerignore) y
  * cargo necesita el manifiesto de TODOS los miembros para resolver el
- * workspace, aunque solo compile ramal-api.
+ * workspace, aunque solo compile git-rudder-api.
  *
  * Regla: todo `<Dockerfile>.dockerignore` cuyo Dockerfile ejecuta cargo y que
  * empieza excluyendolo todo ("*") tiene que readmitir cada miembro del

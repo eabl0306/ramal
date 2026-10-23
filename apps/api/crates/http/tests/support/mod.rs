@@ -13,10 +13,10 @@
 
 use std::sync::Arc;
 
-use ramal_api_application::testing::{FakeHealthProbe, FixedClock};
-use ramal_api_application::{CheckLiveness, CheckReadiness, HealthProbe};
-use ramal_api_domain::ServiceVersion;
-use ramal_api_http::{HealthDependencies, RouterDependencies, build_service};
+use git_rudder_api_application::testing::{FakeHealthProbe, FixedClock};
+use git_rudder_api_application::{CheckLiveness, CheckReadiness, HealthProbe};
+use git_rudder_api_domain::ServiceVersion;
+use git_rudder_api_http::{HealthDependencies, RouterDependencies, build_service};
 use salvo::Response;
 use salvo::http::header::CONTENT_TYPE;
 

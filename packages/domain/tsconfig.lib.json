@@ -1,7 +1,7 @@
 // Codigo de produccion del dominio. Emite solo declaraciones, fuera del arbol,
 // para que las project references de quien lo consume funcionen sin build.
 {
-  "extends": "@ramal/tsconfig/library.json",
+  "extends": "@git-rudder/tsconfig/library.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

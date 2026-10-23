@@ -39,9 +39,9 @@ import { devServerOrigin } from '../infrastructure/webview/webview-html';
 export async function composeExtension(
   context: vscode.ExtensionContext,
 ): Promise<HostProbe | undefined> {
-  const hostLog = vscode.window.createOutputChannel('Ramal', { log: true });
+  const hostLog = vscode.window.createOutputChannel('Git Rudder', { log: true });
   // El sidecar ya escribe su log con hora y nivel (tracing): va tal cual.
-  const engineLog = vscode.window.createOutputChannel('Ramal Engine');
+  const engineLog = vscode.window.createOutputChannel('Git Rudder Engine');
   const logger = createOutputLogger(hostLog);
   const mode = hostMode(context.extensionMode);
   const gitPath = await resolveGitPath(logger);
@@ -106,7 +106,7 @@ function engineLauncher({
     mode,
     platform: process.platform,
     configuredPath: settings.path,
-    environmentPath: process.env['RAMAL_ENGINE_PATH'],
+    environmentPath: process.env['GIT_RUDDER_ENGINE_PATH'],
   });
   logger.info(`engine binary: ${binaryPath}`);
   logger.info(`git: ${gitPath ?? 'the first one on PATH (vscode.git gave none)'}`);
@@ -129,7 +129,9 @@ function webviewPanels(
   logger: Logger,
 ): VsCodeWebviewPanels {
   const devServer =
-    mode === 'development' ? devServerOrigin(process.env['RAMAL_WEBVIEW_DEV_SERVER']) : undefined;
+    mode === 'development'
+      ? devServerOrigin(process.env['GIT_RUDDER_WEBVIEW_DEV_SERVER'])
+      : undefined;
   return new VsCodeWebviewPanels({
     extensionUri: context.extensionUri,
     locale: runtime.locale,

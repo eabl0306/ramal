@@ -2,18 +2,18 @@
 //! hay reglas de negocio aqui, todo lo decide el motor.
 //!
 //! No hay un comando por metodo del motor: `rpc` lleva el mismo sobre JSON-RPC que
-//! el sidecar de VS Code, y la lista de metodos vive en `ramal-protocol`. Cada
+//! el sidecar de VS Code, y la lista de metodos vive en `git-rudder-protocol`. Cada
 //! comando necesita un permiso explicito en `capabilities/default.json` porque
 //! `build.rs` los declara en el `AppManifest`.
 
 use std::path::Path;
 use std::sync::Arc;
 
-use ramal_engine::mapping::error::{internal_error, invalid_params};
-use ramal_engine::{CallContext, Engine};
-use ramal_protocol::methods::RepoOpenMethod;
-use ramal_protocol::repo::{OpenRepoParams, RepoHandle};
-use ramal_protocol::{RpcError, RpcMethod as _, RpcRequest, RpcResponse};
+use git_rudder_engine::mapping::error::{internal_error, invalid_params};
+use git_rudder_engine::{CallContext, Engine};
+use git_rudder_protocol::methods::RepoOpenMethod;
+use git_rudder_protocol::repo::{OpenRepoParams, RepoHandle};
+use git_rudder_protocol::{RpcError, RpcMethod as _, RpcRequest, RpcResponse};
 use tauri::{Runtime, State, Window};
 
 use crate::picker::FolderPicker;

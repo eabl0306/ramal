@@ -1,4 +1,4 @@
-//! Ayudas de los tests de `ramal-api`: el grafo de `Cargo.lock`, los
+//! Ayudas de los tests de `git-rudder-api`: el grafo de `Cargo.lock`, los
 //! `clippy.toml` del nucleo y el binario lanzado como proceso.
 
 #![allow(
@@ -31,18 +31,18 @@ pub fn api_root() -> PathBuf {
 
 /// URL de la base de pruebas, o `None` si estos tests se pueden saltar.
 ///
-/// Misma regla que los tests de `ramal-api-infrastructure`: sin
-/// `RAMAL_TEST_DATABASE_URL` se saltan, y con `RAMAL_TEST_REQUIRE_DATABASE=1`
+/// Misma regla que los tests de `git-rudder-api-infrastructure`: sin
+/// `GIT_RUDDER_TEST_DATABASE_URL` se saltan, y con `GIT_RUDDER_TEST_REQUIRE_DATABASE=1`
 /// que falte es un fallo, para que la CI no de un verde falso.
 pub fn database_url() -> Option<String> {
-    let url = std::env::var("RAMAL_TEST_DATABASE_URL")
+    let url = std::env::var("GIT_RUDDER_TEST_DATABASE_URL")
         .ok()
         .filter(|url| !url.is_empty());
-    let mandatory = std::env::var("RAMAL_TEST_REQUIRE_DATABASE")
+    let mandatory = std::env::var("GIT_RUDDER_TEST_REQUIRE_DATABASE")
         .is_ok_and(|value| !matches!(value.trim(), "" | "0" | "false" | "FALSE"));
     assert!(
         url.is_some() || !mandatory,
-        "RAMAL_TEST_DATABASE_URL is empty but RAMAL_TEST_REQUIRE_DATABASE is set: \
+        "GIT_RUDDER_TEST_DATABASE_URL is empty but GIT_RUDDER_TEST_REQUIRE_DATABASE is set: \
          these tests must not pass without a real postgres"
     );
     url

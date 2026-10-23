@@ -5,7 +5,7 @@
     reason = "tests fail loudly on purpose; a panic here is the assertion"
 )]
 
-use ramal_api_application::{AppError, FieldError, ValidationErrors};
+use git_rudder_api_application::{AppError, FieldError, ValidationErrors};
 
 use super::{UNAUTHORIZED_DETAIL, problem_for};
 
@@ -77,7 +77,7 @@ fn internal_details_never_reach_the_body() {
 
 #[test]
 fn each_error_maps_to_its_status_type_and_code() {
-    let prefix = "https://ramal.bahoque.com/problems/";
+    let prefix = "https://git-rudder.com/problems/";
     assert_eq!(
         kind(&AppError::not_found("x")),
         (404, format!("{prefix}not-found"), "not_found".to_owned())

@@ -14,7 +14,7 @@ use std::path::Path;
 use std::process::{Command, Output};
 
 fn run(roots: &[&Path]) -> Output {
-    Command::new(env!("CARGO_BIN_EXE_ramal-rust-complexity"))
+    Command::new(env!("CARGO_BIN_EXE_git-rudder-rust-complexity"))
         .args(roots)
         .output()
         .unwrap()

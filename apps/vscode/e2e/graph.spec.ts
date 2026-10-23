@@ -63,7 +63,9 @@ test.describe('webview del grafo', () => {
   test('si el motor no esta, lo dice y reintentar vuelve a pedir el grafo', async ({ page }) => {
     await openGraphWebview(page, { locale: 'es', window: TWO_COMMITS, engineDown: true });
     const alert = page.getByRole('alert');
-    await expect(alert).toContainText('El motor de Ramal no está disponible.', { timeout: 15_000 });
+    await expect(alert).toContainText('El motor de Git Rudder no está disponible.', {
+      timeout: 15_000,
+    });
     await bringEngineUp(page);
     await alert.getByRole('button', { name: 'Reintentar' }).click();
     await expect(page.getByText('Primer commit')).toBeVisible();

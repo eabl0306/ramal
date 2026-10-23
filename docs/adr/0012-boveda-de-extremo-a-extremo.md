@@ -7,7 +7,7 @@
 
 ## Contexto
 
-Un usuario de Ramal conecta varias cuentas de GitHub, GitLab, Bitbucket, Gitea o Azure DevOps, y
+Un usuario de Git Rudder conecta varias cuentas de GitHub, GitLab, Bitbucket, Gitea o Azure DevOps, y
 cada una tiene un token que da acceso a su codigo. Quiere que esas cuentas aparezcan en todos sus
 equipos sin volver a crear los tokens en cada uno. Lo mismo, si lo activa, con sus llaves de IA
 personales.
@@ -31,7 +31,7 @@ Este ADR fija el esquema. El contrato de los endpoints esta en
 
 ## Decision
 
-Toda la criptografia ocurre en el motor de Rust del dispositivo (`ramal-vault`, planificado), que
+Toda la criptografia ocurre en el motor de Rust del dispositivo (`git-rudder-vault`, planificado), que
 es el mismo en Desktop y en el sidecar de VS Code. La web no cifra ni descifra nada. El servidor
 guarda bytes que no entiende.
 
@@ -41,8 +41,8 @@ guarda bytes que no entiende.
 que activa la boveda. Nunca sale de sus dispositivos en claro.
 
 **Subllaves.** La VK no se usa directamente ni para cifrar ni para el comprobante: de ella salen
-dos subllaves con HKDF-SHA256 (sin sal), `K_seal = HKDF(VK, "ramal:vault:v1:seal")`, que sella los
-secretos, y `K_check = HKDF(VK, "ramal:vault:v1:check")`, que calcula el comprobante. Usar la misma
+dos subllaves con HKDF-SHA256 (sin sal), `K_seal = HKDF(VK, "git-rudder:vault:v1:seal")`, que sella los
+secretos, y `K_check = HKDF(VK, "git-rudder:vault:v1:check")`, que calcula el comprobante. Usar la misma
 llave para un AEAD y para un HMAC no rompe nada conocido, pero separar los usos cuesta dos lineas
 y quita la pregunta. Lo que se envuelve con la frase y con el codigo es la VK.
 
@@ -60,16 +60,16 @@ y 4 carriles por defecto.
 
 **Envoltura por codigo de recuperacion.** Un codigo de 160 bits aleatorios que el usuario ve una
 sola vez, como 32 caracteres en base32 de Crockford en grupos de cuatro. Como ya tiene entropia
-completa, basta `KEK_r = HKDF-SHA256(codigo, sal, "ramal:vault:v1:recovery")`: Argon2id no anade
+completa, basta `KEK_r = HKDF-SHA256(codigo, sal, "git-rudder:vault:v1:recovery")`: Argon2id no anade
 nada a 160 bits que no se pueden adivinar.
 
 **Envolver la VK.** XChaCha20-Poly1305 con la KEK y un nonce aleatorio de 24 bytes, con datos
-asociados `ramal:vault:v1:wrap:{userId}:{tipo}:{keyVersion}`, donde el tipo es `passphrase` o
+asociados `git-rudder:vault:v1:wrap:{userId}:{tipo}:{keyVersion}`, donde el tipo es `passphrase` o
 `recovery`. Una envoltura copiada a otro usuario o a otra version de la llave no abre. La llave
 envuelta ocupa 48 bytes: 32 de la llave y 16 de la etiqueta.
 
 **Sellar un secreto.** XChaCha20-Poly1305 con `K_seal` y un nonce aleatorio de 24 bytes, con
-datos asociados `ramal:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}`, donde `kind` es
+datos asociados `git-rudder:vault:v1:{userId}:{kind}:{recordId}:{keyVersion}`, donde `kind` es
 `platform_credential` o `ai_key`. El `recordId` es el UUID de la cuenta o de la llave, y lo genera
 el cliente antes de hablar con la API precisamente para poder calcular estos datos asociados. Un
 blob copiado a otra fila, a otro usuario, a otra tabla o a otra version de la llave no descifra.
@@ -96,7 +96,7 @@ nube una URL base en loopback (`localhost`, `127.0.0.1` o `[::1]`); cualquier ot
 confirmar el usuario en ese equipo antes de enviar nada, porque lo que viaja es su codigo.
 
 **Comprobante de la llave.**
-`keyCheck = HMAC-SHA256(K_check, "ramal:vault:key-check:v1:{userId}:{keyVersion}")`. El dispositivo
+`keyCheck = HMAC-SHA256(K_check, "git-rudder:vault:key-check:v1:{userId}:{keyVersion}")`. El dispositivo
 lo manda al crear la boveda y en cada cambio de envoltura o rotacion; el servidor **guarda solo su
 SHA-256** y compara hashes en tiempo constante. Solo quien tiene la VK puede cambiar como se
 envuelve: sin esto, una sesion robada podria sustituir las envolturas por basura y dejar al
@@ -117,16 +117,16 @@ contrasena.
 
 ### Donde vive cada cosa
 
-| Dato                           | Dispositivo                                                                                    | Servidor                                                                                                    |
-| ------------------------------ | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Frase de sincronizacion        | Nunca se guarda: se pide una vez por dispositivo                                               | Nunca                                                                                                       |
-| Codigo de recuperacion         | Nunca se guarda: se ensena una vez                                                             | Nunca                                                                                                       |
-| KEK de frase y de recuperacion | Solo en memoria, limpiada con `zeroize`                                                        | Nunca                                                                                                       |
-| VK desbloqueada                | Llavero del sistema (Desktop) o `SecretStorage` (VS Code), entrada `ramal/vault-key/<user_id>` | Nunca                                                                                                       |
-| Envolturas, sales y parametros | Se descargan al desbloquear                                                                    | Tabla `vaults`                                                                                              |
-| Comprobante de la llave        | Se calcula con la VK cuando hace falta                                                         | Solo su SHA-256, en `vaults.key_check_hash`                                                                 |
-| Secretos sellados              | Copia local en claro en el llavero, para usarlos                                               | Columnas `secret_*` de `linked_accounts` y `ai_keys`                                                        |
-| Metadatos de cuentas y llaves  | Si, y una copia sellada junto al secreto                                                       | En claro: plataforma, host, usuario, etiqueta, scopes, mascara (calculada en el dispositivo antes de subir) |
+| Dato                           | Dispositivo                                                                                         | Servidor                                                                                                    |
+| ------------------------------ | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Frase de sincronizacion        | Nunca se guarda: se pide una vez por dispositivo                                                    | Nunca                                                                                                       |
+| Codigo de recuperacion         | Nunca se guarda: se ensena una vez                                                                  | Nunca                                                                                                       |
+| KEK de frase y de recuperacion | Solo en memoria, limpiada con `zeroize`                                                             | Nunca                                                                                                       |
+| VK desbloqueada                | Llavero del sistema (Desktop) o `SecretStorage` (VS Code), entrada `git-rudder/vault-key/<user_id>` | Nunca                                                                                                       |
+| Envolturas, sales y parametros | Se descargan al desbloquear                                                                         | Tabla `vaults`                                                                                              |
+| Comprobante de la llave        | Se calcula con la VK cuando hace falta                                                              | Solo su SHA-256, en `vaults.key_check_hash`                                                                 |
+| Secretos sellados              | Copia local en claro en el llavero, para usarlos                                                    | Columnas `secret_*` de `linked_accounts` y `ai_keys`                                                        |
+| Metadatos de cuentas y llaves  | Si, y una copia sellada junto al secreto                                                            | En claro: plataforma, host, usuario, etiqueta, scopes, mascara (calculada en el dispositivo antes de subir) |
 
 ### Operaciones
 
@@ -169,15 +169,15 @@ contrasena.
   que impide que una sesion robada lo use para destruir.
 - **Cerrar sesion** borra del dispositivo la VK en cache y las copias de los secretos (tokens de
   plataforma y llaves de IA personales) que llegaron sincronizados de otros equipos. Lo que el
-  usuario creo alli se queda en su llavero: sin cuenta, Ramal sigue siendo un cliente Git que
-  necesita esas credenciales ([ADR 0014](0014-usar-ramal-sin-cuenta.md)). Para un ordenador
+  usuario creo alli se queda en su llavero: sin cuenta, Git Rudder sigue siendo un cliente Git que
+  necesita esas credenciales ([ADR 0014](0014-usar-git-rudder-sin-cuenta.md)). Para un ordenador
   compartido, el dialogo ofrece una casilla **apagada por defecto**, "Borrar también las añadidas
   en este equipo", que borra tambien lo creado alli. El texto propuesto del dialogo es: "Al cerrar
   sesión se borran de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de
   otros equipos. Las que añadiste aquí se quedan para que Git siga funcionando." Lo sostienen
   estas reglas:
   - **Marca local de origen por secreto.** Para saber que se creo en este equipo, el motor guarda
-    junto a cada secreto local si se creo aqui o llego sincronizado, y para que usuario de Ramal.
+    junto a cada secreto local si se creo aqui o llego sincronizado, y para que usuario de Git Rudder.
     La marca es del equipo y no viaja a la nube.
   - **Solo un codigo concreto borra sin preguntar.** El motor hace la misma limpieza cuando un
     refresco recibe un 401 con el `code` `session_ended` de la API (sesion revocada, caducada o
@@ -189,8 +189,8 @@ contrasena.
   - **Las demas ventanas de VS Code sueltan la llave.** Cada ventana tiene su motor y todas
     comparten `SecretStorage`. Al cerrar sesion en una, las demas se enteran por
     `SecretStorage.onDidChange` y sueltan la VK de memoria.
-  - **Un secreto local queda ligado a quien lo creo** (un usuario de Ramal o "sin cuenta"). Si
-    despues entra otra cuenta de Ramal en el mismo equipo, el motor no lo sube solo a la nube de
+  - **Un secreto local queda ligado a quien lo creo** (un usuario de Git Rudder o "sin cuenta"). Si
+    despues entra otra cuenta de Git Rudder en el mismo equipo, el motor no lo sube solo a la nube de
     esa otra cuenta. Si se le pregunta o no se le ofrece nunca esta sin decidir.
   - **Un token que se queda puede haber caducado.** Si una cuenta creada aqui refresco su token en
     otro equipo (GitLab y Bitbucket rotan el refresh token), la copia local puede no valer. La
@@ -233,7 +233,7 @@ En contra, y es lo que el usuario acepto:
   para cada miembro, y el token dejaria de ser el secreto de una persona.
 - **El panel web no puede probar, anadir ni editar un token.** Solo ve metadatos y puede quitar
   la cuenta, y avisa de que el token sigue valido en la plataforma hasta que se revoque alli.
-- **Olvidar frase y codigo pierde las copias de la nube.** Nadie, ni el soporte de Ramal, puede
+- **Olvidar frase y codigo pierde las copias de la nube.** Nadie, ni el soporte de Git Rudder, puede
   recuperarlas. Cada dispositivo conserva su copia local, y el primero que cree una boveda nueva
   vuelve a subir las suyas.
 - **Un ataque sin conexion con una copia de la base, o con las envolturas que recibe cualquier

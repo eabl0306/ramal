@@ -1,7 +1,7 @@
 /**
  * Tramos del tiempo relativo ("hace 5 minutos", "hace 2 semanas"). Aqui se
  * decide la unidad y el numero; el texto lo pone formatRelativeTime de
- * @ramal/i18n con Intl.RelativeTimeFormat, que ya sabe decir "ayer" o "ahora".
+ * @git-rudder/i18n con Intl.RelativeTimeFormat, que ya sabe decir "ayer" o "ahora".
  *
  * Corrige el `ago()` del prototipo (gaps B-48): nada de "hace 0 min", 1439
  * minutos son 23 horas y no "24 h", y hay semanas, meses y anos. Se redondea

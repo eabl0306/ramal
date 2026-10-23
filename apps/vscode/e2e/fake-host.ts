@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import type { GraphWindow } from '@git-rudder/bridge';
 import type { Page } from '@playwright/test';
-import type { GraphWindow } from '@ramal/bridge';
 
 import {
   entryAssets,
@@ -83,7 +83,7 @@ function webviewHtml(locale: string): string {
   const assets = entryAssets(manifest, 'src/webview/app/entries/graph.tsx');
   const nonce = createNonce();
   return renderWebviewPage({
-    title: 'Ramal Graph',
+    title: 'Git Rudder Graph',
     lang: locale,
     csp: productionCsp(ORIGIN, nonce),
     nonce,
@@ -114,7 +114,7 @@ function installFakeHost(scenario: HostScenario): void {
     reply({ type: 'rpc/response', response });
   };
   Object.assign(window, {
-    ramalHost: state,
+    gitRudderHost: state,
     acquireVsCodeApi: () => ({
       postMessage: (message: { type: string; request?: { id: number; method: string } }) => {
         state.posted.push(message);
@@ -154,7 +154,7 @@ export async function openGraphWebview(page: Page, scenario: HostScenario): Prom
 /** Lo que el webview mando al host hasta ahora. */
 export function postedMessages(page: Page): Promise<unknown[]> {
   return page.evaluate(
-    () => (window as unknown as { ramalHost: { posted: unknown[] } }).ramalHost.posted,
+    () => (window as unknown as { gitRudderHost: { posted: unknown[] } }).gitRudderHost.posted,
   );
 }
 
@@ -166,6 +166,7 @@ export function cspViolations(page: Page): Promise<string[]> {
 /** Levanta el motor de mentira: desde ahora contesta bien. */
 export async function bringEngineUp(page: Page): Promise<void> {
   await page.evaluate(() => {
-    (window as unknown as { ramalHost: { engineDown: boolean } }).ramalHost.engineDown = false;
+    (window as unknown as { gitRudderHost: { engineDown: boolean } }).gitRudderHost.engineDown =
+      false;
   });
 }

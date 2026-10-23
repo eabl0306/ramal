@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, PoisonError};
 
 use async_trait::async_trait;
-use ramal_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot};
+use git_rudder_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot};
 
 use super::samples::version_info;
 use crate::port::git_reader::{GitReadError, GitReader, GitVersion, GitVersionInfo, LogQuery};

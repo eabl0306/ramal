@@ -1,5 +1,5 @@
-import { PROTOCOL_VERSION } from '@ramal/bridge';
-import { createTranslator, type Locale, resolveLocale, type Translate } from '@ramal/i18n';
+import { PROTOCOL_VERSION } from '@git-rudder/bridge';
+import { createTranslator, type Locale, resolveLocale, type Translate } from '@git-rudder/i18n';
 
 import type { EngineLauncher } from '../ports/engine-launcher';
 import type { Logger } from '../ports/logger';
@@ -51,7 +51,9 @@ export function startup(deps: StartupDeps): HostRuntime {
       void deps.notifications.showError(translate('vscode.host.protocolMismatch', params));
     },
   });
-  deps.logger.info(`Ramal host ready (locale ${locale}, protocol ${String(PROTOCOL_VERSION)})`);
+  deps.logger.info(
+    `Git Rudder host ready (locale ${locale}, protocol ${String(PROTOCOL_VERSION)})`,
+  );
   return { locale, translate, ids, engine, protocolVersion: PROTOCOL_VERSION };
 }
 

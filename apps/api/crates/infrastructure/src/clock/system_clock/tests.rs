@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use ramal_api_application::Clock;
+use git_rudder_api_application::Clock;
 
 use super::SystemClock;
 

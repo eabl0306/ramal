@@ -3,7 +3,7 @@
  *
  * Es la primera red, para responder al instante: la API vuelve a validar y es la
  * que manda. Devuelve codigos, no textos, porque el texto depende del idioma y
- * lo pone la interfaz con @ramal/i18n.
+ * lo pone la interfaz con @git-rudder/i18n.
  */
 
 /** La regla del prototipo: algo, una arroba, algo, un punto y algo, sin espacios. */

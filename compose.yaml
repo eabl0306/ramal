@@ -13,30 +13,31 @@
 #
 # Las variables salen de .env (copia .env.example). Todas tienen valor por defecto.
 #
-# Los puertos se publican solo en 127.0.0.1 (RAMAL_BIND_IP). Docker abre los
+# Los puertos se publican solo en 127.0.0.1 (GIT_RUDDER_BIND_IP). Docker abre los
 # puertos publicados por su cuenta, saltandose el cortafuegos de la maquina: sin
 # IP, Postgres con la contrasena por defecto quedaria abierto a toda la red local
 # (una wifi compartida, por ejemplo). Quien necesite entrar desde otra maquina
-# pone RAMAL_BIND_IP=0.0.0.0 en su .env.
+# pone GIT_RUDDER_BIND_IP=0.0.0.0 en su .env.
 
-name: ramal
+name: git-rudder
 
 services:
   db:
     image: postgres:18-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-ramal}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ramal}
-      POSTGRES_DB: ${POSTGRES_DB:-ramal}
+      POSTGRES_USER: ${POSTGRES_USER:-git_rudder}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-git_rudder}
+      POSTGRES_DB: ${POSTGRES_DB:-git_rudder}
     ports:
-      - '${RAMAL_BIND_IP:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432'
+      - '${GIT_RUDDER_BIND_IP:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432'
     volumes:
       # postgres:18 guarda los datos en un subdirectorio por version mayor: el
       # volumen va en /var/lib/postgresql, no en /var/lib/postgresql/data. Con la
       # ruta vieja el contenedor no arranca.
       - postgres-data:/var/lib/postgresql
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-ramal} -d ${POSTGRES_DB:-ramal}']
+      test:
+        ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-git_rudder} -d ${POSTGRES_DB:-git_rudder}']
       interval: 5s
       timeout: 3s
       retries: 20
@@ -58,13 +59,13 @@ services:
       db:
         condition: service_healthy
     environment:
-      RAMAL__SERVER__HOST: 0.0.0.0
-      RAMAL__SERVER__PORT: '8080'
-      RAMAL__DATABASE__URL: postgres://${POSTGRES_USER:-ramal}:${POSTGRES_PASSWORD:-ramal}@db:5432/${POSTGRES_DB:-ramal}
-      RAMAL__TELEMETRY__LOG_LEVEL: ${RAMAL__TELEMETRY__LOG_LEVEL:-debug}
+      GIT_RUDDER__SERVER__HOST: 0.0.0.0
+      GIT_RUDDER__SERVER__PORT: '8080'
+      GIT_RUDDER__DATABASE__URL: postgres://${POSTGRES_USER:-git_rudder}:${POSTGRES_PASSWORD:-git_rudder}@db:5432/${POSTGRES_DB:-git_rudder}
+      GIT_RUDDER__TELEMETRY__LOG_LEVEL: ${GIT_RUDDER__TELEMETRY__LOG_LEVEL:-debug}
       # El visor de la API solo en desarrollo: la API lo deja apagado si nadie lo
       # pide, que es como arranca la imagen de produccion.
-      RAMAL__SERVER__SWAGGER_UI: 'true'
+      GIT_RUDDER__SERVER__SWAGGER_UI: 'true'
       # Hilos de cargo dentro del contenedor; "default" son todos los nucleos.
       CARGO_BUILD_JOBS: ${CARGO_BUILD_JOBS:-default}
       # Fuera del bind mount a proposito. Si el directorio de compilacion cuelga
@@ -73,7 +74,7 @@ services:
       # recorren y no se puede borrar sin sudo.
       CARGO_TARGET_DIR: /cargo-target
     ports:
-      - '${RAMAL_BIND_IP:-127.0.0.1}:${API_PORT:-8080}:8080'
+      - '${GIT_RUDDER_BIND_IP:-127.0.0.1}:${API_PORT:-8080}:8080'
     volumes:
       # El codigo en caliente. El target y el registro de cargo viven en
       # volumenes para no pelearse con los del host ni perder la cache.
@@ -102,7 +103,7 @@ services:
       # Vite manda la API al servicio api en vez de a 127.0.0.1.
       VITE_DEV_API_TARGET: http://api:8080
     ports:
-      - '${RAMAL_BIND_IP:-127.0.0.1}:${WEB_PORT:-5173}:5173'
+      - '${GIT_RUDDER_BIND_IP:-127.0.0.1}:${WEB_PORT:-5173}:5173'
     volumes:
       # Solo el codigo fuente, carpeta a carpeta. Montar packages/ entero taparia
       # los node_modules de cada paquete con los del host, que son de otra
@@ -126,8 +127,8 @@ services:
     profiles: [full]
     image: axllent/mailpit:latest
     ports:
-      - '${RAMAL_BIND_IP:-127.0.0.1}:${MAILPIT_WEB_PORT:-8025}:8025'
-      - '${RAMAL_BIND_IP:-127.0.0.1}:${MAILPIT_SMTP_PORT:-1025}:1025'
+      - '${GIT_RUDDER_BIND_IP:-127.0.0.1}:${MAILPIT_WEB_PORT:-8025}:8025'
+      - '${GIT_RUDDER_BIND_IP:-127.0.0.1}:${MAILPIT_SMTP_PORT:-1025}:1025'
     healthcheck:
       test: ['CMD-SHELL', 'wget --quiet --tries=1 --spider http://127.0.0.1:8025/ || exit 1']
       interval: 10s
@@ -146,7 +147,7 @@ services:
       web:
         condition: service_started
     ports:
-      - '${RAMAL_BIND_IP:-127.0.0.1}:${GATEWAY_PORT:-8090}:8080'
+      - '${GIT_RUDDER_BIND_IP:-127.0.0.1}:${GATEWAY_PORT:-8090}:8080'
     volumes:
       - ./docker/gateway.dev.conf:/etc/nginx/conf.d/default.conf:ro
     healthcheck:

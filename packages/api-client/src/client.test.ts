@@ -30,12 +30,8 @@ function recordingFetch(response: () => Response): {
 
 describe('normalizeBaseUrl', () => {
   it('quita las barras finales y los espacios', () => {
-    expect(normalizeBaseUrl(' https://api.ramal.bahoque.com/ ')).toBe(
-      'https://api.ramal.bahoque.com',
-    );
-    expect(normalizeBaseUrl('https://api.ramal.bahoque.com///')).toBe(
-      'https://api.ramal.bahoque.com',
-    );
+    expect(normalizeBaseUrl(' https://api.git-rudder.com/ ')).toBe('https://api.git-rudder.com');
+    expect(normalizeBaseUrl('https://api.git-rudder.com///')).toBe('https://api.git-rudder.com');
   });
 
   it('deja vacio el mismo origen', () => {
@@ -46,14 +42,14 @@ describe('normalizeBaseUrl', () => {
 describe('createApiClient', () => {
   it('pide la ruta tipada bajo el origen configurado y acepta JSON', async () => {
     const fake = recordingFetch(() => jsonResponse(READY_BODY, 200));
-    const client = createApiClient({ baseUrl: 'http://ramal.test/', fetch: fake.fetch });
+    const client = createApiClient({ baseUrl: 'http://git-rudder.test/', fetch: fake.fetch });
 
     const { data, error } = await client.GET('/health/ready');
 
     expect(error).toBeUndefined();
     expect(data?.status).toBe('ok');
     expect(fake.requests).toHaveLength(1);
-    expect(fake.requests[0]?.url).toBe('http://ramal.test/health/ready');
+    expect(fake.requests[0]?.url).toBe('http://git-rudder.test/health/ready');
     expect(fake.requests[0]?.headers.get('accept')).toBe('application/json');
   });
 
@@ -66,7 +62,7 @@ describe('createApiClient', () => {
   it('entrega el cuerpo de un 503 como error, con la respuesta para leer el estado', async () => {
     const degraded = { ...READY_BODY, status: 'degraded' };
     const fake = recordingFetch(() => jsonResponse(degraded, 503));
-    const client = createApiClient({ baseUrl: 'http://ramal.test', fetch: fake.fetch });
+    const client = createApiClient({ baseUrl: 'http://git-rudder.test', fetch: fake.fetch });
 
     const { data, error, response } = await client.GET('/health/ready');
 

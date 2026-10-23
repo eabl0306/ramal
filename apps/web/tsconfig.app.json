@@ -2,7 +2,7 @@
 // architecture.md 5.2 le deja importar: importar otro rompe `tsc -b` con TS6307
 // aunque ESLint no estuviera bien configurado.
 {
-  "extends": "@ramal/tsconfig/react.json",
+  "extends": "@git-rudder/tsconfig/react.json",
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsc/app.tsbuildinfo",

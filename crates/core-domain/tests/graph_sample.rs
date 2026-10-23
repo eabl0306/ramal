@@ -1,5 +1,5 @@
 //! La disposicion contra los dos ejemplos de referencia del analisis de diseno:
-//! los 19 commits de `ramal-data.js` (tabla 3.6) y el ejemplo pequeno (3.5).
+//! los 19 commits de `git-rudder-data.js` (tabla 3.6) y el ejemplo pequeno (3.5).
 //! Los carriles guardados a mano en el prototipo no sirven de oraculo; estas
 //! tablas si.
 
@@ -14,11 +14,11 @@
 
 mod support;
 
-use ramal_core_domain::graph::{EdgeKind, layout};
+use git_rudder_core_domain::graph::{EdgeKind, layout};
 use support::{lanes, nodes, sha};
 
 /// Los 19 commits de muestra, del mas nuevo al mas viejo: `cN` es el id `N`.
-fn sample() -> Vec<ramal_core_domain::CommitNode> {
+fn sample() -> Vec<git_rudder_core_domain::CommitNode> {
     nodes(&[
         (1, &[3]),
         (2, &[4, 5]),
@@ -78,7 +78,7 @@ fn the_sample_merge_of_hotfix_reuses_a_free_lane() {
 }
 
 /// Ejemplo 3.5: M, F, A, E, H, B, X, N, Q, R como 1..=10.
-fn worked_example() -> Vec<ramal_core_domain::CommitNode> {
+fn worked_example() -> Vec<git_rudder_core_domain::CommitNode> {
     nodes(&[
         (1, &[3, 2]),
         (2, &[4]),

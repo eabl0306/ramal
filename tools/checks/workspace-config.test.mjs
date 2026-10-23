@@ -79,10 +79,10 @@ describe('cargo-lints', () => {
 function tsRepo(extra) {
   return sandbox({
     'pnpm-workspace.yaml': 'packages:\n  - "apps/web"\n  - "packages/*"\n',
-    'apps/web/package.json': { name: '@ramal/web' },
+    'apps/web/package.json': { name: '@git-rudder/web' },
     'apps/web/eslint.config.js': 'export default [];\n',
     'apps/web/src/main.tsx': 'export const a = 1;\n',
-    'packages/ui/package.json': { name: '@ramal/ui' },
+    'packages/ui/package.json': { name: '@git-rudder/ui' },
     'packages/ui/eslint.config.js': 'export default [];\n',
     'packages/ui/src/index.ts': 'export const a = 1;\n',
     ...extra,
@@ -97,7 +97,7 @@ describe('eslint-configs', () => {
 
   it('rechaza un paquete con TypeScript sin eslint.config.js propio', () => {
     const root = tsRepo({
-      'packages/new/package.json': { name: '@ramal/new' },
+      'packages/new/package.json': { name: '@git-rudder/new' },
       'packages/new/src/deep/index.tsx': 'export const a = 1;\n',
     });
     const { code, output } = runCheck('eslint-configs.mjs', root);
@@ -114,10 +114,10 @@ describe('eslint-configs', () => {
 
   it('no pide configuracion por declaraciones, codigo generado ni JavaScript', () => {
     const root = tsRepo({
-      'packages/config/package.json': { name: '@ramal/config' },
+      'packages/config/package.json': { name: '@git-rudder/config' },
       'packages/config/index.js': 'export default {};\n',
       'packages/config/types.d.ts': 'export {};\n',
-      'packages/gen/package.json': { name: '@ramal/gen' },
+      'packages/gen/package.json': { name: '@git-rudder/gen' },
       'packages/gen/src/generated/schema.ts': 'export {};\n',
     });
     assert.equal(runCheck('eslint-configs.mjs', root).code, 0);

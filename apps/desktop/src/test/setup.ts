@@ -8,7 +8,7 @@ import { afterEach, beforeEach } from 'vitest';
  * ninguna fila. Se dan medidas fijas a los elementos, las que lee
  * @tanstack/virtual-core (clientWidth y clientHeight para el contenedor con
  * scroll, offsetWidth y offsetHeight para medir cada fila), como hacen los
- * tests de @ramal/repo-view.
+ * tests de @git-rudder/repo-view.
  */
 const VIEWPORT = { height: 400, width: 1000 };
 

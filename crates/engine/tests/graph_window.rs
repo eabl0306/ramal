@@ -14,10 +14,10 @@
 mod fixture;
 
 use fixture::{FixtureRepo, path_text};
+use git_rudder_engine::{CallContext, Engine, EngineBuilder, EngineConfig};
+use git_rudder_protocol::graph::{EdgeKind, GraphWindow, RefKind};
+use git_rudder_protocol::{ErrorKind, RpcError, error_code};
 use pretty_assertions::assert_eq;
-use ramal_engine::{CallContext, Engine, EngineBuilder, EngineConfig};
-use ramal_protocol::graph::{EdgeKind, GraphWindow, RefKind};
-use ramal_protocol::{ErrorKind, RpcError, error_code};
 use serde_json::{Value, json};
 
 async fn call(engine: &Engine, method: &str, params: Value) -> Result<Value, RpcError> {

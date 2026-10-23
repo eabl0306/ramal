@@ -1,4 +1,4 @@
-//! Capa de aplicacion de la API de Ramal.
+//! Capa de aplicacion de la API de Git Rudder.
 //!
 //! Declara los puertos que necesita el nucleo y los casos de uso que los
 //! orquestan. No conoce Salvo, SQLx ni ningun runtime: solo `async-trait`, para

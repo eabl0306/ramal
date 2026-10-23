@@ -19,8 +19,8 @@
 
 use std::sync::Arc;
 
-use ramal_core_domain::RepoId;
-use ramal_core_domain::graph::{GraphWindow, WindowRange, graph_window};
+use git_rudder_core_domain::RepoId;
+use git_rudder_core_domain::graph::{GraphWindow, WindowRange, graph_window};
 
 use crate::error::EngineError;
 use crate::port::git_reader::{GitReader, LogQuery};

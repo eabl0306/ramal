@@ -1,4 +1,4 @@
-import { createTranslator } from '@ramal/i18n';
+import { createTranslator } from '@git-rudder/i18n';
 import type { ReactElement } from 'react';
 import { type LinksFunction, type MetaFunction, useLoaderData, useLocation } from 'react-router';
 

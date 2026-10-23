@@ -5,19 +5,19 @@
 
 ## Contexto
 
-Ramal Web son tres cosas con necesidades distintas:
+Git Rudder Web son tres cosas con necesidades distintas:
 
 - **La landing.** Tiene que verse bien en buscadores y en las previsualizaciones de enlaces, en
   castellano y en ingles, pintar rapido y ensenar las descargas de la ultima version con su tamano
   y sus requisitos.
 - **Las paginas de autenticacion.** Registro, login, OAuth, recuperacion de contrasena,
-  verificacion de correo, "Autorizar Ramal Desktop en este equipo" y la pagina del codigo del
+  verificacion de correo, "Autorizar Git Rudder Desktop en este equipo" y la pagina del codigo del
   device flow. No necesitan SEO.
 - **El panel.** Detras del login: resumen, workspaces, repositorios, cuentas ligadas, equipo y
   ajustes en la nube. Una SPA.
 
 Y tiene que encajar con el resto: escritorio y los webviews de VS Code son apps de Vite que usan
-los mismos paquetes (`@ramal/ui`, `@ramal/i18n`, `@ramal/domain`), consumidos como codigo fuente
+los mismos paquetes (`@git-rudder/ui`, `@git-rudder/i18n`, `@git-rudder/domain`), consumidos como codigo fuente
 ([ADR 0001](0001-monorepo-poliglota.md)). La web se sirve como ficheros estaticos detras del mismo
 gateway que la API ([ADR 0007](0007-docker-desarrollo-y-produccion.md)), y la sesion va en cookies
 HttpOnly de la API ([ADR 0008](0008-autenticacion-con-tokens.md)), no en un servidor de la web.
@@ -46,7 +46,7 @@ las rutas de la landing.
 ### Que se prerenderiza y que no
 
 - Los `loader` de las rutas prerenderizadas corren en Node al construir, y **solo pueden leer datos
-  publicos**: textos de `@ramal/i18n` y los datos de descarga de `GET /v1/releases/latest`. Nada de
+  publicos**: textos de `@git-rudder/i18n` y los datos de descarga de `GET /v1/releases/latest`. Nada de
   sesion en el prerender.
 - Si la API no responde al construir, la pagina se prerenderiza sin los datos de descarga y el
   cliente los pide al hidratar. El build de la web no depende de que la API este levantada.
@@ -66,7 +66,7 @@ Cinco carpetas dentro de `src`, como Gastonomo ([ADR 0002](0002-arquitectura-hex
 - El contenedor lo crea `src/app/composition-root.ts` una vez por carga y `root.tsx` lo entrega a
   la interfaz con providers. Las pantallas reciben los puertos por contexto y nunca construyen
   adaptadores.
-- `@ramal/api-client` solo lo importa `src/infrastructure`.
+- `@git-rudder/api-client` solo lo importa `src/infrastructure`.
 
 ### Como se sirve
 
@@ -81,7 +81,7 @@ Cinco carpetas dentro de `src`, como Gastonomo ([ADR 0002](0002-arquitectura-hex
 
 El prototipo de la landing incrustaba el prototipo de escritorio en un `<iframe>` que cargaba
 React y Babel de unpkg y evaluaba codigo con `new Function`. Eso no se publica nunca. La vista
-previa de produccion pinta componentes de `@ramal/repo-view` con datos de demostracion y un
+previa de produccion pinta componentes de `@git-rudder/repo-view` con datos de demostracion y un
 transporte en memoria, cargados de forma diferida por debajo del primer pantallazo (planificado).
 
 ## Consecuencias

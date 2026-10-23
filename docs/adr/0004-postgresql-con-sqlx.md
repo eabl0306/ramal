@@ -49,8 +49,8 @@ peticiones van en memoria de cada proceso (con la limitacion que eso tiene, desc
   `/health/ready` responde 503 si la base no contesta o su esquema va por detras. Un `SELECT 1`
   no basta: la base contestaria con el esquema a medias. Un esquema por delante si vale, porque
   cada migracion es compatible con el binario anterior.
-- Los repositorios viven en `ramal-api-infrastructure` e implementan los puertos de
-  `ramal-api-application`. Ninguna consulta sale de ese crate.
+- Los repositorios viven en `git-rudder-api-infrastructure` e implementan los puertos de
+  `git-rudder-api-application`. Ninguna consulta sale de ese crate.
 - Ante un interbloqueo (`40P01`) entre transacciones que tocan dos ambitos del registro de
   cambios, el repositorio reintenta una vez. El caso esta descrito en el modelo de datos.
 
@@ -82,11 +82,11 @@ EXISTS` en cada `CREATE`, `text` con `CHECK` en lugar de tipos `ENUM` (un valor 
 
 - Los adaptadores de PostgreSQL se prueban contra una base real, nunca contra un doble. Viven
   en `apps/api/crates/infrastructure/tests/` y, los de punta a punta contra el binario real, en
-  `apps/api/crates/api/tests/`. No van en `apps/api/crates/http/tests/`: `ramal-api-http` no
+  `apps/api/crates/api/tests/`. No van en `apps/api/crates/http/tests/`: `git-rudder-api-http` no
   puede alcanzar SQLx ni en sus tests (lo prohibe el test de arquitectura), asi que sus tests de
-  endpoint usan los fakes de `ramal-api-application`.
-- Leen `RAMAL_TEST_DATABASE_URL`. Sin ella se saltan solos, para que `cargo test` pase en una
-  maquina sin base de datos. **Con `RAMAL_TEST_REQUIRE_DATABASE=1`, que no haya URL es un
+  endpoint usan los fakes de `git-rudder-api-application`.
+- Leen `GIT_RUDDER_TEST_DATABASE_URL`. Sin ella se saltan solos, para que `cargo test` pase en una
+  maquina sin base de datos. **Con `GIT_RUDDER_TEST_REQUIRE_DATABASE=1`, que no haya URL es un
   fallo**: lo ponen `just api-test-db` y la CI, porque un test que se salta en silencio en la
   CI es un verde falso.
 - Se invocan con `--tests`, nunca con una lista de suites escrita a mano. En Gastonomo partir
@@ -121,7 +121,7 @@ En contra:
   descubre en el test de integracion, no en el compilador. Por eso esos tests son obligatorios
   en la CI y no se pueden saltar.
 - Sin ORM, el mapeo de filas a dominio se escribe a mano. Con 37 tablas es bastante codigo, y
-  va en `ramal-api-infrastructure`, que tiene el mismo limite de 300 lineas por fichero.
+  va en `git-rudder-api-infrastructure`, que tiene el mismo limite de 300 lineas por fichero.
 - Un fallo real de migracion no mata el proceso: deja la API viva respondiendo 503 y
   reintentando cada 10 segundos. Es deliberado, pero hay que mirar el log o la sonda de
   readiness para enterarse.

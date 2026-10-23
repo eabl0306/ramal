@@ -19,7 +19,7 @@ gh="gh"
 key="PRIVATE KEY"
 # Patrones precisos: un acierto es casi con seguridad una credencial de verdad.
 # Se aplican a TODOS los ficheros, tests incluidos: una clave de AWS no pinta
-# nada en un fixture. Ramal habla con GitHub, asi que los tokens de GitHub son
+# nada en un fixture. Git Rudder habla con GitHub, asi que los tokens de GitHub son
 # justo lo que mas facil se cuela en un fixture copiado de una sesion real.
 strict_patterns=(
   "${aws}[0-9A-Z]{16}"

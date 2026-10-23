@@ -11,7 +11,7 @@ import { collectFiles, isExcluded, isSourceFile, isTestFile } from './lib/scan.m
  * un motivo escrito, pero una directiva eslint-disable sin reglas o un
  * `#[allow(...)]` sobre los limites pasaban sin decir nada. Cambiar un limite es
  * una decision de equipo (ADR 0005) y se hace en clippy.toml o en
- * @ramal/eslint-config, no fichero a fichero.
+ * @git-rudder/eslint-config, no fichero a fichero.
  *
  * Es un script aparte y no una regla de ESLint o un lint de clippy a proposito:
  * una directiva eslint-disable sin reglas silencia tambien a la regla que la

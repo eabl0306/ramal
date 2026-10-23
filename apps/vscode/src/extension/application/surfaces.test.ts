@@ -1,4 +1,4 @@
-import { ENGINE_METHODS, HOST_METHODS } from '@ramal/bridge';
+import { ENGINE_METHODS, HOST_METHODS } from '@git-rudder/bridge';
 import { describe, expect, it } from 'vitest';
 
 import { SURFACES } from '../../shared/messages';

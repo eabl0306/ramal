@@ -6,13 +6,13 @@
 
 ## Contexto
 
-La API de Ramal es servidor de autorizacion para los tres productos, guarda documentos
+La API de Git Rudder es servidor de autorizacion para los tres productos, guarda documentos
 sincronizados y blobs de la boveda, publica el manifiesto del actualizador y hace de proxy de
 IA para las llaves de organizacion, con respuestas en streaming (SSE). Tiene que ser rapida de
 arrancar, barata de desplegar y dificil de romper en tiempo de ejecucion.
 
 Rust da tipos fuertes, ausencia de nulls y un binario unico sin runtime que instalar en la
-imagen. Ademas permite algo concreto de Ramal: el crate `ramal-ai` (planificado) lo usan el
+imagen. Ademas permite algo concreto de Git Rudder: el crate `git-rudder-ai` (planificado) lo usan el
 motor del dispositivo y la API, asi que el prompt que sale con una llave personal y el que sale
 con una llave de organizacion son el mismo codigo.
 
@@ -24,8 +24,8 @@ OpenTelemetry.
 Lo que si hay que decidir es como se genera el documento OpenAPI. Gastonomo lo construye a mano
 con los builders de utoipa porque la macro `#[utoipa::path]` espera funciones libres y sus
 handlers son structs con dependencias inyectadas. Su ADR 0003 deja escrito el precio: si
-alguien anade una ruta y olvida documentarla, nada lo detecta. En Ramal ese documento es la
-fuente de `@ramal/api-client` y de los tests de contrato de `ramal-cloud-client`, asi que un
+alguien anade una ruta y olvida documentarla, nada lo detecta. En Git Rudder ese documento es la
+fuente de `@git-rudder/api-client` y de los tests de contrato de `git-rudder-cloud-client`, asi que un
 documento desincronizado rompe clientes.
 
 ## Decision
@@ -38,15 +38,15 @@ gateway. Edition 2024 y Rust 1.98.1, por encima del minimo de 1.94 que piden sal
 
 ### Estructura
 
-- `ramal-api-http` es el unico crate que conoce Salvo: router, handlers, DTOs, problem+json,
+- `git-rudder-api-http` es el unico crate que conoce Salvo: router, handlers, DTOs, problem+json,
   catcher, documento OpenAPI, el middleware de request id y el arranque del servidor (`serve`,
   con el apagado ordenado). Los middlewares de limite de peticiones e idempotencia llegan con
   los endpoints que los necesitan. Es un adaptador driving.
-- `ramal-api` es el binario y el composition root (`src/bootstrap.rs` mas un modulo por
+- `git-rudder-api` es el binario y el composition root (`src/bootstrap.rs` mas un modulo por
   contexto en `src/bootstrap/`). Construye los adaptadores, los casos de uso y las
-  dependencias del router, y llama a `ramal_api_http::serve`. No depende de Salvo: el servidor
-  arranca dentro de `ramal-api-http`, asi que ningun tipo del framework sale de ese crate.
-- Configuracion con figment desde el entorno, prefijo `RAMAL__` y `__` como separador de nivel,
+  dependencias del router, y llama a `git_rudder_api_http::serve`. No depende de Salvo: el servidor
+  arranca dentro de `git-rudder-api-http`, asi que ningun tipo del framework sale de ese crate.
+- Configuracion con figment desde el entorno, prefijo `GIT_RUDDER__` y `__` como separador de nivel,
   con valores por defecto en el codigo. `.env.example` es la lista de lo que se puede mover.
 - Apagado ordenado: SIGTERM y SIGINT llaman a `stop_graceful` con margen, igual que Gastonomo.
 
@@ -69,12 +69,12 @@ utoipa 6.0.0.
 - Se sirve en `/openapi.json`. La Swagger UI va en `/swagger-ui/` con la feature `swagger-ui`
   de salvo-oapi, que la feature `oapi` de Salvo ya activa. Sus assets van embebidos en el
   binario (Swagger UI 5.32.11 con `rust-embed`), asi que funciona sin salida a internet, que era
-  un hueco de Gastonomo. Solo se monta con `RAMAL__SERVER__SWAGGER_UI=true`; apagada, la ruta es
+  un hueco de Gastonomo. Solo se monta con `GIT_RUDDER__SERVER__SWAGGER_UI=true`; apagada, la ruta es
   un 404 como cualquier otra. La encienden `compose.yaml` y `just api-run`; la imagen de
   produccion arranca sin ella, asi que no depende de que el gateway no la reenvie.
-- El documento generado se versiona en `apps/api/openapi.json`. Un test de `ramal-api-http` lo
+- El documento generado se versiona en `apps/api/openapi.json`. Un test de `git-rudder-api-http` lo
   compara con lo que genera el router y falla si difieren; `just api-openapi` lo reescribe. Ese
-  fichero es la fuente de `@ramal/api-client` y de los tests de contrato del motor.
+  fichero es la fuente de `@git-rudder/api-client` y de los tests de contrato del motor.
 
 ### Streaming
 

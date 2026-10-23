@@ -21,7 +21,7 @@ const GIT_EXTENSION_TIMEOUT_MS = 10_000;
  * Devuelve `undefined` si la extension falta, esta desactivada, no encontro git
  * o tarda demasiado: el sidecar usa entonces el primer git del `PATH`. No se
  * declara `extensionDependencies` sobre `vscode.git` porque impediria activar
- * Ramal a quien la tenga desactivada.
+ * Git Rudder a quien la tenga desactivada.
  */
 export async function resolveGitPath(logger: Logger): Promise<string | undefined> {
   const extension = vscode.extensions.getExtension<GitExtensionExports>('vscode.git');

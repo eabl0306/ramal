@@ -7,8 +7,8 @@ use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 use async_trait::async_trait;
-use ramal_core_application::{GitReadError, GitReader, GitVersionInfo, LogQuery};
-use ramal_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot, Sha};
+use git_rudder_core_application::{GitReadError, GitReader, GitVersionInfo, LogQuery};
+use git_rudder_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot, Sha};
 
 use crate::cli::version::{capabilities_for, parse_version};
 use crate::cli::{GitBinary, GitCommand, GitRunner, RunError, RunLimits, RunOutput};

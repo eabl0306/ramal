@@ -6,8 +6,8 @@
 
 ## Contexto
 
-Las tres apps de Ramal estan en castellano y en ingles. Los prototipos traen dos diccionarios
-planos, `D` (466 claves, en `ramal-data.js`) y `W` (148, el de la web), con tuplas
+Las tres apps de Git Rudder estan en castellano y en ingles. Los prototipos traen dos diccionarios
+planos, `D` (466 claves, en `git-rudder-data.js`) y `W` (148, el de la web), con tuplas
 `[castellano, ingles]` y marcadores `{x}`. El analisis de esos diccionarios encontro lo que hay
 que corregir antes de que llegue a produccion:
 
@@ -31,7 +31,7 @@ de vistas, descripciones de ajustes), y los errores que vienen del motor de Rust
 
 ## Decision
 
-### Una sola fuente: `@ramal/i18n`
+### Una sola fuente: `@git-rudder/i18n`
 
 Un paquete sin dependencias, la unica fuente de textos de interfaz de las tres apps:
 
@@ -55,8 +55,8 @@ falla si ese fichero no esta al dia.
 
 Espacios de nombres: `common`, `repos`, `graph`, `staging`, `diff`, `conflict`, `rebase`, `menu`,
 `dialog`, `toast`, `settings`, `ai`, `team`, `errors`, `vscode`, `web`, y `email` cuando la API
-mande correos. El enlace con React (`I18nProvider`, `useT`) vive en `@ramal/ui`, para que
-`@ramal/i18n` siga sin dependencias y lo puedan usar el extension host y los scripts de build.
+mande correos. El enlace con React (`I18nProvider`, `useT`) vive en `@git-rudder/ui`, para que
+`@git-rudder/i18n` siga sin dependencias y lo puedan usar el extension host y los scripts de build.
 
 ### Claves y parametros con tipos
 
@@ -104,9 +104,9 @@ El ajuste de idioma de la IA "igual que VS Code" usa la misma funcion.
   `%clave%` en `package.json` y los ficheros `package.nls.json` (ingles, el de reserva de VS Code) y
   `package.nls.es.json`. Es obligatorio: VS Code lee el manifiesto antes de activar la extension, y
   no hay otro mecanismo. Los dos ficheros se generan desde el espacio `vscode.manifest` de
-  `@ramal/i18n` (en el primer corte se escriben a mano).
+  `@git-rudder/i18n` (en el primer corte se escriben a mano).
 - **Los textos en tiempo de ejecucion del extension host** (avisos, QuickPick, InputBox, barra de
-  estado) usan el traductor de `@ramal/i18n` directamente, con el idioma de `resolveLocale`.
+  estado) usan el traductor de `@git-rudder/i18n` directamente, con el idioma de `resolveLocale`.
   **No se usa `vscode.l10n`.**
 
 **Por que no `vscode.l10n`.** Sus bundles usan el texto en ingles como clave. Eso pierde las claves
@@ -120,14 +120,14 @@ porque la regla es la misma, sin ninguno de esos costes.
 
 - **El motor** devuelve un `ErrorKind` cerrado y la interfaz lo traduce con
   `errors.engine.<kind>`. La correspondencia es un `Record<BridgeErrorKind, clave>`
-  (`ENGINE_ERROR_KEYS` en `@ramal/repo-view`, y otro en el extension host para sus avisos), asi
+  (`ENGINE_ERROR_KEYS` en `@git-rudder/repo-view`, y otro en el extension host para sus avisos), asi
   que un `kind` nuevo sin traduccion no compila. El `message` del error va
   en ingles y es para el log.
 - **La API** devuelve problem+json con los mensajes en castellano, como Gastonomo, y un `code`
   estable en el problema y en cada error de campo. La web traduce el `code` con
   `errors.api.<code>` y usa el mensaje en castellano solo si no conoce el codigo.
 - **Los correos de la API** (verificacion, recuperacion, invitaciones) se escriben en el espacio
-  `email` de `@ramal/i18n` y se exportan a JSON al construir; la API los embebe y elige el idioma
+  `email` de `@git-rudder/i18n` y se exportan a JSON al construir; la API los embebe y elige el idioma
   segun la preferencia guardada del usuario. Lo exportado se commitea y la CI comprueba que esta al
   dia, igual que los tipos del protocolo (planificado, con el primer correo).
 
@@ -136,7 +136,7 @@ porque la regla es la misma, sin ninguno de esos costes.
 - El tipado: una clave o un parametro que no existe no compila, y el ingles esta tipado contra el
   castellano.
 - `test/parity.test.ts`: mismas claves, mismos parametros y plurales completos en los dos idiomas.
-- La regla de ESLint `ramal/no-jsx-literal-text`: un texto literal en un componente no pasa el lint
+- La regla de ESLint `git-rudder/no-jsx-literal-text`: un texto literal en un componente no pasa el lint
   ([ADR 0005](0005-enforcement-automatizado.md)).
 
 ### La semilla del prototipo

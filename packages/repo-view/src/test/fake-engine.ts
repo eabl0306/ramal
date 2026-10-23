@@ -12,7 +12,7 @@ import {
   type Transport,
   type Unsubscribe,
   createBridgeClient,
-} from '@ramal/bridge';
+} from '@git-rudder/bridge';
 
 /** Codigo JSON-RPC de cualquier error del motor. */
 const ENGINE_ERROR_CODE = -32_000;

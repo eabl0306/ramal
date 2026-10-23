@@ -1,5 +1,5 @@
-import type { GraphRow } from '@ramal/bridge';
-import { laneColor } from '@ramal/ui';
+import type { GraphRow } from '@git-rudder/bridge';
+import { laneColor } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import type { GraphMetrics } from '../graph/geometry';

@@ -1,5 +1,5 @@
-import { I18nProvider, IconProvider } from '@ramal/ui';
-import { lucideIcons } from '@ramal/ui/icons/lucide';
+import { I18nProvider, IconProvider } from '@git-rudder/ui';
+import { lucideIcons } from '@git-rudder/ui/icons/lucide';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';

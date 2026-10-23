@@ -1,11 +1,11 @@
-import { type BridgeErrorKind, isBridgeError } from '@ramal/bridge';
-import type { PlainKey } from '@ramal/i18n';
+import { type BridgeErrorKind, isBridgeError } from '@git-rudder/bridge';
+import type { PlainKey } from '@git-rudder/i18n';
 
 /**
  * El motor no devuelve textos traducidos: devuelve un `kind`, y la interfaz lo
  * traduce (architecture.md 7.5). Es un Record sobre todos los tipos, asi que un
  * `ErrorKind` nuevo en el motor, o uno nuevo del bridge, no compila hasta que
- * tiene su texto aqui y en @ramal/i18n.
+ * tiene su texto aqui y en @git-rudder/i18n.
  */
 export const ENGINE_ERROR_KEYS: Readonly<Record<BridgeErrorKind, PlainKey>> = {
   invalid_params: 'errors.engine.invalid_params',

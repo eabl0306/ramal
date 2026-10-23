@@ -1,9 +1,9 @@
 {
-  "name": "@ramal/desktop",
+  "name": "@git-rudder/desktop",
   "version": "0.1.0",
   "license": "FSL-1.1-ALv2",
   "private": true,
-  "description": "Ramal Desktop: frontend React del host de Tauri que pinta el grafo con @ramal/repo-view.",
+  "description": "Git Rudder Desktop: frontend React del host de Tauri que pinta el grafo con @git-rudder/repo-view.",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -20,10 +20,10 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@ramal/bridge": "workspace:*",
-    "@ramal/i18n": "workspace:*",
-    "@ramal/repo-view": "workspace:*",
-    "@ramal/ui": "workspace:*",
+    "@git-rudder/bridge": "workspace:*",
+    "@git-rudder/i18n": "workspace:*",
+    "@git-rudder/repo-view": "workspace:*",
+    "@git-rudder/ui": "workspace:*",
     "@tanstack/react-query": "5.104.3",
     "@tauri-apps/api": "2.12.4",
     "react": "19.3.1",
@@ -31,8 +31,8 @@
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
-    "@ramal/eslint-config": "workspace:*",
-    "@ramal/tsconfig": "workspace:*",
+    "@git-rudder/eslint-config": "workspace:*",
+    "@git-rudder/tsconfig": "workspace:*",
     "@tauri-apps/cli": "2.12.3",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",

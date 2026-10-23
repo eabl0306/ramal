@@ -4,22 +4,22 @@
     "repo_not_open": "El repositorio no está abierto.",
     "not_a_repository": "La carpeta no es un repositorio de Git.",
     "git_not_found": "No se encuentra Git en este equipo.",
-    "git_version_unsupported": "Ramal necesita Git 2.34 o posterior.",
+    "git_version_unsupported": "Git Rudder necesita Git 2.34 o posterior.",
     "git_failed": "Git ha devuelto un error.",
-    "internal": "Algo ha fallado en Ramal.",
+    "internal": "Algo ha fallado en Git Rudder.",
     "cancelled": "Operación cancelada.",
-    "not_signed_in": "Inicia sesión en Ramal para seguir.",
-    "transport": "Se ha perdido la conexión con el motor de Ramal.",
-    "timeout": "El motor de Ramal no ha respondido a tiempo.",
-    "engine_unavailable": "El motor de Ramal no está disponible."
+    "not_signed_in": "Inicia sesión en Git Rudder para seguir.",
+    "transport": "Se ha perdido la conexión con el motor de Git Rudder.",
+    "timeout": "El motor de Git Rudder no ha respondido a tiempo.",
+    "engine_unavailable": "El motor de Git Rudder no está disponible."
   },
   "api": {
     "unknown": "Algo ha fallado. Inténtalo de nuevo.",
-    "network": "No hay conexión con Ramal.",
+    "network": "No hay conexión con Git Rudder.",
     "unavailable": "Esta función todavía no está disponible.",
     "terms_required": "Debes aceptar los términos.",
     "version_conflict": "Otro dispositivo cambió estos datos. Recarga para ver la última versión.",
     "web_session_required": "Esta acción solo se puede hacer desde la web.",
-    "native_client_required": "Esta acción solo se puede hacer desde Ramal Desktop o VS Code."
+    "native_client_required": "Esta acción solo se puede hacer desde Git Rudder Desktop o VS Code."
   }
 }

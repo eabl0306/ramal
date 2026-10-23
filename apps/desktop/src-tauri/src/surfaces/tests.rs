@@ -3,8 +3,8 @@
     reason = "tests fail loudly on purpose; a panic here is a failed assertion"
 )]
 
+use git_rudder_protocol::{ErrorKind, METHODS, MethodInfo, error_code};
 use pretty_assertions::assert_eq;
-use ramal_protocol::{ErrorKind, METHODS, MethodInfo, error_code};
 
 use super::{CONTROL_NOTIFICATIONS, MAIN_WINDOW, SURFACES, authorize, methods_for};
 

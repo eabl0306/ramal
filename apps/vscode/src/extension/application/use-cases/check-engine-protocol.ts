@@ -1,4 +1,4 @@
-import { type EngineInfo, PROTOCOL_VERSION } from '@ramal/bridge';
+import { type EngineInfo, PROTOCOL_VERSION } from '@git-rudder/bridge';
 
 import { callEngine } from '../call-engine';
 import { EngineCallError } from '../engine-errors';

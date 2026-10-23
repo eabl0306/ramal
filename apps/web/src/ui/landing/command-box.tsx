@@ -1,4 +1,4 @@
-import { useT } from '@ramal/ui';
+import { useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import { moduleClasses } from '../shared/module-classes';

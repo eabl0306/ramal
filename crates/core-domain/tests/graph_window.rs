@@ -12,13 +12,13 @@
 
 mod support;
 
-use ramal_core_domain::graph::{
+use git_rudder_core_domain::graph::{
     GraphWindow, MAX_WINDOW_LIMIT, WindowError, WindowRange, graph_window, layout,
 };
-use ramal_core_domain::{Head, RefSnapshot};
+use git_rudder_core_domain::{Head, RefSnapshot};
 use support::{git_ref, record, sha, snapshot_on_branch};
 
-fn history() -> Vec<ramal_core_domain::CommitRecord> {
+fn history() -> Vec<git_rudder_core_domain::CommitRecord> {
     vec![
         record(1, &[2]),
         record(2, &[3]),

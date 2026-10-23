@@ -2,8 +2,8 @@
 
 use std::sync::Arc;
 
-use ramal_api_application::{CheckLiveness, CheckReadiness};
-use ramal_api_domain::{ComponentHealth, HealthReport};
+use git_rudder_api_application::{CheckLiveness, CheckReadiness};
+use git_rudder_api_domain::{ComponentHealth, HealthReport};
 use salvo::oapi::endpoint;
 use salvo::prelude::{Json, Response, StatusCode};
 

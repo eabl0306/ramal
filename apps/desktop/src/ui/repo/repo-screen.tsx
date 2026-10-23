@@ -1,5 +1,5 @@
-import type { BridgeClient } from '@ramal/bridge';
-import { GraphView } from '@ramal/repo-view';
+import type { BridgeClient } from '@git-rudder/bridge';
+import { GraphView } from '@git-rudder/repo-view';
 import type { ReactElement } from 'react';
 
 import type { RepoTab } from '../../application/workspace/workspace';
@@ -12,7 +12,7 @@ export interface RepoScreenProps {
 }
 
 /**
- * La vista de un repositorio: el grafo de @ramal/repo-view, el mismo componente
+ * La vista de un repositorio: el grafo de @git-rudder/repo-view, el mismo componente
  * que en VS Code, en densidad comoda. La barra de herramientas, la barra lateral y
  * el panel derecho del diseno llegan con sus casos de uso en el motor.
  */

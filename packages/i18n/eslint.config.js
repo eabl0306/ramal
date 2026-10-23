@@ -7,13 +7,13 @@ import {
   nodeConfig,
   qualityConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
 /**
  * Una sola capa, biblioteca pura: el codigo de src no importa nada de fuera, ni
- * React (su enlace vive en @ramal/ui) ni node:*. Los tests si pueden usar
+ * React (su enlace vive en @git-rudder/ui) ni node:*. Los tests si pueden usar
  * vitest y leer del disco.
  */
 const elements = [
@@ -42,7 +42,7 @@ const policies = [
   {
     from: { element: { type: 'i18n' }, file: { categories: 'source' } },
     disallow: { to: { module: { origin: ['external', 'core'] } } },
-    message: '@ramal/i18n es puro: sin paquetes de npm ni node:*.',
+    message: '@git-rudder/i18n es puro: sin paquetes de npm ni node:*.',
   },
 ];
 

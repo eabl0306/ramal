@@ -2,7 +2,7 @@
 // Playwright, y los e2e. La lib DOM es por page.evaluate de Playwright. Las
 // rutas que se prerenderizan salen del dominio, por eso entran sus dos ficheros.
 {
-  "extends": "@ramal/tsconfig/base.json",
+  "extends": "@git-rudder/tsconfig/base.json",
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsc/node.tsbuildinfo",

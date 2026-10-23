@@ -22,7 +22,7 @@ describe('createLocalPreferencesStore', () => {
 
   it('lee lo guardado e ignora valores desconocidos campo a campo', () => {
     const storage = memoryStorage({
-      'ramal.web.preferences': JSON.stringify({ language: 'en', theme: 'sepia' }),
+      'gitRudder.web.preferences': JSON.stringify({ language: 'en', theme: 'sepia' }),
     });
     const store = createLocalPreferencesStore(() => storage);
 
@@ -31,10 +31,10 @@ describe('createLocalPreferencesStore', () => {
 
   it('ignora un JSON roto o que no es un objeto', () => {
     const broken = createLocalPreferencesStore(() =>
-      memoryStorage({ 'ramal.web.preferences': '{' }),
+      memoryStorage({ 'gitRudder.web.preferences': '{' }),
     );
     const scalar = createLocalPreferencesStore(() =>
-      memoryStorage({ 'ramal.web.preferences': '3' }),
+      memoryStorage({ 'gitRudder.web.preferences': '3' }),
     );
 
     expect(broken.read()).toEqual({ language: null, theme: null });
@@ -52,7 +52,7 @@ describe('createLocalPreferencesStore', () => {
     expect(listener).toHaveBeenCalledTimes(1);
     expect(store.read()).toBe(store.read());
     expect(store.read()).toEqual({ language: null, theme: 'light' });
-    expect(JSON.parse(storage.items.get('ramal.web.preferences') ?? '')).toEqual({
+    expect(JSON.parse(storage.items.get('gitRudder.web.preferences') ?? '')).toEqual({
       language: null,
       theme: 'light',
     });

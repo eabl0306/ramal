@@ -1,10 +1,10 @@
-import { type DetectedPlatform, recommendDownload } from '@ramal/domain';
+import { type DetectedPlatform, recommendDownload } from '@git-rudder/domain';
 
 import type { DownloadEntry, DownloadFile, ReleaseInfo } from './release';
 
 /**
  * Que ensena la landing segun el equipo de quien la visita. La regla de que
- * instalador encaja vive en @ramal/domain; esto solo la aplica a los datos de
+ * instalador encaja vive en @git-rudder/domain; esto solo la aplica a los datos de
  * una publicacion.
  */
 
@@ -29,7 +29,7 @@ export function recommendedFile(
   return files.find((file) => file.id === choice.artifact.id) ?? null;
 }
 
-/** Un movil no puede instalar Ramal: la pagina lo dice en vez de destacar macOS (gaps B-55). */
+/** Un movil no puede instalar Git Rudder: la pagina lo dice en vez de destacar macOS (gaps B-55). */
 export function isMobileVisitor(platform: DetectedPlatform): boolean {
   return platform.os === 'android' || platform.os === 'ios';
 }

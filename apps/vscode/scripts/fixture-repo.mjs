@@ -10,10 +10,10 @@ import path from 'node:path';
 export const FIXTURE_SUMMARIES = ['Tercer commit', 'Segundo commit', 'Primer commit'];
 
 const IDENTITY = {
-  GIT_AUTHOR_NAME: 'Ramal Test',
-  GIT_AUTHOR_EMAIL: 'test@ramal.invalid',
-  GIT_COMMITTER_NAME: 'Ramal Test',
-  GIT_COMMITTER_EMAIL: 'test@ramal.invalid',
+  GIT_AUTHOR_NAME: 'Git Rudder Test',
+  GIT_AUTHOR_EMAIL: 'test@gitRudder.invalid',
+  GIT_COMMITTER_NAME: 'Git Rudder Test',
+  GIT_COMMITTER_EMAIL: 'test@gitRudder.invalid',
 };
 
 function git(cwd, args, date) {
@@ -26,7 +26,7 @@ function git(cwd, args, date) {
 
 /** Crea el repositorio y devuelve su ruta. */
 export function createFixtureRepo() {
-  const root = mkdtempSync(path.join(tmpdir(), 'ramal-vscode-it-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'git-rudder-vscode-it-'));
   git(root, ['init', '--quiet'], '2026-01-01T10:00:00+00:00');
   const summaries = [...FIXTURE_SUMMARIES].reverse();
   summaries.forEach((summary, index) => {

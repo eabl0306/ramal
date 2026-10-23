@@ -11,7 +11,7 @@ import {
   qualityConfig,
   reactConfig,
   testsConfig,
-} from '@ramal/eslint-config';
+} from '@git-rudder/eslint-config';
 
 const tsconfigRootDir = fileURLToPath(new URL('.', import.meta.url));
 
@@ -75,26 +75,26 @@ function core(type) {
  */
 const policies = [
   layer('shared', ['shared']),
-  typesOnly('shared', ['@ramal/bridge']),
+  typesOnly('shared', ['@git-rudder/bridge']),
   layer('ext-application', ['shared', 'ext-application']),
-  external('ext-application', ['@ramal/i18n', '@ramal/bridge']),
+  external('ext-application', ['@git-rudder/i18n', '@git-rudder/bridge']),
   layer('ext-infrastructure', ['shared', 'ext-application', 'ext-infrastructure']),
-  external('ext-infrastructure', ['@ramal/bridge', 'vscode', 'zod']),
+  external('ext-infrastructure', ['@git-rudder/bridge', 'vscode', 'zod']),
   core('ext-infrastructure'),
   layer('ext-app', ['shared', 'ext-application', 'ext-infrastructure', 'ext-app']),
   external('ext-app', ['vscode']),
   layer('web-infrastructure', ['shared', 'web-infrastructure']),
-  external('web-infrastructure', ['@ramal/bridge', '@ramal/domain']),
+  external('web-infrastructure', ['@git-rudder/bridge', '@git-rudder/domain']),
   layer('web-ui', ['web-ui']),
   external('web-ui', [
     'react',
-    '@ramal/ui',
-    '@ramal/ui/**',
-    '@ramal/repo-view',
-    '@ramal/i18n',
-    '@ramal/domain',
+    '@git-rudder/ui',
+    '@git-rudder/ui/**',
+    '@git-rudder/repo-view',
+    '@git-rudder/i18n',
+    '@git-rudder/domain',
   ]),
-  typesOnly('web-ui', ['@ramal/bridge']),
+  typesOnly('web-ui', ['@git-rudder/bridge']),
   layer('web-app', ['shared', 'web-infrastructure', 'web-ui', 'web-app']),
   external('web-app', ['react', 'react-dom', 'react-dom/client', '@tanstack/react-query']),
   {
@@ -111,8 +111,8 @@ const policies = [
             'vitest',
             '@testing-library/**',
             'react',
-            '@ramal/bridge',
-            '@ramal/i18n',
+            '@git-rudder/bridge',
+            '@git-rudder/i18n',
             'node:*',
           ],
         },
@@ -139,13 +139,13 @@ export default [
     ignore: ['src/**/*.d.ts'],
   }),
   {
-    // shared solo puede ver los tipos de @ramal/bridge: ningun valor de un
+    // shared solo puede ver los tipos de @git-rudder/bridge: ningun valor de un
     // paquete entra en los dos lados por la puerta de atras.
     files: ['src/shared/**/*.ts'],
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
-        { paths: [{ name: '@ramal/bridge', allowTypeImports: true }] },
+        { paths: [{ name: '@git-rudder/bridge', allowTypeImports: true }] },
       ],
     },
   },

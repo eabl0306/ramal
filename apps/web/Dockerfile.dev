@@ -31,7 +31,7 @@ RUN mkdir /manifests \
 FROM base
 COPY --from=manifests /manifests/ ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
-    pnpm install --frozen-lockfile --filter "@ramal/web..."
+    pnpm install --frozen-lockfile --filter "@git-rudder/web..."
 COPY packages/ packages/
 COPY apps/web/ apps/web/
 
@@ -40,4 +40,4 @@ EXPOSE 5173
 # ser 0.0.0.0: el gateway entra por la red de Docker (web:5173) y, sin esto, la
 # pila entera se queda sin web.
 ENV VITE_DEV_HOST=0.0.0.0
-CMD ["pnpm", "--filter", "@ramal/web", "dev"]
+CMD ["pnpm", "--filter", "@git-rudder/web", "dev"]

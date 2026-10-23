@@ -1,4 +1,4 @@
-import type { EngineMethod, EngineMethods } from '@ramal/bridge';
+import type { EngineMethod, EngineMethods } from '@git-rudder/bridge';
 
 import { callEngine } from '../call-engine';
 import type { EngineConnection } from '../ports/engine-connection';

@@ -11,9 +11,9 @@ mod wiring;
 
 use std::path::Path;
 
-use ramal_api_domain::ServiceVersion;
-use ramal_api_http::RouterDependencies;
-use ramal_api_infrastructure::AppConfig;
+use git_rudder_api_domain::ServiceVersion;
+use git_rudder_api_http::RouterDependencies;
+use git_rudder_api_infrastructure::AppConfig;
 
 use crate::error::StartupError;
 use crate::shutdown;
@@ -40,8 +40,8 @@ pub async fn serve(config: AppConfig) -> Result<(), StartupError> {
     let wiring = Wiring::new(&config, version)?;
     migrations::spawn(wiring.pool.clone());
     let swagger_ui = config.server.swagger_ui;
-    tracing::info!(%version, swagger_ui, "ramal api is starting");
-    ramal_api_http::serve(
+    tracing::info!(%version, swagger_ui, "git-rudder api is starting");
+    git_rudder_api_http::serve(
         router_dependencies(&wiring, &config),
         address,
         shutdown::signal(),
@@ -66,7 +66,7 @@ pub async fn serve(config: AppConfig) -> Result<(), StartupError> {
 pub fn write_openapi(path: &Path) -> Result<(), StartupError> {
     let config = AppConfig::default();
     let wiring = Wiring::new(&config, service_version()?)?;
-    let document = ramal_api_http::document_json(&router_dependencies(&wiring, &config))
+    let document = git_rudder_api_http::document_json(&router_dependencies(&wiring, &config))
         .map_err(|error| StartupError::OpenApi(error.to_string()))?;
     std::fs::write(path, document).map_err(|source| StartupError::WriteOpenApi {
         path: path.to_path_buf(),

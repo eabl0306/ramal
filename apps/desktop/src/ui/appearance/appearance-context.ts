@@ -1,4 +1,4 @@
-import type { Locale } from '@ramal/i18n';
+import type { Locale } from '@git-rudder/i18n';
 import { createContext, use } from 'react';
 
 import type { ThemeName } from '../../application/ports/appearance-store';
@@ -26,7 +26,7 @@ export function useAppearance(): AppearanceValue {
 
 /**
  * Lleva la apariencia al documento: `data-theme` elige los valores de
- * `@ramal/ui/themes/ramal.css` y `lang` dice a lectores de pantalla y al
+ * `@git-rudder/ui/themes/git-rudder.css` y `lang` dice a lectores de pantalla y al
  * navegador en que idioma esta el texto.
  */
 export function applyAppearance(root: HTMLElement, { theme, locale }: Appearance): void {

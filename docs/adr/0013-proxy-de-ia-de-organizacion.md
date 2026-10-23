@@ -9,7 +9,7 @@
 
 ## Contexto
 
-Ramal genera tres cosas con IA: el mensaje de commit a partir de los cambios preparados, el titulo
+Git Rudder genera tres cosas con IA: el mensaje de commit a partir de los cambios preparados, el titulo
 y la descripcion de un pull request, y el resumen de un commit en el panel de detalle. El usuario
 elige proveedor (Anthropic, OpenAI, Groq, Google, Mistral, OpenRouter, Ollama o cualquier endpoint
 compatible con OpenAI), modelo y llave, y cada llave tiene un alcance: personal u organizacion.
@@ -17,9 +17,9 @@ compatible con OpenAI), modelo y llave, y cada llave tiene un alcance: personal 
 Los dos alcances tienen necesidades opuestas:
 
 - Una **llave personal** es del usuario. Ollama vive en el `localhost` de su maquina y ningun
-  servidor puede llegar a el. Y si la llave es suya, el codigo no tiene por que pasar por Ramal.
+  servidor puede llegar a el. Y si la llave es suya, el codigo no tiene por que pasar por Git Rudder.
 - Una **llave de organizacion** la da de alta un admin para que la usen todos los miembros. Si se
-  copiara a cada dispositivo, cualquier miembro podria sacarla y usarla fuera de Ramal, y quitar a
+  copiara a cada dispositivo, cualquier miembro podria sacarla y usarla fuera de Git Rudder, y quitar a
   alguien del equipo no la recuperaria.
 
 La decision de partida del usuario: **las llaves de organizacion nunca salen del servidor**,
@@ -36,30 +36,30 @@ La IA corre donde vive la llave.
 - Se guardan en el llavero del sistema (Desktop) o en `SecretStorage` (VS Code). Si el usuario
   activa su sincronizacion, que viene apagada, viajan por la boveda de extremo a extremo
   ([ADR 0012](0012-boveda-de-extremo-a-extremo.md)).
-- El caso de uso del motor arma la entrada, y el adaptador de `ramal-ai` llama al proveedor desde
+- El caso de uso del motor arma la entrada, y el adaptador de `git-rudder-ai` llama al proveedor desde
   el dispositivo. El texto llega a la interfaz en streaming como notificaciones del motor.
 - La API no tiene ningun endpoint que genere con una llave personal.
 
 ### Llaves de organizacion: cifrado de sobre en el servidor
 
 - **Una llave de datos (DEK) aleatoria de 256 bits por secreto.** Cifra la llave del proveedor
-  con AES-256-GCM, nonce aleatorio de 96 bits y datos asociados `ramal:org-ai-key:v1:{orgId}:{keyId}`.
+  con AES-256-GCM, nonce aleatorio de 96 bits y datos asociados `git-rudder:org-ai-key:v1:{orgId}:{keyId}`.
   Un ciphertext copiado a otra fila o a otra organizacion no descifra. Con una DEK por secreto no
   hay que contar cuantos mensajes cifra una llave para no repetir nonce.
 - **La DEK se envuelve con la llave maestra activa (KEK)**, tambien con AES-256-GCM y con datos
-  asociados `ramal:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`. Se guardan `ciphertext`, `nonce`,
+  asociados `git-rudder:org-ai-dek:v1:{orgId}:{keyId}:{kekId}`. Se guardan `ciphertext`, `nonce`,
   `wrapped_dek`, `dek_nonce`, `kek_id` y `alg`, mas los metadatos (proveedor, etiqueta, modelo por
   defecto y, si el admin los fija, un modelo por funcion, URL base y la mascara).
 - **El `kekId` va en los datos asociados de la envoltura, no en los del secreto.** Si fuera en los
   del secreto, rotar la KEK (que solo reenvuelve la DEK) dejaria todos los secretos sin poder
   descifrarse, porque sus datos asociados ya no coincidirian. Un test rota la KEK y vuelve a
   descifrar cada llave.
-- **Las KEK no estan en la base.** Llegan por configuracion (`RAMAL__SECRETS__KEKS`, un mapa de
-  identificador a llave en base64, y `RAMAL__SECRETS__ACTIVE_KEK`), se cargan en tipos que se
+- **Las KEK no estan en la base.** Llegan por configuracion (`GIT_RUDDER__SECRETS__KEKS`, un mapa de
+  identificador a llave en base64, y `GIT_RUDDER__SECRETS__ACTIVE_KEK`), se cargan en tipos que se
   limpian de memoria y nunca se registran. Un volcado de la base solo trae ciphertext y DEK
   envueltas. Mas adelante, el mismo puerto `KeyEnvelope` puede tener un adaptador sobre un KMS para
   que la KEK no entre nunca en el proceso.
-- **En produccion la KEK vive en una maquina compartida.** Va en el `.env` de Ramal en `apps-01`,
+- **En produccion la KEK vive en una maquina compartida.** Va en el `.env` de Git Rudder en `apps-01`,
   que tambien sirve otras dos aplicaciones
   ([ADR 0023](0023-despliegue-en-apps-01-y-dominio.md)). La protegen los permisos 0600 del fichero,
   que solo el contenedor de la API la recibe y que cada aplicacion tiene su proyecto de compose, su
@@ -70,7 +70,7 @@ La IA corre donde vive la llave.
   retira cuando ninguna fila la usa. Rotar la llave del proveedor genera una DEK nueva.
 - **El alta y la rotacion de estas llaves son los unicos endpoints que reciben en claro un secreto
   de un tercero para guardarlo**, y es por diseno: la llave es de la organizacion y el servidor
-  tiene que poder usarla. (Las contrasenas de Ramal y el canje del broker tambien pasan por la API,
+  tiene que poder usarla. (Las contrasenas de Git Rudder y el canje del broker tambien pasan por la API,
   pero ni son de un tercero ni se guardan en claro.) Llega por TLS, se cifra en el acto y el
   valor en claro va en tipos con `Debug` redactado que no aparecen en ningun log ni traza.
 - Ningun endpoint devuelve la llave, a nadie, en ningun formato. Los miembros ven proveedor,
@@ -88,7 +88,7 @@ revocada. La web no tiene interfaz de IA y no tiene por que poder gastar llaves.
 - **Entrada estructurada, no un prompt libre.** El cliente manda la funcion (`commit_message`,
   `pull_request` o `commit_summary`), el idioma, las opciones (Conventional Commits, instrucciones
   extra) y los datos de entrada (rama y diff preparado, commits de la rama, o un commit). El
-  servidor monta el prompt con las plantillas de `ramal-ai`, las mismas que usa el motor con una
+  servidor monta el prompt con las plantillas de `git-rudder-ai`, las mismas que usa el motor con una
   llave personal, asi que el resultado es igual por los dos caminos.
 - **La entrada estructurada no impide usar la llave como chat**: las instrucciones extra, la
   plantilla de PR, los cuerpos de commit y los parches son texto libre, y la salida vuelve al
@@ -116,7 +116,7 @@ revocada. La web no tiene interfaz de IA y no tiene por que poder gastar llaves.
   lea el final. Las peticiones que no llegan al proveedor no dejan fila.
 - **Los errores al cliente son categorias** (`unauthorized`, `quota`, `unavailable`), nunca el texto
   del proveedor, que puede traer fragmentos de la peticion.
-- **502 y 504 no son un 500.** El cliente tiene que distinguir "Ramal fallo" de "la llave de tu
+- **502 y 504 no son un 500.** El cliente tiene que distinguir "Git Rudder fallo" de "la llave de tu
   organizacion no tiene saldo", porque lo segundo lo arregla un admin.
 
 ### Que sale, a donde, y que se guarda
@@ -145,7 +145,7 @@ llave no sale del servidor. Por eso:
 - **Los proveedores conocidos tienen el host fijo**: `api.openai.com`, `api.anthropic.com`,
   `api.groq.com`, `generativelanguage.googleapis.com`, `api.mistral.ai` y `openrouter.ai`. Su URL
   base no se elige. Cualquier otro host solo con el proveedor `custom`, y `custom` solo si el
-  despliegue lo permite (`RAMAL__AI__ALLOW_CUSTOM_BASE_URLS=true`).
+  despliegue lo permite (`GIT_RUDDER__AI__ALLOW_CUSTOM_BASE_URLS=true`).
 - **Cambiar la URL base de una llave `custom` exige reenviar la llave** en la misma peticion, deja
   un evento de auditoria y avisa a la titular de la organizacion. Un admin no puede redirigir una
   llave que dio de alta otra persona sin tenerla.
@@ -161,8 +161,8 @@ llave no sale del servidor. Por eso:
 
 ### Un crate para los dos caminos
 
-`ramal-ai` (planificado) es una biblioteca neutral que no depende de ningun crate de Ramal
-([ADR 0002](0002-arquitectura-hexagonal.md)). La usan `ramal-engine` y `ramal-api-infrastructure`,
+`git-rudder-ai` (planificado) es una biblioteca neutral que no depende de ningun crate de Git Rudder
+([ADR 0002](0002-arquitectura-hexagonal.md)). La usan `git-rudder-engine` y `git-rudder-api-infrastructure`,
 y contiene:
 
 - Las plantillas de prompt, versionadas por funcion e idioma, y las reglas de Conventional
@@ -179,18 +179,18 @@ y contiene:
 
 A favor:
 
-- Una llave de organizacion no se puede sacar de Ramal ni usar fuera de el, y quitar a un miembro
+- Una llave de organizacion no se puede sacar de Git Rudder ni usar fuera de el, y quitar a un miembro
   le quita el acceso de verdad.
 - Las organizaciones tienen cuotas y una vista de consumo, asi que la llave no es un cheque en
   blanco.
-- Ollama y las llaves personales funcionan sin cuenta de Ramal y sin que el codigo pase por
+- Ollama y las llaves personales funcionan sin cuenta de Git Rudder y sin que el codigo pase por
   nuestros servidores.
 - El resultado es el mismo con una llave personal y con una de organizacion: mismas plantillas,
   mismo filtro.
 
 En contra:
 
-- **El proxy hace pasar codigo por Ramal.** Esta acotado (solo llaves de organizacion, entrada
+- **El proxy hace pasar codigo por Git Rudder.** Esta acotado (solo llaves de organizacion, entrada
   estructurada, filtro doble, nada guardado), pero cada organizacion tiene que saberlo antes de dar
   de alta una llave.
 - **Perder las KEK pierde todas las llaves de organizacion.** Copia fuera de linea obligatoria,
@@ -210,7 +210,7 @@ En contra:
 **Repartir la llave de organizacion a los dispositivos de los miembros.** Sin servidor en medio,
 pero cualquier miembro se la puede llevar, y no hay forma de retirarla al salir del equipo.
 
-**Todo por la API, tambien las llaves personales.** Todo el codigo pasaria por Ramal, Ollama seria
+**Todo por la API, tambien las llaves personales.** Todo el codigo pasaria por Git Rudder, Ollama seria
 imposible y cada generacion costaria infraestructura.
 
 **Extremo a extremo tambien para las llaves de organizacion.** El servidor no podria llamar al

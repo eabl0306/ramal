@@ -5,7 +5,7 @@
 #
 #   docker compose --profile full up api
 #
-# El primer arranque tarda varios minutos: compila ramal-api con todas sus
+# El primer arranque tarda varios minutos: compila git-rudder-api con todas sus
 # dependencias. Despues la cache vive en los volumenes de compose.
 
 # Va a la par que rust-toolchain.toml: se suben juntos.
@@ -29,9 +29,9 @@ WORKDIR /app
 # en el repositorio del host un directorio de root que no se borra sin sudo.
 # RUSTUP_TOOLCHAIN gana al rust-toolchain.toml montado, que haria a rustup
 # descargar componentes que aqui no se usan.
-ENV RAMAL__SERVER__HOST=0.0.0.0 \
-    RAMAL__SERVER__PORT=8080 \
-    RAMAL__TELEMETRY__LOG_LEVEL=debug \
+ENV GIT_RUDDER__SERVER__HOST=0.0.0.0 \
+    GIT_RUDDER__SERVER__PORT=8080 \
+    GIT_RUDDER__TELEMETRY__LOG_LEVEL=debug \
     CARGO_TARGET_DIR=/cargo-target \
     RUSTUP_TOOLCHAIN=${RUST_VERSION}
 
@@ -46,4 +46,4 @@ CMD ["cargo", "watch", "--why", \
      "--watch", "Cargo.lock", \
      "--ignore", "target/**", \
      "--ignore", "**/target/**", \
-     "--exec", "run --bin ramal-api"]
+     "--exec", "run --bin git-rudder-api"]

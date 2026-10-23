@@ -39,9 +39,9 @@ describe('App: abrir un repositorio', () => {
 
     await openRepository();
 
-    const tab = screen.getByRole('button', { name: 'ramal' });
+    const tab = screen.getByRole('button', { name: 'git-rudder' });
     expect(tab).toHaveAttribute('aria-current', 'page');
-    expect(tab).toHaveAttribute('title', '/home/ana/code/ramal');
+    expect(tab).toHaveAttribute('title', '/home/ana/code/git-rudder');
     const grid = await screen.findByRole('grid', { name: 'Historial de commits' });
     expect(within(grid).getByText('Segundo commit')).toBeInTheDocument();
     expect(host.requests[0]).toMatchObject({
@@ -84,7 +84,7 @@ describe('App: abrir un repositorio', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Inicio' }));
     expect(screen.queryByRole('grid')).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('button', { name: 'ramal' }));
+    await userEvent.click(screen.getByRole('button', { name: 'git-rudder' }));
     expect(await screen.findByRole('grid')).toBeInTheDocument();
   });
 
@@ -95,10 +95,10 @@ describe('App: abrir un repositorio', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Inicio' }));
     await openRepository();
-    expect(screen.getAllByRole('button', { name: 'ramal' })).toHaveLength(1);
+    expect(screen.getAllByRole('button', { name: 'git-rudder' })).toHaveLength(1);
 
     await userEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
-    expect(screen.queryByRole('button', { name: 'ramal' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'git-rudder' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Repositorios' })).toBeInTheDocument();
   });
 });

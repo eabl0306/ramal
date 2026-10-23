@@ -1,4 +1,4 @@
-import type { EngineInfo, RpcNotification, RpcResponse } from '@ramal/bridge';
+import type { EngineInfo, RpcNotification, RpcResponse } from '@git-rudder/bridge';
 
 import type { IdentifiedRpcRequest } from '../../../shared/messages';
 import { type EngineCallError, EngineUnavailableError, describeError } from '../engine-errors';

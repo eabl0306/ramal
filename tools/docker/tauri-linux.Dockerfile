@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 #
-# Imagen para compilar y probar el lado nativo de Ramal Desktop (crate
-# ramal-desktop) en maquinas sin webkit2gtk. No es una imagen de produccion: es
+# Imagen para compilar y probar el lado nativo de Git Rudder Desktop (crate
+# git-rudder-desktop) en maquinas sin webkit2gtk. No es una imagen de produccion: es
 # el entorno de Linux que Tauri 2 necesita, con las mismas versiones que fija el
 # repo, para correr dentro las recetas desktop-rust-check, desktop-build y
 # desktop-e2e-native (ver las recetas desktop-docker-* del justfile).
@@ -114,7 +114,7 @@ RUN set -eux; \
   just --version
 
 # cargo-llvm-cov, con la suma de su release: desktop-rust-check mide la cobertura
-# de ramal-desktop (60% global, ADR 0006). La misma version que instala la CI.
+# de git-rudder-desktop (60% global, ADR 0006). La misma version que instala la CI.
 RUN set -eux; \
   case "${TARGETARCH:-amd64}" in \
     amd64) cov_triple=x86_64-unknown-linux-musl; cov_sha=bc2122fd7bd9b6d3eb371690ed085f82e5a8bf1851f4645ef521d12ed04b2616 ;; \

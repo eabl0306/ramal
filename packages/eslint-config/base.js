@@ -4,7 +4,7 @@ import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescrip
 import importX from 'eslint-plugin-import-x';
 import tseslint from 'typescript-eslint';
 
-import { ramalPlugin } from './rules/plugin.js';
+import { gitRudderPlugin } from './rules/plugin.js';
 
 /**
  * Directorios que nunca contienen codigo que revisar. Los patrones empiezan por
@@ -101,10 +101,10 @@ export function baseConfig({ tsconfigRootDir, files = ['**/*.{ts,tsx,mts,cts}'] 
     },
     {
       files,
-      plugins: { ramal: ramalPlugin },
+      plugins: { 'git-rudder': gitRudderPlugin },
       // La excepcion de packages/ui/src/themes la aplica la propia regla mirando la
       // ruta del fichero, asi funciona igual desde cualquier eslint.config.js.
-      rules: { 'ramal/no-raw-colors': 'error' },
+      rules: { 'git-rudder/no-raw-colors': 'error' },
     },
     { files, extends: [prettier] },
   );

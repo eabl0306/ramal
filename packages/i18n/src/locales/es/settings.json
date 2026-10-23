@@ -13,7 +13,7 @@
     "appearance": "Apariencia"
   },
   "profile": {
-    "subtitle": "Tu identidad en Ramal. Es lo que ve tu equipo en invitaciones y actividad.",
+    "subtitle": "Tu identidad en Git Rudder. Es lo que ve tu equipo en invitaciones y actividad.",
     "changePhoto": "Cambiar foto",
     "fullName": "Nombre",
     "username": "Usuario",
@@ -21,9 +21,9 @@
     "saveChanges": "Guardar cambios"
   },
   "account": {
-    "subtitle": "Tu cuenta de Ramal, la suscripción y los miembros de tu organización.",
+    "subtitle": "Tu cuenta de Git Rudder, la suscripción y los miembros de tu organización.",
     "plan": "Plan",
-    "planName": "Ramal Pro",
+    "planName": "Git Rudder Pro",
     "planRenewal_one": "Se renueva el {date} · {count} asiento",
     "planRenewal_other": "Se renueva el {date} · {count} asientos",
     "manageSubscription": "Gestionar suscripción",
@@ -48,7 +48,7 @@
     "empty": "Sin cuentas conectadas"
   },
   "git": {
-    "subtitle": "Opciones globales que Ramal aplica a todos los repositorios.",
+    "subtitle": "Opciones globales que Git Rudder aplica a todos los repositorios.",
     "identity": "Identidad",
     "identityDescription": "Autor de tus commits (user.name / user.email).",
     "defaultBranch": "Rama inicial por defecto",

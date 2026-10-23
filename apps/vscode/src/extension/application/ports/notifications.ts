@@ -1,6 +1,6 @@
 /**
  * Avisos nativos de VS Code. Los textos llegan ya traducidos: la aplicacion es
- * la unica capa que usa @ramal/i18n.
+ * la unica capa que usa @git-rudder/i18n.
  */
 export interface Notifications {
   showInfo(message: string): void;

@@ -22,7 +22,7 @@ const FIRST_COMMIT_SECONDS = 1_790_755_200;
  * quien corre el E2E no se cuele.
  */
 export function createFixtureRepo(): FixtureRepo {
-  const base = mkdtempSync(path.join(tmpdir(), 'ramal-e2e-'));
+  const base = mkdtempSync(path.join(tmpdir(), 'git-rudder-e2e-'));
   const home = path.join(base, 'home');
   const repo = path.join(base, 'repo');
   mkdirSync(home);

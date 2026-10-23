@@ -1,7 +1,7 @@
 // Tests y configuracion de Vitest: ven Node y referencian el codigo en vez de
 // incluirlo, asi cada fichero de src se comprueba una vez y con sus reglas.
 {
-  "extends": "@ramal/tsconfig/node.json",
+  "extends": "@git-rudder/tsconfig/node.json",
   "compilerOptions": {
     "lib": ["ES2023", "DOM"],
     "composite": true,

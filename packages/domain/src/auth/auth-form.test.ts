@@ -17,7 +17,7 @@ describe('isValidEmail', () => {
 
   it('rechaza emails sin arroba, sin punto o con espacios dentro', () => {
     expect(isValidEmail('marta.example.com')).toBe(false);
-    expect(isValidEmail('marta@ramal')).toBe(false);
+    expect(isValidEmail('marta@git-rudder')).toBe(false);
     expect(isValidEmail('marta @example.com')).toBe(false);
     expect(isValidEmail('')).toBe(false);
   });

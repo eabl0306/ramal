@@ -7,7 +7,7 @@
 //! defecto, hooks) se cuela en el resultado. Tambien se borran `GIT_DIR` y su
 //! familia: los tests corren desde hooks de git (pre-push) que las exportan.
 //!
-//! Lo usan los tests de `ramal-git`, los de `ramal-engine` y los del sidecar
+//! Lo usan los tests de `git-rudder-git`, los de `git-rudder-engine` y los del sidecar
 //! (estos dos lo incluyen con `#[path]`, porque no pueden depender de este crate).
 
 #![allow(

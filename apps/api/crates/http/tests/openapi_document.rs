@@ -15,11 +15,11 @@ mod support;
 
 use std::path::PathBuf;
 
-use ramal_api_http::{API_TITLE, document_json};
+use git_rudder_api_http::{API_TITLE, document_json};
 use salvo::prelude::StatusCode;
 use salvo::test::{ResponseExt, TestClient};
 
-/// Documento versionado, fuente de `@ramal/api-client`.
+/// Documento versionado, fuente de `@git-rudder/api-client`.
 fn committed_document_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("..")

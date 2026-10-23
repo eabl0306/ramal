@@ -13,7 +13,7 @@ const sandboxes = [];
  * script ejecutado como en el hook y el codigo de salida comprobado.
  */
 export function sandbox(files) {
-  const root = mkdtempSync(path.join(tmpdir(), 'ramal-checks-'));
+  const root = mkdtempSync(path.join(tmpdir(), 'git-rudder-checks-'));
   sandboxes.push(root);
   for (const [relativePath, content] of Object.entries(files)) {
     const absolute = path.join(root, relativePath);

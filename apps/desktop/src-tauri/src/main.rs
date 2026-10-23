@@ -1,4 +1,4 @@
-//! Binario de Ramal Desktop. Todo el arranque vive en la biblioteca para que los
+//! Binario de Git Rudder Desktop. Todo el arranque vive en la biblioteca para que los
 //! tests lo cubran; aqui solo se llama y se traduce el resultado a un codigo de
 //! salida.
 
@@ -12,10 +12,10 @@
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
-    match ramal_desktop::run() {
+    match git_rudder_desktop::run() {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            tracing::error!(%error, "Ramal Desktop could not start");
+            tracing::error!(%error, "Git Rudder Desktop could not start");
             ExitCode::FAILURE
         }
     }

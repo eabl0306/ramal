@@ -1,12 +1,12 @@
 # Brief #62: estados comunes (C-01 a C-10, B-61)
 
-Issue: [eabl0306/ramal#62](https://github.com/eabl0306/ramal/issues/62). Fuente: `docs/design/gaps.md`,
+Issue: [eabl0306/git-rudder#62](https://github.com/eabl0306/git-rudder/issues/62). Fuente: `docs/design/gaps.md`,
 seccion 1.1 y fila B-61.
 
 ## Contexto
 
-- Productos: los tres. Se disena una vez y se reutiliza en Ramal Desktop (`Ramal.dc.html`), Ramal for
-  VS Code (`Ramal VS Code.dc.html`) y Ramal Web (`Ramal Web.dc.html`). En codigo vivira en `@ramal/ui`.
+- Productos: los tres. Se disena una vez y se reutiliza en Git Rudder Desktop (`Git Rudder.dc.html`), Git Rudder for
+  VS Code (`Git Rudder VS Code.dc.html`) y Git Rudder Web (`Git Rudder Web.dc.html`). En codigo vivira en `@git-rudder/ui`.
 - El prototipo no tiene ni un estado de carga, de error ni sin conexion. El unico estado asincrono es
   "Generando..." de la IA. El toast `err` existe y nunca se emite.
 - Componentes del prototipo que hay que reutilizar tal cual: el **toast** (abajo a la derecha, punto de
@@ -14,14 +14,14 @@ seccion 1.1 y fila B-61.
   select, segmented, checkbox y action, boton principal acento o peligro), la **tarjeta** de ajustes
   (radio 14) con sus **filas de ajustes**, el **menu contextual**, la **caja de error** del formulario de
   autenticacion web (`au.error`), la caja punteada de **"Sin cuentas conectadas"** y la linea **"Sin
-  cambios"** del staging. En VS Code: la **notificacion** con "Origen: Ramal", el **quick input** (600 px
+  cambios"** del staging. En VS Code: la **notificacion** con "Origen: Git Rudder", el **quick input** (600 px
   arriba), las cabeceras de seccion de 22 px y la **barra de estado**.
 - Las pantallas propias de cada producto (primer arranque D-05, panel web vacio W-19, errores de git
   D-18...) son de otros briefs: aqui se fija el patron que esos briefs usan.
 
 ## Pantallas y estados
 
-Densidades (tokens de `@ramal/ui`, ya definidos): escritorio y web `comfortable` (filas 40 px, menu 32,
+Densidades (tokens de `@git-rudder/ui`, ya definidos): escritorio y web `comfortable` (filas 40 px, menu 32,
 barra lateral 30, barra de herramientas 62); VS Code `compact` (filas 28 px, menu 24, barra lateral 22,
 barra de herramientas 34). Cada estado se dibuja en claro y oscuro y, donde aplica, en las dos
 densidades.
@@ -72,7 +72,7 @@ densidades.
   ("Reintentar") y "Cerrar".
 - **Banner de error en linea.** Para una seccion o panel que no carga (lo usaran W-20 y los paneles de
   Desktop): franja con borde y fondo `--danger` al 10 %, icono, texto, "Reintentar" y "Ver detalle".
-- **VS Code.** Notificacion nativa de error con botones "Ver detalle" (abre el canal de salida "Ramal"
+- **VS Code.** Notificacion nativa de error con botones "Ver detalle" (abre el canal de salida "Git Rudder"
   con el comando y la salida) y "Reintentar". Dentro de un webview, el banner en linea con tokens de
   VS Code (`--vscode-inputValidation-errorBorder` y `errorBackground`).
 - **Estados.** Toast de los cuatro tipos (con y sin accion), dialogo plegado, dialogo desplegado con
@@ -80,23 +80,23 @@ densidades.
 - **Ejemplo que dibujar.** Push rechazado por el hook `pre-push` (salida de lint de 12 lineas) y un error
   de la API con `code: internal`.
 
-| Clave         | ES                                                                       | EN                                                            |
-| ------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| errFetchToast | No se pudo hacer fetch de {remote}                                       | Couldn't fetch {remote}                                       |
-| viewDetail    | Ver detalle                                                              | View details                                                  |
-| showDetail    | Mostrar detalle                                                          | Show details                                                  |
-| detail        | Detalle                                                                  | Details                                                       |
-| copyDetail    | Copiar detalle                                                           | Copy details                                                  |
-| detailCopied  | Detalle copiado                                                          | Details copied                                                |
-| close         | Cerrar                                                                   | Close                                                         |
-| hookTitle     | El hook {hook} rechazó el push                                           | The {hook} hook rejected the push                             |
-| hookHelp      | Revisa la salida del hook, corrige lo que indique y vuelve a intentarlo. | Check the hook output, fix what it reports and try again.     |
-| saveFailTitle | No se pudo guardar                                                       | Couldn't save                                                 |
-| apiDownHelp   | Ramal no respondió. Inténtalo de nuevo en unos minutos.                  | Ramal didn't respond. Try again in a few minutes.             |
-| sectionFail   | No se pudo cargar esta sección.                                          | This section couldn't load.                                   |
-| errTimeout    | La operación tardó demasiado y se canceló.                               | The operation took too long and was canceled.                 |
-| errTransport  | Se perdió la comunicación con el motor de Ramal.                         | Lost contact with the Ramal engine.                           |
-| errInternal   | Algo falló en Ramal. Copia el detalle si quieres avisarnos.              | Something went wrong in Ramal. Copy the details to report it. |
+| Clave         | ES                                                                       | EN                                                                 |
+| ------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| errFetchToast | No se pudo hacer fetch de {remote}                                       | Couldn't fetch {remote}                                            |
+| viewDetail    | Ver detalle                                                              | View details                                                       |
+| showDetail    | Mostrar detalle                                                          | Show details                                                       |
+| detail        | Detalle                                                                  | Details                                                            |
+| copyDetail    | Copiar detalle                                                           | Copy details                                                       |
+| detailCopied  | Detalle copiado                                                          | Details copied                                                     |
+| close         | Cerrar                                                                   | Close                                                              |
+| hookTitle     | El hook {hook} rechazó el push                                           | The {hook} hook rejected the push                                  |
+| hookHelp      | Revisa la salida del hook, corrige lo que indique y vuelve a intentarlo. | Check the hook output, fix what it reports and try again.          |
+| saveFailTitle | No se pudo guardar                                                       | Couldn't save                                                      |
+| apiDownHelp   | Git Rudder no respondió. Inténtalo de nuevo en unos minutos.             | Git Rudder didn't respond. Try again in a few minutes.             |
+| sectionFail   | No se pudo cargar esta sección.                                          | This section couldn't load.                                        |
+| errTimeout    | La operación tardó demasiado y se canceló.                               | The operation took too long and was canceled.                      |
+| errTransport  | Se perdió la comunicación con el motor de Git Rudder.                    | Lost contact with the Git Rudder engine.                           |
+| errInternal   | Algo falló en Git Rudder. Copia el detalle si quieres avisarnos.         | Something went wrong in Git Rudder. Copy the details to report it. |
 
 ### 3. C-03 Errores de validacion en linea en los modales
 
@@ -165,12 +165,12 @@ densidades.
 | clearSearch   | Limpiar búsqueda                                               | Clear search                                       |
 | clearFilters  | Limpiar filtros                                                | Clear filters                                      |
 
-### 5. C-05 Sin conexion o API de Ramal caida
+### 5. C-05 Sin conexion o API de Git Rudder caida
 
 - **Proposito.** Git local sigue funcionando sin red (ADR 0014); el estado tiene que decir que solo se
   degrada la nube.
 - **Dos casos distintos.** Sin red en el equipo ("Sin conexion") y red bien pero la API no responde
-  ("Ramal no responde"). Fetch, pull y push muestran sus propios errores (D-18, brief #65).
+  ("Git Rudder no responde"). Fetch, pull y push muestran sus propios errores (D-18, brief #65).
 - **Desktop.** Indicador en la barra de titulo, a la izquierda del selector ES/EN: chip con icono de nube
   tachada y texto, fondo `--warn` al 14 %. El chip con texto solo sale si algo va mal; el resto del
   tiempo es el icono de C-06. Al pulsarlo, popover (radio 12, como un menu) con titulo, explicacion, "Cambios pendientes: N" y
@@ -181,25 +181,25 @@ densidades.
 - **VS Code.** Elemento nativo en la barra de estado con icono `cloud-offline` y tooltip; banner en el
   webview de ajustes.
 - **Web.** Banner arriba del panel ("Reintentando..."); en el login, la caja de error. Enlace a la pagina
-  de estado `https://ramal.bahoque.com/status`.
-- **Estados.** Sin conexion, Ramal no responde, reconectando, conexion recuperada (toast `ok`), control
+  de estado `https://git-rudder.com/status`.
+- **Estados.** Sin conexion, Git Rudder no responde, reconectando, conexion recuperada (toast `ok`), control
   deshabilitado con tooltip, banner de zona de nube con copia guardada, N cambios pendientes.
 
-| Clave         | ES                                                                                                                             | EN                                                                                                             |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| offline       | Sin conexión                                                                                                                   | Offline                                                                                                        |
-| offlineD      | Git local sigue funcionando. Lo que cambies en los ajustes se guarda en este equipo y se sincroniza cuando vuelva la conexión. | Local Git keeps working. Settings you change are saved on this device and sync when you're back online.        |
-| apiDown       | Ramal no responde                                                                                                              | Ramal isn't responding                                                                                         |
-| apiDownD      | Tu conexión funciona, pero los servidores de Ramal no responden. Git local sigue funcionando y lo volveremos a intentar solos. | Your connection works, but Ramal's servers aren't responding. Local Git keeps working and we'll retry for you. |
-| statusLink    | Ver el estado del servicio                                                                                                     | View service status                                                                                            |
-| pending_one   | {count} cambio pendiente de sincronizar                                                                                        | {count} change waiting to sync                                                                                 |
-| pending_other | {count} cambios pendientes de sincronizar                                                                                      | {count} changes waiting to sync                                                                                |
-| retryNow      | Reintentar ahora                                                                                                               | Retry now                                                                                                      |
-| reconnecting  | Reconectando…                                                                                                                  | Reconnecting…                                                                                                  |
-| backOnline    | Conexión recuperada                                                                                                            | Back online                                                                                                    |
-| needsNet      | Necesitas conexión para esto                                                                                                   | You need a connection for this                                                                                 |
-| cachedCopy    | Sin conexión. Ves la última copia guardada ({ago}).                                                                            | Offline. You're seeing the last saved copy ({ago}).                                                            |
-| loginNoApi    | No podemos conectar con Ramal. Inténtalo de nuevo en unos minutos.                                                             | We can't reach Ramal. Try again in a few minutes.                                                              |
+| Clave         | ES                                                                                                                                  | EN                                                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| offline       | Sin conexión                                                                                                                        | Offline                                                                                                             |
+| offlineD      | Git local sigue funcionando. Lo que cambies en los ajustes se guarda en este equipo y se sincroniza cuando vuelva la conexión.      | Local Git keeps working. Settings you change are saved on this device and sync when you're back online.             |
+| apiDown       | Git Rudder no responde                                                                                                              | Git Rudder isn't responding                                                                                         |
+| apiDownD      | Tu conexión funciona, pero los servidores de Git Rudder no responden. Git local sigue funcionando y lo volveremos a intentar solos. | Your connection works, but Git Rudder's servers aren't responding. Local Git keeps working and we'll retry for you. |
+| statusLink    | Ver el estado del servicio                                                                                                          | View service status                                                                                                 |
+| pending_one   | {count} cambio pendiente de sincronizar                                                                                             | {count} change waiting to sync                                                                                      |
+| pending_other | {count} cambios pendientes de sincronizar                                                                                           | {count} changes waiting to sync                                                                                     |
+| retryNow      | Reintentar ahora                                                                                                                    | Retry now                                                                                                           |
+| reconnecting  | Reconectando…                                                                                                                       | Reconnecting…                                                                                                       |
+| backOnline    | Conexión recuperada                                                                                                                 | Back online                                                                                                         |
+| needsNet      | Necesitas conexión para esto                                                                                                        | You need a connection for this                                                                                      |
+| cachedCopy    | Sin conexión. Ves la última copia guardada ({ago}).                                                                                 | Offline. You're seeing the last saved copy ({ago}).                                                                 |
+| loginNoApi    | No podemos conectar con Git Rudder. Inténtalo de nuevo en unos minutos.                                                             | We can't reach Git Rudder. Try again in a few minutes.                                                              |
 
 ### 6. C-06 Estado de sincronizacion
 
@@ -209,7 +209,7 @@ densidades.
   texto; tooltip "Sincronizado hace 2 min". Estados: sincronizado, sincronizando (icono girando),
   pendiente (N), error (punto `--danger`), sin conexion (C-05) y sin sesion (no aparece: la zona de
   cuenta invita a entrar, D-04). En Ajustes, bajo el titulo de cada seccion que se sincroniza (Git, IA,
-  Apariencia), una linea de 12 px en `--faint`: "Se sincroniza con tu cuenta de Ramal · hace 2 min", o
+  Apariencia), una linea de 12 px en `--faint`: "Se sincroniza con tu cuenta de Git Rudder · hace 2 min", o
   "Solo en este equipo" sin sesion o con la categoria apagada.
 - **Cambio en otro dispositivo.** Cuando llega un cambio de otro equipo con la pantalla abierta, la fila
   afectada se resalta 2 s con `--info` al 10 % y sale un toast `info`. Una escritura descartada porque la
@@ -218,7 +218,7 @@ densidades.
   boton "Guardar" global. Los campos de texto guardan al salir del campo y muestran "Guardando..." y
   "Guardado" (con marca, se desvanece a los 2 s) junto al control; si falla, "No se pudo guardar" con
   "Reintentar".
-- **VS Code.** Linea bajo el titulo de "Configuracion de Ramal" y tooltip del elemento de barra de
+- **VS Code.** Linea bajo el titulo de "Configuracion de Git Rudder" y tooltip del elemento de barra de
   estado. **Web.** W-25 (brief #70) reutiliza este componente.
 - **Estados.** Sincronizado, sincronizando, pendiente, error con detalle, actualizado desde otro
   dispositivo (fila resaltada), escritura descartada, guardando, guardado, fallo al guardar, solo en este
@@ -230,7 +230,7 @@ densidades.
 | syncedAgo   | Sincronizado {ago}                                                                                            | Synced {ago}                                                                            |
 | syncing     | Sincronizando…                                                                                                | Syncing…                                                                                |
 | syncFail    | No se pudo sincronizar                                                                                        | Couldn't sync                                                                           |
-| syncsWith   | Se sincroniza con tu cuenta de Ramal · {ago}                                                                  | Syncs with your Ramal account · {ago}                                                   |
+| syncsWith   | Se sincroniza con tu cuenta de Git Rudder · {ago}                                                             | Syncs with your Git Rudder account · {ago}                                              |
 | localOnly   | Solo en este equipo                                                                                           | This device only                                                                        |
 | localOnlyD  | Inicia sesión para sincronizarlo.                                                                             | Sign in to sync it.                                                                     |
 | updatedElse | Actualizado desde otro dispositivo                                                                            | Updated from another device                                                             |
@@ -262,8 +262,8 @@ densidades.
 
 | Clave         | ES                                                                                                                                                                             | EN                                                                                                                                                              |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| sessEndTitle  | Tu sesión de Ramal se cerró                                                                                                                                                    | Your Ramal session has ended                                                                                                                                    |
-| sessEnded     | Se cerró desde otro dispositivo o desde el panel web, o caducó tras un tiempo sin usar Ramal en este equipo.                                                                   | It was ended from another device or the web dashboard, or it expired after a while without using Ramal on this device.                                          |
+| sessEndTitle  | Tu sesión de Git Rudder se cerró                                                                                                                                               | Your Git Rudder session has ended                                                                                                                               |
+| sessEnded     | Se cerró desde otro dispositivo o desde el panel web, o caducó tras un tiempo sin usar Git Rudder en este equipo.                                                              | It was ended from another device or the web dashboard, or it expired after a while without using Git Rudder on this device.                                     |
 | sessRenewFail | No pudimos renovar tu sesión. Vuelve a iniciarla: tus cuentas y llaves de este equipo siguen aquí.                                                                             | We couldn't renew your session. Sign in again: your accounts and keys on this device are still here.                                                            |
 | sessCleanup   | Por seguridad, borramos de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de otros equipos. Lo que añadiste aquí sigue disponible y Git funciona igual. | For security, we removed your vault key and the accounts and keys that came from other devices. What you added here is still available and Git works as before. |
 | signIn        | Iniciar sesión                                                                                                                                                                 | Sign in                                                                                                                                                         |
@@ -342,8 +342,8 @@ densidades.
 ## Reglas
 
 - **B-61:** el toast `info` usa `--info`. `--accent` queda para la accion principal y la marca. Corrige
-  tambien la linea del toast en `Ramal.dc.html` (`x.kind === 'info' ? 'var(--accent)'`).
-- Solo tokens existentes (tabla del README del handoff; en codigo, los `--r-*` de `@ramal/ui`). Ningun
+  tambien la linea del toast en `Git Rudder.dc.html` (`x.kind === 'info' ? 'var(--accent)'`).
+- Solo tokens existentes (tabla del README del handoff; en codigo, los `--r-*` de `@git-rudder/ui`). Ningun
   color nuevo; los fondos suaves son el color al 10 o 14 % con `color-mix`.
 - Ningun texto dice "simulado" (B-46). Plurales con claves `_one` y `_other` sobre `{count}` (B-42,
   ADR 0017). Marcadores con nombre (`{count}`, `{remote}`), nunca `{n}` o `{m}` ambiguos (B-44). Glifos
@@ -358,13 +358,13 @@ densidades.
 
 ## Entregable
 
-- Un zip `ramal-handoff-62-estados.zip` con la misma estructura que el handoff original:
+- Un zip `git-rudder-handoff-62-estados.zip` con la misma estructura que el handoff original:
   - `README.md` con solo lo nuevo: componentes, medidas, tokens usados y la tabla de estados.
-  - `Ramal Estados.dc.html`: un Design Component con props `product` (`desktop`, `vscode`, `web`),
+  - `Git Rudder Estados.dc.html`: un Design Component con props `product` (`desktop`, `vscode`, `web`),
     `theme` (`dark`, `light`), `lang` (`es`, `en`) y `state` (`C-01` a `C-10`, o `all` para ver la
     rejilla entera). Cada estado es una lamina con todas sus variantes lado a lado.
-  - `ramal-data.js` con un objeto nuevo `STATES` de pares `[es, en]` con las claves de este brief.
-  - `Ramal.dc.html` con la correccion de B-61 y nada mas.
+  - `git-rudder-data.js` con un objeto nuevo `STATES` de pares `[es, en]` con las claves de este brief.
+  - `Git Rudder.dc.html` con la correccion de B-61 y nada mas.
   - `support.js` sin cambios.
 
 ## Hecho cuando

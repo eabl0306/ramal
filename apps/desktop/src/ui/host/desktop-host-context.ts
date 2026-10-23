@@ -1,4 +1,4 @@
-import type { BridgeClient } from '@ramal/bridge';
+import type { BridgeClient } from '@git-rudder/bridge';
 import { createContext, use } from 'react';
 
 import type { RepositoryPicker } from '../../application/ports/repository-picker';

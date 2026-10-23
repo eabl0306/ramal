@@ -1,8 +1,8 @@
 // Extension host: Node con los tipos de VS Code y sin DOM. Un `window` o un
 // `document` aqui no compila. Referencia lo que puede importar: los mensajes
-// compartidos, @ramal/bridge y @ramal/i18n.
+// compartidos, @git-rudder/bridge y @git-rudder/i18n.
 {
-  "extends": "@ramal/tsconfig/node.json",
+  "extends": "@git-rudder/tsconfig/node.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

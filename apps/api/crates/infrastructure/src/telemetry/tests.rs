@@ -15,12 +15,12 @@ fn accepts_a_plain_level() {
 
 #[test]
 fn accepts_a_per_target_directive() {
-    assert!(build_filter("warn,ramal_api_http=debug").is_ok());
+    assert!(build_filter("warn,git_rudder_api_http=debug").is_ok());
 }
 
 #[test]
 fn rejects_a_malformed_directive() {
-    let error = build_filter("ramal_api_http=not-a-level").expect_err("must fail");
+    let error = build_filter("git_rudder_api_http=not-a-level").expect_err("must fail");
     assert!(error.to_string().contains("invalid log filter"));
 }
 

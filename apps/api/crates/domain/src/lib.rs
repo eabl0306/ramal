@@ -1,8 +1,8 @@
-//! Dominio de la API de Ramal: valores y reglas puras.
+//! Dominio de la API de Git Rudder: valores y reglas puras.
 //!
 //! Este crate no conoce HTTP, SQL ni ningun runtime asincrono. Sus unicas
 //! dependencias son librerias igual de puras (`thiserror` y `chrono`), y el test
-//! de arquitectura de `ramal-api` lo comprueba en cada build. Su `clippy.toml`
+//! de arquitectura de `git-rudder-api` lo comprueba en cada build. Su `clippy.toml`
 //! prohibe ademas procesos, ficheros, red, entorno y reloj de pared.
 //!
 //! El primer corte solo trae el contexto `health`. Cada contexto planificado

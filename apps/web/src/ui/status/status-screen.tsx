@@ -1,5 +1,5 @@
-import { type PlainKey, formatDate } from '@ramal/i18n';
-import { Button, useLocale, useT } from '@ramal/ui';
+import { type PlainKey, formatDate } from '@git-rudder/i18n';
+import { Button, useLocale, useT } from '@git-rudder/ui';
 import type { ReactElement } from 'react';
 
 import type { HealthProbe } from '../../application/use-cases/check-api-health';

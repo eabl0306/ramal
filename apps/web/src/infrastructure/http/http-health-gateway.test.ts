@@ -4,7 +4,7 @@ import { HealthGatewayError } from '../../application/ports/health-gateway';
 
 import { createHttpHealthGateway } from './http-health-gateway';
 
-const BASE_URL = 'http://ramal.test';
+const BASE_URL = 'http://git-rudder.test';
 
 const READY = {
   status: 'ok',

@@ -1,5 +1,5 @@
 {
-  "name": "@ramal/domain",
+  "name": "@git-rudder/domain",
   "version": "0.1.0",
   "license": "FSL-1.1-ALv2",
   "private": true,
@@ -17,8 +17,8 @@
     "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
-    "@ramal/eslint-config": "workspace:*",
-    "@ramal/tsconfig": "workspace:*",
+    "@git-rudder/eslint-config": "workspace:*",
+    "@git-rudder/tsconfig": "workspace:*",
     "@types/node": "24.19.2",
     "@vitest/coverage-v8": "5.0.5",
     "eslint": "10.13.0",

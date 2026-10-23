@@ -2,9 +2,9 @@
 
 use std::sync::Arc;
 
-use ramal_api_application::Clock;
-use ramal_api_domain::ServiceVersion;
-use ramal_api_infrastructure::{AppConfig, PgPool, SystemClock, connect_pool};
+use git_rudder_api_application::Clock;
+use git_rudder_api_domain::ServiceVersion;
+use git_rudder_api_infrastructure::{AppConfig, PgPool, SystemClock, connect_pool};
 
 use crate::error::StartupError;
 

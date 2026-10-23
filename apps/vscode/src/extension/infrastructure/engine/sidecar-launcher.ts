@@ -23,9 +23,9 @@ export type SpawnSidecar = (
 export interface SidecarLauncherOptions {
   readonly binaryPath: string;
   readonly args: readonly string[];
-  /** Log del host (canal "Ramal"). */
+  /** Log del host (canal "Git Rudder"). */
   readonly logger: Logger;
-  /** Cada linea de stderr del sidecar: su log, que va al canal "Ramal Engine". */
+  /** Cada linea de stderr del sidecar: su log, que va al canal "Git Rudder Engine". */
   readonly onEngineLog: (line: string) => void;
   /** Para los tests; por defecto `child_process.spawn` con las tres tuberias. */
   readonly spawn?: SpawnSidecar;
@@ -35,7 +35,7 @@ const defaultSpawn: SpawnSidecar = (binary, args) =>
   nodeSpawn(binary, [...args], { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
 
 /**
- * Lanza `ramal-vscode-engine` como proceso hijo. stdout es solo protocolo
+ * Lanza `git-rudder-vscode-engine` como proceso hijo. stdout es solo protocolo
  * (marcos `Content-Length`); stderr es su log. El sidecar termina cuando se
  * cierra su stdin, asi que parar es cerrar stdin y matar solo si no sale.
  */

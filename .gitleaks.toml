@@ -1,0 +1,12 @@
+# Configuracion de gitleaks (job "secretos" de quality.yml). Extiende las reglas
+# por defecto; aqui solo van los falsos positivos, uno a uno y con su motivo.
+[extend]
+useDefault = true
+
+# La regla generic-api-key salta cuando una constante se llama *_KEY y su valor
+# tiene bastante entropia. `APPEARANCE_KEY` cumple las dos cosas y no es un
+# secreto: es el nombre de la ranura de localStorage donde el escritorio guarda
+# el tema, y tiene que estar en el codigo para poder leerla.
+[allowlist]
+description = "Clave de localStorage del tema del escritorio: un nombre de ranura, no un secreto"
+regexes = ['''gitRudder\.appearance\.v\d+''']

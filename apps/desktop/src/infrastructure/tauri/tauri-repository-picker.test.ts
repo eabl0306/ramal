@@ -1,4 +1,4 @@
-import type { RepoHandle } from '@ramal/bridge';
+import type { RepoHandle } from '@git-rudder/bridge';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Invoke } from './invoke';
@@ -10,7 +10,7 @@ import {
 
 const repo: RepoHandle = {
   repoId: 'repo-1',
-  root: '/home/ana/code/ramal',
+  root: '/home/ana/code/git-rudder',
   headRef: 'main',
   headSha: '1'.repeat(40),
   isDetached: false,

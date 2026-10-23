@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use ramal_api_application::{CheckLiveness, CheckReadiness};
+use git_rudder_api_application::{CheckLiveness, CheckReadiness};
 use salvo::prelude::Router;
 
 use crate::handler::{LivenessHandler, ReadinessHandler};

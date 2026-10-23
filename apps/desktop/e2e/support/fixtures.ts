@@ -1,10 +1,10 @@
-import type { GraphEdge, GraphRow, RefLabel, RepoHandle } from '@ramal/bridge';
+import type { GraphEdge, GraphRow, RefLabel, RepoHandle } from '@git-rudder/bridge';
 
 import type { E2eScenario } from './scenario';
 
 export const REPO: RepoHandle = {
   repoId: 'repo-1',
-  root: '/home/ana/code/ramal',
+  root: '/home/ana/code/git-rudder',
   headRef: 'main',
   headSha: sha(0),
   isDetached: false,

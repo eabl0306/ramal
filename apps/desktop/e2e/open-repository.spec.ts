@@ -15,7 +15,7 @@ test.describe('abrir un repositorio', () => {
     await expect(grid).toBeVisible();
     await expect(grid.getByText("Merge branch 'feature/grafo'")).toBeVisible();
     await expect(grid.getByText('Primer commit')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'ramal' })).toHaveAttribute(
+    await expect(page.getByRole('button', { name: 'git-rudder' })).toHaveAttribute(
       'aria-current',
       'page',
     );

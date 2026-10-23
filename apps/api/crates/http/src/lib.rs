@@ -1,4 +1,4 @@
-//! Adaptador driving HTTP de la API de Ramal, sobre Salvo.
+//! Adaptador driving HTTP de la API de Git Rudder, sobre Salvo.
 //!
 //! Es el unico crate que conoce Salvo (ADR 0003). Traduce peticiones a casos de
 //! uso y respuestas de dominio a DTOs; el dominio nunca se serializa directo,

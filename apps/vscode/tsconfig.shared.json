@@ -1,7 +1,7 @@
 // Mensajes entre webview y extension host. Sin DOM ni Node: los importan los
-// dos lados. Solo ve los tipos de @ramal/bridge.
+// dos lados. Solo ve los tipos de @git-rudder/bridge.
 {
-  "extends": "@ramal/tsconfig/library.json",
+  "extends": "@git-rudder/tsconfig/library.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

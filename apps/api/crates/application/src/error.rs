@@ -4,7 +4,7 @@
 //! HTTP lo traduce una sola vez a `application/problem+json`. Asi el mapeo a
 //! codigos de estado vive en un sitio y no repartido por los handlers.
 //!
-//! Los `code` son estables: los clientes los traducen con `@ramal/i18n` cuando la
+//! Los `code` son estables: los clientes los traducen con `@git-rudder/i18n` cuando la
 //! interfaz esta en ingles. Los `message` van en castellano y son el texto de
 //! respaldo. Los `reason` y `detail` son solo para el log y nunca viajan.
 
