@@ -59,11 +59,6 @@
       "doneTitle": "Bóveda creada",
       "doneBody": "Tus secretos se sincronizan cifrados. En cada equipo nuevo te pediremos la frase una vez."
     },
-    "strength": {
-      "weak": "Débil",
-      "acceptable": "Aceptable",
-      "strong": "Fuerte"
-    },
     "error": {
       "tooShort": "La frase necesita al menos 12 caracteres.",
       "guessable": "Es fácil de adivinar. Añade más palabras.",

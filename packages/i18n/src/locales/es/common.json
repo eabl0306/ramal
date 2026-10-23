@@ -45,5 +45,10 @@
   "hide": "Ocultar",
   "back": "Atrás",
   "later": "Más tarde",
-  "setUp": "Configurar"
+  "setUp": "Configurar",
+  "strength": {
+    "weak": "Débil",
+    "acceptable": "Aceptable",
+    "strong": "Fuerte"
+  }
 }

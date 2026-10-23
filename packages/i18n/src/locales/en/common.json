@@ -45,5 +45,10 @@
   "hide": "Hide",
   "back": "Back",
   "later": "Later",
-  "setUp": "Set up"
+  "setUp": "Set up",
+  "strength": {
+    "weak": "Weak",
+    "acceptable": "Acceptable",
+    "strong": "Strong"
+  }
 }

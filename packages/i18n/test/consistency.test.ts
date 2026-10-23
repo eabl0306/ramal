@@ -43,6 +43,16 @@ const SAME_ES: readonly SharedText[] = [
     keys: ['settings.section.integrations', 'vscode.settings.section.platforms'],
     reason: 'el manifiesto de VS Code escribe las categorias de ajustes en Title Case',
   },
+  {
+    keys: ['web.auth.authorize.device', 'web.dashboard.nav.team'],
+    reason:
+      '"Equipo" es la maquina que pide autorizacion y el equipo de personas; en ingles son "Device" y "Team"',
+  },
+  {
+    keys: ['vscode.scm.commitButton', 'web.auth.reauth.confirm'],
+    reason:
+      '"Confirmar" es el verbo generico de confirmar y el verbo de hacer un commit; en ingles son "Confirm" y "Commit"',
+  },
 ];
 
 /**
