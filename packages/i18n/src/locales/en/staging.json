@@ -14,5 +14,6 @@
   "title_other": "{count} changes",
   "commitButton_one": "Commit {count} file to {branch}",
   "commitButton_other": "Commit {count} files to {branch}",
-  "commitLabel": "Commit"
+  "commitLabel": "Commit",
+  "emptyHelp": "All clear: no changes in the working tree."
 }

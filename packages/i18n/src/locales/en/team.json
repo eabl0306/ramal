@@ -9,5 +9,9 @@
     "admin": "Admin",
     "member": "Member"
   },
-  "pending": "Invitation pending"
+  "pending": "Invitation pending",
+  "readOnlyMember": "You're a member of {org}. You can see the team; admins handle invitations and roles.",
+  "onlyAdmins": "Only admins can change this",
+  "onlyOwner": "Only the owner can do this",
+  "seatReason": "there are no free seats left on the plan"
 }

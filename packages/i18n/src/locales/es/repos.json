@@ -46,7 +46,9 @@
     "repoCount_one": "{count} repositorio",
     "repoCount_other": "{count} repositorios",
     "openPrCount_one": "{count} PR abierto",
-    "openPrCount_other": "{count} PR abiertos"
+    "openPrCount_other": "{count} PR abiertos",
+    "empty": "Este workspace está vacío",
+    "addRepos": "Añadir repositorios"
   },
   "pr": {
     "title": "Pull requests",
@@ -74,6 +76,9 @@
       "checks": "Checks",
       "reviews": "Revisiones",
       "updated": "Actualizado"
-    }
-  }
+    },
+    "needsAccount": "Conecta una cuenta de {platform} para ver los pull requests.",
+    "connectAccount": "Conectar cuenta"
+  },
+  "noResultsFor": "Nada coincide con «{query}»"
 }

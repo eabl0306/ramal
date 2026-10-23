@@ -54,7 +54,8 @@
   "branch": {
     "title": "Create branch",
     "name": "Branch name",
-    "checkoutAfter": "Checkout after creating"
+    "checkoutAfter": "Checkout after creating",
+    "nameHelp": "For example: feature/login-oauth"
   },
   "renameBranch": {
     "title": "Rename branch"
@@ -97,7 +98,8 @@
     "title": "Clone repository",
     "url": "Repository URL",
     "urlPlaceholder": "URL or owner/repo",
-    "destination": "Destination folder"
+    "destination": "Destination folder",
+    "destinationHelp": "A folder named after the repository will be created."
   },
   "open": {
     "title": "Open local repository",
@@ -110,5 +112,11 @@
   "forcePush": {
     "title": "Force push to {branch}?",
     "info": "Uses --force-with-lease: fails if someone pushed since your last fetch."
+  },
+  "sessionEnded": {
+    "title": "Your Git Rudder session has ended",
+    "info": "It was ended from another device or the web dashboard, or it expired after a while without using Git Rudder on this device.",
+    "renewFailed": "We couldn't renew your session. Sign in again: your accounts and keys on this device are still here.",
+    "cleanup": "For security, we removed your vault key and the accounts and keys that came from other devices. What you added here is still available and Git works as before."
   }
 }

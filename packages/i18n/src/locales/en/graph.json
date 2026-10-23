@@ -18,7 +18,12 @@
     "pullRequests": "Pull requests",
     "stashes": "Stashes",
     "tags": "Tags",
-    "submodules": "Submodules"
+    "submodules": "Submodules",
+    "stashesEmptyHelp": "Save changes without committing using Stash.",
+    "tagsEmpty": "No tags",
+    "remotesEmpty": "This repository has no remotes",
+    "addRemote": "Add remote",
+    "submodulesEmpty": "No submodules"
   },
   "column": {
     "refs": "Branch / tag",
@@ -33,7 +38,8 @@
     "empty": "This repository has no commits yet.",
     "error": "The history could not be loaded.",
     "retry": "Retry",
-    "loadingMore": "Loading more commits…"
+    "loadingMore": "Loading more commits…",
+    "noResultsFor": "No commits match \"{query}\""
   },
   "refs": {
     "more": "+{count}",

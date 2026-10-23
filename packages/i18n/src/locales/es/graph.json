@@ -18,7 +18,12 @@
     "pullRequests": "Pull requests",
     "stashes": "Stashes",
     "tags": "Tags",
-    "submodules": "Submódulos"
+    "submodules": "Submódulos",
+    "stashesEmptyHelp": "Guarda cambios sin hacer commit con Stash.",
+    "tagsEmpty": "Sin tags",
+    "remotesEmpty": "Este repositorio no tiene remotos",
+    "addRemote": "Añadir remoto",
+    "submodulesEmpty": "Sin submódulos"
   },
   "column": {
     "refs": "Rama / tag",
@@ -33,7 +38,8 @@
     "empty": "Este repositorio todavía no tiene commits.",
     "error": "No se ha podido cargar el historial.",
     "retry": "Reintentar",
-    "loadingMore": "Cargando más commits…"
+    "loadingMore": "Cargando más commits…",
+    "noResultsFor": "Ningún commit coincide con «{query}»"
   },
   "refs": {
     "more": "+{count}",

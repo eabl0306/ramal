@@ -43,5 +43,8 @@
   "keyRemoved": "Key removed",
   "defaultKey": "{label} is now the default key",
   "keyTestPassed": "Connected to {provider} · {model}",
-  "aiGenerated": "Generated with {provider} · {model}"
+  "aiGenerated": "Generated with {provider} · {model}",
+  "fetchFailed": "Couldn't fetch {remote}",
+  "detailCopied": "Details copied",
+  "backOnline": "Back online"
 }

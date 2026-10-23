@@ -48,5 +48,8 @@
     "engineStopped": "El motor de Git Rudder se ha detenido después de caerse varias veces.",
     "retry": "Reintentar",
     "protocolMismatch": "Esta instalación de Git Rudder está dañada: el motor usa la versión {engine} del protocolo y la extensión espera la {expected}. Reinstala la extensión."
+  },
+  "auth": {
+    "signIn": "Iniciar sesión en Git Rudder"
   }
 }

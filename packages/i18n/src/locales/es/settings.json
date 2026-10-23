@@ -32,7 +32,10 @@
     "signOut": "Cerrar sesión",
     "sessions": "Sesiones activas",
     "thisDevice": "Este dispositivo",
-    "revokeSession": "Revocar"
+    "revokeSession": "Revocar",
+    "readOnlyBilling": "Solo el titular gestiona la suscripción.",
+    "planPrice": "USD 8 por asiento al mes, facturado al año",
+    "subscription": "Suscripción"
   },
   "vault": {
     "noRecovery": "Nadie puede recuperar tus secretos si pierdes la frase y el código de recuperación, tampoco el soporte de Git Rudder."
@@ -48,7 +51,8 @@
     "usedIn_one": "Usada en {count} repositorio",
     "usedIn_other": "Usada en {count} repositorios",
     "addFor": "Añadir cuenta de {platform}",
-    "empty": "Sin cuentas conectadas"
+    "empty": "Sin cuentas conectadas",
+    "emptyAll": "Aún no has conectado ninguna plataforma"
   },
   "git": {
     "subtitle": "Opciones globales que Git Rudder aplica a todos los repositorios.",
@@ -64,7 +68,8 @@
     "prune": "Podar ramas remotas al hacer fetch",
     "sshKeys": "Llaves SSH",
     "generateSshKey": "Generar llave SSH",
-    "usedBy": "Usada por {user}"
+    "usedBy": "Usada por {user}",
+    "defaultBranchHelp": "Rama inicial al crear un repositorio."
   },
   "appearance": {
     "subtitle": "Tema, idioma y visualización del grafo.",
@@ -76,6 +81,20 @@
     "display": "Visualización",
     "density": "Densidad",
     "comfortable": "Cómoda",
-    "compact": "Compacta"
+    "compact": "Compacta",
+    "themeSystemHelp": "«Sistema» sigue el modo claro u oscuro de tu equipo.",
+    "languageDetected": "Detectado de tu sistema. Puedes cambiarlo cuando quieras."
+  },
+  "sync": {
+    "synced": "Sincronizado",
+    "syncedAgo": "Sincronizado {ago}",
+    "syncing": "Sincronizando…",
+    "failed": "No se pudo sincronizar",
+    "syncsWith": "Se sincroniza con tu cuenta de Git Rudder · {ago}",
+    "deviceOnly": "Solo en este equipo",
+    "deviceOnlyHelp": "Inicia sesión para sincronizarlo.",
+    "updatedElsewhere": "Actualizado desde otro dispositivo",
+    "notSaved": "No se guardó en la nube: la sincronización de {category} está desactivada. El cambio se queda en este equipo.",
+    "saved": "Guardado"
   }
 }

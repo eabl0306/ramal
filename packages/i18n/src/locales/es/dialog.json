@@ -54,7 +54,8 @@
   "branch": {
     "title": "Crear rama",
     "name": "Nombre de la rama",
-    "checkoutAfter": "Hacer checkout después de crearla"
+    "checkoutAfter": "Hacer checkout después de crearla",
+    "nameHelp": "Por ejemplo: feature/login-oauth"
   },
   "renameBranch": {
     "title": "Renombrar rama"
@@ -97,7 +98,8 @@
     "title": "Clonar repositorio",
     "url": "URL del repositorio",
     "urlPlaceholder": "URL o owner/repo",
-    "destination": "Carpeta de destino"
+    "destination": "Carpeta de destino",
+    "destinationHelp": "Se creará una carpeta con el nombre del repositorio."
   },
   "open": {
     "title": "Abrir repositorio local",
@@ -110,5 +112,11 @@
   "forcePush": {
     "title": "¿Force push a {branch}?",
     "info": "Se usa --force-with-lease: falla si alguien ha hecho push desde tu último fetch."
+  },
+  "sessionEnded": {
+    "title": "Tu sesión de Git Rudder se cerró",
+    "info": "Se cerró desde otro dispositivo o desde el panel web, o caducó tras un tiempo sin usar Git Rudder en este equipo.",
+    "renewFailed": "No pudimos renovar tu sesión. Vuelve a iniciarla: tus cuentas y llaves de este equipo siguen aquí.",
+    "cleanup": "Por seguridad, borramos de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de otros equipos. Lo que añadiste aquí sigue disponible y Git funciona igual."
   }
 }
