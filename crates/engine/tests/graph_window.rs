@@ -117,7 +117,7 @@ async fn windows_keep_absolute_rows_and_say_when_there_is_more() {
     let last = window(&engine, &repo_id, 5, 3).await;
     assert_eq!(last.rows.len(), 2);
     assert!(!last.has_more);
-    assert!(last.rows[1].edges.is_empty());
+    assert!(last.rows[1].edges.is_empty(), "{:?}", last.rows[1].edges);
 }
 
 #[tokio::test]
@@ -178,7 +178,7 @@ async fn an_empty_repository_has_an_empty_graph() {
 
     let graph = window(&engine, &repo_id, 0, 200).await;
 
-    assert!(graph.rows.is_empty());
+    assert!(graph.rows.is_empty(), "{:?}", graph.rows);
     assert!(!graph.has_more);
 }
 

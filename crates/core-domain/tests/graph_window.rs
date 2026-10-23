@@ -86,7 +86,7 @@ fn a_window_past_the_end_is_empty() {
     let refs = snapshot_on_branch(vec![git_ref("refs/heads/main", 1)], "refs/heads/main", 1);
     let window = graph_window(WindowRange::new(50, 10).unwrap(), history(), &refs);
 
-    assert!(window.rows.is_empty());
+    assert!(window.rows.is_empty(), "{:?}", window.rows);
     assert!(!window.has_more);
 }
 
@@ -134,7 +134,7 @@ fn rows_carry_their_refs_with_the_head_branch_first() {
     assert!(window.rows[0].is_head);
     assert!(!window.rows[2].is_head);
     assert_eq!(window.rows[2].refs.len(), 1);
-    assert!(window.rows[1].refs.is_empty());
+    assert!(window.rows[1].refs.is_empty(), "{:?}", window.rows[1].refs);
 }
 
 #[test]

@@ -34,7 +34,7 @@ async fn reports_an_error_when_postgres_is_unreachable() {
         .check()
         .await
         .expect_err("port 1 should refuse");
-    assert!(!error.message().is_empty());
+    assert_ne!(error.message(), "");
 }
 
 #[tokio::test]

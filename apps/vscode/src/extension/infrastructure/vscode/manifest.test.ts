@@ -25,7 +25,7 @@ function manifest(): Manifest {
   return JSON.parse(readFileSync(file, 'utf8')) as Manifest;
 }
 
-/** "^1.138.0" es "1.138": la landing ensena mayor y menor. */
+/** "^1.140.0" es "1.140": la landing ensena mayor y menor. */
 function minimumVersion(range: string): string {
   const match = /^\^?(\d+)\.(\d+)\.\d+$/u.exec(range);
   if (match === null) throw new Error(`engines.vscode no es una version simple: ${range}`);

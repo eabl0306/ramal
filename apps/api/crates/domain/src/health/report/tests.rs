@@ -30,7 +30,7 @@ fn a_report_without_components_is_healthy() {
     let report = HealthReport::without_components(version(), instant());
     assert_eq!(report.status(), HealthStatus::Ok);
     assert!(report.is_healthy());
-    assert!(report.components().is_empty());
+    assert!(report.components().is_empty(), "{:?}", report.components());
     assert_eq!(report.version(), version());
     assert_eq!(report.checked_at(), instant());
 }
@@ -46,7 +46,8 @@ fn all_components_ok_keep_the_report_healthy() {
         ],
     );
     assert_eq!(report.status(), HealthStatus::Ok);
-    assert!(report.failing_components().is_empty());
+    let failing = report.failing_components();
+    assert!(failing.is_empty(), "{failing:?}");
 }
 
 #[test]

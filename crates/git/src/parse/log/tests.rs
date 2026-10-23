@@ -68,7 +68,8 @@ fn it_reads_commits_with_their_parents_in_order() {
         "2026-09-30T11:42:00+02:00"
     );
     assert_eq!(commits[0].summary, "Merge branch 'x'");
-    assert!(commits[2].node.parents.is_empty());
+    let roots = &commits[2].node.parents;
+    assert!(roots.is_empty(), "{roots:?}");
     assert_eq!(commits[2].authored_at.offset_minutes(), -180);
 }
 
@@ -155,8 +156,11 @@ fn an_unreadable_date_falls_back_to_the_epoch_instead_of_failing() {
 
 #[test]
 fn empty_output_is_an_empty_history() {
-    assert!(parse_log(b"").unwrap().is_empty());
-    assert!(parse_log(b"\0").unwrap().is_empty());
+    let empty = parse_log(b"").unwrap();
+    let only_nul = parse_log(b"\0").unwrap();
+
+    assert!(empty.is_empty(), "{empty:?}");
+    assert!(only_nul.is_empty(), "{only_nul:?}");
 }
 
 #[test]

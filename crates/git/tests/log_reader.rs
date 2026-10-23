@@ -51,7 +51,8 @@ async fn a_merge_lists_its_parents_in_order_and_children_come_first() {
     );
     assert_eq!(commits[0].summary, "Merge branch 'feature'");
     assert_eq!(commits[3].summary, "Initial commit");
-    assert!(commits[3].node.parents.is_empty());
+    let roots = &commits[3].node.parents;
+    assert!(roots.is_empty(), "{roots:?}");
     for (row, commit) in commits.iter().enumerate() {
         for parent in &commit.node.parents {
             let parent_row = commits.iter().position(|c| c.node.sha == *parent).unwrap();
@@ -149,7 +150,9 @@ async fn subjects_keep_unicode_and_separator_characters() {
 async fn an_empty_repository_has_no_history() {
     let repo = FixtureRepo::new();
 
-    assert!(log(&repo, 10).await.is_empty());
+    let commits = log(&repo, 10).await;
+
+    assert!(commits.is_empty(), "{commits:?}");
 }
 
 #[tokio::test]

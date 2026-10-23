@@ -50,7 +50,7 @@
     "title": "Git Rudder inside VS Code",
     "text": "The graph, pending changes, the conflict resolver and AI, for the repository you have open. It uses your editor theme and language and the same Git Rudder account.",
     "install": "Install extension",
-    "requirement": "VS Code 1.138 or later. Not available on vscode.dev",
+    "requirement": "VS Code 1.140 or later. Not available on vscode.dev",
     "marketplace": "VS Code Marketplace",
     "openVsx": "Open VSX"
   },

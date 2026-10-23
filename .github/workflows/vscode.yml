@@ -129,7 +129,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: apps/vscode/.vscode-test
-          key: vscode-test-${{ runner.os }}-1.138.0
+          key: vscode-test-${{ runner.os }}-1.140.0
 
       # Compila el sidecar en release y la extension, y corre los tests de
       # integracion: activacion, el comando abre el panel y el motor contesta

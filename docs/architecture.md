@@ -38,7 +38,7 @@ de todo lo demas.
 | Llaves de IA de organizacion en el servidor                     | Cifradas en reposo con cifrado de sobre (AES-256-GCM, KEK con identificador para rotar). Nunca salen del servidor: la API hace de proxy de la generacion. Las llaves personales se llaman desde el motor del dispositivo, que es la unica forma de que funcione Ollama.                                                                                                  |
 | Funciona sin cuenta de Git Rudder                               | Todo lo que es Git local funciona sin iniciar sesion. Sincronizacion, equipos, llaves de IA de organizacion, dispositivos y el panel web piden sesion.                                                                                                                                                                                                                   |
 | Gratis para cada persona, de pago para los equipos              | Todo lo personal es gratis, sincronizacion incluida. Git Rudder Pro es el plan de una organizacion por asiento, cobrado con Paddle detras del puerto `BillingProvider`. Equipos, IA de organizacion y facturacion salen en la primera version publica ([ADR 0026](adr/0026-planes-y-precios.md), [ADR 0022](adr/0022-proveedor-de-pagos.md)).                            |
-| Monorepo pnpm + un workspace de Cargo + just                    | pnpm 11.18.0 por corepack con versiones exactas, un unico `Cargo.toml` raiz (resolver 3, edicion 2024, Rust 1.98.1 fijado en `rust-toolchain.toml`), `just` como punto de entrada unico, lefthook y commitlint. Sin Turborepo ni Nx. El crate de Tauri es miembro del workspace pero no esta en `default-members`, para que `cargo` funcione en maquinas sin webkit2gtk. |
+| Monorepo pnpm + un workspace de Cargo + just                    | pnpm 11.18.0 por corepack con versiones exactas, un unico `Cargo.toml` raiz (resolver 3, edicion 2024, Rust 1.99.1 fijado en `rust-toolchain.toml`), `just` como punto de entrada unico, lefthook y commitlint. Sin Turborepo ni Nx. El crate de Tauri es miembro del workspace pero no esta en `default-members`, para que `cargo` funcione en maquinas sin webkit2gtk. |
 | Web y API en el mismo origen                                    | Un gateway sirve la web estatica y enruta los prefijos de la API. La API no envia CORS. Desktop y VS Code nunca llaman a la API desde el webview: lo hace el motor en Rust. En produccion la web esta en `git-rudder.com` (con la API bajo su mismo origen) y los clientes nativos usan `api.git-rudder.com` ([ADR 0023](adr/0023-despliegue-en-apps-01-y-dominio.md)).  |
 
 ## 1. La idea en un parrafo
@@ -142,7 +142,7 @@ primer corte pero ya tiene sitio reservado, para que nadie lo invente en otro lu
 ```
 Cargo.toml                  Workspace unico: members, default-members (sin git-rudder-desktop), dependencias y lints comunes
 Cargo.lock                  Un solo lockfile de Rust; lo leen los tests de arquitectura
-rust-toolchain.toml         Rust 1.98.1 fijado, con clippy, rustfmt y llvm-tools-preview
+rust-toolchain.toml         Rust 1.99.1 fijado, con clippy, rustfmt y llvm-tools-preview
 clippy.toml                 Umbrales comunes: cognitiva 15, 50 lineas, 5 parametros, anidamiento 4
 rustfmt.toml                Formato de Rust
 deny.toml                   cargo-deny: licencias, avisos y crates vetados (git2, libgit2-sys)

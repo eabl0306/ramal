@@ -4,7 +4,7 @@
 // lo demas (zod, @git-rudder/i18n, @git-rudder/bridge) va dentro, asi la VSIX no lleva
 // node_modules (`vsce package --no-dependencies`).
 
-/** Node del Electron de VS Code 1.138. */
+/** Node del Electron de VS Code: node22 vale desde la 1.138. */
 const NODE_TARGET = 'node22';
 
 /** @type {import('esbuild').BuildOptions} */
