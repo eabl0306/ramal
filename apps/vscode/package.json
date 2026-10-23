@@ -119,7 +119,7 @@
     "@git-rudder/i18n": "workspace:*",
     "@git-rudder/repo-view": "workspace:*",
     "@git-rudder/ui": "workspace:*",
-    "@tanstack/react-query": "5.104.3",
+    "@tanstack/react-query": "5.104.5",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "zod": "4.6.7"
