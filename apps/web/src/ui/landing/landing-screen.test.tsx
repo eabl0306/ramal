@@ -85,7 +85,7 @@ describe('LandingScreen', () => {
     renderLanding({ os: 'mac', arch: 'arm64' });
 
     const card = screen.getByTestId('download-card-vscode');
-    expect(card).toHaveTextContent('VS Code 1.138 o posterior. No disponible en vscode.dev');
+    expect(card).toHaveTextContent('VS Code 1.140 o posterior. No disponible en vscode.dev');
     expect(within(card).getAllByRole('button', { name: /\(\.vsix\)$/u })).toHaveLength(8);
     expect(within(card).getByRole('button', { name: 'Alpine ARM64 (.vsix)' })).toBeVisible();
     expect(within(card).queryByText(/MB$/u)).not.toBeInTheDocument();

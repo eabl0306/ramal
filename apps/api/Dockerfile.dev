@@ -9,7 +9,7 @@
 # dependencias. Despues la cache vive en los volumenes de compose.
 
 # Va a la par que rust-toolchain.toml: se suben juntos.
-ARG RUST_VERSION=1.98.1
+ARG RUST_VERSION=1.99.1
 
 FROM rust:${RUST_VERSION}-slim-trixie
 ARG RUST_VERSION

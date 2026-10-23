@@ -38,7 +38,7 @@ export default defineConfig({
   label: 'integration',
   files: 'out/test/integration/**/*.test.cjs',
   // La minima que declara engines.vscode: si funciona aqui, funciona en las nuevas.
-  version: '1.138.0',
+  version: '1.140.0',
   extensionDevelopmentPath: root,
   workspaceFolder: createFixtureRepo(),
   launchArgs: [

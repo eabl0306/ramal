@@ -13,7 +13,7 @@
   },
   "type": "module",
   "engines": {
-    "vscode": "^1.138.0"
+    "vscode": "^1.140.0"
   },
   "categories": [
     "SCM Providers",
@@ -119,33 +119,33 @@
     "@ramal/i18n": "workspace:*",
     "@ramal/repo-view": "workspace:*",
     "@ramal/ui": "workspace:*",
-    "@tanstack/react-query": "5.104.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
-    "zod": "4.6.5"
+    "@tanstack/react-query": "5.104.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0",
+    "@playwright/test": "1.64.1",
     "@ramal/eslint-config": "workspace:*",
     "@ramal/tsconfig": "workspace:*",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",
     "@types/mocha": "10.0.10",
-    "@types/node": "24.19.0",
+    "@types/node": "24.19.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@types/vscode": "1.138.0",
-    "@vitejs/plugin-react": "6.1.1",
-    "@vitest/coverage-v8": "5.0.2",
+    "@types/vscode": "1.140.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@vitest/coverage-v8": "5.0.5",
     "@vscode/test-cli": "0.0.15",
     "@vscode/test-electron": "3.1.0",
     "@vscode/vsce": "4.0.0",
     "esbuild": "0.28.2",
-    "eslint": "10.11.0",
-    "jsdom": "30.1.1",
+    "eslint": "10.13.0",
+    "jsdom": "30.1.3",
     "typescript": "6.0.3",
-    "vite": "8.3.1",
-    "vitest": "5.0.2"
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
   }
 }

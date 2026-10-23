@@ -5,35 +5,35 @@ import { afterEach, beforeEach } from 'vitest';
 
 /**
  * jsdom no maqueta: todo mide 0 px y el virtualizador del grafo no pintaria
- * ninguna fila. Se da un tamano fijo a los elementos, que es lo unico que lee
- * @tanstack/virtual-core, como hacen los tests de @ramal/repo-view.
+ * ninguna fila. Se dan medidas fijas a los elementos, las que lee
+ * @tanstack/virtual-core (clientWidth y clientHeight para el contenedor con
+ * scroll, offsetWidth y offsetHeight para medir cada fila), como hacen los
+ * tests de @ramal/repo-view.
  */
 const VIEWPORT = { height: 400, width: 1000 };
 
-const originals = {
-  height: Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight'),
-  width: Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth'),
+const SIZES: Readonly<Record<string, number>> = {
+  offsetHeight: VIEWPORT.height,
+  clientHeight: VIEWPORT.height,
+  offsetWidth: VIEWPORT.width,
+  clientWidth: VIEWPORT.width,
 };
 
+const originals = Object.keys(SIZES).map(
+  (name) => [name, Object.getOwnPropertyDescriptor(HTMLElement.prototype, name)] as const,
+);
+
 beforeEach(() => {
-  Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
-    configurable: true,
-    get: () => VIEWPORT.height,
-  });
-  Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
-    configurable: true,
-    get: () => VIEWPORT.width,
-  });
+  for (const [name, size] of Object.entries(SIZES)) {
+    Object.defineProperty(HTMLElement.prototype, name, { configurable: true, get: () => size });
+  }
 });
 
 // Vitest corre sin globals, asi que el limpiado de Testing Library se declara
 // aqui, y despues se devuelven las medidas originales de jsdom.
 afterEach(() => {
   cleanup();
-  if (originals.height !== undefined) {
-    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', originals.height);
-  }
-  if (originals.width !== undefined) {
-    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', originals.width);
+  for (const [name, original] of originals) {
+    if (original !== undefined) Object.defineProperty(HTMLElement.prototype, name, original);
   }
 });

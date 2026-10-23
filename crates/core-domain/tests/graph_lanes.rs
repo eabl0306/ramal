@@ -27,7 +27,8 @@ fn a_single_root_commit_takes_lane_zero() {
 
     assert_eq!(lanes(&result), vec![0]);
     assert_eq!(result.width, 1);
-    assert!(result.rows[0].edges.is_empty());
+    let edges = &result.rows[0].edges;
+    assert!(edges.is_empty(), "{edges:?}");
 }
 
 #[test]

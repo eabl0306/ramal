@@ -25,7 +25,7 @@ fn use_case(probes: Vec<Arc<dyn HealthProbe>>) -> CheckReadiness {
 fn a_check_without_probes_is_healthy() {
     let report = block_on(use_case(Vec::new()).execute());
     assert_eq!(report.status(), HealthStatus::Ok);
-    assert!(report.components().is_empty());
+    assert!(report.components().is_empty(), "{:?}", report.components());
     assert_eq!(report.checked_at(), FixedClock::fixture_instant());
 }
 

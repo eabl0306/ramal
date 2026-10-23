@@ -35,7 +35,8 @@ fn an_unknown_method_is_rejected() {
 
 #[test]
 fn an_unknown_window_cannot_ask_for_anything() {
-    assert!(methods_for("settings").is_empty());
+    let methods = methods_for("settings");
+    assert!(methods.is_empty(), "{methods:?}");
     assert!(authorize("settings", "graph/window", false).is_err());
 }
 

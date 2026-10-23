@@ -10,7 +10,7 @@ fn liveness_is_always_healthy_and_has_no_components() {
     let clock = Arc::new(FixedClock::at_fixture());
     let report = CheckLiveness::new(ServiceVersion::new(1, 2, 3), clock).execute();
     assert_eq!(report.status(), HealthStatus::Ok);
-    assert!(report.components().is_empty());
+    assert!(report.components().is_empty(), "{:?}", report.components());
     assert_eq!(report.version(), ServiceVersion::new(1, 2, 3));
     assert_eq!(report.checked_at(), FixedClock::fixture_instant());
 }

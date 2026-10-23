@@ -15,7 +15,7 @@
 # VS Code y el crate de escritorio, que nunca se compilan aqui.
 
 # Va a la par que rust-toolchain.toml: se suben juntos.
-ARG RUST_VERSION=1.98.1
+ARG RUST_VERSION=1.99.1
 ARG CARGO_CHEF_VERSION=0.1.78
 
 FROM rust:${RUST_VERSION}-slim-trixie AS chef
