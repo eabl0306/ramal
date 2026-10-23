@@ -4,7 +4,9 @@
     "merge": "Cambios de merge",
     "staged": "Cambios preparados",
     "branches": "Ramas",
-    "remotes": "Remotos"
+    "remotes": "Remotos",
+    "welcome": "Git Rudder",
+    "pullRequests": "Pull requests"
   },
   "scm": {
     "messagePlaceholder": "Mensaje ({shortcut} para commit en \"{branch}\")",
@@ -20,7 +22,11 @@
   "diff": {
     "workingTree": "{file} (Árbol de trabajo)",
     "index": "{file} (Índice)",
-    "commit": "{file} ({sha})"
+    "commit": "{file} ({sha})",
+    "diffWorking": "{file} (Índice ↔ Árbol de trabajo)",
+    "diffStaged": "{file} (HEAD ↔ Índice)",
+    "linesStaged_other": "{count} líneas preparadas",
+    "linesStaged_one": "{count} línea preparada"
   },
   "commandPlaceholder": "Escribe un comando de Git Rudder",
   "sourceGitRudder": "Origen: Git Rudder",
@@ -40,7 +46,17 @@
     "addKey": "Añadir llave…",
     "aiKey": "Llave usada por las funciones de IA.",
     "aiLanguage": "Idioma del texto generado.",
-    "matchVsCode": "Igual que VS Code"
+    "matchVsCode": "Igual que VS Code",
+    "cfgCloud": "Usar la configuración de mi cuenta de Git Rudder",
+    "cfgCloudD": "Este VS Code usa las cuentas, las llaves de IA y las preferencias de Git e IA de tu cuenta. Qué se guarda en la nube se elige en tu cuenta. El tema, el idioma y el resto del editor los sincroniza VS Code.",
+    "cfgLogLevel": "Cuánto escribe el motor de Git Rudder en el canal de salida \"Git Rudder Engine\". Solo en este equipo.",
+    "cfgHeader": "Estas preferencias las comparte Git Rudder Desktop y se guardan en tu cuenta de Git Rudder. No aparecen en la configuración de VS Code.",
+    "cfgLocal": "Solo en este VS Code",
+    "keyModel": "Modelo de la llave ({model})",
+    "orgModelFixed": "Fijado por {org}: {model}",
+    "aiHint": "Para los mensajes de commit te recomendamos un modelo rápido y barato. Para PRs y resúmenes, uno equilibrado. Cada generación la paga tu llave.",
+    "excludeLabel": "Archivos que nunca se envían a la IA",
+    "excludeD": "Además de .env, *.pem, *.key y otros que Git Rudder excluye siempre."
   },
   "host": {
     "noFolder": "Abre una carpeta con un repositorio Git para ver su grafo.",
@@ -50,6 +66,335 @@
     "protocolMismatch": "Esta instalación de Git Rudder está dañada: el motor usa la versión {engine} del protocolo y la extensión espera la {expected}. Reinstala la extensión."
   },
   "auth": {
-    "signIn": "Iniciar sesión en Git Rudder"
+    "signIn": "Iniciar sesión en Git Rudder",
+    "cardSignedOut": "Inicia sesión para usar en este VS Code las cuentas, llaves y preferencias de tu cuenta de Git Rudder. Git funciona igual sin cuenta.",
+    "progressBrowser": "Iniciando sesión en Git Rudder: termina en el navegador.",
+    "slowBrowser": "¿No se abrió el navegador o no vuelve a VS Code?",
+    "useCode": "Usar un código",
+    "openAgain": "Abrir de nuevo",
+    "codeTitle": "Escribe este código en git-rudder.com/activate",
+    "codeDetail": "{code}. Caduca en 10 minutos. Apruébalo solo si lo pediste tú en este equipo.",
+    "copyAndOpen": "Copiar código y abrir el navegador",
+    "waitingApproval": "Esperando la aprobación en el navegador…",
+    "signedInMsg": "Sesión iniciada como {name}",
+    "signInFailed": "No se pudo iniciar sesión: {reason}",
+    "reasonDenied": "cancelaste la autorización en el navegador.",
+    "reasonExpired": "el código caducó.",
+    "reasonNetwork": "no hay conexión con Git Rudder. Git local sigue funcionando.",
+    "signOutTitle": "¿Cerrar sesión en Git Rudder?",
+    "signOutDetail": "Se borran de este equipo la llave de tu bóveda y las cuentas y llaves que llegaron de otros equipos. Las que añadiste aquí se quedan para que Git siga funcionando.",
+    "signOutKeep": "Cerrar sesión",
+    "signOutWipe": "Cerrar sesión y borrar también las añadidas aquí",
+    "otherWindowOut": "Se cerró la sesión de Git Rudder en otra ventana."
+  },
+  "command": {
+    "openGraph": "Abrir grafo",
+    "selectRepository": "Elegir repositorio…",
+    "pullWithMode": "Pull (elegir modo)…",
+    "forcePush": "Force push (with lease)…",
+    "publishBranch": "Publicar rama…",
+    "generateCommitMessage": "Generar mensaje de commit con IA",
+    "checkout": "Checkout a…",
+    "createBranch": "Crear rama…",
+    "merge": "Merge en la rama actual…",
+    "rebase": "Rebase de la rama actual sobre…",
+    "continueOperation": "Continuar la operación en curso",
+    "skipCommit": "Omitir este commit",
+    "abortOperation": "Abortar la operación en curso…",
+    "stash": "Stash…",
+    "stashPop": "Pop del último stash",
+    "stashApply": "Aplicar stash…",
+    "createTag": "Crear tag…",
+    "createPullRequest": "Crear pull request…",
+    "fileHistory": "Ver historial del archivo",
+    "stageSelectedRanges": "Preparar las líneas seleccionadas",
+    "unstageSelectedRanges": "Quitar de preparados las líneas seleccionadas",
+    "discardSelectedRanges": "Descartar las líneas seleccionadas…",
+    "clone": "Clonar repositorio…",
+    "initRepository": "Iniciar repositorio",
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión…",
+    "openSettings": "Abrir configuración de Git Rudder",
+    "openDashboard": "Abrir panel web",
+    "addPlatformAccount": "Añadir cuenta de plataforma…",
+    "addAiKey": "Añadir llave de IA…",
+    "checkGit": "Volver a comprobar Git",
+    "restartEngine": "Reiniciar el motor",
+    "showEngineLog": "Mostrar el registro del motor",
+    "refresh": "Actualizar",
+    "category": "Git Rudder"
+  },
+  "menu": {
+    "mergeCurrent": "Merge en la rama actual…",
+    "rebaseOnThis": "Rebase de la actual sobre esta…",
+    "renameBranch": "Renombrar rama…",
+    "copyName": "Copiar nombre",
+    "copyUrl": "Copiar URL",
+    "stashView": "Ver cambios",
+    "tagCheckout": "Checkout del tag",
+    "openFile": "Abrir archivo",
+    "fileHistory": "Ver historial del archivo"
+  },
+  "status": {
+    "repoTip": "Repositorio de Git Rudder: {repo} ({index} de {total})",
+    "syncTip": "{behind} commits por traer y {ahead} por subir",
+    "publish": "Publicar",
+    "opTip": "Rebase en curso: commit {index} de {total}",
+    "aiTip": "IA para mensajes de commit: {provider} · {model} (llave «{label}»)",
+    "aiNoKey": "Sin llave",
+    "signedOut": "Git Rudder: sin sesión",
+    "signedOutTip": "Sin sesión. Git local funciona igual. Inicia sesión para sincronizar cuentas, llaves y preferencias.",
+    "signedInTip": "Sesión iniciada como {name} ({email}) · Sincronizado {ago}",
+    "cloudOffTip": "La nube de Git Rudder está desactivada en este VS Code.",
+    "expired": "Git Rudder: inicia sesión",
+    "restarting": "Git Rudder: reiniciando el motor…",
+    "stopped": "Git Rudder: motor detenido",
+    "detached": "{sha} (separado)",
+    "branchTip_other": "Rama actual · {count} cambios sin commit",
+    "branchTip_one": "Rama actual · {count} cambio sin commit",
+    "signedIn": "Git Rudder",
+    "publishTip": "La rama {branch} todavía no está en ningún remoto."
+  },
+  "tree": {
+    "prTooltip": "#{num} {title} · {from} → {to} · @{author} · {state} · Checks: {checks} · Revisiones: {reviews}"
+  },
+  "quickInput": {
+    "branchFrom": "Crear rama desde {sha}",
+    "branchBad": "Nombre no válido: {reason}",
+    "createCo": "Crear y hacer checkout",
+    "createOnly": "Solo crear",
+    "local": "Locales",
+    "remote": "Remotas",
+    "strategy": "¿Cómo hacer el merge de {source} en {target}?",
+    "mergeMsg": "Mensaje del commit de merge",
+    "stashAll": "Todos los cambios",
+    "stashUntr": "Todos, con archivos sin seguimiento",
+    "stashStaged": "Solo lo preparado",
+    "stashMsg": "Mensaje (opcional)",
+    "pickRemote": "¿En qué remoto publicar {branch}?",
+    "remoteName": "Nombre de la rama en el remoto",
+    "cloneAcc": "¿Con qué cuenta clonar?",
+    "cloneDest": "Elegir carpeta de destino",
+    "cloning": "Clonando {repo}: {phase} {percent}%",
+    "cloned": "Repositorio clonado en {path}.",
+    "openNew": "Abrir en una ventana nueva",
+    "addWs": "Añadir al espacio de trabajo"
+  },
+  "welcome": {
+    "noFolder": "Abre una carpeta con un repositorio de Git, o clona uno, para ver su grafo. No necesitas cuenta.",
+    "openFolder": "Abrir carpeta",
+    "cloneRepo": "Clonar repositorio",
+    "notRepo": "La carpeta abierta no es un repositorio de Git.",
+    "notRepoMulti": "Ninguna de las carpetas abiertas es un repositorio de Git.",
+    "initRepo": "Iniciar repositorio",
+    "pickFolder": "Elige la carpeta donde iniciar el repositorio",
+    "gitMissing": "Git Rudder necesita Git 2.34 o posterior y no lo encuentra en este equipo. Si está en otra ruta, indícala en el ajuste `git.path`.",
+    "gitOld": "Git Rudder necesita Git 2.34 o posterior. La versión que encuentra es más antigua.",
+    "gitRemote": "Git Rudder corre en la máquina remota y necesita Git 2.34 o posterior instalado allí.",
+    "installGit": "Instalar Git",
+    "checkAgain": "Volver a comprobar"
+  },
+  "engine": {
+    "bannerReconnect": "Reconectando con el motor de Git Rudder…",
+    "engineStopped": "El motor de Git Rudder se detuvo 5 veces en 3 minutos y no se volverá a arrancar solo.",
+    "showLog": "Ver registro",
+    "protocolBroken": "La extensión está dañada: el motor y la interfaz no son de la misma versión. Reinstala Git Rudder.",
+    "noBinary": "Esta instalación de Git Rudder no trae el motor para {os} {arch}. Instala la extensión desde el Marketplace o Open VSX para que VS Code elija la versión correcta."
+  },
+  "repo": {
+    "pickRepo": "Elige el repositorio que muestran las vistas de Git Rudder",
+    "graphTab": "Grafo: {repo}",
+    "submoduleOf": "Submódulo de {repo}",
+    "nestedIn": "Anidado en {repo}",
+    "repoGone": "{repo} ya no es un repositorio. Cerramos su grafo."
+  },
+  "operation": {
+    "opRebase": "Rebase en curso · commit {index} de {total}: «{subject}»",
+    "opCherry": "Cherry-pick de {sha} en curso",
+    "opRevert": "Revert de {sha} en curso",
+    "opPull": "Pull de {remote}/{branch} con conflictos",
+    "skip": "Omitir commit",
+    "abortOp": "Abortar {operation}",
+    "continueTip": "Resuelve todos los conflictos para continuar",
+    "editInEditor": "Editar a mano",
+    "markResolved": "Marcar como resuelto igualmente",
+    "wipOp": "// {operation} en curso · resuelve los conflictos",
+    "labelB": {
+      "merge": "Entrante ({branch})",
+      "rebase": "Commit que se reaplica ({sha})",
+      "cherryPick": "Cherry-pick de {sha}",
+      "revert": "Revert de {sha}",
+      "stashApply": "Stash {index}"
+    },
+    "labelA": {
+      "rebase": "Base ({upstream})",
+      "stashApply": "Tu árbol de trabajo"
+    },
+    "name": {
+      "merge": "merge",
+      "rebase": "rebase",
+      "cherryPick": "cherry-pick",
+      "revert": "revert",
+      "stashApply": "stash"
+    }
+  },
+  "graph": {
+    "loadMore": "Cargar más commits",
+    "staleWindow": "El historial cambió. Recargamos el grafo desde el principio.",
+    "emptyRepo": "Este repositorio aún no tiene commits. Prepara archivos y haz el primer commit en {branch}.",
+    "goChanges": "Ir a Cambios",
+    "firstCommit": "Commit inicial en {branch}",
+    "detached": "HEAD separado en {sha}. Los commits que hagas aquí no pertenecen a ninguna rama.",
+    "branchHere": "Crear rama aquí…"
+  },
+  "push": {
+    "pushRejected": "Push rechazado: origin/{branch} tiene commits que no tienes.",
+    "pullRetry": "Pull y reintentar",
+    "viewDetail": "Ver detalle",
+    "copyDetail": "Copiar detalle",
+    "noUpstream": "La rama {branch} todavía no está en ningún remoto.",
+    "publish": "Publicar rama",
+    "authFailed": "No se pudo autenticar con {host}.",
+    "connectAcc": "Conectar una cuenta de {platform}",
+    "updateCreds": "Actualizar credenciales…"
+  },
+  "dirty": {
+    "stashAndGo": "Guardar en stash y continuar",
+    "autostash": "Rebase con autostash",
+    "stashedNow": "Tus cambios están en stash@{0}.",
+    "applyNow": "Aplicar ahora",
+    "dirtyCheckout_other": "No se puede hacer checkout de {branch}: tus cambios en {count} archivos se sobrescribirían.",
+    "dirtyCheckout_one": "No se puede hacer checkout de {branch}: tus cambios en {count} archivo se sobrescribirían."
+  },
+  "history": {
+    "historyTab": "Historial: {file}",
+    "followsRenames": "Incluye los commits anteriores a cambiar de nombre",
+    "noHistory": "Este archivo aún no está en el historial."
+  },
+  "tag": {
+    "tagMsg": "Mensaje (opcional; vacío crea un tag ligero)",
+    "tagLocal": "Solo en local"
+  },
+  "account": {
+    "prNoAccount": "Para ver y crear pull requests de este repositorio, conecta una cuenta de su plataforma.",
+    "prNoAccountMsg": "El remoto está en {host}. No hay ninguna cuenta conectada para ese servidor.",
+    "prUnknownHost": "Git Rudder no reconoce la plataforma de este remoto. Si es GitLab, Gitea, Forgejo o GitHub Enterprise, añade una cuenta con ese servidor.",
+    "prNoRemote": "Este repositorio no tiene remoto. Los pull requests necesitan uno.",
+    "pickPlatform": "¿En qué plataforma está la cuenta?",
+    "oauthRec": "Iniciar sesión con {platform} (recomendado)",
+    "tokenFine": "Token de grano fino",
+    "tokenPersonal": "Token personal",
+    "apiToken": "API token",
+    "hostPrompt": "Servidor, por ejemplo gitlab.empresa.com",
+    "azureOrg": "Organización de Azure DevOps. El token tiene que tener alcance de esa organización.",
+    "tokenPrompt": "Pega el token. Git Rudder lo guarda en el almacén seguro de VS Code y nunca lo vuelve a mostrar.",
+    "testingToken": "Probando el token…",
+    "tokenResult": "@{user} · permisos: {scopes}",
+    "labelOpt": "Etiqueta (opcional): Trabajo, Personal…",
+    "ghCodeTitle": "Escribe este código en github.com/login/device",
+    "copyOpenGh": "Copiar código y abrir GitHub",
+    "waitPlatform": "Esperando a {platform} en el navegador…",
+    "tokenRejected": "{platform} rechazó el token.",
+    "scopesMissing": "Al token le faltan permisos: {scopes}."
+  },
+  "errors": {
+    "plat401": "{platform} rechazó el token de @{user}.",
+    "platRate": "Límite de peticiones de {platform}. Lo volvemos a intentar a las {time}.",
+    "platSso": "La organización {org} exige autorizar el token con SSO.",
+    "authorizeSso": "Autorizar en {platform}",
+    "aiNetwork": "No hay conexión con {provider}.",
+    "aiBadKey": "{provider} rechazó la llave «{label}».",
+    "aiQuota": "Tu cuenta de {provider} no tiene saldo o llegó a su cuota.",
+    "aiModelGone": "El modelo {model} ya no está disponible.",
+    "pickModel": "Elegir otro modelo",
+    "reviewKey": "Revisar llave",
+    "orgProxyTitle": "Esta llave es de tu organización",
+    "orgProxyDetail": "Para generar el mensaje, los cambios preparados pasan por los servidores de Git Rudder, que usan la llave de {org}. Con una llave personal no pasa.",
+    "generate": "Generar",
+    "useMyKey": "Usar mi llave",
+    "checkingKey": "Comprobando la llave…",
+    "recFast": "Recomendado · Rápido",
+    "recBalanced": "Recomendado · Equilibrado",
+    "modelsFail": "No se pudo cargar la lista de modelos de {provider}.",
+    "aiOrgLimit_other": "Llegaste a tu límite diario de IA en {org} ({count} peticiones). Se renueva mañana.",
+    "aiOrgLimit_one": "Llegaste a tu límite diario de IA en {org} ({count} petición). Se renueva mañana."
+  },
+  "desktop": {
+    "noDesktop": "Git Rudder Desktop no parece estar instalado en este equipo.",
+    "getDesktop": "Descargar Git Rudder Desktop"
+  },
+  "manifest": {
+    "untrustedDesc": "Git Rudder ejecuta Git en la carpeta, y Git puede ejecutar hooks y configuración del propio repositorio. Confía en la carpeta para usar Git Rudder.",
+    "virtualDesc": "Git Rudder necesita Git y archivos locales. No funciona en vscode.dev ni en github.dev."
+  },
+  "confirm": {
+    "discard": {
+      "message": "¿Descartar los cambios de {file}?",
+      "button": "Descartar"
+    },
+    "deleteBranch": {
+      "message": "¿Eliminar la rama {branch}?",
+      "detail": "Tiene commits que no están en otra rama."
+    },
+    "deleteRemoteBranch": {
+      "message": "¿Eliminar {remote}/{branch} en el servidor?",
+      "detail": "Se borra para todo el equipo.",
+      "button": "Eliminar en {remote}"
+    },
+    "forcePush": {
+      "message": "¿Force push a origin/{branch}?",
+      "button": "Force push"
+    },
+    "resetHard": {
+      "button": "Reset --hard"
+    },
+    "dropStash": {
+      "message": "¿Eliminar {stash}?",
+      "detail": "«{message}». Esta acción no se puede deshacer.",
+      "button": "Eliminar"
+    },
+    "deleteTag": {
+      "message": "¿Eliminar el tag {tag}?",
+      "detail": "Si ya está en origin, también puedes borrarlo allí.",
+      "button2": "Eliminar también en origin"
+    },
+    "disconnectAccount": {
+      "message": "¿Desconectar @{user} ({host})?",
+      "detail": "Git Rudder deja de usarla en este y en tus otros equipos. No revoca el token en {platform}.",
+      "button": "Desconectar"
+    },
+    "deleteAiKey": {
+      "message": "¿Eliminar la llave «{label}»?",
+      "detail": "Las funciones que la usaban pasan a la llave predeterminada."
+    },
+    "abortOperation": {
+      "message": "¿Abortar el {operation}?",
+      "detail": "Se descartan los conflictos resueltos y la rama vuelve a como estaba antes de empezar.",
+      "button": "Abortar"
+    }
+  },
+  "walkthrough": {
+    "title": "Empieza con Git Rudder",
+    "description": "El grafo de tu repositorio, conflictos línea a línea e IA con tu llave, dentro de VS Code.",
+    "step1": {
+      "title": "Abre el grafo",
+      "description": "Todas las ramas, tags y stashes del repositorio abierto. Atajo: {shortcut}.",
+      "button": "Abrir grafo"
+    },
+    "step2": {
+      "title": "Conecta tu plataforma",
+      "description": "Para ver y crear pull requests en GitHub, GitLab, Bitbucket, Gitea o Azure DevOps.",
+      "button": "Añadir cuenta"
+    },
+    "step3": {
+      "title": "Añade una llave de IA (opcional)",
+      "description": "Genera mensajes de commit y descripciones de PR. Cada generación la paga tu llave.",
+      "button": "Añadir llave"
+    },
+    "step4": {
+      "title": "Sincroniza con tu cuenta (opcional)",
+      "description": "Usa las mismas cuentas, llaves y preferencias que en Git Rudder Desktop.",
+      "button": "Iniciar sesión"
+    }
   }
 }

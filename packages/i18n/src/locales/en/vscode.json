@@ -4,7 +4,9 @@
     "merge": "Merge Changes",
     "staged": "Staged Changes",
     "branches": "Branches",
-    "remotes": "Remotes"
+    "remotes": "Remotes",
+    "welcome": "Git Rudder",
+    "pullRequests": "Pull Requests"
   },
   "scm": {
     "messagePlaceholder": "Message ({shortcut} to commit on \"{branch}\")",
@@ -20,7 +22,11 @@
   "diff": {
     "workingTree": "{file} (Working Tree)",
     "index": "{file} (Index)",
-    "commit": "{file} ({sha})"
+    "commit": "{file} ({sha})",
+    "diffWorking": "{file} (Index ↔ Working Tree)",
+    "diffStaged": "{file} (HEAD ↔ Index)",
+    "linesStaged_other": "{count} lines staged",
+    "linesStaged_one": "{count} line staged"
   },
   "commandPlaceholder": "Type a Git Rudder command",
   "sourceGitRudder": "Source: Git Rudder",
@@ -40,7 +46,17 @@
     "addKey": "Add Key…",
     "aiKey": "Key used by AI features.",
     "aiLanguage": "Language of generated text.",
-    "matchVsCode": "Match VS Code"
+    "matchVsCode": "Match VS Code",
+    "cfgCloud": "Use my Git Rudder account settings",
+    "cfgCloudD": "This VS Code uses your account's linked accounts, AI keys and Git and AI preferences. What's stored in the cloud is chosen in your account. VS Code syncs the theme, language and the rest of the editor.",
+    "cfgLogLevel": "How much the Git Rudder engine writes to the \"Git Rudder Engine\" output channel. This machine only.",
+    "cfgHeader": "Git Rudder Desktop shares these preferences and they're stored in your Git Rudder account. They don't appear in VS Code's settings.",
+    "cfgLocal": "This VS Code only",
+    "keyModel": "Key's model ({model})",
+    "orgModelFixed": "Set by {org}: {model}",
+    "aiHint": "For commit messages we recommend a fast, low-cost model. For PRs and summaries, a balanced one. Your key pays for every generation.",
+    "excludeLabel": "Files never sent to AI",
+    "excludeD": "On top of .env, *.pem, *.key and others Git Rudder always excludes."
   },
   "host": {
     "noFolder": "Open a folder with a Git repository to see its graph.",
@@ -50,6 +66,335 @@
     "protocolMismatch": "This Git Rudder installation is damaged: the engine uses protocol version {engine} and the extension expects {expected}. Reinstall the extension."
   },
   "auth": {
-    "signIn": "Sign in to Git Rudder"
+    "signIn": "Sign in to Git Rudder",
+    "cardSignedOut": "Sign in to use your Git Rudder account's accounts, keys and preferences in this VS Code. Git works the same without an account.",
+    "progressBrowser": "Signing in to Git Rudder: finish in your browser.",
+    "slowBrowser": "Browser didn't open or didn't come back to VS Code?",
+    "useCode": "Use a Code",
+    "openAgain": "Open Again",
+    "codeTitle": "Enter this code at git-rudder.com/activate",
+    "codeDetail": "{code}. It expires in 10 minutes. Only approve it if you requested it on this device.",
+    "copyAndOpen": "Copy Code and Open Browser",
+    "waitingApproval": "Waiting for approval in the browser…",
+    "signedInMsg": "Signed in as {name}",
+    "signInFailed": "Couldn't sign in: {reason}",
+    "reasonDenied": "you cancelled the authorization in the browser.",
+    "reasonExpired": "the code expired.",
+    "reasonNetwork": "Git Rudder can't be reached. Local Git keeps working.",
+    "signOutTitle": "Sign out of Git Rudder?",
+    "signOutDetail": "Your vault key and the accounts and keys that came from other devices are removed from this device. The ones you added here stay so Git keeps working.",
+    "signOutKeep": "Sign Out",
+    "signOutWipe": "Sign Out and Also Remove the Ones Added Here",
+    "otherWindowOut": "Git Rudder was signed out in another window."
+  },
+  "command": {
+    "openGraph": "Open Graph",
+    "selectRepository": "Select Repository…",
+    "pullWithMode": "Pull (Choose Mode)…",
+    "forcePush": "Force Push (with Lease)…",
+    "publishBranch": "Publish Branch…",
+    "generateCommitMessage": "Generate Commit Message with AI",
+    "checkout": "Checkout to…",
+    "createBranch": "Create Branch…",
+    "merge": "Merge into Current Branch…",
+    "rebase": "Rebase Current Branch onto…",
+    "continueOperation": "Continue Current Operation",
+    "skipCommit": "Skip This Commit",
+    "abortOperation": "Abort Current Operation…",
+    "stash": "Stash…",
+    "stashPop": "Pop Latest Stash",
+    "stashApply": "Apply Stash…",
+    "createTag": "Create Tag…",
+    "createPullRequest": "Create Pull Request…",
+    "fileHistory": "Show File History",
+    "stageSelectedRanges": "Stage Selected Lines",
+    "unstageSelectedRanges": "Unstage Selected Lines",
+    "discardSelectedRanges": "Discard Selected Lines…",
+    "clone": "Clone Repository…",
+    "initRepository": "Initialize Repository",
+    "signIn": "Sign In",
+    "signOut": "Sign Out…",
+    "openSettings": "Open Git Rudder Settings",
+    "openDashboard": "Open Web Dashboard",
+    "addPlatformAccount": "Add Platform Account…",
+    "addAiKey": "Add AI Key…",
+    "checkGit": "Check Git Again",
+    "restartEngine": "Restart Engine",
+    "showEngineLog": "Show Engine Log",
+    "refresh": "Refresh",
+    "category": "Git Rudder"
+  },
+  "menu": {
+    "mergeCurrent": "Merge into Current Branch…",
+    "rebaseOnThis": "Rebase Current onto This…",
+    "renameBranch": "Rename Branch…",
+    "copyName": "Copy Name",
+    "copyUrl": "Copy URL",
+    "stashView": "View Changes",
+    "tagCheckout": "Check Out Tag",
+    "openFile": "Open File",
+    "fileHistory": "Show File History"
+  },
+  "status": {
+    "repoTip": "Git Rudder repository: {repo} ({index} of {total})",
+    "syncTip": "{behind} commits to pull and {ahead} to push",
+    "publish": "Publish",
+    "opTip": "Rebase in progress: commit {index} of {total}",
+    "aiTip": "AI for commit messages: {provider} · {model} (\"{label}\" key)",
+    "aiNoKey": "No Key",
+    "signedOut": "Git Rudder: Signed Out",
+    "signedOutTip": "Signed out. Local Git works the same. Sign in to sync accounts, keys and preferences.",
+    "signedInTip": "Signed in as {name} ({email}) · Synced {ago}",
+    "cloudOffTip": "Git Rudder cloud is turned off in this VS Code.",
+    "expired": "Git Rudder: Sign In",
+    "restarting": "Git Rudder: Restarting Engine…",
+    "stopped": "Git Rudder: Engine Stopped",
+    "detached": "{sha} (detached)",
+    "branchTip_other": "Current branch · {count} uncommitted changes",
+    "branchTip_one": "Current branch · {count} uncommitted change",
+    "signedIn": "Git Rudder",
+    "publishTip": "The branch {branch} isn't on any remote yet."
+  },
+  "tree": {
+    "prTooltip": "#{num} {title} · {from} → {to} · @{author} · {state} · Checks: {checks} · Reviews: {reviews}"
+  },
+  "quickInput": {
+    "branchFrom": "Create branch from {sha}",
+    "branchBad": "Invalid name: {reason}",
+    "createCo": "Create and Check Out",
+    "createOnly": "Create Only",
+    "local": "Local",
+    "remote": "Remote",
+    "strategy": "How should {source} merge into {target}?",
+    "mergeMsg": "Merge commit message",
+    "stashAll": "All Changes",
+    "stashUntr": "All, Including Untracked Files",
+    "stashStaged": "Staged Changes Only",
+    "stashMsg": "Message (optional)",
+    "pickRemote": "Which remote should {branch} go to?",
+    "remoteName": "Branch name on the remote",
+    "cloneAcc": "Which account should clone it?",
+    "cloneDest": "Choose Destination Folder",
+    "cloning": "Cloning {repo}: {phase} {percent}%",
+    "cloned": "Repository cloned to {path}.",
+    "openNew": "Open in New Window",
+    "addWs": "Add to Workspace"
+  },
+  "welcome": {
+    "noFolder": "Open a folder with a Git repository, or clone one, to see its graph. No account needed.",
+    "openFolder": "Open Folder",
+    "cloneRepo": "Clone Repository",
+    "notRepo": "The open folder isn't a Git repository.",
+    "notRepoMulti": "None of the open folders is a Git repository.",
+    "initRepo": "Initialize Repository",
+    "pickFolder": "Choose the folder to initialize the repository in",
+    "gitMissing": "Git Rudder needs Git 2.34 or later and can't find it on this machine. If it's somewhere else, set it in the `git.path` setting.",
+    "gitOld": "Git Rudder needs Git 2.34 or later. The version it found is older.",
+    "gitRemote": "Git Rudder runs on the remote machine and needs Git 2.34 or later installed there.",
+    "installGit": "Install Git",
+    "checkAgain": "Check Again"
+  },
+  "engine": {
+    "bannerReconnect": "Reconnecting to the Git Rudder engine…",
+    "engineStopped": "The Git Rudder engine stopped 5 times in 3 minutes and won't restart on its own.",
+    "showLog": "Show Log",
+    "protocolBroken": "The extension is damaged: the engine and the interface aren't the same version. Reinstall Git Rudder.",
+    "noBinary": "This Git Rudder install doesn't include the engine for {os} {arch}. Install the extension from the Marketplace or Open VSX so VS Code picks the right build."
+  },
+  "repo": {
+    "pickRepo": "Choose the repository Git Rudder's views show",
+    "graphTab": "Graph: {repo}",
+    "submoduleOf": "Submodule of {repo}",
+    "nestedIn": "Nested in {repo}",
+    "repoGone": "{repo} is no longer a repository. Its graph was closed."
+  },
+  "operation": {
+    "opRebase": "Rebase in progress · commit {index} of {total}: \"{subject}\"",
+    "opCherry": "Cherry-pick of {sha} in progress",
+    "opRevert": "Revert of {sha} in progress",
+    "opPull": "Pull from {remote}/{branch} has conflicts",
+    "skip": "Skip Commit",
+    "abortOp": "Abort {operation}",
+    "continueTip": "Resolve every conflict to continue",
+    "editInEditor": "Edit Manually",
+    "markResolved": "Mark as Resolved Anyway",
+    "wipOp": "// {operation} in progress · resolve conflicts",
+    "labelB": {
+      "merge": "Incoming ({branch})",
+      "rebase": "Commit being reapplied ({sha})",
+      "cherryPick": "Cherry-pick of {sha}",
+      "revert": "Revert of {sha}",
+      "stashApply": "Stash {index}"
+    },
+    "labelA": {
+      "rebase": "Base ({upstream})",
+      "stashApply": "Your working tree"
+    },
+    "name": {
+      "merge": "merge",
+      "rebase": "rebase",
+      "cherryPick": "cherry-pick",
+      "revert": "revert",
+      "stashApply": "stash"
+    }
+  },
+  "graph": {
+    "loadMore": "Load More Commits",
+    "staleWindow": "The history changed. The graph was reloaded from the top.",
+    "emptyRepo": "This repository has no commits yet. Stage files and make the first commit on {branch}.",
+    "goChanges": "Go to Changes",
+    "firstCommit": "Initial commit on {branch}",
+    "detached": "Detached HEAD at {sha}. Commits you make here don't belong to any branch.",
+    "branchHere": "Create Branch Here…"
+  },
+  "push": {
+    "pushRejected": "Push rejected: origin/{branch} has commits you don't have.",
+    "pullRetry": "Pull and Retry",
+    "viewDetail": "View Details",
+    "copyDetail": "Copy Details",
+    "noUpstream": "The branch {branch} isn't on any remote yet.",
+    "publish": "Publish Branch",
+    "authFailed": "Couldn't authenticate with {host}.",
+    "connectAcc": "Connect a {platform} Account",
+    "updateCreds": "Update Credentials…"
+  },
+  "dirty": {
+    "stashAndGo": "Stash and Continue",
+    "autostash": "Rebase with Autostash",
+    "stashedNow": "Your changes are in stash@{0}.",
+    "applyNow": "Apply Now",
+    "dirtyCheckout_other": "Can't check out {branch}: your changes to {count} files would be overwritten.",
+    "dirtyCheckout_one": "Can't check out {branch}: your changes to {count} file would be overwritten."
+  },
+  "history": {
+    "historyTab": "History: {file}",
+    "followsRenames": "Includes commits from before it was renamed",
+    "noHistory": "This file isn't in the history yet."
+  },
+  "tag": {
+    "tagMsg": "Message (optional; empty creates a lightweight tag)",
+    "tagLocal": "Local Only"
+  },
+  "account": {
+    "prNoAccount": "To see and create pull requests for this repository, connect an account on its platform.",
+    "prNoAccountMsg": "The remote is on {host}. No account is connected for that host.",
+    "prUnknownHost": "Git Rudder doesn't recognize this remote's platform. If it's GitLab, Gitea, Forgejo or GitHub Enterprise, add an account for that host.",
+    "prNoRemote": "This repository has no remote. Pull requests need one.",
+    "pickPlatform": "Which platform is the account on?",
+    "oauthRec": "Sign In with {platform} (Recommended)",
+    "tokenFine": "Fine-Grained Token",
+    "tokenPersonal": "Personal Access Token",
+    "apiToken": "API Token",
+    "hostPrompt": "Host, for example gitlab.company.com",
+    "azureOrg": "Azure DevOps organization. The token must be scoped to that organization.",
+    "tokenPrompt": "Paste the token. Git Rudder stores it in VS Code's secret storage and never shows it again.",
+    "testingToken": "Testing the token…",
+    "tokenResult": "@{user} · scopes: {scopes}",
+    "labelOpt": "Label (optional): Work, Personal…",
+    "ghCodeTitle": "Enter this code at github.com/login/device",
+    "copyOpenGh": "Copy Code and Open GitHub",
+    "waitPlatform": "Waiting for {platform} in the browser…",
+    "tokenRejected": "{platform} rejected the token.",
+    "scopesMissing": "The token is missing scopes: {scopes}."
+  },
+  "errors": {
+    "plat401": "{platform} rejected @{user}'s token.",
+    "platRate": "{platform} rate limit reached. We'll try again at {time}.",
+    "platSso": "The {org} organization requires SSO authorization for the token.",
+    "authorizeSso": "Authorize on {platform}",
+    "aiNetwork": "Can't reach {provider}.",
+    "aiBadKey": "{provider} rejected the key \"{label}\".",
+    "aiQuota": "Your {provider} account is out of credit or hit its quota.",
+    "aiModelGone": "The model {model} is no longer available.",
+    "pickModel": "Choose Another Model",
+    "reviewKey": "Review Key",
+    "orgProxyTitle": "This key belongs to your organization",
+    "orgProxyDetail": "To generate the message, your staged changes go through Git Rudder's servers, which use {org}'s key. With a personal key they don't.",
+    "generate": "Generate",
+    "useMyKey": "Use My Key",
+    "checkingKey": "Checking the key…",
+    "recFast": "Recommended · Fast",
+    "recBalanced": "Recommended · Balanced",
+    "modelsFail": "Couldn't load {provider}'s model list.",
+    "aiOrgLimit_other": "You reached your daily AI limit in {org} ({count} requests). It resets tomorrow.",
+    "aiOrgLimit_one": "You reached your daily AI limit in {org} ({count} request). It resets tomorrow."
+  },
+  "desktop": {
+    "noDesktop": "Git Rudder Desktop doesn't seem to be installed on this machine.",
+    "getDesktop": "Download Git Rudder Desktop"
+  },
+  "manifest": {
+    "untrustedDesc": "Git Rudder runs Git in the folder, and Git can run hooks and configuration from the repository itself. Trust the folder to use Git Rudder.",
+    "virtualDesc": "Git Rudder needs Git and local files. It doesn't work on vscode.dev or github.dev."
+  },
+  "confirm": {
+    "discard": {
+      "message": "Discard changes to {file}?",
+      "button": "Discard"
+    },
+    "deleteBranch": {
+      "message": "Delete branch {branch}?",
+      "detail": "It has commits that aren't on any other branch."
+    },
+    "deleteRemoteBranch": {
+      "message": "Delete {remote}/{branch} on the server?",
+      "detail": "It is deleted for the whole team.",
+      "button": "Delete on {remote}"
+    },
+    "forcePush": {
+      "message": "Force push to origin/{branch}?",
+      "button": "Force push"
+    },
+    "resetHard": {
+      "button": "Reset --hard"
+    },
+    "dropStash": {
+      "message": "Drop {stash}?",
+      "detail": "\"{message}\". This can't be undone.",
+      "button": "Drop"
+    },
+    "deleteTag": {
+      "message": "Delete tag {tag}?",
+      "detail": "If it's already on origin, you can delete it there too.",
+      "button2": "Also delete on origin"
+    },
+    "disconnectAccount": {
+      "message": "Disconnect @{user} ({host})?",
+      "detail": "Git Rudder stops using it on this and your other devices. It doesn't revoke the token on {platform}.",
+      "button": "Disconnect"
+    },
+    "deleteAiKey": {
+      "message": "Delete the key \"{label}\"?",
+      "detail": "Features that used it switch to the default key."
+    },
+    "abortOperation": {
+      "message": "Abort the {operation}?",
+      "detail": "Resolved conflicts are discarded and the branch goes back to how it was before you started.",
+      "button": "Abort"
+    }
+  },
+  "walkthrough": {
+    "title": "Get Started with Git Rudder",
+    "description": "Your repository's graph, line-by-line conflicts and AI with your own key, inside VS Code.",
+    "step1": {
+      "title": "Open the graph",
+      "description": "Every branch, tag and stash in the open repository. Shortcut: {shortcut}.",
+      "button": "Open Graph"
+    },
+    "step2": {
+      "title": "Connect your platform",
+      "description": "To see and create pull requests on GitHub, GitLab, Bitbucket, Gitea or Azure DevOps.",
+      "button": "Add Account"
+    },
+    "step3": {
+      "title": "Add an AI key (optional)",
+      "description": "Generate commit messages and PR descriptions. Your key pays for each generation.",
+      "button": "Add Key"
+    },
+    "step4": {
+      "title": "Sync with your account (optional)",
+      "description": "Use the same accounts, keys and preferences as in Git Rudder Desktop.",
+      "button": "Sign In"
+    }
   }
 }
