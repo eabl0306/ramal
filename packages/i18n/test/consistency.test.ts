@@ -40,10 +40,6 @@ const SAME_ES: readonly SharedText[] = [
       '"Usuario" nombra a la persona (el grupo de ajustes) y al campo del nombre de usuario; en ingles son "User" y "Username"',
   },
   {
-    keys: ['settings.section.integrations', 'vscode.settings.section.platforms'],
-    reason: 'el manifiesto de VS Code escribe las categorias de ajustes en Title Case',
-  },
-  {
     keys: ['web.auth.authorize.device', 'web.dashboard.nav.team'],
     reason:
       '"Equipo" es la maquina que pide autorizacion y el equipo de personas; en ingles son "Device" y "Team"',
@@ -52,6 +48,15 @@ const SAME_ES: readonly SharedText[] = [
     keys: ['vscode.scm.commitButton', 'web.auth.reauth.confirm'],
     reason:
       '"Confirmar" es el verbo generico de confirmar y el verbo de hacer un commit; en ingles son "Confirm" y "Commit"',
+  },
+  {
+    keys: ['common.dismiss', 'vscode.confirm.discard.button'],
+    reason:
+      '"Descartar" es cerrar un aviso y tirar unos cambios; en ingles son "Dismiss" y "Discard"',
+  },
+  {
+    keys: ['common.delete', 'vscode.confirm.dropStash.button'],
+    reason: '"Eliminar" es borrar algo y tirar un stash, que en git es "Drop" y no "Delete"',
   },
 ];
 
@@ -70,6 +75,16 @@ const SAME_EN: readonly SharedText[] = [
     reason: 'concordancia de genero: "Todas" las plataformas y "Todos" los repositorios y estados',
   },
   {
+    keys: ['graph.sidebar.local', 'repos.filter.kind.local', 'vscode.quickInput.local'],
+    reason:
+      'concordancia: "Local" es un repositorio y la seccion de refs, y "Locales" son las ramas del selector de VS Code; en ingles las tres son "Local"',
+  },
+  {
+    keys: ['repos.filter.kind.remote', 'vscode.quickInput.remote'],
+    reason:
+      'concordancia: "Remoto" es un repositorio y "Remotas" son las ramas del selector de VS Code; en ingles las dos son "Remote"',
+  },
+  {
     keys: ['staging.commitLabel', 'vscode.scm.commit', 'vscode.scm.commitButton'],
     reason:
       '"Commit" es el sustantivo (la etiqueta y el comando, que en castellano se queda en "Commit") y el verbo del boton del panel SCM, que es "Confirmar" (gaps B-47)',
@@ -82,6 +97,23 @@ const SAME_EN: readonly SharedText[] = [
 const COUNT_WITHOUT_PLURAL: Readonly<Record<string, string>> = {
   'graph.refs.more': 'la insignia "+3" del grafo es un numero suelto, sin sustantivo',
 };
+
+/**
+ * VS Code escribe en Title Case los comandos, las vistas, los menus, los ajustes y
+ * el recorrido de bienvenida: es su convencion y la lee su manifiesto. Asi que una
+ * clave de `vscode` puede decir "Force Push (with Lease)…" donde la app dice
+ * "Force push (with lease)…", y eso no es una inconsistencia. Lo que no puede es
+ * decir otra cosa: si al pasar a minusculas los dos ingleses siguen sin coincidir,
+ * la regla salta igual.
+ */
+function onlyTitleCaseInVsCode(
+  keys: readonly string[],
+  target: ReadonlyMap<string, string>,
+): boolean {
+  if (!keys.some((key) => key.startsWith('vscode.'))) return false;
+  const folded = new Set(keys.map((key) => (target.get(key) ?? '').toLowerCase()));
+  return folded.size === 1;
+}
 
 function signature(keys: readonly string[]): string {
   return [...keys].sort().join(', ');
@@ -116,6 +148,7 @@ function offenders(
   const allowed = new Set(exceptions.map((entry) => signature(entry.keys)));
   return [...divergent(source, target)]
     .filter(([, keys]) => !allowed.has(signature(keys)))
+    .filter(([, keys]) => !onlyTitleCaseInVsCode(keys, target))
     .map(([text, keys]) => `${text}: ${signature(keys)}`);
 }
 
@@ -169,6 +202,32 @@ describe('common es el unico sitio de un texto compartido', () => {
  * Una clave en camelCase ahi es un texto que nadie va a encontrar, y puede chocar
  * el dia que ese nombre sea un code de verdad.
  */
+/**
+ * Una palabra que el producto no usa en ningun sitio no puede colarse en un texto
+ * nuevo. Hoy solo hay una: el producto dice "Sign out" y "Signed out" en todas
+ * partes y no dice "Log out" en ninguna, asi que el verbo de entrar es "sign in" y
+ * no "log in". El castellano no tiene el problema: siempre es "iniciar sesion".
+ */
+const BANNED_IN_ENGLISH: readonly { readonly pattern: RegExp; readonly instead: string }[] = [
+  {
+    pattern: /\blog(ging)? in\b/iu,
+    instead: '"sign in", que es el verbo que usa el resto del producto',
+  },
+];
+
+describe('el vocabulario del ingles', () => {
+  it('ningun texto usa una palabra que el producto no usa', () => {
+    const offenders = [...en]
+      .flatMap(([key, text]) =>
+        BANNED_IN_ENGLISH.filter((rule) => rule.pattern.test(text)).map(
+          (rule) => `${key}: usa ${rule.instead}`,
+        ),
+      )
+      .sort();
+    expect(offenders).toEqual([]);
+  });
+});
+
 describe('las tablas de errores llevan solo codigos', () => {
   const TABLES = ['errors.engine.', 'errors.api.'];
 

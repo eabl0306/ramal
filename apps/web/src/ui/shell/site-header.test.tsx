@@ -26,7 +26,7 @@ describe('SiteHeader', () => {
     renderScreen(<SiteHeader />, { path: '/login', language: 'en' });
 
     expect(screen.getByRole('link', { name: 'Download' })).toHaveAttribute('href', '/en/#download');
-    expect(screen.getByRole('link', { name: 'Log in' })).toHaveAttribute('href', '/login');
+    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/login');
   });
 
   it('cambiar de idioma en la landing lleva a la otra landing y lo recuerda', async () => {

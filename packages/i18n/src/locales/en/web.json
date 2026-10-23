@@ -3,7 +3,7 @@
     "features": "Features",
     "download": "Download",
     "vscode": "VS Code",
-    "login": "Log in",
+    "login": "Sign in",
     "signup": "Create account",
     "openDashboard": "Open dashboard"
   },
@@ -105,7 +105,7 @@
     "privacy": "Privacy"
   },
   "auth": {
-    "loginTitle": "Log in",
+    "loginTitle": "Sign in",
     "loginSubtitle": "Access your settings and your team.",
     "signupTitle": "Create account",
     "signupSubtitle": "Sync Git Rudder across your machines and work as a team.",
@@ -131,7 +131,7 @@
       "emailTaken": "An account with this email already exists.",
       "nameTooLong": "Enter your name (80 characters max).",
       "server": "Something went wrong at Git Rudder. Try again in a moment.",
-      "revokedElsewhere": "Your session was ended from another device. Log in again to continue.",
+      "revokedElsewhere": "Your session was ended from another device. Sign in again to continue.",
       "tooManyAttempts_other": "Too many attempts. Try again in {count} minutes.",
       "tooManyAttempts_one": "Too many attempts. Try again in {count} minute."
     },
@@ -142,7 +142,7 @@
       "title": "Reset your password",
       "subtitle": "Enter your account email and we'll send you a link to choose a new one.",
       "submit": "Send link",
-      "back": "Back to log in",
+      "back": "Back to sign in",
       "sentTitle": "Check your email",
       "sent": "If there's an account for {email}, a link will arrive in a few minutes. It expires in 30 minutes and works only once.",
       "spam": "Not there? Check your spam folder or ask for another link.",
@@ -161,7 +161,7 @@
       "sessionsNotice": "Saving it signs you out on every device. Sign in again on each one; your sync passphrase brings your accounts and keys back there.",
       "submit": "Save password",
       "doneTitle": "Password changed",
-      "done": "You can now log in with your new password. We signed you out on every device.",
+      "done": "You can now sign in with your new password. We signed you out on every device.",
       "deadTitle": "This link no longer works",
       "dead": "It may have expired (links last 30 minutes), already been used, or been replaced by a newer one.",
       "askAgain": "Ask for another link"
@@ -174,7 +174,7 @@
       "doneTitle": "Email confirmed",
       "done": "You can now create organizations and invite your team.",
       "expiry": "It expires after 48 hours and works only once.",
-      "logInToResend": "Log in to ask for another link.",
+      "logInToResend": "Sign in to ask for another link.",
       "resent": "We sent another link to {email}.",
       "tooMany": "We've already sent several links. Wait a while before asking for another.",
       "already": "Your email was already confirmed."
@@ -198,7 +198,7 @@
     },
     "emailChange": {
       "doneTitle": "Email changed",
-      "done": "From now on, log in and get notices with your new email.",
+      "done": "From now on, sign in and get notices with your new email.",
       "taken": "That address already has a Git Rudder account. The change wasn't applied.",
       "undoTitle": "Undo the email change?",
       "undoText": "Your account will go back to this email and we'll end every session. Do it if you didn't ask for the change.",
@@ -209,9 +209,9 @@
     },
     "oauth": {
       "connecting": "Connecting to {provider}…",
-      "denied": "You cancelled access at the provider. You can try again or log in with your email.",
+      "denied": "You cancelled access at the provider. You can try again or sign in with your email.",
       "failed": "Signing in with the provider couldn't be completed. Try again.",
-      "accountExists": "There's already a Git Rudder account with that email, but it isn't confirmed yet. Log in with your password or use \"Forgot it?\" to recover it; then you can link this provider from Account.",
+      "accountExists": "There's already a Git Rudder account with that email, but it isn't confirmed yet. Sign in with your password or use \"Forgot it?\" to recover it; then you can link this provider from Account.",
       "unverifiedAtProvider": "Your email isn't verified at the provider. Verify it there or sign up with your email."
     },
     "finish": {
@@ -223,7 +223,7 @@
       "restart": "Sign up again"
     },
     "authorize": {
-      "logInFirst": "Log in to authorize {client} on this device.",
+      "logInFirst": "Sign in to authorize {client} on this device.",
       "title": "Authorize {client}",
       "text": "{client} is asking for access to your Git Rudder account on this device.",
       "notYou": "Not you? Switch account",
@@ -240,7 +240,7 @@
       "cancelled": "Cancelled. You can close this tab."
     },
     "deviceCode": {
-      "logInFirst": "Log in to connect a device with a code.",
+      "logInFirst": "Sign in to connect a device with a code.",
       "title": "Connect a device",
       "text": "Enter the code shown in Git Rudder for VS Code or Git Rudder Desktop.",
       "format": "The code has 8 letters, for example WDJB-MJHT.",
@@ -256,14 +256,14 @@
       "requestedAgo_one": "Requested {count} second ago",
       "searching": "Looking up…"
     },
-    "loggingIn": "Logging in…",
+    "loggingIn": "Signing in…",
     "creatingAccount": "Creating account…",
     "reauth": {
       "title": "Confirm it's you",
       "for": "To {action}, we need to confirm your identity.",
       "confirm": "Confirm",
       "emailMeALink": "Email me a link",
-      "providerNotEnough": "GitHub and GitLab don't work for this action: they can't ask you to log in again.",
+      "providerNotEnough": "GitHub and GitLab don't work for this action: they can't ask you to sign in again.",
       "waiting": "We sent a link to {maskedEmail}. Open it on any device; this window will continue on its own.",
       "otherMethod": "Use another method",
       "wrongPassword": "The password is incorrect.",
@@ -427,20 +427,20 @@
   },
   "account": {
     "password": {
-      "help": "Used to log in with your email.",
+      "help": "Used to sign in with your email.",
       "change": "Change password…",
-      "noneHelp": "Your account has no password: you log in with {provider}. Add one so you can also log in with your email.",
+      "noneHelp": "Your account has no password: you sign in with {provider}. Add one so you can also sign in with your email.",
       "add": "Add password…",
       "current": "Current password",
       "repeatNew": "Repeat the new password",
       "note": "It doesn't change your sync passphrase. We'll sign you out on your other devices and browsers.",
       "wrongCurrent": "The current password is incorrect.",
       "changed": "Password changed. We signed you out on your other devices.",
-      "added": "Password added. You can now log in with your email too."
+      "added": "Password added. You can now sign in with your email too."
     },
     "identities": {
       "title": "Sign-in methods",
-      "subtitle": "They let you log in to Git Rudder. Accounts for cloning and pushing are in Linked accounts.",
+      "subtitle": "They let you sign in to Git Rudder. Accounts for cloning and pushing are in Linked accounts.",
       "emailAndPassword": "Email and password",
       "meta": "Linked on {date} · last used {ago}",
       "link": "Link",
@@ -449,8 +449,8 @@
       "alreadyLinked": "That {provider} account is already linked to another Git Rudder account.",
       "needsVerifiedEmail": "Confirm your email to link another sign-in method.",
       "removeTitle": "Remove {provider}?",
-      "removeText": "You won't be able to log in with {provider} anymore. We'll email you about it.",
-      "lastOne": "It's your only way to log in. Add a password or another identity before removing it.",
+      "removeText": "You won't be able to sign in with {provider} anymore. We'll email you about it.",
+      "lastOne": "It's your only way to sign in. Add a password or another identity before removing it.",
       "neverUsed": "never used"
     }
   }
