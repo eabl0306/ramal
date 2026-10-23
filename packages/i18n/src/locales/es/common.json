@@ -32,5 +32,12 @@
   "language": {
     "es": "Español",
     "en": "Inglés"
-  }
+  },
+  "loadingMore": "Cargando más…",
+  "slowLoad": "Está tardando más de lo normal.",
+  "saving": "Guardando…",
+  "checking": "Comprobando…",
+  "clearSearch": "Limpiar búsqueda",
+  "skipToContent": "Saltar al contenido",
+  "continue": "Continuar"
 }

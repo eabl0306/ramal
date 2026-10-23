@@ -21,5 +21,39 @@
     "version_conflict": "Another device changed this data. Reload to see the latest version.",
     "web_session_required": "This action can only be done from the web.",
     "native_client_required": "This action can only be done from Git Rudder Desktop or VS Code."
+  },
+  "forbidden": "You no longer have permission to do this. Ask an admin of {org} to do it.",
+  "notFound": "We couldn't find this, or you no longer have access.",
+  "viewDetail": "View details",
+  "showDetail": "Show details",
+  "detailLabel": "Details",
+  "copyDetail": "Copy details",
+  "hookRejected": "The {hook} hook rejected the push",
+  "hookHelp": "Check the hook output, fix what it reports and try again.",
+  "saveFailed": "Couldn't save",
+  "apiDownHelp": "Git Rudder didn't respond. Try again in a few minutes.",
+  "sectionFailed": "This section couldn't load.",
+  "timedOut": "The operation took too long and was canceled.",
+  "internalWithDetail": "Something went wrong in Git Rudder. Copy the details to report it.",
+  "validation": {
+    "nameRequired": "Enter a name.",
+    "badRefName": "Invalid name: no spaces, no \"..\", no ~ ^ : ? * [ \\ and it can't end in \"/\" or \".lock\".",
+    "branchExists": "A branch with that name already exists.",
+    "tagExists": "A tag with that name already exists.",
+    "badRemoteUrl": "We don't recognize this address. Use https://…, git@host:path or owner/repo.",
+    "serverRefused": "Couldn't complete it: {reason}"
+  },
+  "offline": {
+    "title": "Offline",
+    "help": "Local Git keeps working. Settings you change are saved on this device and sync when you're back online.",
+    "apiDown": "Git Rudder isn't responding",
+    "apiDownDetail": "Your connection works, but Git Rudder's servers aren't responding. Local Git keeps working and we'll retry for you.",
+    "statusLink": "View service status",
+    "pending_one": "{count} change waiting to sync",
+    "pending_other": "{count} changes waiting to sync",
+    "retryNow": "Retry now",
+    "reconnecting": "Reconnecting…",
+    "needsConnection": "You need a connection for this",
+    "cachedCopy": "Offline. You're seeing the last saved copy ({ago})."
   }
 }

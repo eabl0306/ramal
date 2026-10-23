@@ -48,5 +48,8 @@
     "engineStopped": "The Git Rudder engine stopped after crashing several times.",
     "retry": "Retry",
     "protocolMismatch": "This Git Rudder installation is damaged: the engine uses protocol version {engine} and the extension expects {expected}. Reinstall the extension."
+  },
+  "auth": {
+    "signIn": "Sign in to Git Rudder"
   }
 }

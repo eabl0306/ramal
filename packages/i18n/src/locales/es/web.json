@@ -124,10 +124,13 @@
       "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
       "name": "Escribe tu nombre.",
       "terms": "Debes aceptar los términos.",
-      "passwordRequired": "Escribe tu contraseña."
+      "passwordRequired": "Escribe tu contraseña.",
+      "noApi": "No podemos conectar con Git Rudder. Inténtalo de nuevo en unos minutos.",
+      "expired": "Tu sesión caducó. Vuelve a iniciar sesión para continuar."
     },
     "resetSent": "Te enviamos un enlace para restablecer la contraseña.",
-    "welcome": "Sesión iniciada como {email}"
+    "welcome": "Sesión iniciada como {email}",
+    "continueWithoutAccount": "Seguir sin cuenta"
   },
   "dashboard": {
     "nav": {

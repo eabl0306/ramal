@@ -211,6 +211,16 @@ cosas distintas, y el nombre lo dice:
 
 Las dos de la sincronizacion llegan con su pantalla; las demas ya estan en el paquete.
 
+**No todo lo que hay en esos diccionarios es texto de producto.** Al traer `STATES` resulto que
+99 de sus 250 claves son el andamio de la propia lamina del prototipo: su titulo y subtitulo, los
+conmutadores de producto, tema e idioma, el nombre de cada variante dibujada (`vRepoCard`,
+`vDlgOpen`, `v403`), la matriz de estados de controles (`stHover`, `kBtnP`) y, sobre todo, la
+especificacion de cada patron (`c01T`, `c01P`, `c01Vs`), que habla de milisegundos, de tokens de
+CSS y de `aria-busy`. Eso es documentacion de diseno, no se ensena a nadie, y en el diccionario
+solo habria que traducirlo y mantenerlo para siempre, asi que no entra. Las especificaciones
+citan textos de producto ("No hay stashes", "Ver detalle"), pero esos ya tienen su propia clave;
+la cita es redundante. Al traer `VAULT`, `VS`, `WAUTH` y `WEB70` hay que mirar lo mismo.
+
 Al escribir las reglas, el diccionario que ya estaba en el repositorio tenia 15 claves que
 repetian un texto de `common` (casi todo `web.common.*` y los campos de `web.accounts.*`), que se
 han borrado, y cinco inconsistencias reales, que se han corregido:

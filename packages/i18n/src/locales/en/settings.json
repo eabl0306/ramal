@@ -32,7 +32,10 @@
     "signOut": "Sign out",
     "sessions": "Active sessions",
     "thisDevice": "This device",
-    "revokeSession": "Revoke"
+    "revokeSession": "Revoke",
+    "readOnlyBilling": "Only the owner manages the subscription.",
+    "planPrice": "USD 8 per seat per month, billed yearly",
+    "subscription": "Subscription"
   },
   "vault": {
     "noRecovery": "Nobody can recover your secrets if you lose the passphrase and the recovery code, not even Git Rudder support."
@@ -48,7 +51,8 @@
     "usedIn_one": "Used in {count} repo",
     "usedIn_other": "Used in {count} repos",
     "addFor": "Add {platform} account",
-    "empty": "No connected accounts"
+    "empty": "No connected accounts",
+    "emptyAll": "You haven't connected any platform yet"
   },
   "git": {
     "subtitle": "Global options Git Rudder applies to every repository.",
@@ -64,7 +68,8 @@
     "prune": "Prune remote branches on fetch",
     "sshKeys": "SSH keys",
     "generateSshKey": "Generate SSH key",
-    "usedBy": "Used by {user}"
+    "usedBy": "Used by {user}",
+    "defaultBranchHelp": "Initial branch when you create a repository."
   },
   "appearance": {
     "subtitle": "Theme, language and graph display.",
@@ -76,6 +81,20 @@
     "display": "Display",
     "density": "Density",
     "comfortable": "Comfortable",
-    "compact": "Compact"
+    "compact": "Compact",
+    "themeSystemHelp": "\"System\" follows your device's light or dark mode.",
+    "languageDetected": "Detected from your system. You can change it anytime."
+  },
+  "sync": {
+    "synced": "Synced",
+    "syncedAgo": "Synced {ago}",
+    "syncing": "Syncing…",
+    "failed": "Couldn't sync",
+    "syncsWith": "Syncs with your Git Rudder account · {ago}",
+    "deviceOnly": "This device only",
+    "deviceOnlyHelp": "Sign in to sync it.",
+    "updatedElsewhere": "Updated from another device",
+    "notSaved": "Not saved to the cloud: {category} sync is turned off. The change stays on this device.",
+    "saved": "Saved"
   }
 }

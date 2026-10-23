@@ -124,10 +124,13 @@
       "passwordTooShort": "Password must be at least 8 characters.",
       "name": "Enter your name.",
       "terms": "You must accept the terms.",
-      "passwordRequired": "Enter your password."
+      "passwordRequired": "Enter your password.",
+      "noApi": "We can't reach Git Rudder. Try again in a few minutes.",
+      "expired": "Your session expired. Sign in again to continue."
     },
     "resetSent": "We sent you a password reset link.",
-    "welcome": "Signed in as {email}"
+    "welcome": "Signed in as {email}",
+    "continueWithoutAccount": "Continue without an account"
   },
   "dashboard": {
     "nav": {

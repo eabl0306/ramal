@@ -43,5 +43,8 @@
   "keyRemoved": "Llave eliminada",
   "defaultKey": "{label} es ahora la llave predeterminada",
   "keyTestPassed": "Conexión con {provider} correcta · {model}",
-  "aiGenerated": "Generado con {provider} · {model}"
+  "aiGenerated": "Generado con {provider} · {model}",
+  "fetchFailed": "No se pudo hacer fetch de {remote}",
+  "detailCopied": "Detalle copiado",
+  "backOnline": "Conexión recuperada"
 }

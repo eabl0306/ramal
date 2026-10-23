@@ -152,6 +152,26 @@ describe('common es el unico sitio de un texto compartido', () => {
   });
 });
 
+/**
+ * `errors.engine` y `errors.api` no son dos grupos cualquiera: son las tablas que
+ * traducen el `kind` del motor y el `code` de la API, y la interfaz las consulta con
+ * ese valor ([ADR 0017](../../../docs/adr/0017-internacionalizacion-compartida.md)).
+ * Una clave en camelCase ahi es un texto que nadie va a encontrar, y puede chocar
+ * el dia que ese nombre sea un code de verdad.
+ */
+describe('las tablas de errores llevan solo codigos', () => {
+  const TABLES = ['errors.engine.', 'errors.api.'];
+
+  it('cada clave de errors.engine y errors.api es un code en snake_case', () => {
+    const wrong = [...es.keys()]
+      .filter((key) => TABLES.some((table) => key.startsWith(table)))
+      .map((key) => ({ key, name: key.slice(key.lastIndexOf('.') + 1) }))
+      .filter((entry) => !/^[a-z][a-z0-9]*(_[a-z0-9]+)*$/u.test(entry.name))
+      .map((entry) => entry.key);
+    expect(wrong).toEqual([]);
+  });
+});
+
 describe('los recuentos', () => {
   it('un texto con {count} tiene formas plurales', () => {
     const missing = [...es]

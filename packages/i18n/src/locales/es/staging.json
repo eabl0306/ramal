@@ -14,5 +14,6 @@
   "title_other": "{count} cambios",
   "commitButton_one": "Commit de {count} archivo en {branch}",
   "commitButton_other": "Commit de {count} archivos en {branch}",
-  "commitLabel": "Commit"
+  "commitLabel": "Commit",
+  "emptyHelp": "Todo al día: no hay cambios en el árbol de trabajo."
 }

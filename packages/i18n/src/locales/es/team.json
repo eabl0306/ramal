@@ -9,5 +9,9 @@
     "admin": "Admin",
     "member": "Miembro"
   },
-  "pending": "Invitación pendiente"
+  "pending": "Invitación pendiente",
+  "readOnlyMember": "Eres miembro de {org}. Puedes ver el equipo; invitar y cambiar roles lo hacen los administradores.",
+  "onlyAdmins": "Solo los administradores pueden cambiar esto",
+  "onlyOwner": "Solo el titular puede hacer esto",
+  "seatReason": "no quedan asientos libres en el plan"
 }
