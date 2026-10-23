@@ -59,11 +59,6 @@
       "doneTitle": "Vault created",
       "doneBody": "Your secrets now sync encrypted. Each new device will ask for the passphrase once."
     },
-    "strength": {
-      "weak": "Weak",
-      "acceptable": "Acceptable",
-      "strong": "Strong"
-    },
     "error": {
       "tooShort": "The passphrase needs at least 12 characters.",
       "guessable": "It's easy to guess. Add more words.",
