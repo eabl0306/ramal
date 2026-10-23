@@ -30,15 +30,15 @@ esta fijada en `packageManager` (11.18.0). Rust lo fija `rust-toolchain.toml` (1
 El producto es **Git Rudder** ([ADR 0027](docs/adr/0027-renombrado-a-git-rudder.md)). En
 identificadores hay una forma por convencion de cada sitio, y no se mezclan:
 
-| Donde                                                             | Forma                                               |
-| ----------------------------------------------------------------- | --------------------------------------------------- |
-| Texto visible, titulos, categoria de comandos                     | `Git Rudder`                                        |
-| Crates, paquetes, repositorio, extension, nombres de fichero      | `git-rudder`                                        |
-| Scope de npm                                                      | `@git-rudder/`                                      |
-| Modulos de Rust, upstreams de nginx, usuario y base de PostgreSQL | `git_rudder`                                        |
-| Comandos, vistas y ajustes de VS Code; claves de almacenamiento   | `gitRudder`                                         |
-| Variables de entorno y constantes                                 | `GIT_RUDDER`                                        |
-| Id de la extension, y de Tauri y Flatpak                          | `git-rudder.git-rudder`, `com.git_rudder.GitRudder` |
+| Donde                                                             | Forma                                              |
+| ----------------------------------------------------------------- | -------------------------------------------------- |
+| Texto visible, titulos, categoria de comandos                     | `Git Rudder`                                       |
+| Crates, paquetes, repositorio, extension, nombres de fichero      | `git-rudder`                                       |
+| Scope de npm                                                      | `@git-rudder/`                                     |
+| Modulos de Rust, upstreams de nginx, usuario y base de PostgreSQL | `git_rudder`                                       |
+| Comandos, vistas y ajustes de VS Code; claves de almacenamiento   | `gitRudder`                                        |
+| Variables de entorno y constantes                                 | `GIT_RUDDER`                                       |
+| Id de la extension, y de Tauri y Flatpak                          | `git-rudder.git-rudder`, `com.gitrudder.GitRudder` |
 
 No llevan el nombre y no hay que tocarlos: el prefijo `--r-` de los tokens de CSS (la `r` vale
 igual para Rudder) y el prefijo `repo-` de los `repoId`.

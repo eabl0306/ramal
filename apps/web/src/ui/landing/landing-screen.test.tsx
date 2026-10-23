@@ -53,7 +53,7 @@ describe('LandingScreen', () => {
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /flatpak install flathub/u }));
-    expect(clipboard.copied).toEqual(['flatpak install flathub com.git_rudder.GitRudder']);
+    expect(clipboard.copied).toEqual(['flatpak install flathub com.gitrudder.GitRudder']);
     expect(await screen.findByText(/Copiado: flatpak/u)).toBeInTheDocument();
   });
 
@@ -69,7 +69,7 @@ describe('LandingScreen', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /^Flathub/u })).toHaveAttribute(
       'href',
-      'https://flathub.org/apps/com.git_rudder.GitRudder',
+      'https://flathub.org/apps/com.gitrudder.GitRudder',
     );
   });
 

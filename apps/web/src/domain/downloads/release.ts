@@ -76,7 +76,7 @@ export interface ReleaseInfo {
 export const INSTALL_COMMANDS: Readonly<Record<InstallMethod, string>> = {
   'brew-cask': 'brew install --cask git-rudder',
   winget: 'winget install Git Rudder.Git Rudder',
-  flatpak: 'flatpak install flathub com.git_rudder.GitRudder',
+  flatpak: 'flatpak install flathub com.gitrudder.GitRudder',
   vscode: 'code --install-extension git-rudder.git-rudder',
 };
 
@@ -84,7 +84,7 @@ export const INSTALL_COMMANDS: Readonly<Record<InstallMethod, string>> = {
 export const STORE_URLS: Readonly<Record<StoreId, string>> = {
   marketplace: 'https://marketplace.visualstudio.com/items?itemName=git-rudder.git-rudder',
   'open-vsx': 'https://open-vsx.org/extension/git-rudder/git-rudder',
-  flathub: 'https://flathub.org/apps/com.git_rudder.GitRudder',
+  flathub: 'https://flathub.org/apps/com.gitrudder.GitRudder',
 };
 
 /** Megabytes decimales, como los ensena el diseno ("118 MB"). */

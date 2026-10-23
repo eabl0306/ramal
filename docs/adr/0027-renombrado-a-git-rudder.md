@@ -22,17 +22,24 @@ manera.
 El nombre visible es **Git Rudder**, con esa grafia (dos palabras, las dos en mayuscula). En
 identificadores hay cuatro formas, una por convencion de cada sitio:
 
-| Contexto                                                              | Forma                      | Ejemplo                            |
-| --------------------------------------------------------------------- | -------------------------- | ---------------------------------- |
-| Texto visible, titulos de ventana, categoria de comandos              | `Git Rudder`               | "Git Rudder: Open Graph"           |
-| Crates, paquetes, repositorio, extension, nombres de fichero          | `git-rudder`               | `git-rudder-api-domain`            |
-| Scope de npm                                                          | `@git-rudder/`             | `@git-rudder/repo-view`            |
-| Modulos de Rust, upstreams de nginx, usuario y base de PostgreSQL     | `git_rudder`               | `git_rudder_core_domain`           |
-| Comandos, vistas y ajustes de VS Code; claves de almacenamiento local | `gitRudder`                | `gitRudder.engine.path`            |
-| Variables de entorno y constantes                                     | `GIT_RUDDER`               | `GIT_RUDDER__DATABASE__URL`        |
-| Identificador de la extension (`publisher.name`)                      | `git-rudder.git-rudder`    | la URI de vuelta de OAuth lo usa   |
-| Identificador de Tauri y de Flatpak                                   | `com.git_rudder.GitRudder` | un id de D-Bus no admite guiones   |
-| Dominio                                                               | `git-rudder.com`           | y `api.git-rudder.com` para la API |
+| Contexto                                                              | Forma                     | Ejemplo                            |
+| --------------------------------------------------------------------- | ------------------------- | ---------------------------------- |
+| Texto visible, titulos de ventana, categoria de comandos              | `Git Rudder`              | "Git Rudder: Open Graph"           |
+| Crates, paquetes, repositorio, extension, nombres de fichero          | `git-rudder`              | `git-rudder-api-domain`            |
+| Scope de npm                                                          | `@git-rudder/`            | `@git-rudder/repo-view`            |
+| Modulos de Rust, upstreams de nginx, usuario y base de PostgreSQL     | `git_rudder`              | `git_rudder_core_domain`           |
+| Comandos, vistas y ajustes de VS Code; claves de almacenamiento local | `gitRudder`               | `gitRudder.engine.path`            |
+| Variables de entorno y constantes                                     | `GIT_RUDDER`              | `GIT_RUDDER__DATABASE__URL`        |
+| Identificador de la extension (`publisher.name`)                      | `git-rudder.git-rudder`   | la URI de vuelta de OAuth lo usa   |
+| Identificador de Tauri y de Flatpak                                   | `com.gitrudder.GitRudder` | ni guiones ni subrayados           |
+| Dominio                                                               | `git-rudder.com`          | y `api.git-rudder.com` para la API |
+
+**El identificador de Tauri y de Flatpak va en una palabra, sin separador.** Es el unico sitio
+donde las dos convenciones chocan: Tauri solo admite alfanumericos, guiones y puntos en el
+`identifier`, y un nombre de D-Bus (el que Flatpak deriva del id de la aplicacion) solo admite
+alfanumericos y subrayados. La interseccion no deja separador, asi que el nombre se junta:
+`com.gitrudder.GitRudder`. Es la misma forma que tenia antes (`io.ramal.Ramal`), y el dominio de
+la parte de atras es `git-rudder.com`, con guion.
 
 **El dominio es propio: `git-rudder.com`.** Ezequiel lo registra el. Esto cambia la respuesta del
 [ADR 0023](0023-despliegue-en-apps-01-y-dominio.md), que habia elegido un subdominio del dominio
@@ -82,7 +89,8 @@ registros DNS antes de la primera build publica.
   recordar el apodo. Tambien choca de nombre con RudderStack, que publica `@rudderstack/*` y
   `rudder-sdk-js`; hoy no importa porque nada se publica, pero el dia que algo se publique si.
 - **`gitrudder` en una palabra**, como `gitkraken`. Se lee peor en kebab-case y obliga a decidir
-  caso por caso donde va el corte.
+  caso por caso donde va el corte. Solo se usa en el identificador de Tauri y de Flatpak, porque
+  ahi ninguno de los dos separadores vale.
 - **Dejar el nombre viejo en los identificadores y cambiar solo lo visible.** Es lo que hacen los
   productos que renombran tarde. Aqui no hay nada publicado, asi que no hay razon para cargar con
   dos nombres desde el primer dia.
