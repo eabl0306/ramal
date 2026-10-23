@@ -230,6 +230,29 @@ castellano y su hermana `stageFile` si; `repos.workspace.openPrCount_other` plur
 ("PRs"); `web.nav.signup` decia "Sign up" donde el titulo de la pagina dice "Create account"; y el
 enlace del pie a la pagina de estado tenia clave propia en vez de usar el titulo de esa pagina.
 
+### Lo que queda por partir
+
+Al traer el handoff quedaron siete textos con un numero que gobierna un sustantivo y sin
+formas plurales, asi que diran "1 asientos". No se arreglan con renombrar el parametro,
+porque **llevan dos o tres recuentos en la misma frase** y una clave solo puede pluralizar
+por uno:
+
+| Clave                       | Texto                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------- |
+| `dialog.signOut.removed`    | Se borran: {accounts} cuentas y {keys} llaves de otros equipos                          |
+| `dialog.signOut.kept`       | Se quedan: {accounts} cuentas y {keys} llaves anadidas aqui                             |
+| `web.team.tmCounts`         | {members} miembros y {pending} invitacion pendiente · {used} de {total} asientos usados |
+| `web.billing.biAnnualLine`  | Pago anual · {seats} asientos · se renueva el {date}                                    |
+| `web.billing.biMonthlyLine` | Pago mensual · {seats} asientos · se renueva el {date}                                  |
+| `web.billing.seMin`         | No puedes bajar de {used}: hay {members} miembros y {pending} invitaciones pendientes   |
+| `web.billing.seReduce`      | Reducir a {seats} asientos                                                              |
+
+La salida es la de arriba: una clave por recuento y que la interfaz las componga, que es
+ademas lo que quita el `·` de los textos. Partirlas cambia como se pinta cada una de esas
+lineas, asi que se hace con su pantalla y no en la importacion. Mientras no se parta, la
+regla del `{count}` no las ve: su parametro no se llama `count`, y llamarlo asi sin partir
+la frase solo elegiria la forma por uno de los dos numeros.
+
 ## Consecuencias
 
 A favor:
