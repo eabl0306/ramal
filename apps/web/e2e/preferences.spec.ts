@@ -20,12 +20,12 @@ test('cambiar a ingles lleva a /en/ y el idioma sigue en las paginas SPA', async
   await expect(page.getByRole('heading', { level: 1 })).toContainText('A Git client');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
-  await page.getByRole('link', { name: 'Log in' }).click();
+  await page.getByRole('link', { name: 'Sign in' }).click();
   await expect(page).toHaveURL(/\/login$/u);
-  await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
 
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
 });
 
 test('en una pagina SPA el conmutador cambia el idioma sin cambiar de URL', async ({ page }) => {

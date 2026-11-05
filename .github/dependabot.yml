@@ -87,6 +87,14 @@ updates:
       - dependency-name: '@types/node'
         versions: ['>=25.0.0']
 
+      # @types/vscode: los tipos van con engines.vscode de apps/vscode/package.json
+      # (^1.140.0). vsce se niega a empaquetar si son mas nuevos, y con ellos el
+      # typecheck aprobaria APIs que el VS Code minimo no tiene.
+      # Para borrar esta regla: subir engines.vscode a la vez (y la version de la
+      # tarjeta de VS Code de la landing, que un test compara con el manifiesto).
+      - dependency-name: '@types/vscode'
+        versions: ['>=1.141.0']
+
       # @tauri-apps/*: su mayor va con el del crate tauri (regla de cargo arriba).
       - dependency-name: '@tauri-apps/*'
         update-types: ['version-update:semver-major']
