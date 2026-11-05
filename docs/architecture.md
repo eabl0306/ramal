@@ -344,7 +344,11 @@ Puertos, casos de uso y estado del motor. Depende de `git-rudder-core-domain`, `
 
 ```
 src/port.rs                           Declaracion de modulos de puertos
-src/port/git_reader.rs                GitReader (primer corte)
+src/port/git_reader.rs                GitReader: version, raiz, refs y log
+src/port/repo_reader.rs               Lectores por area: StatusReader, HistoryReader, InventoryReader,
+                                      ConflictReader y RepoInspector (configuracion local y hooks)
+src/port/host.rs                      Lo que pone el host: EventSink, RepoWatcher, TrustStore,
+                                      RepoScanner y GitSetup
 (plan) src/port/git_writer.rs         GitWriter: todo lo que escribe o toca la red
 (plan) src/port/secret_store.rs       SecretStore: llavero o SecretStorage
 (plan) src/port/cloud_client.rs       CloudClient: Git Rudder API
@@ -352,16 +356,26 @@ src/port/git_reader.rs                GitReader (primer corte)
 (plan) src/port/ai_client.rs          AiClient: generacion con llave personal
 (plan) src/port/vault_cipher.rs       VaultCipher: derivar, envolver, sellar y abrir
 (plan) src/port/clock.rs              Clock
-(plan) src/port/repo_watcher.rs       RepoWatcher: cambios en .git y en el arbol de trabajo
 (plan) src/port/progress_sink.rs      ProgressSink: progreso de operaciones largas
 src/use_case.rs                       Declaracion de modulos de casos de uso
 src/use_case/engine/describe_engine.rs     DescribeEngine: version del motor y de git
-src/use_case/repo/open_repository.rs       OpenRepository: descubre la raiz y emite un RepoId
-src/use_case/graph/load_graph_window.rs    LoadGraphWindow: log + refs + disposicion + ventana
-src/state/open_repositories.rs        Registro RepoId -> RepoRoot; el id sale de la raiz (`repo-` + 16 hex)
+src/use_case/engine/configure_git.rs       ConfigureGit: cambiar el binario y recalcular capacidades
+src/use_case/repo/open_repository.rs       OpenRepository: descubre la raiz, decide la confianza y emite un RepoId
+src/use_case/repo/trust_repository.rs      TrustRepository: recuerda la confianza en el dispositivo
+src/use_case/repo/open_submodule.rs        OpenSubmodule: abre un submodulo como repositorio
+src/use_case/repos.rs                      Estado de fondo de muchos repos y escaneo de carpetas
+src/use_case/graph/load_graph_window.rs    LoadGraphWindow: refs + cache de disposicion + ventana
+src/use_case/graph/history_filler.rs       Hace crecer la disposicion por lotes hasta la ventana pedida
+src/use_case/graph/search_history.rs       SearchHistory: sha, mensaje o autor en todo el historial
+src/use_case/reads/*.rs                    Las lecturas de un repo abierto, un caso de uso por metodo
+src/state/open_repositories.rs        Registro RepoId -> RepoRoot y confianza; el id sale de la raiz (`repo-` + 16 hex)
+src/state/graph_cache.rs              Disposicion del grafo por repo, huella de refs y filtro
+src/state/concurrency.rs              Limite de procesos git a la vez para las lecturas de fondo
 src/error.rs                          EngineError, el unico error que sale de un caso de uso
 src/testing.rs                        Solo con #[cfg(any(test, feature = "testing"))]
 src/testing/fake_git_reader.rs        FakeGitReader: responde lo que le digas y cuenta llamadas
+src/testing/fake_repo_reader.rs       Fakes de los lectores por area
+src/testing/fake_host.rs              Fakes de los puertos del host (sink, vigilante, TrustStore...)
 src/testing/samples.rs                Datos de ejemplo para los tests
 src/testing/block_on.rs               Ejecutor sin runtime (Waker::noop) para tests sin tokio
 ```
@@ -369,7 +383,7 @@ src/testing/block_on.rs               Ejecutor sin runtime (Waker::noop) para te
 Cada puerto nace con su primer caso de uso; no se declaran puertos que nadie usa. La lista de
 arriba marca los que ya tienen sitio.
 
-El puerto del primer corte:
+El puerto con que empezo el motor (los lectores por area siguen el mismo patron):
 
 ```rust
 #[async_trait]
@@ -383,7 +397,8 @@ pub trait GitReader: Send + Sync {
 
 `EngineError` tiene variantes cerradas (`RepositoryNotOpen`, `NotARepository`,
 `GitUnavailable`, `GitVersionUnsupported { found, minimum }`, `InvalidWindow`, `StaleWindow`,
-`GitFailed { detail }`, y mas adelante `Cancelled` y `NotSignedIn`). El `detail` de un
+`GitFailed { detail }`, `NotFound`, `Internal`, y mas adelante `NotSignedIn`; la cancelacion
+la resuelve el motor sin pasar por el caso de uso). El `detail` de un
 fallo de git solo va al log; al cliente llega un tipo de error estable (ver 6.5).
 
 El `RepoId` no es un contador: es `repo-` mas el hash FNV-1a de 64 bits de la raiz en 16 cifras
@@ -406,10 +421,15 @@ cambiaria el contrato sin que nadie lo viera. El mapeo entre dominio y DTO vive 
 
 ```
 src/envelope.rs      RpcRequest, RpcResponse, RpcError, ErrorKind, RpcNotification, codigos JSON-RPC
-src/methods.rs       PROTOCOL_VERSION (hoy 2) y la tabla de metodos (macro define_methods!, con host_only)
+src/methods.rs       PROTOCOL_VERSION (hoy 3) y la tabla de metodos (macro define_methods!, con host_only)
+src/notifications.rs Notificaciones del motor (repo/changed) con su marcador
 src/engine.rs        EngineInfo, GitInfo
-src/repo.rs          OpenRepoParams, RepoHandle
-src/graph.rs         GraphWindowParams, GraphWindow, GraphRow, GraphEdge, RefLabel
+src/repo.rs          OpenRepoParams, RepoHandle, TrustFinding
+src/repos.rs         repos/summary, repos/scan y git/configure (los del host sin repoId)
+src/graph.rs         GraphWindowParams, GraphFilter, GraphWindow, GraphRow, GraphEdge, RefLabel
+src/status.rs        WorkingTreeStatus, entradas, operacion en curso
+src/diff.rs          DiffTarget, DiffOptions, FileDiff y sus hunks
+src/commit.rs  src/refs.rs  src/history.rs  src/inventory.rs   Detalle, refs, busqueda, historial, blame, comparar, stashes, submodulos y conflictos
 tests/export_bindings.rs   Escribe methods.ts e index.ts en packages/bridge/src/generated
 tests/methods.rs           La tabla de metodos y sus marcas de host
 ```
@@ -419,26 +439,30 @@ Los tipos no llevan sufijo `Dto`: son exactamente los nombres que vera TypeScrip
 
 #### git-rudder-git
 
-Adaptador driven del git CLI. Implementa `GitReader` en el primer corte y `GitWriter`
-despues. Depende de `git-rudder-core-domain`, `git-rudder-core-application`, `async-trait` (para
-implementar los puertos), `tokio` (process, io-util, fs), `thiserror` y `tracing`.
+Adaptador driven del git CLI. Implementa los puertos de lectura (`GitReader` y los lectores por
+area) y, despues, `GitWriter`. Depende de `git-rudder-core-domain`, `git-rudder-core-application`,
+`async-trait` (para implementar los puertos), `tokio` (process, io-util, fs, time), `notify` (el
+vigilante), `thiserror` y `tracing`.
 
 ```
 src/cli.rs              Descubrimiento del binario
 src/cli/command.rs      Construccion de comandos: opciones con formato y revisiones tras --end-of-options
 src/cli/runner.rs       Lanza git con entorno fijo y limites (120 s, stderr acotado); kill_on_drop si se abandona
+src/cli/runner/pipes.rs stdin y stdout con su limite (o recortado, para diffs enormes)
 src/cli/version.rs      Parsea git --version y calcula GitCapabilities (el minimo lo aplica OpenRepository)
-src/reader.rs           GitCliReader: implementa GitReader
-src/parse.rs            Declaracion de parsers
-src/parse/log.rs        Parser del log: NUL entre commits y un campo por linea
-src/parse/refs.rs       Parser de for-each-ref: NUL entre campos y salto de linea entre refs
+src/reader.rs           GitCliReader: implementa los puertos de lectura
+src/reader/safety.rs    Las opciones de una lectura sin confianza
+src/reader/{log,status,diff_file,history,commits,inventory,conflict,inspect}.rs   Una pieza por puerto
+src/parse/*.rs          Un parser por formato: log, refs, status (porcelain v2 -z), diff, blame,
+                        config, operacion en curso, cambios, historial e inventario
+src/scan.rs             Buscar repositorios en una carpeta con profundidad maxima
+src/watch.rs            Vigilante de notify: agrupa rafagas y descarta lo ignorado
 (plan) src/writer.rs    GitCliWriter
 (plan) src/askpass.rs   Helper de credenciales por repo y de GIT_SSH (varias cuentas por plataforma)
-(plan) src/trust.rs     Lectura de la configuracion local que puede ejecutar codigo (confianza)
 (plan) src/sequence.rs  Helpers de GIT_SEQUENCE_EDITOR y GIT_EDITOR para el rebase interactivo
 tests/support/mod.rs    Constructor de repos de prueba con el propio git en un tempdir (lo reutilizan
                         el motor, el sidecar y el host de escritorio con #[path])
-tests/discover.rs  tests/log_reader.rs  tests/refs_reader.rs   Lecturas contra repos reales de prueba
+tests/*_reader.rs       Lecturas contra repos reales de prueba
 ```
 
 Reglas del adaptador que evitan los errores clasicos. Las de red, credenciales y confianza son
@@ -477,15 +501,17 @@ para lo que llega despues de las lecturas del primer corte:
 - SSH por cuenta con `GIT_SSH` apuntando al helper, que recibe argv y lanza ssh sin shell, nunca
   con `core.sshCommand`. El helper de credenciales solo entrega un token si el protocolo es
   `https` y el host coincide exactamente (tras IDNA) con el de la cuenta ligada.
-- **Confianza (planificada).** Antes del primer comando en un repositorio que Git Rudder no clono, el motor lee
+- **Confianza.** Antes del primer comando en un repositorio que Git Rudder no clono, el motor lee
   `git config --local --list --show-origin` (no ejecuta nada) y mira `.git/hooks`. Si hay claves
   que lanzan comandos (`core.fsmonitor`, `core.hooksPath`, `core.sshCommand`, `core.pager`,
   `core.editor`, `sequence.editor`, `diff.external`, `diff.*.textconv`, `diff.*.command`,
   `filter.*`, `merge.*.driver`, `credential.helper`, `gpg*.program`, `uploadpack.*`, `include*`) o
-  hooks que no son `.sample`, el caso de uso devuelve `untrusted_repository` y la interfaz pregunta
-  "Confiar en este repositorio". Sin confianza solo se lee, con
-  `-c core.fsmonitor=false --no-ext-diff --no-textconv`. La confianza se guarda en el dispositivo
-  por repositorio (puerto `TrustStore`)
+  hooks que no son `.sample`, `repo/open` lo abre sin confianza con esos hallazgos y la interfaz
+  pregunta "Confiar en este repositorio" (`repo/trust`). Sin confianza solo se lee, con
+  `-c core.fsmonitor=false --no-ext-diff --no-textconv` y los filtros de `.gitattributes`
+  vaciados (`filter.<driver>.clean`, `smudge` y `process`). `untrusted_repository` queda para las
+  escrituras. La confianza se guarda en el dispositivo por repositorio (puerto `TrustStore`, un
+  fichero en la carpeta de datos del host que no se sincroniza)
   ([ADR 0020](adr/0020-confianza-de-repositorios-y-frontera-del-webview.md)).
 - Capacidades por deteccion, no por suposicion: `GitCapabilities` dice si hay
   `merge-tree --write-tree` o `rebase --update-refs` (2.38).
@@ -502,24 +528,29 @@ Adaptador driving y composition root compartido del cliente. Es lo unico que los
 src/builder.rs          EngineBuilder y EngineConfig: construye los adaptadores compartidos
 src/engine.rs           Engine, CallContext y CallOrigin: handle, handle_with y dispatch
 src/dispatch.rs         Tabla metodo -> handler; rechaza los metodos del host si llama un webview
-src/dispatch/engine.rs  engine/info
-src/dispatch/repo.rs    repo/open
-src/dispatch/graph.rs   graph/window
+src/dispatch/engine.rs  engine/info y git/configure
+src/dispatch/repo.rs    repo/open, repo/trust, submodule/open, repos/summary y repos/scan
+src/dispatch/graph.rs   graph/window y graph/search
+src/dispatch/reads.rs   El resto de lecturas de un repositorio abierto
+src/cancel.rs           Cancellations: $/cancel suelta el futuro de la peticion con ese id
+src/host_ports.rs       NotificationSink, el puerto que implementan los hosts, y su puente al EventSink
+src/adapters.rs         TrustStore en fichero y el vigilante de cada repositorio abierto
 src/mapping.rs          Funciones de mapeo dominio -> DTO y EngineError -> RpcError
-src/mapping/engine.rs  src/mapping/repo.rs  src/mapping/graph.rs  src/mapping/error.rs
-(plan) src/host_ports.rs     Reexporta los puertos que implementan los hosts (SecretStore) y EventSink
+src/mapping/*.rs        Una por area, mas params.rs (DTO -> dominio, con las rutas validadas)
 (plan) src/adapters/ai.rs    Envoltorio fino que implementa AiClient sobre git-rudder-ai
 tests/architecture.rs   Reglas de dependencia del hexagono del cliente (lee Cargo.lock)
 tests/core_purity.rs    Los clippy.toml de los cuatro nucleos y que su codigo no nombra el IO
-tests/envelope.rs       handle y los errores estables del protocolo, con el lector de git falso
-tests/graph_window.rs  tests/repo_open.rs   dispatch de punta a punta contra repos reales de prueba
+tests/envelope.rs  tests/events.rs   handle, errores estables, cancelacion y notificaciones
+tests/graph_window.rs  tests/repo_open.rs  tests/reads.rs  tests/host_methods.rs   De punta a punta contra repos reales
+tests/large_repo.rs     Cien mil commits: la primera ventana en menos de un segundo
+tests/golden.rs         Repos dorados y sus snapshots en tests/snapshots (tambien en macOS y Windows)
 ```
 
 La interfaz publica:
 
 ```rust
 impl Engine {
-    /// Peticion del propio host. None para notificaciones (sin id), que el primer corte ignora.
+    /// Peticion del propio host. None para notificaciones (sin id): solo atiende `$/cancel`.
     pub async fn handle(&self, request: RpcRequest) -> Option<RpcResponse>;
 
     /// Como handle, diciendo quien llama: CallContext::host() o CallContext::webview().
@@ -580,9 +611,11 @@ src/picker.rs        FolderPicker: el dialogo nativo de carpetas, o una carpeta 
   devuelve el `RepoHandle`: el webview nunca manda una ruta. Las acciones sobre ficheros
   (planificadas: "Mostrar en carpeta", "Copiar ruta") iran por `repoId` y ruta relativa al motor,
   que las valida (6.5).
-- `rpc_subscribe` recibe un `Channel<RpcNotification>` al arrancar el frontend; por ahi
-  salen progreso, cambios del repo y tokens de IA (planificado; el primer corte no emite
-  notificaciones).
+- `rpc_subscribe` recibe un `Channel<RpcNotification>` al arrancar el frontend; por ahi sale
+  `repo/changed` (y, planificados, progreso y tokens de IA). `NotificationChannels` implementa
+  `NotificationSink` y descarta el canal de una ventana que se recargo.
+- La confianza en repositorios se guarda en la carpeta de datos de la app (`dirs`), en el
+  dispositivo. Elegir una carpeta en el dialogo no es confiar en ella: decide el motor.
 - El `Engine` se guarda como estado gestionado (`app.manage(Arc<Engine>)`).
 - Plugins de Tauri solo donde el SO manda. Hoy, el de dialogo (elegir carpeta, usado solo desde
   Rust y sin ningun permiso en las capacidades) y, solo en los builds de E2E, el servidor
@@ -679,13 +712,14 @@ escritorio.
 **Mensajes compartidos, `apps/vscode/src/shared`.** Tipos de los mensajes entre webview y
 extension host, sin dependencias salvo los tipos de `@git-rudder/bridge`. Los dos lados los
 importan; nadie mas. Del webview al host: `webview/ready { surface }`,
-`rpc/request { request }` y `host/request { id, method, params }`. Del host al webview:
+`rpc/request { request }`, `rpc/cancel { id }` y `host/request { id, method, params }`. Del host al webview:
 `init { locale, surface, repoId, protocolVersion }`, `rpc/response { response }`,
 `rpc/notification { notification }` y `host/response { id, result | error }`. `request`,
 `response` y `notification` son los tipos del sobre generados desde `git-rudder-protocol`. El unico
 metodo nativo del primer corte es `clipboard/writeText`; los dialogos llegan con `RepoViewHost`.
-Un `rpc/request` lleva siempre id: un webview no manda notificaciones, asi que `$/cancel` no se
-reenvia todavia.
+Un `rpc/request` lleva siempre id. La unica notificacion que sale de un webview es `$/cancel`, y
+viaja como `rpc/cancel` para que el host traduzca el id. `repo/changed` solo llega a los
+paneles de su `repoId`.
 
 **Superficies nativas, no clones.** La paleta de comandos, los dialogos (`showInputBox`,
 `showQuickPick`, avisos modales), las notificaciones, la barra de estado, las vistas de
@@ -700,11 +734,12 @@ JSON-RPC) y raiz de composicion exterior del cliente de VS Code.
 ```
 src/main.rs        Llama a la biblioteca con los argumentos
 src/lib.rs         Runtime de tokio, tracing a stderr y arranque
-src/args.rs        --git-path, --log-level y --version, sin crate de argumentos
+src/args.rs        --git-path, --data-dir, --log-level y --version, sin crate de argumentos
 src/bootstrap.rs   Composition root: EngineBuilder con la configuracion recibida y los adaptadores del host
 src/framing.rs     Lectura y escritura de marcos Content-Length sobre stdin y stdout
 src/message.rs     De los bytes de un marco a la respuesta: JSON roto -32700, sobre invalido -32600
-src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en stdout
+src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en stdout (Outbox),
+                   por la que salen tambien las notificaciones del motor
 (plan) src/reverse.rs   Peticiones del motor al extension host (secretos de SecretStorage)
 ```
 
@@ -733,13 +768,14 @@ src/server.rs      Bucle: una tarea por peticion, una unica tarea escritora en s
   `GIT_RUDDER_ENGINE_PATH` o lo que haya compilado cargo en `target/` del monorepo. Un ajuste de workspace nunca puede elegir que
   binario se ejecuta: seria ejecucion de codigo con abrir una carpeta.
 - El binario de git llega del `git.path` de la extension `vscode.git` (`--git-path`), que se
-  lee al activar la extension.
+  lee al activar la extension. `--data-dir` es el `globalStorageUri` de la extension: ahi guarda
+  el motor la confianza en repositorios, en el dispositivo y fuera de Settings Sync.
 - Manifiesto: `extensionKind: ["workspace"]` (git corre donde esta el repo, tambien en
   Remote SSH, WSL y contenedores), `capabilities.virtualWorkspaces: false` y
   `capabilities.untrustedWorkspaces.supported: false`, porque ejecutar git en una carpeta
-  no confiable puede ejecutar hooks y configuracion del repo. Un repositorio que se abra fuera
-  de las carpetas de confianza del workspace pasara por la misma comprobacion de confianza que en
-  escritorio (planificada, ver `git-rudder-git`).
+  no confiable puede ejecutar hooks y configuracion del repo. Una carpeta de un workspace de
+  confianza se abre con `trusted: true`; un repositorio fuera de esas carpetas pasa por la misma
+  comprobacion de confianza que en escritorio (ver `git-rudder-git`).
 
 ### 4.5 La API (`apps/api`)
 
@@ -1192,7 +1228,7 @@ webview y extension host).
   "error": { "code": -32000, "message": "repository repo-0123456789abcdef is not open",
              "data": { "kind": "repo_not_open" } } }
 
-// Notificacion (sin id); planificadas
+// Notificacion (sin id)
 { "jsonrpc": "2.0", "method": "repo/changed", "params": { "repoId": "repo-3f2a9c41d7e0b5a8" } }
 ```
 
@@ -1202,8 +1238,8 @@ webview y extension host).
   raiz del repositorio (ver `git-rudder-core-application`).
 - `params` es siempre un objeto; los metodos sin parametros reciben `{}`.
 - Nombres de metodo `<area>/<verbo>` en camelCase (`graph/window`, `repo/open`,
-  `engine/info`). Notificaciones de control con prefijo `$/` (`$/cancel`, `$/progress`,
-  planificadas).
+  `engine/info`). Notificaciones de control con prefijo `$/` (`$/cancel`; `$/progress`,
+  planificada).
 - Campos en camelCase (`#[serde(rename_all = "camelCase")]`). Los parametros llevan
   `deny_unknown_fields`. Un campo opcional se declara con
   `#[serde(default, skip_serializing_if = "Option::is_none")]` y `#[ts(optional)]`.
@@ -1216,8 +1252,8 @@ webview y extension host).
   -32000 para cualquier error del motor. Lo que la interfaz usa para decidir es
   `error.data.kind`, un enum cerrado (`ErrorKind`) que ts-rs exporta como union de literales:
   `invalid_params`, `repo_not_open`, `not_a_repository`, `git_not_found`,
-  `git_version_unsupported`, `git_failed`, `stale_window`, `internal`, y mas adelante
-  `cancelled` y `not_signed_in`. `message` esta en ingles y es para el log; la interfaz traduce
+  `git_version_unsupported`, `git_failed`, `not_found` (un sha, una ref o un fichero que no
+  esta), `cancelled` (-32800), `stale_window` e `internal`; mas adelante `not_signed_in`. `message` esta en ingles y es para el log; la interfaz traduce
   el `kind` con `@git-rudder/i18n`.
 - Un metodo que no existe (-32601), un JSON roto (-32700) y un sobre invalido (-32600) llevan
   `kind: internal`: la interfaz solo llama a los metodos del mapa generado, asi que son fallos de
@@ -1228,8 +1264,8 @@ webview y extension host).
   `repoId` que no es el de su panel; ademas, si el motor contesto `engine/info` con un error al
   arrancar (`git_not_found`, por ejemplo), reenvia ese error al webview con su tipo en vez de
   `engine_unavailable`. Cancelar una llamada con `signal` rechaza con `signal.reason`, como
-  `fetch`; todavia no hay tipo `cancelled`.
-- Version: `PROTOCOL_VERSION` es una constante de `git-rudder-protocol` (hoy 2). `engine/info` la
+  `fetch`: el cliente no espera la respuesta `cancelled` del motor.
+- Version: `PROTOCOL_VERSION` es una constante de `git-rudder-protocol` (hoy 3). `engine/info` la
   devuelve y el extension host la compara cada vez que arranca un proceso del sidecar con la
   que trae generada; como viajan en la misma VSIX, una diferencia es un fallo de empaquetado y
   se muestra como tal. En escritorio no puede haber diferencia: se compila todo junto.
@@ -1238,11 +1274,20 @@ webview y extension host).
   la conexion. El sidecar atiende peticiones en paralelo (una tarea por peticion) y una unica
   tarea escribe en stdout, para que dos respuestas no se mezclen.
 - Cliente del bridge: `client.call(method, params, { signal, timeoutMs })` con 30 segundos por
-  defecto. Rechaza con `BridgeError { kind, message, data }`. Cancelar manda `$/cancel`, que el
-  motor del primer corte todavia ignora. Las operaciones largas (planificadas: fetch, push,
-  clonado) informan por `$/progress` y no usan timeout.
+  defecto. Rechaza con `BridgeError { kind, message, data }`. Cancelar manda `$/cancel { id }`:
+  el motor suelta el futuro de esa peticion, `kill_on_drop` mata el git que estuviera
+  corriendo y la respuesta es `cancelled`. En VS Code el webview lo manda como `rpc/cancel` y el
+  extension host lo traduce al id con que salio la peticion (6.7). Las operaciones largas
+  (planificadas: fetch, push, clonado) informan por `$/progress` y no usan timeout.
+- **Notificaciones.** El motor las emite por el puerto `NotificationSink`: en escritorio, un
+  `Channel` de Tauri que el webview abre con el comando `rpc_subscribe`; en el sidecar, la misma
+  cola que escribe las respuestas en stdout. Hoy solo `repo/changed { repoId }`: el vigilante
+  (`notify`) mira el arbol de trabajo y `.git` de cada repo abierto, agrupa las rafagas (120 ms
+  sin eventos, 500 ms como mucho) y descarta lo que ignora `.gitignore`. El extension host solo
+  la entrega a los paneles de ese `repoId`.
 - **Metodos del host.** `define_methods!` marca con `host_only` los metodos que solo puede llamar
-  un host (hoy `repo/open`, y los que se anadan con rutas absolutas o secretos). El motor los
+  un host: los que llevan rutas absolutas o deciden la confianza (`git/configure`, `repo/open`,
+  `repo/trust`, `repos/summary`, `repos/scan` y `submodule/open`). El motor los
   rechaza cuando la llamada llega como de webview (`CallContext::webview()`), y cada host filtra
   antes con su lista por ventana o superficie: `surfaces.rs` en escritorio, escrita a mano con
   los marcadores de `define_methods!`, y `application/surfaces.ts` en VS Code, tipada contra la
@@ -1253,13 +1298,49 @@ webview y extension host).
 - **Nada secreto hacia un webview.** Ningun metodo devuelve tokens, llaves, la VK ni la frase. Los
   resultados pueden traer rutas para ensenarlas (`root` de `RepoHandle`), nunca al reves.
 
-**Metodos del primer corte.**
+**Metodos.** Todos los de lectura reciben `repoId` y responden `repo_not_open` si no esta
+abierto; los de la ultima columna "host" son `host_only`.
 
-| Metodo         | Parametros                                                     | Resultado                                                                                  | Quien lo llama                                                                                               |
-| -------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| `engine/info`  | `{}`                                                           | `EngineInfo { engineVersion, protocolVersion, git: GitInfo { path, version, supported } }` | Host de escritorio (lo deja en el log) y extension host, al arrancar cada proceso                            |
-| `repo/open`    | `{ path }`                                                     | `RepoHandle { repoId, root, headRef?, headSha?, isDetached, isEmpty }`                     | Solo los hosts: el comando `repo_pick_and_open` en escritorio y el extension host en VS Code. Ningun webview |
-| `graph/window` | `{ repoId, offset, limit, snapshot? }`, `limit` entre 1 y 1000 | `GraphWindow { repoId, offset, rows, hasMore, laneCount, snapshot }`                       | `@git-rudder/repo-view`                                                                                      |
+| Metodo           | Parametros                                                | Resultado                                                                                      | Quien lo llama |
+| ---------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | -------------- |
+| `engine/info`    | `{}`                                                      | `EngineInfo { engineVersion, protocolVersion, git: GitInfo { path, version, supported } }`     | Los hosts      |
+| `git/configure`  | `{ path? }` (sin ruta, vuelve al git del `PATH`)          | `GitInfo`; una ruta que no es git da `git_not_found`                                           | host           |
+| `repo/open`      | `{ path, trusted? }`                                      | `RepoHandle { repoId, root, headRef?, headSha?, isDetached, isEmpty, trusted, trustFindings }` | host           |
+| `repo/trust`     | `{ repoId }`                                              | `RepoTrusted`; la confianza se guarda en el dispositivo                                        | host           |
+| `repos/summary`  | `{ path }`                                                | `RepoSummary { root, branch, counts }`, con limite de procesos git a la vez                    | host           |
+| `repos/scan`     | `{ path, maxDepth? }`                                     | `ScanReposResult { roots }`, repos y submodulos sin duplicar                                   | host           |
+| `submodule/open` | `{ repoId, path }`                                        | `RepoHandle` del submodulo                                                                     | host           |
+| `graph/window`   | `{ repoId, offset, limit (1..1000), snapshot?, filter? }` | `GraphWindow { repoId, offset, rows, hasMore, laneCount, snapshot }`                           | Webviews       |
+| `graph/search`   | `{ repoId, query, limit?, filter? }`                      | `GraphSearchResult`: coincidencias en todo el historial, por sha, mensaje o autor              | Webviews       |
+| `status/read`    | `{ repoId }`                                              | `WorkingTreeStatus { branch, entries, counts, operation? }`                                    | Webviews       |
+| `diff/file`      | `{ repoId, path, oldPath?, target, options? }`            | `FileDiff`: hunks, binario, imagen, recortado o puntero LFS                                    | Webviews       |
+| `commit/detail`  | `{ repoId, sha }`                                         | `CommitDetail` con todos los padres y los ficheros con lineas                                  | Webviews       |
+| `refs/list`      | `{ repoId }`                                              | `RefListing`: ramas con upstream, delante y detras; tags; remotos con enlace web               | Webviews       |
+| `stash/list`     | `{ repoId }`                                              | `StashList`                                                                                    | Webviews       |
+| `stash/show`     | `{ repoId, sha }`                                         | `StashContents { tracked, untracked }`                                                         | Webviews       |
+| `submodule/list` | `{ repoId }`                                              | `SubmoduleList`, anidados incluidos                                                            | Webviews       |
+| `history/file`   | `{ repoId, path, offset, limit }`                         | `FileHistoryPage`, siguiendo renombrados                                                       | Webviews       |
+| `blame/file`     | `{ repoId, path, revision? }`                             | `Blame`, con `.git-blame-ignore-revs` si existe                                                | Webviews       |
+| `compare/refs`   | `{ repoId, base, head }`                                  | `Comparison`: merge-base, commits de cada lado y ficheros                                      | Webviews       |
+| `conflict/read`  | `{ repoId, path }`                                        | `ConflictFile`: bloques base, nuestro y suyo con zdiff3, o binario, borrado o renombrado       | Webviews       |
+
+`target` de `diff/file` es `workingTree`, `index`, `commit { sha }` (contra su primer padre) o
+`range { from, to }`; `options` admite diff por palabras y los tres modos de ignorar espacios.
+`filter` del grafo oculta o aisla ramas y filtra por autor y fechas, y la disposicion de los
+carriles se calcula con el filtro puesto. Las respuestas de los repos dorados
+(`crates/engine/tests/snapshots/`) son el ejemplo de cada forma.
+
+**Confianza (ADR 0020).** `repo/open` lee `git config --local --list --show-origin -z` y la
+carpeta de hooks sin ejecutar nada. Si encuentra una clave que lanza comandos o un hook activo y
+el usuario no confio en ese repo, lo abre sin confianza (`trusted: false` y `trustFindings`):
+solo lee, y cada lectura va con `core.fsmonitor=false`, `--no-ext-diff`, `--no-textconv` y los
+filtros de `.gitattributes` vaciados. `trusted: true` en los parametros lo pone un host que ya
+sabe que el usuario confia (en VS Code, una carpeta de un workspace de confianza). Todas las
+lecturas van con `GIT_OPTIONAL_LOCKS=0`: no toman `index.lock`.
+
+**Cache del grafo.** La disposicion se guarda por repositorio con la huella de las refs y el
+filtro, y crece por lotes (2000 commits, el doble cada vez): la pagina siguiente no recalcula
+las anteriores, y cambiar HEAD o las refs la invalida.
 
 ```
 GraphRow  { sha, shortSha, parents: string[], lane, edges: GraphEdge[], summary,
@@ -1275,7 +1356,7 @@ omitia). La punta fijada del algoritmo es la rama por defecto, y nada mas en el 
 la rama local que corresponde a `refs/remotes/origin/HEAD`, si no esa rama remota, si no
 `main`, si no `master`. Es la local porque es la que mueve el usuario; si va por detras del
 remoto, el remoto sale como una rama mas que desemboca en ella. La fila WIP no la da
-`graph/window`: llegara con el estado del arbol de trabajo.
+`graph/window`: la interfaz la pinta con `status/read`.
 
 Otros detalles de los resultados:
 
@@ -1329,7 +1410,8 @@ ficheros), asi que se trata como un cliente hostil. El extension host es la fron
    son pequenas.
 3. **Forma.** `webview-message-schema.ts` valida con zod la union de mensajes de
    `src/shared`: `webview/ready`, `rpc/request` (con un `RpcRequest` bien formado: id
-   entero en rango, `method` texto, `params` objeto) y `host/request` (con `params` validado
+   entero en rango, `method` texto, `params` objeto), `rpc/cancel { id }` y `host/request`
+   (con `params` validado
    por un esquema zod por metodo del host). Lo que no encaja se descarta y se registra.
 4. **Metodo, superficie y repositorio.** Un `rpc/request` solo pasa si el metodo esta en
    `ENGINE_METHODS` (generado), no es del host (`HOST_METHODS`, generado, mas `engine/info`) y
@@ -1340,7 +1422,8 @@ ficheros), asi que se trata como un cliente hostil. El extension host es la fron
    `repo_not_open` sin llamar al motor.
 5. **Ids propios.** El host reescribe el id hacia el sidecar con un contador propio y guarda
    `(panel, id original)`. Un webview no puede chocar con otro ni recibir la respuesta de otro.
-   Un webview solo manda peticiones con id: `$/cancel` no se reenvia todavia.
+   `rpc/cancel { id }` busca la peticion de ese panel con ese id original y manda al motor
+   `$/cancel` con el id del host; si no es suya o ya contesto, no hace nada.
 6. **El motor vuelve a validar.** Los parametros se deserializan con `deny_unknown_fields` y
    los `repoId` se buscan en el registro del motor: un id inventado da `repo_not_open`. El
    motor es la autoridad; el host es la primera red.
@@ -1871,6 +1954,15 @@ tabla dice lo que hay en `main`, no lo que se pidio.
 | VS Code    | Extension host con el comando "Git Rudder: Open Graph" y la vista de bienvenida, supervision del sidecar (reinicios con espera creciente, version del protocolo en cada arranque, error de git sin bucle de reinicios, reapertura de los repos de los paneles), validacion de mensajes con el `repoId` de cada panel, panel `gitRudder.graph` con la CSP de 6.8, `clipboard/writeText`; `git-rudder-vscode-engine` con framing, mensajes y servidor; Playwright con acquireVsCodeApi falso; tests de integracion en un VS Code real; la VSIX de `linux-x64` en la CI                                                                                                  | Vistas de arbol, vista Cambios, merge como editor personalizado, ajustes, barra de estado, `AuthenticationProvider`, peticiones inversas de secretos, reenviar `$/cancel`, el hash de React Aria en la CSP de los webviews, `package.nls*.json` generados desde `@git-rudder/i18n`, VSIX del resto de plataformas y publicacion                                       |
 | Web        | Landing prerenderizada en ES y EN con descargas (datos fijos) y preferencias de idioma y tema, pantallas de login y registro con la validacion de `@git-rudder/domain` (el envio va a un `AuthGateway` que responde "no disponible todavia"), ruta `/status` con `checkApiHealth`, imagen de produccion (nginx) con su prueba de humo, Playwright con la red simulada y contra la pila                                                                                                                                                                                                                                                                                | Auth real, panel (resumen, workspaces, repositorios, cuentas ligadas, equipo, ajustes en la nube), vista previa del producto en la landing, datos de descarga desde la API, la CSP de la web en el gateway de produccion                                                                                                                                              |
 | Paquetes   | `@git-rudder/ui` con tokens, los dos temas, las dos densidades, `DENSITIES`, iconos y primitivas; `@git-rudder/i18n` con la semilla de `D` y `W` en JSON y los parametros generados; `@git-rudder/bridge` con cliente y tipos generados; `@git-rudder/repo-view` con el grafo; `@git-rudder/domain` con auth, descargas, resolver de conflictos, rebase, filtros y grupos de repos, PRs, tiempo relativo, llaves, commits, nombres de ref y plataformas; `@git-rudder/api-client` generado; `@git-rudder/eslint-config` (con sus reglas propias) y `@git-rudder/tsconfig`                                                                                             | El resto de `@git-rudder/repo-view` (fila WIP, detalle, diff, resolver, rebase) y el puerto `RepoViewHost`                                                                                                                                                                                                                                                            |
+
+**Despues del primer corte.** La tabla es la foto del cierre. La epica E05 (lecturas del motor)
+ya trajo parte de lo que figura como planificado: estado y staging de solo lectura, diff,
+detalle de commit, refs, stashes, submodulos, historial y blame, comparar, conflictos y
+operacion en curso; la cache de disposicion del grafo, la busqueda y los filtros; la
+vigilancia de cambios con `repo/changed` (`rpc_subscribe` en escritorio); atender `$/cancel`
+con el tipo `cancelled`, tambien reenviado desde un webview de VS Code; la confianza de
+repositorios; y los repos dorados, que corren en Linux, macOS y Windows. Los metodos estan en
+6.5.
 
 **Que se verifico al cerrar el primer corte** (2026-10-01, en Linux, sobre `main` en `ff84876`):
 

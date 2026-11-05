@@ -93,11 +93,21 @@ escritorio; en VS Code, `postMessage` entre webview y extension host y marcos
 `Content-Length: <bytes>\r\n\r\n` por stdio hasta el sidecar (32 MiB como maximo). En el
 sidecar **stdout es solo protocolo**: el log va a stderr y `print_stdout` esta denegado.
 
-| Metodo         | Parametros                                       | Resultado                                                               | Quien lo llama          |
-| -------------- | ------------------------------------------------ | ----------------------------------------------------------------------- | ----------------------- |
-| `engine/info`  | `{}`                                             | `{ engineVersion, protocolVersion, git: { path, version, supported } }` | Los hosts al arrancar   |
-| `repo/open`    | `{ path }`                                       | `{ repoId, root, headRef?, headSha?, isDetached, isEmpty }`             | Solo los hosts          |
-| `graph/window` | `{ repoId, offset, limit (1..1000), snapshot? }` | `{ repoId, offset, rows, hasMore, laneCount, snapshot }`                | `@git-rudder/repo-view` |
+Veinte metodos; la tabla completa, con sus tipos, esta en la seccion 6.5 de
+`docs/architecture.md`. Los que hay que tener en la cabeza:
+
+| Metodo         | Parametros                                                | Resultado                                                                           | Quien lo llama |
+| -------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------- | -------------- |
+| `engine/info`  | `{}`                                                      | `{ engineVersion, protocolVersion, git: { path, version, supported } }`             | Los hosts      |
+| `repo/open`    | `{ path, trusted? }`                                      | `{ repoId, root, headRef?, headSha?, isDetached, isEmpty, trusted, trustFindings }` | Solo los hosts |
+| `graph/window` | `{ repoId, offset, limit (1..1000), snapshot?, filter? }` | `{ repoId, offset, rows, hasMore, laneCount, snapshot }`                            | Webviews       |
+| `status/read`  | `{ repoId }`                                              | `{ branch, entries, counts, operation? }`                                           | Webviews       |
+| `diff/file`    | `{ repoId, path, oldPath?, target, options? }`            | hunks, o binario, imagen, recortado o puntero LFS                                   | Webviews       |
+
+Las demas lecturas de un repo abierto: `graph/search`, `commit/detail`, `refs/list`,
+`stash/list`, `stash/show`, `submodule/list`, `history/file`, `blame/file`, `compare/refs` y
+`conflict/read`. Del host: `git/configure`, `repo/trust`, `repos/summary`, `repos/scan` y
+`submodule/open`. La unica notificacion del motor es `repo/changed { repoId }`.
 
 Lo que no se puede romper:
 
@@ -105,23 +115,35 @@ Lo que no se puede romper:
   menores que 2^31. Nada de enteros de 64 bits (ts-rs los da como `bigint`). Instantes como texto
   ISO 8601 estricto.
 - La interfaz decide por `error.data.kind`: `invalid_params`, `repo_not_open`,
-  `not_a_repository`, `git_not_found`, `git_version_unsupported`, `git_failed`, `stale_window`,
-  `internal`. El bridge anade `transport` y `timeout`; el extension host, `engine_unavailable`.
+  `not_a_repository`, `git_not_found`, `git_version_unsupported`, `git_failed`, `not_found`,
+  `cancelled`, `stale_window`, `internal`. El bridge anade `transport` y `timeout`; el extension host, `engine_unavailable`.
   `message` va en ingles y es para el log. Un metodo inexistente o un sobre roto da `internal`.
 - Los metodos con rutas absolutas o secretos se marcan `host_only` en `define_methods!`
-  (`crates/protocol/src/methods.rs`). Hoy solo `repo/open`. Ningun webview los puede llamar.
+  (`crates/protocol/src/methods.rs`): hoy los cinco del host y `repo/open`. Ningun webview los
+  puede llamar.
 - `repoId` es opaco: `repo-` mas 16 cifras hexadecimales que salen de la raiz. Reabrir la misma
   carpeta da el mismo id, tambien tras reiniciar el sidecar.
 - `snapshot`: la pagina siguiente del grafo se pide con la huella de la primera; si las refs
   cambiaron, el motor responde `stale_window` y la interfaz vuelve a la fila 0.
-- `PROTOCOL_VERSION` (hoy 2) la compara el extension host en cada arranque del sidecar. En los
+- `PROTOCOL_VERSION` (hoy 3) la compara el extension host en cada arranque del sidecar. En los
   tests no se escribe a mano: los fakes la toman de `@git-rudder/bridge`. Un test que fijaba la 1 se
   rompio al subirla a la 2.
 - Los tipos de TypeScript salen de Rust con ts-rs y se commitean en
   `packages/bridge/src/generated`. Tras cambiar un DTO o un metodo: `just protocol-gen` y
   commitear lo generado en el mismo commit. `just protocol-check` (y la CI) falla si no.
-- `$/cancel` existe en el cliente pero el motor todavia lo ignora, y VS Code no lo reenvia desde
-  un webview. No hay tipo `cancelled`: cancelar rechaza con `signal.reason`.
+- `$/cancel { id }` para la peticion: el motor suelta su futuro y `kill_on_drop` mata el git.
+  Responde `cancelled` (-32800), pero el bridge no espera: cancelar rechaza con `signal.reason`.
+  En VS Code el webview lo manda como `rpc/cancel` y el extension host traduce el id.
+- Notificaciones: en escritorio por el `Channel` de `rpc_subscribe`; en el sidecar, por la misma
+  cola que las respuestas. El extension host solo entrega `repo/changed` a los paneles de ese
+  `repoId`.
+- Confianza ([ADR 0020](docs/adr/0020-confianza-de-repositorios-y-frontera-del-webview.md)): un
+  repo con claves que ejecutan comandos o hooks activos se abre sin confianza y solo se lee con
+  fsmonitor, diff externo, textconv y filtros apagados. Todas las lecturas van con
+  `GIT_OPTIONAL_LOCKS=0`. La confianza se guarda en el dispositivo (`--data-dir` en el sidecar).
+- Los repos dorados (`just engine-golden`) guardan cada lectura en
+  `crates/engine/tests/snapshots/`. Si cambia un parser o un DTO, se reescriben con
+  `GIT_RUDDER_UPDATE_SNAPSHOTS=1` y el diff se revisa en el PR. Corren tambien en macOS y Windows.
 
 ## El contrato de la API
 
@@ -200,6 +222,7 @@ just guard                 # tools/checks: tamano, tests apagados, TODO, grafo, 
 just fmt / just fmt-check  # prettier y rustfmt
 just api-test-db           # tests de la API contra el Postgres de compose; no se pueden saltar
 just engine-check          # motor y sidecar: clippy, tests y cobertura
+just engine-golden         # repos dorados y sus snapshots del protocolo
 just protocol-gen          # regenera packages/bridge/src/generated
 just api-openapi           # reescribe apps/api/openapi.json
 just api-client            # regenera @git-rudder/api-client

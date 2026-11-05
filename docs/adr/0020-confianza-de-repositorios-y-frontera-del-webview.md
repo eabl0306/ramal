@@ -151,6 +151,25 @@ Para lo demas, la regla sobre los parametros:
 - Un metodo del motor que necesite una ruta absoluta o un secreto **no se anade a ninguna lista de
   webview**: se marca `host_only` y lo llama el host.
 
+## Como quedo al implementarlo (E05, 2026-11)
+
+Tres precisiones sobre lo de arriba, sin cambiar la decision:
+
+- **Abrir no falla.** `repo/open` no responde `untrusted_repository`: abre el repositorio sin
+  confianza y devuelve `trusted: false` con `trustFindings` (cada clave y cada hook, para
+  ensenarlos al preguntar). La interfaz puede pintar el grafo y el estado mientras pregunta, y
+  `repo/trust` guarda la respuesta. `untrusted_repository` queda para la primera escritura, que
+  llega con `GitWriter`.
+- **Los filtros tambien se apagan.** Los tres flags no bastan: `git status` y `git diff` pueden
+  lanzar el `clean` de un filtro de `.gitattributes`, que es configuracion del propio repo. Las
+  lecturas sin confianza vacian `filter.<driver>.clean`, `smudge` y `process` (y quitan
+  `required`) para cada driver que aparece en la configuracion local. Un test de estado lo
+  comprueba con un control positivo: con confianza, el mismo repo si ejecuta el script.
+- **Donde se guarda.** En escritorio, un fichero en la carpeta de datos de la app; en VS Code,
+  en el `globalStorageUri` de la extension (`--data-dir` del sidecar). Los dos estan en el
+  dispositivo y no se sincronizan. En VS Code, una carpeta de un workspace de confianza
+  (Workspace Trust) se abre con `trusted: true`; fuera de esas carpetas decide el motor.
+
 ## Alternativas descartadas
 
 - **No tener confianza en escritorio.** Es lo que habia, y deja la ejecucion de codigo a un doble
