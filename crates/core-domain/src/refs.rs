@@ -4,6 +4,9 @@
 //! es ambiguo: una rama local y un tag pueden llamarse igual.
 
 mod fingerprint;
+mod listing;
+
+pub use listing::{BranchInfo, RefListing, TagInfo, Tracking};
 
 use std::collections::HashMap;
 
