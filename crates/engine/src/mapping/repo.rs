@@ -4,6 +4,8 @@ use git_rudder_core_application::OpenedRepository;
 use git_rudder_core_domain::Sha;
 use git_rudder_protocol::repo as dto;
 
+use super::inventory::finding_to_dto;
+
 /// Repositorio abierto tal como lo ve el host.
 #[must_use]
 pub fn opened_to_dto(opened: &OpenedRepository) -> dto::RepoHandle {
@@ -17,5 +19,7 @@ pub fn opened_to_dto(opened: &OpenedRepository) -> dto::RepoHandle {
         head_sha: opened.refs.head_target().map(Sha::to_hex),
         is_detached: opened.refs.is_detached(),
         is_empty: opened.refs.is_empty(),
+        trusted: opened.trust.is_trusted(),
+        trust_findings: opened.findings.iter().map(finding_to_dto).collect(),
     }
 }

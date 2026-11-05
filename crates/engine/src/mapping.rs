@@ -4,10 +4,14 @@
 //! este crate, y la regla de huerfanos de Rust no deja implementar `From` entre
 //! dos tipos ajenos.
 
+pub mod diff;
 pub mod engine;
 pub mod error;
 pub mod graph;
+pub mod inventory;
+pub mod params;
 pub mod repo;
+pub mod status;
 
 /// Los DTOs no llevan enteros de 64 bits (ts-rs los haria `bigint`). Filas y
 /// carriles caben de sobra en 32 bits; si algun dia no cupieran, se satura en vez

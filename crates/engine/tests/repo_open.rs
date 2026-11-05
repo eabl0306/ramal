@@ -66,6 +66,8 @@ async fn opening_a_repository_returns_its_handle() {
             head_sha: Some(repo.rev("main")),
             is_detached: false,
             is_empty: false,
+            trusted: true,
+            trust_findings: Vec::new(),
         }
     );
 }

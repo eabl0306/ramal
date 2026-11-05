@@ -8,19 +8,24 @@ publish.workspace = true
 license.workspace = true
 
 [dependencies]
+# Para implementar TrustStore, que se declara con #[async_trait].
+async-trait = { workspace = true }
 git-rudder-core-application = { workspace = true }
 git-rudder-core-domain = { workspace = true }
 git-rudder-git = { workspace = true }
 git-rudder-protocol = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+# El almacen de confianza lee y escribe su fichero sin bloquear el runtime del host.
+tokio = { workspace = true, features = ["fs", "sync"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
+async-trait = { workspace = true }
 pretty_assertions = { workspace = true }
 git-rudder-core-application = { workspace = true, features = ["testing"] }
 tempfile = { workspace = true }
-tokio = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }
 
 [lints]
 workspace = true

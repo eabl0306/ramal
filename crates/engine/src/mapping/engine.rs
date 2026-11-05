@@ -1,6 +1,6 @@
 //! `EngineDescription` -> `EngineInfo`.
 
-use git_rudder_core_application::EngineDescription;
+use git_rudder_core_application::{EngineDescription, GitVersionInfo};
 use git_rudder_protocol::PROTOCOL_VERSION;
 use git_rudder_protocol::engine as dto;
 
@@ -10,10 +10,16 @@ pub fn description_to_dto(description: &EngineDescription) -> dto::EngineInfo {
     dto::EngineInfo {
         engine_version: description.engine_version.clone(),
         protocol_version: PROTOCOL_VERSION,
-        git: dto::GitInfo {
-            path: description.git.path.to_string_lossy().into_owned(),
-            version: description.git.version.to_string(),
-            supported: description.git.is_supported(),
-        },
+        git: git_to_dto(&description.git),
+    }
+}
+
+/// El git que va a usar el motor.
+#[must_use]
+pub fn git_to_dto(git: &GitVersionInfo) -> dto::GitInfo {
+    dto::GitInfo {
+        path: git.path.to_string_lossy().into_owned(),
+        version: git.version.to_string(),
+        supported: git.is_supported(),
     }
 }
