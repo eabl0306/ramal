@@ -11,14 +11,23 @@
 //! opcionales con `skip_serializing_if` mas `#[ts(optional)]`, y ningun entero de
 //! 64 bits (ts-rs los traduce a `bigint` y romperian el JSON normal).
 
+pub mod commit;
+pub mod diff;
 pub mod engine;
 pub mod envelope;
 pub mod graph;
+pub mod history;
+pub mod inventory;
 pub mod methods;
+pub mod notifications;
+pub mod refs;
 pub mod repo;
+pub mod repos;
+pub mod status;
 
 pub use envelope::{
     ErrorKind, JsonRpcVersion, RequestId, RpcError, RpcErrorData, RpcNotification, RpcOutcome,
     RpcRequest, RpcResponse, error_code,
 };
 pub use methods::{METHODS, MethodInfo, MethodVisitor, PROTOCOL_VERSION, RpcMethod};
+pub use notifications::{EngineNotification, NotificationVisitor};

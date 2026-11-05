@@ -42,6 +42,8 @@ const ERROR_KEYS: Readonly<Record<HostVisibleErrorKind, PlainKey>> = {
   git_not_found: 'errors.engine.git_not_found',
   git_version_unsupported: 'errors.engine.git_version_unsupported',
   git_failed: 'errors.engine.git_failed',
+  not_found: 'errors.engine.not_found',
+  cancelled: 'errors.engine.cancelled',
   // Solo lo provoca la paginacion del grafo, que vive en el webview y vuelve a
   // empezar sola. Si llegara al host seria un fallo nuestro: interno.
   stale_window: 'errors.engine.internal',

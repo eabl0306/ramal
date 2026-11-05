@@ -193,3 +193,25 @@ fn an_unknown_argument_exits_with_the_usage() {
     assert!(String::from_utf8_lossy(&output.stderr).contains("usage:"));
     assert!(output.stdout.is_empty(), "{:?}", output.stdout);
 }
+
+#[test]
+fn a_commit_from_the_terminal_arrives_as_a_repo_changed_frame() {
+    let repo = FixtureRepo::new();
+    repo.commit("Initial");
+    let data = tempfile::tempdir().unwrap();
+    let data_dir = path_text(data.path());
+    let mut sidecar = Sidecar::start(&["--data-dir", &data_dir]);
+    let open = sidecar.request(1, "repo/open", &json!({ "path": path_text(&repo.path()) }));
+    let repo_id = open["result"]["repoId"].clone();
+
+    repo.commit("From the terminal");
+    let notification = sidecar.receive();
+
+    assert_eq!(notification.get("id"), None, "a notification has no id");
+    assert_eq!(notification["method"], json!("repo/changed"));
+    assert_eq!(notification["params"], json!({ "repoId": repo_id }));
+    assert!(
+        sidecar.finish().success(),
+        "the watcher does not keep it alive"
+    );
+}

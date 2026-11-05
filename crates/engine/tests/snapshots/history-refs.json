@@ -1,0 +1,50 @@
+{
+  "local": [
+    {
+      "fullName": "refs/heads/a",
+      "isHead": false,
+      "name": "a",
+      "sha": "<sha-0>",
+      "upstreamGone": false
+    },
+    {
+      "fullName": "refs/heads/b",
+      "isHead": false,
+      "name": "b",
+      "sha": "<sha-1>",
+      "upstreamGone": false
+    },
+    {
+      "fullName": "refs/heads/c",
+      "isHead": false,
+      "name": "c",
+      "sha": "<sha-2>",
+      "upstreamGone": false
+    },
+    {
+      "fullName": "refs/heads/feature/rename",
+      "isHead": false,
+      "name": "feature/rename",
+      "sha": "<sha-3>",
+      "upstreamGone": false
+    },
+    {
+      "fullName": "refs/heads/main",
+      "isHead": true,
+      "name": "main",
+      "sha": "<sha-4>",
+      "upstreamGone": false
+    }
+  ],
+  "remote": [],
+  "remotes": [],
+  "repoId": "<repoId>",
+  "tags": [
+    {
+      "annotation": "First release",
+      "fullName": "refs/tags/v1.0",
+      "name": "v1.0",
+      "sha": "<sha-4>"
+    }
+  ]
+}

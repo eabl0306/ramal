@@ -1,8 +1,8 @@
-import { type RpcResponse, createBridgeClient } from '@git-rudder/bridge';
+import { type RpcNotification, type RpcResponse, createBridgeClient } from '@git-rudder/bridge';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { Invoke } from './invoke';
-import { RPC_COMMAND, createTauriTransport } from './tauri-transport';
+import { RPC_COMMAND, SUBSCRIBE_COMMAND, createTauriTransport } from './tauri-transport';
 
 const window = {
   repoId: 'repo-1',
@@ -76,13 +76,48 @@ describe('createTauriTransport', () => {
     expect(invoke).toHaveBeenCalledWith(RPC_COMMAND, { request: notification });
   });
 
-  it('suscribirse no hace nada hasta que exista rpc_subscribe', () => {
-    const transport = createTauriTransport(vi.fn());
-    const listener = vi.fn();
+  it('la primera suscripcion abre un canal con rpc_subscribe y reparte lo que llega', async () => {
+    const invoke = vi.fn(() => Promise.resolve(null)) as unknown as Invoke;
+    let deliver: ((notification: RpcNotification) => void) | undefined;
+    const channel = { id: 7 };
+    const openChannel = vi.fn((onMessage: (notification: RpcNotification) => void) => {
+      deliver = onMessage;
+      return channel;
+    });
+    const transport = createTauriTransport(invoke, openChannel);
+    const first = vi.fn();
+    const second = vi.fn();
 
-    const unsubscribe = transport.subscribe(listener);
+    transport.subscribe(first);
+    const unsubscribe = transport.subscribe(second);
+    await Promise.resolve();
+    const changed: RpcNotification = {
+      jsonrpc: '2.0',
+      method: 'repo/changed',
+      params: { repoId: 'repo-1' },
+    };
+    deliver?.(changed);
     unsubscribe();
+    deliver?.(changed);
 
-    expect(listener).not.toHaveBeenCalled();
+    expect(openChannel).toHaveBeenCalledTimes(1);
+    expect(invoke).toHaveBeenCalledWith(SUBSCRIBE_COMMAND, { channel });
+    expect(first).toHaveBeenCalledTimes(2);
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
+  it('si rpc_subscribe falla, la siguiente suscripcion lo vuelve a intentar', async () => {
+    const invoke = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('no permission'))
+      .mockResolvedValue(null) as unknown as Invoke;
+    const openChannel = vi.fn(() => ({}));
+    const transport = createTauriTransport(invoke, openChannel);
+
+    transport.subscribe(vi.fn());
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    transport.subscribe(vi.fn());
+
+    expect(openChannel).toHaveBeenCalledTimes(2);
   });
 });

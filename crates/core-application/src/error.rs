@@ -45,6 +45,19 @@ pub enum EngineError {
     /// fila 0 en vez de pegar paginas de dos historiales.
     #[error("the graph changed since the first page was read")]
     StaleWindow,
+    /// El commit, la ref, el fichero o el submodulo pedido no existe.
+    #[error("not found: {what}")]
+    NotFound {
+        /// Que se busco, en ingles, para el log.
+        what: String,
+    },
+    /// Fallo del propio motor (no de git): un almacen que no se puede escribir.
+    /// El detalle va solo al log.
+    #[error("internal engine error: {detail}")]
+    Internal {
+        /// Que fallo, en ingles.
+        detail: String,
+    },
     /// git fallo. El detalle va solo al log; la interfaz recibe un tipo estable.
     #[error("git command failed: {detail}")]
     GitFailed {
@@ -58,6 +71,7 @@ impl From<GitReadError> for EngineError {
         match error {
             GitReadError::NotFound => Self::GitUnavailable,
             GitReadError::NotARepository { path } => Self::NotARepository { path },
+            GitReadError::Missing { what } => Self::NotFound { what },
             GitReadError::Failed { detail } => Self::GitFailed { detail },
         }
     }

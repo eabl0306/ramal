@@ -30,13 +30,18 @@ export type OpenGraphResult =
  * "Git Rudder: Open Graph" (architecture.md 6.2): elige el repositorio (la carpeta
  * del workspace, o un QuickPick si hay varias), lo abre el propio host con
  * `repo/open` y ensena el panel del grafo con el `repoId`. El webview nunca ve
- * ni manda una ruta. Nunca lanza: los fallos se avisan y se devuelven.
+ * ni manda una ruta. Una carpeta de un workspace de confianza se abre con
+ * `trusted`; si no, decide el motor (ADR 0020). Nunca lanza: los fallos se
+ * avisan y se devuelven.
  */
 export async function openGraph(deps: OpenGraphDeps): Promise<OpenGraphResult> {
   const folder = await chooseFolder(deps);
   if (folder === 'no-folder' || folder === 'cancelled') return { outcome: folder };
   try {
-    const handle = await callEngine(deps.engine, deps.ids, 'repo/open', { path: folder.path });
+    const handle = await callEngine(deps.engine, deps.ids, 'repo/open', {
+      path: folder.path,
+      ...(deps.repositories.vouches(folder.path) ? { trusted: true } : {}),
+    });
     deps.panels.show({
       surface: 'graph',
       repoId: handle.repoId,

@@ -121,3 +121,59 @@ fn git_time_rejects_values_that_do_not_fit() {
         assert!(error.to_string().contains(text));
     }
 }
+
+#[test]
+fn iso_instants_from_the_interface_are_read_back() {
+    let written = GitTime::new(1_790_761_320, 120);
+    let read = GitTime::parse_iso8601(&written.to_iso8601()).unwrap();
+    assert_eq!(read, written);
+
+    let utc = GitTime::parse_iso8601("2026-09-30T10:00:00.250Z").unwrap();
+    assert_eq!(utc.seconds(), 1_790_762_400);
+    assert_eq!(utc.offset_minutes(), 0);
+
+    let west = GitTime::parse_iso8601("2026-09-30T05:00:00-05:00").unwrap();
+    assert_eq!(west.seconds(), utc.seconds());
+    assert_eq!(west.offset_minutes(), -300);
+
+    let midnight = GitTime::parse_iso8601("1970-01-02").unwrap();
+    assert_eq!(midnight.seconds(), 86_400);
+    let leap = GitTime::parse_iso8601("2024-02-29").unwrap();
+    assert_eq!(leap.to_iso8601(), "2024-02-29T00:00:00+00:00");
+    let before_epoch = GitTime::parse_iso8601("1969-12-31T23:59:59Z").unwrap();
+    assert_eq!(before_epoch.seconds(), -1);
+}
+
+#[test]
+fn iso_text_that_is_not_strict_is_rejected() {
+    for text in [
+        "2026-9-30",
+        "2026-09-30 10:00:00Z",
+        "2026-09-30T10:00Z",
+        "2026-09-30T10:00:00",
+        "2026-09-30T10:00:00.Z",
+        "2026-09-30T10:00:00+0200",
+        "2026-09-30T10:00:00*02:00",
+        "+2026-09-30",
+        "",
+    ] {
+        assert!(
+            matches!(GitTime::parse_iso8601(text), Err(TimeError::Malformed(_))),
+            "{text:?}"
+        );
+    }
+    for text in [
+        "2026-13-01",
+        "2026-02-29",
+        "2026-04-31",
+        "2026-09-30T24:00:00Z",
+        "2026-09-30T10:60:00Z",
+        "2026-09-30T10:00:60Z",
+        "2026-09-30T10:00:00+24:00",
+    ] {
+        assert!(
+            matches!(GitTime::parse_iso8601(text), Err(TimeError::OutOfRange(_))),
+            "{text:?}"
+        );
+    }
+}

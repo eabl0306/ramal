@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Ventana principal: solo los dos comandos del host. Ningun permiso de core ni de plugins: el dialogo de carpetas lo abre Rust y el webview no habla con nada mas.",
+  "description": "Ventana principal: solo los tres comandos del host (rpc, rpc_subscribe y repo_pick_and_open). Ningun permiso de core ni de plugins: el dialogo de carpetas lo abre Rust y el webview no habla con nada mas.",
   "windows": ["main"],
-  "permissions": ["allow-rpc", "allow-repo-pick-and-open"]
+  "permissions": ["allow-rpc", "allow-rpc-subscribe", "allow-repo-pick-and-open"]
 }

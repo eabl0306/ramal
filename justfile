@@ -310,6 +310,14 @@ engine-check:
 engine-test:
     cargo test {{engine_crates}}
 
+# Repos de prueba dorados: las lecturas contra historias dificiles (merges, octopus,
+# renombrados, submodulos, LFS) y sus snapshots en crates/engine/tests/snapshots.
+# La CI los corre tambien en macOS y Windows. Para reescribirlos y revisar el diff:
+# GIT_RUDDER_UPDATE_SNAPSHOTS=1 just engine-golden
+[group('engine')]
+engine-golden:
+    cargo test -p git-rudder-engine --test golden
+
 # Igual que api-cov: el nucleo con sus propios tests, un informe por crate, y el
 # global con todos.
 [group('engine')]

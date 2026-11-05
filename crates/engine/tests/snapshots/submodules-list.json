@@ -1,0 +1,17 @@
+{
+  "submodules": [
+    {
+      "canOpen": true,
+      "describe": "heads/main",
+      "path": "vendor/inner",
+      "sha": "<sha-0>",
+      "state": "modified"
+    },
+    {
+      "canOpen": false,
+      "path": "vendor/pristine",
+      "sha": "<sha-1>",
+      "state": "uninitialized"
+    }
+  ]
+}

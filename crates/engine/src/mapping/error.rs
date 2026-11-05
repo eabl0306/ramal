@@ -19,6 +19,8 @@ pub fn engine_error(error: &EngineError) -> RpcError {
         }
         EngineError::InvalidWindow(_) => (error_code::INVALID_PARAMS, ErrorKind::InvalidParams),
         EngineError::StaleWindow => (error_code::ENGINE_ERROR, ErrorKind::StaleWindow),
+        EngineError::NotFound { .. } => (error_code::ENGINE_ERROR, ErrorKind::NotFound),
+        EngineError::Internal { detail } => return internal_error(detail),
         EngineError::GitFailed { detail } => {
             tracing::warn!(%detail, "git command failed");
             return RpcError::new(
@@ -60,6 +62,16 @@ pub fn forbidden_method(method: &str) -> RpcError {
         error_code::METHOD_NOT_FOUND,
         format!("method {method} is not available to webviews"),
         ErrorKind::Internal,
+    )
+}
+
+/// Peticion cancelada con `$/cancel`.
+#[must_use]
+pub fn cancelled() -> RpcError {
+    RpcError::new(
+        error_code::REQUEST_CANCELLED,
+        "request cancelled",
+        ErrorKind::Cancelled,
     )
 }
 

@@ -9,10 +9,14 @@
 //! viven aqui.
 
 mod edges;
+mod filter;
+mod history;
 mod lanes;
 mod window;
 
 pub use edges::{EdgeKind, GraphEdge};
+pub use filter::{GraphFilter, RefSelection, filter_history};
+pub use history::LaidOutHistory;
 pub use window::{GraphWindow, MAX_WINDOW_LIMIT, WindowError, WindowRange, WindowRow};
 
 use crate::commit::{CommitNode, CommitRecord};

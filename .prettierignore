@@ -27,6 +27,8 @@ packages/bridge/src/generated/
 packages/api-client/src/generated/
 apps/api/openapi.json
 apps/desktop/src-tauri/gen/
+# Los snapshots de los repos dorados los escribe su test y los compara tal cual.
+crates/engine/tests/snapshots/
 
 # Los lockfiles y el workspace los escriben cargo y pnpm por su cuenta: que no
 # peleen los dos formateadores.

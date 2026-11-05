@@ -24,4 +24,24 @@ describe('argumentos del sidecar', () => {
     const gitPath = 'C:\\Program Files\\Git=portable\\cmd\\git.exe';
     expect(engineArgs({ gitPath, logLevel: 'info' }).slice(0, 2)).toEqual(['--git-path', gitPath]);
   });
+
+  it('pasa la carpeta de datos con --data-dir para recordar la confianza', () => {
+    expect(
+      engineArgs({ gitPath: '/usr/bin/git', dataDir: '/home/ana/.vscode/data', logLevel: 'info' }),
+    ).toEqual([
+      '--git-path',
+      '/usr/bin/git',
+      '--data-dir',
+      '/home/ana/.vscode/data',
+      '--log-level',
+      'info',
+    ]);
+  });
+
+  it('sin carpeta de datos no pasa --data-dir', () => {
+    expect(engineArgs({ gitPath: undefined, dataDir: '', logLevel: 'info' })).toEqual([
+      '--log-level',
+      'info',
+    ]);
+  });
 });

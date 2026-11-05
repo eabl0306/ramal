@@ -46,7 +46,12 @@ pub fn parse_log(stdout: &[u8]) -> Result<Vec<CommitRecord>, ParseError> {
         .collect()
 }
 
-fn parse_record(record: &str) -> Result<CommitRecord, ParseError> {
+/// Un commit con los siete campos de [`LOG_FORMAT`].
+///
+/// # Errors
+///
+/// [`ParseError`] si faltan campos o un sha no es valido.
+pub fn parse_record(record: &str) -> Result<CommitRecord, ParseError> {
     let fields: Vec<&str> = record.splitn(FIELDS, '\n').collect();
     let [sha, short, parents, date, name, email, summary] = fields.as_slice() else {
         return Err(ParseError(format!(

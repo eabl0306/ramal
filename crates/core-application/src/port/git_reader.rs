@@ -8,7 +8,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 
 use async_trait::async_trait;
-use git_rudder_core_domain::{CommitRecord, RefSnapshot, RepoRoot};
+use git_rudder_core_domain::{CommitRecord, RefName, RefSnapshot, RepoRoot};
 use thiserror::Error;
 
 /// Version de git: mayor, menor y parche.
@@ -52,6 +52,9 @@ pub struct GitCapabilities {
     pub merge_tree_write_tree: bool,
     /// `git rebase --update-refs` (2.38).
     pub rebase_update_refs: bool,
+    /// Marcadores de conflicto `zdiff3` (2.35): las lineas comunes salen del
+    /// bloque. Sin ellos se piden `diff3`.
+    pub zdiff3: bool,
 }
 
 /// El git que va a usar el motor.
@@ -73,16 +76,43 @@ impl GitVersionInfo {
     }
 }
 
-/// Que commits leer para el grafo.
-///
-/// El adaptador recorre siempre las mismas refs que devuelve `read_refs` (ramas,
-/// ramas remotas y tags) mas HEAD, en orden topologico; aqui solo se dice cuantos
-/// commits como maximo. Asi cada fila del grafo cuelga de algo que se puede
-/// etiquetar, y la huella de esas refs basta para saber si el historial cambio.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Desde donde recorre el log del grafo.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum LogRevisions {
+    /// Ramas, ramas remotas, tags y HEAD: las mismas refs que devuelve
+    /// `read_refs`, asi cada fila cuelga de algo que se puede etiquetar.
+    #[default]
+    All,
+    /// Solo estas refs, y HEAD si `include_head` (ocultar o aislar ramas).
+    Refs {
+        /// Refs completas.
+        names: Vec<RefName>,
+        /// Anadir HEAD (un HEAD separado no tiene ref que lo nombre).
+        include_head: bool,
+    },
+}
+
+/// Que commits leer para el grafo, en orden topologico.
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct LogQuery {
-    /// Maximo de commits.
-    pub max_count: usize,
+    /// Commits que saltar desde el principio: los que ya tiene la cache.
+    pub skip: usize,
+    /// Maximo de commits; `None` para leer hasta el final.
+    pub max_count: Option<usize>,
+    /// Desde donde se recorre.
+    pub revisions: LogRevisions,
+}
+
+impl LogQuery {
+    /// Los primeros `max_count` commits de todas las refs.
+    #[must_use]
+    pub const fn first(max_count: usize) -> Self {
+        Self {
+            skip: 0,
+            max_count: Some(max_count),
+            revisions: LogRevisions::All,
+        }
+    }
 }
 
 /// Fallo de una lectura de git.
@@ -96,6 +126,12 @@ pub enum GitReadError {
     NotARepository {
         /// Ruta pedida.
         path: PathBuf,
+    },
+    /// El commit, la ref o el fichero pedido no existe.
+    #[error("{what} does not exist")]
+    Missing {
+        /// Que se busco.
+        what: String,
     },
     /// git fallo o su salida no se pudo leer. El detalle es para el log.
     #[error("git command failed: {detail}")]

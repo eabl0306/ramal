@@ -23,7 +23,10 @@ const HANDLE = {
   isEmpty: false,
 };
 
-function deps(folders: readonly WorkspaceFolderInfo[]): OpenGraphDeps & {
+function deps(
+  folders: readonly WorkspaceFolderInfo[],
+  trusted: readonly string[] = [],
+): OpenGraphDeps & {
   readonly engine: FakeEngine;
   readonly dialogs: FakeDialogs;
   readonly notifications: FakeNotifications;
@@ -34,7 +37,7 @@ function deps(folders: readonly WorkspaceFolderInfo[]): OpenGraphDeps & {
   return {
     engine,
     ids: createRequestIds(),
-    repositories: { list: () => folders },
+    repositories: { list: () => folders, vouches: (path) => trusted.includes(path) },
     dialogs: new FakeDialogs(),
     notifications: new FakeNotifications(),
     panels: new FakePanels(),
@@ -104,5 +107,13 @@ describe('Git Rudder: Open Graph', () => {
     const d = deps([GIT_RUDDER]);
     d.engine.respond = () => Promise.reject(new EngineUnavailableError('gone'));
     expect(await openGraph(d)).toEqual({ outcome: 'failed', kind: 'engine_unavailable' });
+  });
+
+  it('una carpeta de un workspace de confianza se abre con trusted', async () => {
+    const d = deps([GIT_RUDDER], [GIT_RUDDER.path]);
+    await openGraph(d);
+    expect(d.engine.requests.map((request) => request.params)).toEqual([
+      { path: '/work/git-rudder', trusted: true },
+    ]);
   });
 });

@@ -10,6 +10,7 @@
 //! "rama que sale" del diseno no cambia.
 
 use std::collections::HashMap;
+use std::ops::Range;
 
 use super::LayoutRow;
 use super::lanes::LaneAssignment;
@@ -43,20 +44,53 @@ pub struct GraphEdge {
     pub kind: EdgeKind,
 }
 
+/// Fila de cada sha: la primera en la que aparece.
+pub(super) fn index_rows(
+    rows_by_sha: &mut HashMap<Sha, usize>,
+    commits: &[CommitNode],
+    first: usize,
+) {
+    for (row, commit) in (first..).zip(commits) {
+        rows_by_sha.entry(commit.sha).or_insert(row);
+    }
+}
+
 /// Construye las filas a partir de la asignacion de carriles.
 pub(super) fn build(commits: &[CommitNode], assignment: &LaneAssignment) -> Vec<LayoutRow> {
     let mut rows_by_sha: HashMap<Sha, usize> = HashMap::with_capacity(commits.len());
-    for (row, commit) in commits.iter().enumerate() {
-        rows_by_sha.entry(commit.sha).or_insert(row);
-    }
+    index_rows(&mut rows_by_sha, commits, 0);
+    build_range(
+        commits,
+        assignment,
+        &rows_by_sha,
+        0..commits.len(),
+        commits.len(),
+    )
+}
+
+/// Filas de `range`. Un padre en una fila igual o posterior a `horizon` cuenta
+/// como no leido: asi una ventana sale igual tanto si hay mas filas en cache
+/// como si no.
+pub(super) fn build_range(
+    commits: &[CommitNode],
+    assignment: &LaneAssignment,
+    rows_by_sha: &HashMap<Sha, usize>,
+    range: Range<usize>,
+    horizon: usize,
+) -> Vec<LayoutRow> {
     let router = Router {
         rows_by_sha,
         lanes: &assignment.lanes,
+        horizon,
     };
+    let start = range.start;
+    let take = range.len();
     commits
         .iter()
         .zip(&assignment.lanes)
         .zip(&assignment.travel)
+        .skip(start)
+        .take(take)
         .map(|((commit, &lane), travel)| LayoutRow {
             lane,
             edges: router.edges(commit, lane, travel),
@@ -66,8 +100,9 @@ pub(super) fn build(commits: &[CommitNode], assignment: &LaneAssignment) -> Vec<
 
 /// Lo que hace falta para resolver el destino de cada arista.
 struct Router<'a> {
-    rows_by_sha: HashMap<Sha, usize>,
+    rows_by_sha: &'a HashMap<Sha, usize>,
     lanes: &'a [usize],
+    horizon: usize,
 }
 
 impl Router<'_> {
@@ -89,7 +124,11 @@ impl Router<'_> {
     }
 
     fn edge(&self, parent: Sha, from_lane: usize, travel_lane: usize, kind: EdgeKind) -> GraphEdge {
-        let parent_row = self.rows_by_sha.get(&parent).copied();
+        let parent_row = self
+            .rows_by_sha
+            .get(&parent)
+            .copied()
+            .filter(|row| *row < self.horizon);
         let to_lane = parent_row
             .and_then(|row| self.lanes.get(row))
             .copied()

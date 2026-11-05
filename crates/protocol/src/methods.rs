@@ -10,16 +10,35 @@ use serde::Serialize;
 use serde::de::DeserializeOwned;
 use ts_rs::TS;
 
-use crate::engine::{EngineInfo, EngineInfoParams};
+use crate::commit::{CommitDetail, CommitDetailParams};
+use crate::diff::{DiffFileParams, FileDiff};
+use crate::engine::{EngineInfo, EngineInfoParams, GitInfo};
 use crate::graph::{GraphWindow, GraphWindowParams};
+use crate::history::{
+    Blame, BlameParams, CompareParams, Comparison, FileHistoryPage, FileHistoryParams,
+    GraphSearchParams, GraphSearchResult,
+};
+use crate::inventory::{
+    ConflictFile, RepoPathParams, StashContents, StashList, StashShowParams, SubmoduleList,
+};
+use crate::refs::RefListing;
 use crate::repo::{OpenRepoParams, RepoHandle};
+use crate::repos::{
+    ConfigureGitParams, RepoSummary, RepoSummaryParams, RepoTrusted, ScanReposParams,
+    ScanReposResult,
+};
+use crate::status::{RepoParams, WorkingTreeStatus};
 
 /// Version del protocolo. Sube con cualquier cambio incompatible. El extension
 /// host la compara al arrancar el sidecar con la que trae generada.
 ///
 /// 2: `graph/window` lleva `snapshot` y puede responder `stale_window`. Un motor
 /// de la version 1 rechazaria el parametro nuevo por `deny_unknown_fields`.
-pub const PROTOCOL_VERSION: u32 = 2;
+///
+/// 3: las lecturas del repositorio (estado, diffs, refs, historia, stashes,
+/// submodulos y conflictos), el filtro de `graph/window`, la confianza en
+/// `repo/open`, la notificacion `repo/changed` y `$/cancel`.
+pub const PROTOCOL_VERSION: u32 = 3;
 
 /// Un metodo del motor con sus tipos.
 pub trait RpcMethod {
@@ -98,8 +117,44 @@ macro_rules! define_methods {
 define_methods! {
     /// Version del motor y de git. Los hosts la piden al arrancar.
     "engine/info" => EngineInfoMethod(EngineInfoParams) -> EngineInfo, host_only = false;
+    /// Cambia el ejecutable de git y vuelve a comprobarlo. Decide que se ejecuta.
+    "git/configure" => GitConfigureMethod(ConfigureGitParams) -> GitInfo, host_only = true;
     /// Abre un repositorio por ruta. Solo los hosts: un webview nunca manda rutas.
     "repo/open" => RepoOpenMethod(OpenRepoParams) -> RepoHandle, host_only = true;
+    /// El usuario confia en un repositorio abierto. Solo los hosts, tras su propia
+    /// confirmacion: si un webview pudiera, la pregunta no protegeria de nada.
+    "repo/trust" => RepoTrustMethod(RepoParams) -> RepoTrusted, host_only = true;
+    /// Estado de fondo de un repositorio de la lista, sin abrirlo.
+    "repos/summary" => ReposSummaryMethod(RepoSummaryParams) -> RepoSummary, host_only = true;
+    /// Repositorios dentro de una carpeta.
+    "repos/scan" => ReposScanMethod(ScanReposParams) -> ScanReposResult, host_only = true;
+    /// Abre como repositorio un submodulo inicializado de uno abierto. Lo abre el
+    /// host, que es quien ensena el repositorio nuevo.
+    "submodule/open" => SubmoduleOpenMethod(RepoPathParams) -> RepoHandle, host_only = true;
     /// Ventana del grafo de un repositorio abierto.
     "graph/window" => GraphWindowMethod(GraphWindowParams) -> GraphWindow, host_only = false;
+    /// Busca en todo el historial por mensaje, autor o sha.
+    "graph/search" => GraphSearchMethod(GraphSearchParams) -> GraphSearchResult, host_only = false;
+    /// Estado del arbol de trabajo.
+    "status/read" => StatusReadMethod(RepoParams) -> WorkingTreeStatus, host_only = false;
+    /// Diff de un fichero.
+    "diff/file" => DiffFileMethod(DiffFileParams) -> FileDiff, host_only = false;
+    /// Detalle de un commit.
+    "commit/detail" => CommitDetailMethod(CommitDetailParams) -> CommitDetail, host_only = false;
+    /// Ramas, tags y remotos.
+    "refs/list" => RefsListMethod(RepoParams) -> RefListing, host_only = false;
+    /// Stashes.
+    "stash/list" => StashListMethod(RepoParams) -> StashList, host_only = false;
+    /// Ficheros y diff de un stash.
+    "stash/show" => StashShowMethod(StashShowParams) -> StashContents, host_only = false;
+    /// Submodulos.
+    "submodule/list" => SubmoduleListMethod(RepoParams) -> SubmoduleList, host_only = false;
+    /// Commits que tocan un fichero.
+    "history/file" => HistoryFileMethod(FileHistoryParams) -> FileHistoryPage, host_only = false;
+    /// Autor y commit de cada linea.
+    "blame/file" => BlameFileMethod(BlameParams) -> Blame, host_only = false;
+    /// Compara dos refs.
+    "compare/refs" => CompareRefsMethod(CompareParams) -> Comparison, host_only = false;
+    /// Lados y bloques de un fichero en conflicto.
+    "conflict/read" => ConflictReadMethod(RepoPathParams) -> ConflictFile, host_only = false;
 }

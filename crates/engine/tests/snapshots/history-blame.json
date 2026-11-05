@@ -1,0 +1,42 @@
+{
+  "commits": [
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:01:00+02:00",
+      "path": "README.md",
+      "sha": "<sha-0>",
+      "summary": "Initial",
+      "uncommitted": false
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:03:00+02:00",
+      "path": "README.md",
+      "sha": "<sha-1>",
+      "summary": "Edit README",
+      "uncommitted": false
+    }
+  ],
+  "lines": [
+    {
+      "line": 1,
+      "originalLine": 1,
+      "sha": "<sha-0>",
+      "text": "# Demo"
+    },
+    {
+      "line": 2,
+      "originalLine": 2,
+      "sha": "<sha-0>",
+      "text": ""
+    },
+    {
+      "line": 3,
+      "originalLine": 3,
+      "sha": "<sha-1>",
+      "text": "Otra linea."
+    }
+  ]
+}

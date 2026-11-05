@@ -1,0 +1,38 @@
+{
+  "authorEmail": "ana@example.com",
+  "authorName": "Ana Ruiz",
+  "authoredAt": "2026-09-30T10:08:00+02:00",
+  "committedAt": "2026-09-30T10:08:00+02:00",
+  "committerEmail": "ana@example.com",
+  "committerName": "Ana Ruiz",
+  "files": [
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "a.txt",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "b.txt",
+      "status": "added"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "c.txt",
+      "status": "added"
+    }
+  ],
+  "message": "Octopus a, b and c",
+  "parents": [
+    "<sha-0>",
+    "<sha-1>",
+    "<sha-2>",
+    "<sha-3>"
+  ],
+  "sha": "<sha-4>",
+  "shortSha": "<sha-4:short>",
+  "summary": "Octopus a, b and c"
+}

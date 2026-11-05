@@ -6,6 +6,7 @@
     "git_not_found": "Git was not found on this computer.",
     "git_version_unsupported": "Git Rudder needs Git 2.34 or later.",
     "git_failed": "Git returned an error.",
+    "not_found": "That is no longer in the repository.",
     "internal": "Something went wrong in Git Rudder.",
     "cancelled": "Operation cancelled.",
     "not_signed_in": "Sign in to Git Rudder to continue.",

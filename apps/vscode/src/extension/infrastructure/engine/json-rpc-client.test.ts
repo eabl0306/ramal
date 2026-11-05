@@ -53,6 +53,24 @@ describe('cliente JSON-RPC del sidecar', () => {
     expect(received).toEqual([{ jsonrpc: '2.0', method: 'repo/changed', params: { repoId: 'r' } }]);
   });
 
+  it('escribe las notificaciones en un marco, y nada tras cerrarse', () => {
+    const { client: rpc, sent } = client();
+    const cancel = { jsonrpc: '2.0', method: '$/cancel', params: { id: 3 } } as const;
+    rpc.notify(cancel);
+    rpc.close('exit');
+    rpc.notify(cancel);
+    expect(sent).toEqual([cancel]);
+  });
+
+  it('si no puede escribir una notificacion, lo registra y sigue', () => {
+    const logger = new RecordingLogger();
+    const rpc = new JsonRpcClient(() => {
+      throw new Error('EPIPE');
+    }, logger);
+    rpc.notify({ jsonrpc: '2.0', method: '$/cancel', params: { id: 3 } });
+    expect(logger.messages('warn')[0]).toContain('could not send $/cancel');
+  });
+
   it('ignora y registra lo que no es JSON, lo que no es JSON-RPC y los ids que no espera', () => {
     const { client: rpc, logger } = client();
     rpc.receive('not json');

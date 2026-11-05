@@ -20,7 +20,7 @@ use support::FixtureRepo;
 
 async fn log(repo: &FixtureRepo, max_count: usize) -> Vec<CommitRecord> {
     GitCliReader::new(GitCliConfig::default())
-        .read_log(&RepoRoot::new(repo.path()), &LogQuery { max_count })
+        .read_log(&RepoRoot::new(repo.path()), &LogQuery::first(max_count))
         .await
         .unwrap()
 }

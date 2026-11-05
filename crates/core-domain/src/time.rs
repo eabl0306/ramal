@@ -13,6 +13,8 @@
 //! La conversion de calendario se hace aqui a mano (algoritmo de dias civiles de
 //! Howard Hinnant) para no traer chrono al nucleo.
 
+mod iso;
+
 use std::fmt;
 
 use thiserror::Error;

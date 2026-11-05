@@ -3,8 +3,8 @@ import type { JsonRpcVersion } from "./JsonRpcVersion";
 import type { JsonValue } from "./serde_json/JsonValue";
 
 /**
- * Notificacion: un mensaje sin id y sin respuesta (planificadas: `$/cancel`,
- * `$/progress`, `repo/changed`).
+ * Notificacion: un mensaje sin id y sin respuesta. La interfaz manda `$/cancel`
+ * y el motor manda las de `define_notifications!` (`repo/changed`).
  */
 export type RpcNotification = { 
 /**

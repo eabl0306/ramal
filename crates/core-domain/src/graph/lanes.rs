@@ -19,6 +19,7 @@ use crate::commit::CommitNode;
 use crate::sha::Sha;
 
 /// Resultado de la asignacion, fila a fila.
+#[derive(Debug, Clone, Default)]
 pub(super) struct LaneAssignment {
     /// Carril de cada commit.
     pub lanes: Vec<usize>,
@@ -26,29 +27,62 @@ pub(super) struct LaneAssignment {
     pub travel: Vec<Vec<usize>>,
     /// Maximo de huecos ocupados a la vez.
     pub width: usize,
+    /// `width` hasta cada fila incluida: lo que necesita la columna si la
+    /// ventana acaba ahi.
+    pub width_until: Vec<usize>,
+}
+
+/// Asignacion que se puede seguir con mas commits: la de las filas ya puestas
+/// no cambia al anadir las siguientes.
+#[derive(Debug, Clone)]
+pub(super) struct LaneState {
+    slots: Slots,
+    assignment: LaneAssignment,
+}
+
+impl LaneState {
+    /// Estado inicial con las puntas fijadas reservadas.
+    pub(super) fn new(pinned: &[Sha]) -> Self {
+        let slots = Slots::pinned(pinned);
+        let width = slots.len();
+        Self {
+            slots,
+            assignment: LaneAssignment {
+                width,
+                ..LaneAssignment::default()
+            },
+        }
+    }
+
+    /// Asigna carril a los commits siguientes, en orden.
+    pub(super) fn extend(&mut self, commits: &[CommitNode]) {
+        for commit in commits {
+            let lane = self.slots.place(commit.sha);
+            let travel = self.slots.reserve_parents(lane, &commit.parents);
+            let assignment = &mut self.assignment;
+            assignment.travel.push(travel);
+            assignment.lanes.push(lane);
+            assignment.width = assignment.width.max(self.slots.len());
+            assignment.width_until.push(assignment.width);
+            self.slots.trim();
+        }
+    }
+
+    /// Lo asignado hasta ahora.
+    pub(super) const fn assignment(&self) -> &LaneAssignment {
+        &self.assignment
+    }
 }
 
 /// Recorre los commits en orden y asigna carriles.
 pub(super) fn assign(commits: &[CommitNode], pinned: &[Sha]) -> LaneAssignment {
-    let mut slots = Slots::pinned(pinned);
-    let mut lanes = Vec::with_capacity(commits.len());
-    let mut travel = Vec::with_capacity(commits.len());
-    let mut width = slots.len();
-    for commit in commits {
-        let lane = slots.place(commit.sha);
-        travel.push(slots.reserve_parents(lane, &commit.parents));
-        lanes.push(lane);
-        width = width.max(slots.len());
-        slots.trim();
-    }
-    LaneAssignment {
-        lanes,
-        travel,
-        width,
-    }
+    let mut state = LaneState::new(pinned);
+    state.extend(commits);
+    state.assignment
 }
 
 /// Huecos de carril: cada uno espera un commit o esta libre.
+#[derive(Debug, Clone)]
 struct Slots(Vec<Option<Sha>>);
 
 impl Slots {

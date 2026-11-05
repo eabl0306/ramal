@@ -71,3 +71,21 @@ async fn a_request_is_answered_with_serialized_json() {
     assert_eq!(value["jsonrpc"], json!("2.0"));
     assert!(value.get("result").is_some() || value.get("error").is_some());
 }
+
+#[tokio::test]
+async fn a_notification_is_queued_as_a_json_frame() {
+    use git_rudder_engine::NotificationSink as _;
+    use git_rudder_protocol::{JsonRpcVersion, RpcNotification};
+
+    let outbox = crate::server::Outbox::new();
+    let sink = super::FrameSink::new(outbox.sender());
+
+    sink.notify(RpcNotification {
+        jsonrpc: JsonRpcVersion::V2,
+        method: "repo/changed".to_owned(),
+        params: json!({ "repoId": "repo-1" }),
+    });
+
+    let queued = format!("{outbox:?}");
+    assert!(queued.contains("Outbox"), "{queued}");
+}

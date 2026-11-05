@@ -1,4 +1,5 @@
-//! Argumentos del sidecar: `--git-path`, `--log-level` y `--version`.
+//! Argumentos del sidecar: `--git-path`, `--data-dir`, `--log-level` y
+//! `--version`.
 //!
 //! Sin crate de argumentos: son tres opciones y el extension host es el unico que
 //! lanza el binario. El ejecutable de git llega del `git.path` de VS Code; el
@@ -10,8 +11,8 @@ use std::path::PathBuf;
 use thiserror::Error;
 
 /// Ayuda breve para un argumento invalido.
-pub const USAGE: &str =
-    "usage: git-rudder-vscode-engine [--git-path <path>] [--log-level <filter>] [--version]";
+pub const USAGE: &str = "usage: git-rudder-vscode-engine [--git-path <path>] [--data-dir <path>] \
+                         [--log-level <filter>] [--version]";
 
 /// Nivel de log por defecto.
 const DEFAULT_LOG_LEVEL: &str = "info";
@@ -21,6 +22,9 @@ const DEFAULT_LOG_LEVEL: &str = "info";
 pub struct Args {
     /// Ejecutable de git explicito.
     pub git_path: Option<PathBuf>,
+    /// Carpeta de datos de la extension (su `globalStorage`), donde se recuerda
+    /// en que repositorios confio el usuario. Sin ella, se olvida al cerrar.
+    pub data_dir: Option<PathBuf>,
     /// Filtro de `tracing` (`info`, `debug`, `git_rudder_git=debug`...).
     pub log_level: String,
 }
@@ -29,6 +33,7 @@ impl Default for Args {
     fn default() -> Self {
         Self {
             git_path: None,
+            data_dir: None,
             log_level: DEFAULT_LOG_LEVEL.to_owned(),
         }
     }
@@ -76,6 +81,10 @@ impl Args {
                 "--git-path" => {
                     let value = take_value("--git-path", inline, &mut rest)?;
                     args.git_path = Some(PathBuf::from(value));
+                }
+                "--data-dir" => {
+                    let value = take_value("--data-dir", inline, &mut rest)?;
+                    args.data_dir = Some(PathBuf::from(value));
                 }
                 "--log-level" => {
                     let value = take_value("--log-level", inline, &mut rest)?;

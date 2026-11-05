@@ -120,7 +120,8 @@ impl FixtureRepo {
         command
     }
 
-    fn tick(&self) {
+    /// Avanza el reloj de los commits un minuto.
+    pub fn tick(&self) {
         self.clock.fetch_add(60, Ordering::Relaxed);
     }
 
@@ -171,9 +172,133 @@ impl FixtureRepo {
         self.git(&["checkout", "--quiet", "--detach", revision]);
     }
 
-    /// Escribe un fichero en el arbol de trabajo.
+    /// Escribe un fichero en el arbol de trabajo, creando sus carpetas.
     pub fn write(&self, relative: &str, contents: &str) {
-        std::fs::write(self.path().join(relative), contents).expect("could not write a file");
+        self.write_bytes(relative, contents.as_bytes());
+    }
+
+    /// Escribe bytes tal cual (binarios, CRLF) en el arbol de trabajo.
+    pub fn write_bytes(&self, relative: &str, contents: &[u8]) {
+        let path = self.path().join(relative);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).expect("could not create the parent dir");
+        }
+        std::fs::write(path, contents).expect("could not write a file");
+    }
+
+    /// Prepara rutas (o todo con `.`).
+    pub fn add(&self, paths: &[&str]) {
+        let mut args = vec!["add", "--"];
+        args.extend_from_slice(paths);
+        self.git(&args);
+    }
+
+    /// Escribe, prepara y hace commit de unos ficheros; devuelve el sha.
+    pub fn commit_files(&self, files: &[(&str, &str)], message: &str) -> String {
+        for (path, contents) in files {
+            self.write(path, contents);
+        }
+        let paths: Vec<&str> = files.iter().map(|(path, _)| *path).collect();
+        self.add(&paths);
+        self.tick();
+        self.git(&["commit", "--quiet", "-m", message]);
+        self.rev("HEAD")
+    }
+
+    /// Renombra con `git mv` y hace commit.
+    pub fn rename(&self, from: &str, to: &str, message: &str) -> String {
+        self.git(&["mv", from, to]);
+        self.tick();
+        self.git(&["commit", "--quiet", "-m", message]);
+        self.rev("HEAD")
+    }
+
+    /// Ejecuta git y devuelve si salio bien, sin fallar el test (para dejar un
+    /// merge en conflicto, por ejemplo).
+    pub fn try_git(&self, args: &[&str]) -> bool {
+        self.tick();
+        self.command(args)
+            .output()
+            .expect("git must be installed to run these tests")
+            .status
+            .success()
+    }
+
+    /// Guarda los cambios en un stash, los no rastreados incluidos.
+    pub fn stash(&self, message: &str) {
+        self.tick();
+        self.git(&[
+            "stash",
+            "push",
+            "--quiet",
+            "--include-untracked",
+            "-m",
+            message,
+        ]);
+    }
+
+    /// Fija una clave de configuracion local.
+    pub fn config(&self, key: &str, value: &str) {
+        self.git(&["config", key, value]);
+    }
+
+    /// Anade como submodulo otro repositorio de prueba en `path` y hace commit.
+    pub fn add_submodule(&self, other: &Self, path: &str) {
+        let url = other.path().to_string_lossy().into_owned();
+        self.git(&[
+            "-c",
+            "protocol.file.allow=always",
+            "submodule",
+            "add",
+            "--quiet",
+            &url,
+            path,
+        ]);
+        self.tick();
+        self.git(&["commit", "--quiet", "-m", &format!("Add submodule {path}")]);
+    }
+
+    /// Crea `count` commits lineales de golpe con `git fast-import` en la rama
+    /// `main`, sin ficheros. Un repositorio de cien mil commits sale en segundos.
+    pub fn fast_import_linear(&self, count: usize) {
+        use std::fmt::Write as _;
+        use std::io::Write as _;
+        use std::process::Stdio;
+
+        let mut stream = String::with_capacity(count * 120);
+        for mark in 1..=count {
+            let seconds = FIRST_COMMIT_SECONDS + u64::try_from(mark).expect("fits") * 60;
+            write!(
+                stream,
+                "commit refs/heads/main
+mark :{mark}
+\
+                 committer Ana Ruiz <ana@example.com> {seconds} +0200
+\
+                 data 11
+commit {:04}
+",
+                mark % 10_000
+            )
+            .expect("writing to a String does not fail");
+            if mark > 1 {
+                writeln!(stream, "from :{}", mark - 1).expect("writing to a String does not fail");
+            }
+            stream.push('\n');
+        }
+        let mut child = self
+            .command(&["fast-import", "--quiet"])
+            .stdin(Stdio::piped())
+            .spawn()
+            .expect("git must be installed to run these tests");
+        child
+            .stdin
+            .take()
+            .expect("stdin is piped")
+            .write_all(stream.as_bytes())
+            .expect("could not feed fast-import");
+        let status = child.wait().expect("fast-import did not finish");
+        assert!(status.success(), "git fast-import failed");
     }
 
     /// Sha completo de una revision.

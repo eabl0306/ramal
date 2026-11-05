@@ -49,15 +49,18 @@ fn serve_stdio(args: &Args) -> ExitCode {
     let Some(runtime) = build_runtime() else {
         return ExitCode::FAILURE;
     };
-    let handler = Arc::new(EngineHandler::new(bootstrap::build_engine(args)));
+    let outbox = server::Outbox::new();
+    let sink = Arc::new(message::FrameSink::new(outbox.sender()));
+    let handler = Arc::new(EngineHandler::new(bootstrap::build_engine(args, sink)));
     tracing::info!(
         version = git_rudder_engine::ENGINE_VERSION,
         "engine ready on stdio"
     );
-    let result = runtime.block_on(server::serve(
+    let result = runtime.block_on(server::serve_with(
         handler,
         tokio::io::stdin(),
         tokio::io::stdout(),
+        outbox,
     ));
     // La lectura de stdin de tokio vive en un hilo bloqueante; sin un limite, cerrar
     // el runtime esperaria a una lectura que no va a llegar.

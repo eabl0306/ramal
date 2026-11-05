@@ -12,6 +12,9 @@ use git_rudder_core_application::{GitCapabilities, GitVersion};
 /// Primera version con `merge-tree --write-tree` y `rebase --update-refs`.
 const MERGE_TREE_AND_UPDATE_REFS: GitVersion = GitVersion::new(2, 38, 0);
 
+/// Primera version con marcadores `zdiff3`.
+const ZDIFF3: GitVersion = GitVersion::new(2, 35, 0);
+
 /// Lee la salida de `git version`: `git version 2.53.0`, `git version 2.39.5
 /// (Apple Git-154)` o `git version 2.45.1.windows.1`. Un componente que falta
 /// cuenta como 0 (`git version 2.40`).
@@ -39,6 +42,7 @@ pub fn capabilities_for(version: GitVersion) -> GitCapabilities {
     GitCapabilities {
         merge_tree_write_tree: modern,
         rebase_update_refs: modern,
+        zdiff3: version >= ZDIFF3,
     }
 }
 

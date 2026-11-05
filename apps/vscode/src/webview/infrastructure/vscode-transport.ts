@@ -8,7 +8,11 @@ import {
   type Unsubscribe,
 } from '@git-rudder/bridge';
 
-import type { HostToWebviewMessage, RpcRequestMessage } from '../../shared/messages';
+import type {
+  HostToWebviewMessage,
+  RpcCancelMessage,
+  RpcRequestMessage,
+} from '../../shared/messages';
 
 import { isHostFailure } from './host-messages';
 import type { VsCodeApi } from './vscode-api';
@@ -47,11 +51,14 @@ export class VsCodeTransport implements Transport {
   }
 
   /**
-   * `$/cancel` no sale del webview en el primer corte: el motor aun no cancela
-   * y el host tendria que traducir el id (planificado con la cancelacion).
+   * Solo `$/cancel` sale del webview, como `rpc/cancel` con el id del propio
+   * webview: el host lo traduce al suyo. Otra notificacion no tiene a quien ir.
    */
-  notify(_notification: RpcNotification): void {
-    // Sin efecto a proposito; ver arriba.
+  notify(notification: RpcNotification): void {
+    const id = cancelledId(notification);
+    if (id === undefined) return;
+    const message: RpcCancelMessage = { type: 'rpc/cancel', id };
+    this.#api.postMessage(message);
   }
 
   subscribe(listener: NotificationListener): Unsubscribe {
@@ -78,4 +85,13 @@ export class VsCodeTransport implements Transport {
     }
     pending.resolve(response);
   }
+}
+
+/** El id que pide cancelar una notificacion `$/cancel`, si lo es. */
+function cancelledId(notification: RpcNotification): number | undefined {
+  if (notification.method !== '$/cancel') return undefined;
+  const params = notification.params;
+  if (typeof params !== 'object' || params === null || Array.isArray(params)) return undefined;
+  const id = params['id'];
+  return typeof id === 'number' ? id : undefined;
 }

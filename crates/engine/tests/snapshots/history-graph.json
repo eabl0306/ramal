@@ -1,0 +1,315 @@
+{
+  "hasMore": false,
+  "laneCount": 4,
+  "offset": 0,
+  "repoId": "<repoId>",
+  "rows": [
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:10:00+02:00",
+      "edges": [
+        {
+          "fromLane": 0,
+          "kind": "firstParent",
+          "parentRow": 1,
+          "parentSha": "<sha-0>",
+          "toLane": 0,
+          "travelLane": 0
+        }
+      ],
+      "isHead": true,
+      "lane": 0,
+      "parents": [
+        "<sha-0>"
+      ],
+      "refs": [
+        {
+          "fullName": "refs/heads/main",
+          "isHead": true,
+          "kind": "localBranch",
+          "name": "main"
+        },
+        {
+          "fullName": "refs/tags/v1.0",
+          "isHead": false,
+          "kind": "tag",
+          "name": "v1.0"
+        }
+      ],
+      "sha": "<sha-1>",
+      "shortSha": "<sha-1:short>",
+      "summary": "Add binary data"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:09:00+02:00",
+      "edges": [
+        {
+          "fromLane": 0,
+          "kind": "firstParent",
+          "parentRow": 2,
+          "parentSha": "<sha-2>",
+          "toLane": 0,
+          "travelLane": 0
+        }
+      ],
+      "isHead": false,
+      "lane": 0,
+      "parents": [
+        "<sha-2>"
+      ],
+      "refs": [],
+      "sha": "<sha-0>",
+      "shortSha": "<sha-0:short>",
+      "summary": "Add logo through LFS"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:08:00+02:00",
+      "edges": [
+        {
+          "fromLane": 0,
+          "kind": "firstParent",
+          "parentRow": 6,
+          "parentSha": "<sha-3>",
+          "toLane": 0,
+          "travelLane": 0
+        },
+        {
+          "fromLane": 0,
+          "kind": "merge",
+          "parentRow": 5,
+          "parentSha": "<sha-4>",
+          "toLane": 1,
+          "travelLane": 1
+        },
+        {
+          "fromLane": 0,
+          "kind": "merge",
+          "parentRow": 4,
+          "parentSha": "<sha-5>",
+          "toLane": 2,
+          "travelLane": 2
+        },
+        {
+          "fromLane": 0,
+          "kind": "merge",
+          "parentRow": 3,
+          "parentSha": "<sha-6>",
+          "toLane": 3,
+          "travelLane": 3
+        }
+      ],
+      "isHead": false,
+      "lane": 0,
+      "parents": [
+        "<sha-3>",
+        "<sha-4>",
+        "<sha-5>",
+        "<sha-6>"
+      ],
+      "refs": [],
+      "sha": "<sha-2>",
+      "shortSha": "<sha-2:short>",
+      "summary": "Octopus a, b and c"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:07:00+02:00",
+      "edges": [
+        {
+          "fromLane": 3,
+          "kind": "firstParent",
+          "parentRow": 6,
+          "parentSha": "<sha-3>",
+          "toLane": 0,
+          "travelLane": 3
+        }
+      ],
+      "isHead": false,
+      "lane": 3,
+      "parents": [
+        "<sha-3>"
+      ],
+      "refs": [
+        {
+          "fullName": "refs/heads/c",
+          "isHead": false,
+          "kind": "localBranch",
+          "name": "c"
+        }
+      ],
+      "sha": "<sha-6>",
+      "shortSha": "<sha-6:short>",
+      "summary": "Add c"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:06:00+02:00",
+      "edges": [
+        {
+          "fromLane": 2,
+          "kind": "firstParent",
+          "parentRow": 6,
+          "parentSha": "<sha-3>",
+          "toLane": 0,
+          "travelLane": 2
+        }
+      ],
+      "isHead": false,
+      "lane": 2,
+      "parents": [
+        "<sha-3>"
+      ],
+      "refs": [
+        {
+          "fullName": "refs/heads/b",
+          "isHead": false,
+          "kind": "localBranch",
+          "name": "b"
+        }
+      ],
+      "sha": "<sha-5>",
+      "shortSha": "<sha-5:short>",
+      "summary": "Add b"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:05:00+02:00",
+      "edges": [
+        {
+          "fromLane": 1,
+          "kind": "firstParent",
+          "parentRow": 6,
+          "parentSha": "<sha-3>",
+          "toLane": 0,
+          "travelLane": 1
+        }
+      ],
+      "isHead": false,
+      "lane": 1,
+      "parents": [
+        "<sha-3>"
+      ],
+      "refs": [
+        {
+          "fullName": "refs/heads/a",
+          "isHead": false,
+          "kind": "localBranch",
+          "name": "a"
+        }
+      ],
+      "sha": "<sha-4>",
+      "shortSha": "<sha-4:short>",
+      "summary": "Add a"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:04:00+02:00",
+      "edges": [
+        {
+          "fromLane": 0,
+          "kind": "firstParent",
+          "parentRow": 8,
+          "parentSha": "<sha-7>",
+          "toLane": 0,
+          "travelLane": 0
+        },
+        {
+          "fromLane": 0,
+          "kind": "merge",
+          "parentRow": 7,
+          "parentSha": "<sha-8>",
+          "toLane": 1,
+          "travelLane": 1
+        }
+      ],
+      "isHead": false,
+      "lane": 0,
+      "parents": [
+        "<sha-7>",
+        "<sha-8>"
+      ],
+      "refs": [],
+      "sha": "<sha-3>",
+      "shortSha": "<sha-3:short>",
+      "summary": "Merge feature/rename"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:02:00+02:00",
+      "edges": [
+        {
+          "fromLane": 1,
+          "kind": "firstParent",
+          "parentRow": 9,
+          "parentSha": "<sha-9>",
+          "toLane": 0,
+          "travelLane": 1
+        }
+      ],
+      "isHead": false,
+      "lane": 1,
+      "parents": [
+        "<sha-9>"
+      ],
+      "refs": [
+        {
+          "fullName": "refs/heads/feature/rename",
+          "isHead": false,
+          "kind": "localBranch",
+          "name": "feature/rename"
+        }
+      ],
+      "sha": "<sha-8>",
+      "shortSha": "<sha-8:short>",
+      "summary": "Rename old.rs to new.rs"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:03:00+02:00",
+      "edges": [
+        {
+          "fromLane": 0,
+          "kind": "firstParent",
+          "parentRow": 9,
+          "parentSha": "<sha-9>",
+          "toLane": 0,
+          "travelLane": 0
+        }
+      ],
+      "isHead": false,
+      "lane": 0,
+      "parents": [
+        "<sha-9>"
+      ],
+      "refs": [],
+      "sha": "<sha-7>",
+      "shortSha": "<sha-7:short>",
+      "summary": "Edit README"
+    },
+    {
+      "authorEmail": "ana@example.com",
+      "authorName": "Ana Ruiz",
+      "authoredAt": "2026-09-30T10:01:00+02:00",
+      "edges": [],
+      "isHead": false,
+      "lane": 0,
+      "parents": [],
+      "refs": [],
+      "sha": "<sha-9>",
+      "shortSha": "<sha-9:short>",
+      "summary": "Initial"
+    }
+  ],
+  "snapshot": "<snapshot>"
+}

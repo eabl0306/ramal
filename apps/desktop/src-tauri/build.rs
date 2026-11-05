@@ -4,7 +4,8 @@
 //! que no se le haya concedido.
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let manifest = tauri_build::AppManifest::new().commands(&["rpc", "repo_pick_and_open"]);
+    let manifest =
+        tauri_build::AppManifest::new().commands(&["rpc", "rpc_subscribe", "repo_pick_and_open"]);
     // Un error aqui sale como el error de main: cargo lo ensena y para el build.
     tauri_build::try_build(tauri_build::Attributes::new().app_manifest(manifest))?;
     Ok(())

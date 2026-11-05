@@ -4,7 +4,8 @@
 #
 # La suite del motor corre dos veces: con el git del runner (el mas reciente) y
 # con git 2.34, la minima que admite Git Rudder (ADR 0009). Es la unica forma de que la
-# deteccion de capacidades y los formatos de salida se prueben de verdad.
+# deteccion de capacidades y los formatos de salida se prueben de verdad. Los repos
+# dorados (just engine-golden) corren ademas en macOS y Windows.
 name: engine
 
 on:
@@ -93,6 +94,37 @@ jobs:
 
       - name: Tests del motor (just engine-test)
         run: just engine-test
+
+  # Los repos dorados en los otros dos sistemas (en Linux ya van en engine-check):
+  # rutas, finales de linea y el git de cada plataforma no pueden cambiar lo que
+  # lee la interfaz. Los snapshots son los mismos ficheros en los tres.
+  golden:
+    name: repos dorados en ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Instalar el toolchain de rust-toolchain.toml
+        run: rustup toolchain install
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: golden
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Version de git
+        run: git --version
+
+      # En Windows `just` usa el bash de Git for Windows, que trae el runner.
+      - name: Repos dorados (just engine-golden)
+        run: just engine-golden
 
   bridge:
     name: '@git-rudder/bridge'

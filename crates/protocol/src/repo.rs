@@ -3,6 +3,8 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::repos::TrustFinding;
+
 /// Parametros de `repo/open`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -10,6 +12,11 @@ use ts_rs::TS;
 pub struct OpenRepoParams {
     /// Carpeta del repositorio o cualquier carpeta dentro de el.
     pub path: String,
+    /// El host responde por la confianza (una carpeta de confianza de VS Code).
+    /// Sin el, el motor decide con lo que recuerda y lo que encuentra.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub trusted: Option<bool>,
 }
 
 /// Repositorio abierto.
@@ -33,4 +40,9 @@ pub struct RepoHandle {
     pub is_detached: bool,
     /// El repositorio no tiene ningun commit.
     pub is_empty: bool,
+    /// Se confia en el. Si no, solo se lee, y la interfaz pregunta "Confiar en
+    /// este repositorio" ensenando `trustFindings`.
+    pub trusted: bool,
+    /// Lo que puede ejecutar codigo y obliga a preguntar.
+    pub trust_findings: Vec<TrustFinding>,
 }

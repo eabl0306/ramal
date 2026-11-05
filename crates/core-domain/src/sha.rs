@@ -64,6 +64,16 @@ impl Sha {
     pub fn to_hex(self) -> String {
         self.to_string()
     }
+
+    /// El sha cero, que git usa para "sin objeto" (las lineas sin commit de un
+    /// blame, el lado vacio de un fichero nuevo).
+    pub const ZERO: Self = Self([0; SHA_BYTES]);
+
+    /// Es el sha cero.
+    #[must_use]
+    pub fn is_zero(self) -> bool {
+        self == Self::ZERO
+    }
 }
 
 impl fmt::Display for Sha {

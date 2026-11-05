@@ -36,9 +36,11 @@ describe('BridgeError', () => {
 
 describe('isBridgeErrorKind', () => {
   it('reconoce los kinds del motor y los tres del puente', () => {
-    expect(BRIDGE_ERROR_KINDS).toHaveLength(11);
+    expect(BRIDGE_ERROR_KINDS).toHaveLength(13);
     for (const kind of [
       'repo_not_open',
+      'not_found',
+      'cancelled',
       'stale_window',
       'transport',
       'timeout',
@@ -49,7 +51,7 @@ describe('isBridgeErrorKind', () => {
   });
 
   it('rechaza cualquier otra cosa', () => {
-    for (const value of ['cancelled', 'toString', 42, undefined, null]) {
+    for (const value of ['aborted', 'toString', 42, undefined, null]) {
       expect(isBridgeErrorKind(value)).toBe(false);
     }
   });
@@ -77,8 +79,36 @@ describe('fromRpcError', () => {
 
 describe('tipos generados', () => {
   it('exponen la lista de metodos, los del host y la version del protocolo', () => {
-    expect(ENGINE_METHODS).toEqual(['engine/info', 'repo/open', 'graph/window']);
-    expect(HOST_METHODS).toEqual(['repo/open']);
-    expect(PROTOCOL_VERSION).toBe(2);
+    expect(ENGINE_METHODS).toEqual([
+      'engine/info',
+      'git/configure',
+      'repo/open',
+      'repo/trust',
+      'repos/summary',
+      'repos/scan',
+      'submodule/open',
+      'graph/window',
+      'graph/search',
+      'status/read',
+      'diff/file',
+      'commit/detail',
+      'refs/list',
+      'stash/list',
+      'stash/show',
+      'submodule/list',
+      'history/file',
+      'blame/file',
+      'compare/refs',
+      'conflict/read',
+    ]);
+    expect(HOST_METHODS).toEqual([
+      'git/configure',
+      'repo/open',
+      'repo/trust',
+      'repos/summary',
+      'repos/scan',
+      'submodule/open',
+    ]);
+    expect(PROTOCOL_VERSION).toBe(3);
   });
 });

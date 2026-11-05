@@ -15,6 +15,8 @@ const repo: RepoHandle = {
   headSha: '1'.repeat(40),
   isDetached: false,
   isEmpty: false,
+  trusted: true,
+  trustFindings: [],
 };
 
 function answering(result: Promise<unknown>): Invoke {

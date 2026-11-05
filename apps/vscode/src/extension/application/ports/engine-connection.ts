@@ -16,5 +16,7 @@ export type Unsubscribe = () => void;
  */
 export interface EngineConnection {
   request(request: IdentifiedRpcRequest): Promise<RpcResponse>;
+  /** Manda una notificacion (`$/cancel`). Si el motor no esta, se pierde: no hay a quien cancelar. */
+  notify(notification: RpcNotification): void;
   onNotification(listener: (notification: RpcNotification) => void): Unsubscribe;
 }

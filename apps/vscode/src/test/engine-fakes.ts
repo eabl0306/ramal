@@ -54,12 +54,17 @@ export function infoResponder(protocolVersion: number = PROTOCOL_VERSION): Respo
 /** Conexion falsa con el motor: guarda lo que recibe y responde lo que se le diga. */
 export class FakeEngine implements EngineConnection {
   readonly requests: IdentifiedRpcRequest[] = [];
+  readonly notifications: RpcNotification[] = [];
   respond: Responder = infoResponder();
   readonly #listeners = new Set<(notification: RpcNotification) => void>();
 
   request(request: IdentifiedRpcRequest): Promise<RpcResponse> {
     this.requests.push(request);
     return this.respond(request);
+  }
+
+  notify(notification: RpcNotification): void {
+    this.notifications.push(notification);
   }
 
   onNotification(listener: (notification: RpcNotification) => void): Unsubscribe {

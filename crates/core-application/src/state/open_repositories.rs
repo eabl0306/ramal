@@ -13,17 +13,28 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, PoisonError};
 
-use git_rudder_core_domain::{RepoId, RepoRoot};
+use git_rudder_core_domain::{RepoId, RepoRoot, TrustLevel};
+
+use crate::error::EngineError;
 
 /// Base de FNV-1a de 64 bits.
 const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
 /// Primo de FNV-1a de 64 bits.
 const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
 
+/// Un repositorio abierto: su raiz y si se confia en el.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OpenRepo {
+    /// Raiz del arbol de trabajo.
+    pub root: RepoRoot,
+    /// Si las lecturas pueden dejar que su configuracion ejecute comandos.
+    pub trust: TrustLevel,
+}
+
 /// Registro compartido por los casos de uso. Seguro entre hilos.
 #[derive(Debug, Default)]
 pub struct OpenRepositories {
-    inner: Mutex<HashMap<RepoId, RepoRoot>>,
+    inner: Mutex<HashMap<RepoId, OpenRepo>>,
 }
 
 impl OpenRepositories {
@@ -37,15 +48,44 @@ impl OpenRepositories {
     /// devuelve el mismo id, asi dos pestanas sobre un repo comparten identidad,
     /// y lo mismo pasa en otro registro (un motor reiniciado).
     pub fn register(&self, root: RepoRoot) -> RepoId {
+        self.register_with(root, TrustLevel::Untrusted)
+    }
+
+    /// Registra la raiz con su nivel de confianza. Si ya estaba abierta, se
+    /// queda con la confianza nueva: volver a abrir tras confiar no la pierde,
+    /// porque quien abre ya consulto el almacen de confianza.
+    pub fn register_with(&self, root: RepoRoot, trust: TrustLevel) -> RepoId {
         let id = id_for(&root);
-        self.lock().entry(id.clone()).or_insert(root);
+        self.lock().insert(id.clone(), OpenRepo { root, trust });
         id
+    }
+
+    /// Cambia la confianza de un repositorio abierto. `false` si no esta abierto.
+    pub fn set_trust(&self, id: &RepoId, trust: TrustLevel) -> bool {
+        self.lock()
+            .get_mut(id)
+            .map(|entry| entry.trust = trust)
+            .is_some()
     }
 
     /// Raiz del repositorio `id`, si esta abierto.
     #[must_use]
     pub fn get(&self, id: &RepoId) -> Option<RepoRoot> {
-        self.lock().get(id).cloned()
+        self.lock().get(id).map(|entry| entry.root.clone())
+    }
+
+    /// El repositorio abierto `id`.
+    ///
+    /// # Errors
+    ///
+    /// [`EngineError::RepositoryNotOpen`] si no esta abierto.
+    pub fn require(&self, id: &RepoId) -> Result<OpenRepo, EngineError> {
+        self.lock()
+            .get(id)
+            .cloned()
+            .ok_or_else(|| EngineError::RepositoryNotOpen {
+                repo_id: id.clone(),
+            })
     }
 
     /// Cuantos repositorios hay abiertos.
@@ -63,7 +103,7 @@ impl OpenRepositories {
     /// Un hilo que entra en panico con el candado tomado no deja el registro a
     /// medias (cada operacion es una insercion o una lectura), asi que se recupera
     /// el candado envenenado en lugar de propagar el panico.
-    fn lock(&self) -> std::sync::MutexGuard<'_, HashMap<RepoId, RepoRoot>> {
+    fn lock(&self) -> std::sync::MutexGuard<'_, HashMap<RepoId, OpenRepo>> {
         self.inner.lock().unwrap_or_else(PoisonError::into_inner)
     }
 }

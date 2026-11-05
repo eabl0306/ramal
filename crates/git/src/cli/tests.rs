@@ -84,3 +84,27 @@ fn a_git_file_without_execute_permission_is_skipped() {
 
     assert_eq!(GitBinary::find_in(dir.path().as_os_str()), None);
 }
+
+#[test]
+fn values_numbers_and_paths_cannot_become_options() {
+    let command = GitCommand::new("log")
+        .number("--skip=", 5)
+        .value("--grep=", "--exec=rm -rf /")
+        .revisions(["HEAD"])
+        .paths(["-n"])
+        .paths(["src/a.rs"]);
+
+    assert_eq!(
+        args(&command),
+        vec![
+            "log",
+            "--skip=5",
+            "--grep=--exec=rm -rf /",
+            "--end-of-options",
+            "HEAD",
+            "--",
+            "-n",
+            "src/a.rs"
+        ]
+    );
+}
