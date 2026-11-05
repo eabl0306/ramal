@@ -80,3 +80,23 @@ fn a_poisoned_lock_is_recovered() {
     let id = registry.register(RepoRoot::new("/work/a"));
     assert_eq!(registry.get(&id), Some(RepoRoot::new("/work/a")));
 }
+
+#[test]
+fn trust_is_kept_per_repository_and_can_change() {
+    use git_rudder_core_domain::TrustLevel;
+
+    let registry = OpenRepositories::new();
+    let id = registry.register(RepoRoot::new("/work/a"));
+    assert_eq!(registry.require(&id).unwrap().trust, TrustLevel::Untrusted);
+
+    assert!(registry.set_trust(&id, TrustLevel::Trusted));
+    assert_eq!(registry.require(&id).unwrap().trust, TrustLevel::Trusted);
+
+    let again = registry.register_with(RepoRoot::new("/work/a"), TrustLevel::Untrusted);
+    assert_eq!(again, id);
+    assert_eq!(registry.require(&id).unwrap().trust, TrustLevel::Untrusted);
+
+    let unknown = git_rudder_core_domain::RepoId::new("repo-0000000000000000");
+    assert!(!registry.set_trust(&unknown, TrustLevel::Trusted));
+    assert!(registry.require(&unknown).is_err());
+}

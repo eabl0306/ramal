@@ -102,7 +102,8 @@ impl FakeGitReader {
         self.lock().refs = Ok(refs);
     }
 
-    /// Fija la respuesta de `read_log`. Se recorta a `max_count` como haria git.
+    /// Fija la respuesta de `read_log`. Se recorta con `skip` y `max_count` como
+    /// haria git.
     #[must_use]
     pub fn with_log(self, log: Result<Vec<CommitRecord>, GitReadError>) -> Self {
         self.lock().log = log;
@@ -118,7 +119,7 @@ impl FakeGitReader {
     /// Ultima consulta de log recibida.
     #[must_use]
     pub fn last_log_query(&self) -> Option<LogQuery> {
-        self.lock().last_log_query
+        self.lock().last_log_query.clone()
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, State> {
@@ -162,10 +163,12 @@ impl GitReader for FakeGitReader {
     ) -> Result<Vec<CommitRecord>, GitReadError> {
         let mut state = self.lock();
         state.calls.read_log += 1;
-        state.last_log_query = Some(*query);
-        state
-            .log
-            .clone()
-            .map(|log| log.into_iter().take(query.max_count).collect())
+        state.last_log_query = Some(query.clone());
+        state.log.clone().map(|log| {
+            log.into_iter()
+                .skip(query.skip)
+                .take(query.max_count.unwrap_or(usize::MAX))
+                .collect()
+        })
     }
 }
