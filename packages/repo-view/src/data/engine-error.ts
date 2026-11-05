@@ -14,6 +14,10 @@ export const ENGINE_ERROR_KEYS: Readonly<Record<BridgeErrorKind, PlainKey>> = {
   git_not_found: 'errors.engine.git_not_found',
   git_version_unsupported: 'errors.engine.git_version_unsupported',
   git_failed: 'errors.engine.git_failed',
+  not_found: 'errors.engine.not_found',
+  // El bridge rechaza la llamada cancelada con `signal.reason` y no espera la
+  // respuesta del motor; si llega, es la de quien cancelo.
+  cancelled: 'errors.engine.cancelled',
   // useGraphWindow no lo ensena nunca: vuelve a pedir desde la fila 0. Si
   // llegara a la pantalla seria un fallo de la vista, asi que cuenta como interno.
   stale_window: 'errors.engine.internal',
