@@ -114,13 +114,18 @@ pub fn is_risky_key(key: &str) -> bool {
         return false;
     };
     let name = rest.rsplit('.').next().unwrap_or(rest);
-    let has_subsection = rest.contains('.');
-    EXACT_KEYS.contains(&lower.as_str())
-        || matches!(section, "filter" | "uploadpack" | "include" | "includeif")
-        || (section == "diff" && has_subsection && matches!(name, "textconv" | "command"))
-        || (section == "merge" && has_subsection && name == "driver")
-        || (section == "credential" && name == "helper")
-        || (section.starts_with("gpg") && name == "program")
+    EXACT_KEYS.contains(&lower.as_str()) || is_risky_in_section(section, name, rest.contains('.'))
+}
+
+/// Las familias de claves de riesgo, por seccion y nombre final.
+fn is_risky_in_section(section: &str, name: &str, has_subsection: bool) -> bool {
+    match section {
+        "filter" | "uploadpack" | "include" | "includeif" => true,
+        "diff" => has_subsection && matches!(name, "textconv" | "command"),
+        "merge" => has_subsection && name == "driver",
+        "credential" => name == "helper",
+        _ => section.starts_with("gpg") && name == "program",
+    }
 }
 
 /// git solo ejecuta los hooks sin la extension `.sample` que trae `git init`.

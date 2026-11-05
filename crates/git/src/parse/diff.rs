@@ -93,20 +93,13 @@ fn finish(sections: &mut [FileSection], hunk: &mut Option<HunkBuilder>) {
 }
 
 fn read_meta(section: &mut FileSection, line: &str) {
+    if read_path_meta(section, line) {
+        return;
+    }
     if line.starts_with("new file mode") {
         section.status = FileStatus::Added;
     } else if line.starts_with("deleted file mode") {
         section.status = FileStatus::Deleted;
-    } else if let Some(from) = line.strip_prefix("rename from ") {
-        section.status = FileStatus::Renamed;
-        section.old_path = Some(unquote(from));
-    } else if let Some(to) = line.strip_prefix("rename to ") {
-        section.new_path = Some(unquote(to));
-    } else if let Some(from) = line.strip_prefix("copy from ") {
-        section.status = FileStatus::Copied;
-        section.old_path = Some(unquote(from));
-    } else if let Some(to) = line.strip_prefix("copy to ") {
-        section.new_path = Some(unquote(to));
     } else if let Some(mode) = line.strip_prefix("new mode ") {
         if is_type_change(mode) {
             section.status = FileStatus::TypeChanged;
@@ -114,6 +107,25 @@ fn read_meta(section: &mut FileSection, line: &str) {
     } else if line.starts_with("Binary files ") || line == "GIT binary patch" {
         section.binary = true;
     }
+}
+
+/// Las cabeceras de renombrado y de copia. `true` si la linea era una de ellas.
+fn read_path_meta(section: &mut FileSection, line: &str) -> bool {
+    if let Some(from) = line.strip_prefix("rename from ") {
+        section.status = FileStatus::Renamed;
+        section.old_path = Some(unquote(from));
+    } else if let Some(from) = line.strip_prefix("copy from ") {
+        section.status = FileStatus::Copied;
+        section.old_path = Some(unquote(from));
+    } else if let Some(to) = line
+        .strip_prefix("rename to ")
+        .or_else(|| line.strip_prefix("copy to "))
+    {
+        section.new_path = Some(unquote(to));
+    } else {
+        return false;
+    }
+    true
 }
 
 /// Un cambio de modo a enlace o a submodulo es un cambio de tipo; el bit de
