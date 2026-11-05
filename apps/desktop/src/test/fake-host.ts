@@ -33,6 +33,8 @@ export const GIT_RUDDER_REPO: RepoHandle = {
   headSha: 'a'.repeat(40),
   isDetached: false,
   isEmpty: false,
+  trusted: true,
+  trustFindings: [],
 };
 
 /** Lo que contesta `repo_pick_and_open`: el repo, `null` (cancelar) o un rechazo. */

@@ -21,6 +21,7 @@ use std::sync::Arc;
 
 use fixture::FixtureRepo;
 use git_rudder_desktop::bootstrap::{build_engine, configure};
+use git_rudder_desktop::notifications::NotificationChannels;
 use git_rudder_desktop::picker::{FixedFolderPicker, FolderPicker};
 use pretty_assertions::assert_eq;
 use serde_json::{Value, json};
@@ -33,10 +34,14 @@ use tauri::{App, WebviewWindow, WebviewWindowBuilder};
 /// capacidades) y un selector de carpetas fijo en lugar del dialogo.
 fn app_with(picker: FixedFolderPicker) -> App<MockRuntime> {
     let picker: Arc<dyn FolderPicker> = Arc::new(picker);
-    configure(mock_builder(), Arc::new(build_engine()))
-        .manage(picker)
-        .build(git_rudder_desktop::context())
-        .expect("the app must build with the mock runtime")
+    configure(
+        mock_builder(),
+        Arc::new(build_engine()),
+        Arc::new(NotificationChannels::default()),
+    )
+    .manage(picker)
+    .build(git_rudder_desktop::context())
+    .expect("the app must build with the mock runtime")
 }
 
 /// La ventana principal tal como la declara `tauri.conf.json`. La app real la crea

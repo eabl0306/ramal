@@ -4,10 +4,13 @@
 //! La composicion del cliente tiene dos niveles. `EngineBuilder` construye lo que
 //! es igual en los dos productos (git CLI); este fichero es la raiz de fuera y
 //! aporta lo que solo el escritorio sabe construir: el selector de carpetas sobre
-//! el dialogo nativo y, mas adelante, el `SecretStore` sobre el llavero y el
-//! `EventSink` sobre un `Channel` de Tauri.
+//! el dialogo nativo, las notificaciones sobre `Channel` de Tauri, la carpeta de
+//! datos donde se recuerda la confianza y, mas adelante, el `SecretStore` sobre el
+//! llavero.
 
 use std::sync::Arc;
+
+use std::path::PathBuf;
 
 use git_rudder_engine::{CallContext, ENGINE_VERSION, Engine, EngineBuilder, EngineConfig};
 use git_rudder_protocol::RpcMethod as _;
@@ -15,7 +18,12 @@ use git_rudder_protocol::methods::EngineInfoMethod;
 use tauri::{App, AppHandle, Builder, Manager as _, Runtime};
 
 use crate::commands;
+use crate::notifications::NotificationChannels;
 use crate::picker::{DialogFolderPicker, FolderPicker};
+
+/// Fichero de la carpeta de datos de la app donde se recuerda en que
+/// repositorios confio el usuario (ADR 0020). No se sincroniza.
+pub const TRUST_FILE: &str = "trusted-repositories.txt";
 
 /// Variable de entorno con el filtro de log (sintaxis de `tracing`), por defecto
 /// `info`. El log va a stderr.
@@ -31,7 +39,18 @@ pub const E2E_FOLDER_ENV_VAR: &str = "GIT_RUDDER_E2E_FOLDER";
 /// El error de Tauri si no puede crear la ventana o el runtime.
 pub fn run() -> tauri::Result<()> {
     init_tracing();
-    assemble(tauri::Builder::default(), Arc::new(build_engine())).run(context())
+    let context = context();
+    let channels = Arc::new(NotificationChannels::default());
+    let trust_file = data_dir(&context.config().identifier).map(|dir| dir.join(TRUST_FILE));
+    let engine = Arc::new(build_engine_with(trust_file, Arc::clone(&channels)));
+    assemble(tauri::Builder::default(), engine, channels).run(context)
+}
+
+/// La carpeta de datos de la app, la misma que `app_data_dir` de Tauri: la de
+/// datos del sistema y el identificador. Se calcula antes de crear la app porque
+/// el motor se construye antes.
+fn data_dir(identifier: &str) -> Option<PathBuf> {
+    dirs::data_dir().map(|dir| dir.join(identifier))
 }
 
 /// Todo el arranque menos el bucle de eventos.
@@ -41,28 +60,55 @@ pub fn run() -> tauri::Result<()> {
 /// de arranque lo construya sobre el runtime simulado y la cobertura llegue al
 /// composition root (ADR 0006).
 #[must_use]
-pub fn assemble<R: Runtime>(builder: Builder<R>, engine: Arc<Engine>) -> Builder<R> {
-    configure(with_plugins(builder), engine).setup(|app| {
+pub fn assemble<R: Runtime>(
+    builder: Builder<R>,
+    engine: Arc<Engine>,
+    channels: Arc<NotificationChannels>,
+) -> Builder<R> {
+    configure(with_plugins(builder), engine, channels).setup(|app| {
         setup(app);
         Ok(())
     })
 }
 
-/// El motor con la configuracion del escritorio. El binario de git es el del
-/// `PATH` hasta que exista el ajuste (planificado).
+/// El motor con la configuracion por defecto, sin notificaciones y con la
+/// confianza en memoria: el de los tests de arranque.
 #[must_use]
 pub fn build_engine() -> Engine {
     EngineBuilder::new(EngineConfig::default()).build()
 }
 
-/// El motor como estado gestionado y los dos comandos. Es lo comun a la app real y
-/// a los tests, que lo montan sobre el runtime simulado de Tauri.
+/// El motor del escritorio: notifica por los canales de los webviews y recuerda
+/// la confianza en `trust_file`. El binario de git es el del `PATH` hasta que el
+/// ajuste lo cambie con `git/configure`.
 #[must_use]
-pub fn configure<R: Runtime>(builder: Builder<R>, engine: Arc<Engine>) -> Builder<R> {
+pub fn build_engine_with(
+    trust_file: Option<PathBuf>,
+    channels: Arc<NotificationChannels>,
+) -> Engine {
+    EngineBuilder::new(EngineConfig {
+        trust_file,
+        ..EngineConfig::default()
+    })
+    .with_notification_sink(channels)
+    .build()
+}
+
+/// El motor y los canales de notificacion como estado gestionado, y los tres
+/// comandos. Es lo comun a la app real y a los tests, que lo montan sobre el
+/// runtime simulado de Tauri.
+#[must_use]
+pub fn configure<R: Runtime>(
+    builder: Builder<R>,
+    engine: Arc<Engine>,
+    channels: Arc<NotificationChannels>,
+) -> Builder<R> {
     builder
         .manage(engine)
+        .manage(channels)
         .invoke_handler(tauri::generate_handler![
             commands::rpc,
+            commands::rpc_subscribe,
             commands::repo_pick_and_open
         ])
 }

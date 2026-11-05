@@ -16,8 +16,8 @@ use git_rudder_protocol::{MethodInfo, RpcError, RpcMethod as _};
 pub const MAIN_WINDOW: &str = "main";
 
 /// Notificaciones de control del protocolo que cualquier ventana puede mandar.
-/// `$/cancel` la manda el cliente del bridge al cancelar una llamada; el motor del
-/// primer corte todavia la ignora.
+/// `$/cancel` la manda el cliente del bridge al cancelar una llamada, y el motor
+/// para la peticion con ese id.
 pub const CONTROL_NOTIFICATIONS: &[&str] = &["$/cancel"];
 
 /// Una ventana y los metodos del motor que puede pedir.

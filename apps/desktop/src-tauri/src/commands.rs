@@ -1,5 +1,5 @@
-//! Comandos de Tauri: `rpc` y `repo_pick_and_open`. Son adaptadores driving: no
-//! hay reglas de negocio aqui, todo lo decide el motor.
+//! Comandos de Tauri: `rpc`, `rpc_subscribe` y `repo_pick_and_open`. Son
+//! adaptadores driving: no hay reglas de negocio aqui, todo lo decide el motor.
 //!
 //! No hay un comando por metodo del motor: `rpc` lleva el mismo sobre JSON-RPC que
 //! el sidecar de VS Code, y la lista de metodos vive en `git-rudder-protocol`. Cada
@@ -13,9 +13,11 @@ use git_rudder_engine::mapping::error::{internal_error, invalid_params};
 use git_rudder_engine::{CallContext, Engine};
 use git_rudder_protocol::methods::RepoOpenMethod;
 use git_rudder_protocol::repo::{OpenRepoParams, RepoHandle};
-use git_rudder_protocol::{RpcError, RpcMethod as _, RpcRequest, RpcResponse};
+use git_rudder_protocol::{RpcError, RpcMethod as _, RpcNotification, RpcRequest, RpcResponse};
+use tauri::ipc::Channel;
 use tauri::{Runtime, State, Window};
 
+use crate::notifications::NotificationChannels;
 use crate::picker::FolderPicker;
 use crate::surfaces;
 
@@ -39,6 +41,22 @@ pub async fn rpc<R: Runtime>(
     request: RpcRequest,
 ) -> Result<Option<RpcResponse>, RpcError> {
     Ok(forward(&engine, window.label(), request).await)
+}
+
+/// El webview abre el canal por el que recibe las notificaciones del motor
+/// (`repo/changed`). Solo recibe: no hay nada que pueda pedir por el.
+///
+/// # Errors
+///
+/// Nunca: Tauri exige un `Result` a los comandos asincronos que toman estado
+/// prestado.
+#[tauri::command]
+pub async fn rpc_subscribe(
+    channels: State<'_, Arc<NotificationChannels>>,
+    channel: Channel<RpcNotification>,
+) -> Result<(), RpcError> {
+    channels.subscribe(channel);
+    Ok(())
 }
 
 /// El cuerpo de `rpc`, sin Tauri: la lista de la ventana y despues el motor.
@@ -87,6 +105,8 @@ pub async fn open_folder(engine: &Engine, folder: &Path) -> Result<RepoHandle, R
     };
     let params = serde_json::to_value(OpenRepoParams {
         path: path.to_owned(),
+        // Elegir la carpeta no es confiar en ella: decide el motor (ADR 0020).
+        trusted: None,
     })
     .map_err(|error| internal_error(&error.to_string()))?;
     let result = engine

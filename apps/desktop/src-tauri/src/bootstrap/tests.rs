@@ -59,7 +59,23 @@ fn the_startup_log_says_the_engine_is_ready_when_git_works() {
 fn the_startup_log_warns_when_git_is_missing() {
     let config = EngineConfig {
         git_path: Some(PathBuf::from("/nonexistent/git-rudder/git")),
+        ..EngineConfig::default()
     };
     let log = startup_log(&EngineBuilder::new(config).build());
     assert!(log.contains("engine started without a usable git"), "{log}");
+}
+
+#[test]
+fn the_desktop_engine_remembers_trust_in_the_data_folder() {
+    let dir = tempfile::tempdir().unwrap_or_else(|_| unreachable!());
+    let engine = super::build_engine_with(
+        Some(dir.path().join(super::TRUST_FILE)),
+        Arc::new(crate::notifications::NotificationChannels::default()),
+    );
+    let log = startup_log(&engine);
+    assert!(log.contains("engine ready"), "{log}");
+    assert!(
+        super::data_dir("com.gitrudder.GitRudder")
+            .is_some_and(|dir| dir.ends_with("com.gitrudder.GitRudder"))
+    );
 }

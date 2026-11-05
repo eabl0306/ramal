@@ -8,6 +8,7 @@
 
 pub mod bootstrap;
 pub mod commands;
+pub mod notifications;
 pub mod picker;
 pub mod surfaces;
 

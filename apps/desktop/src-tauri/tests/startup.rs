@@ -15,6 +15,7 @@
 use std::sync::{Arc, Mutex, PoisonError};
 
 use git_rudder_desktop::bootstrap::{assemble, build_engine};
+use git_rudder_desktop::notifications::NotificationChannels;
 use git_rudder_desktop::picker::{DialogFolderPicker, FolderPicker};
 use git_rudder_engine::Engine;
 use tauri::test::{MockRuntime, mock_builder};
@@ -38,9 +39,13 @@ fn inspect(handle: &AppHandle<MockRuntime>) -> Started {
 
 #[test]
 fn the_setup_registers_the_native_folder_picker_and_opens_the_main_window() {
-    let app = assemble(mock_builder(), Arc::new(build_engine()))
-        .build(git_rudder_desktop::context())
-        .expect("the app must build with the mock runtime");
+    let app = assemble(
+        mock_builder(),
+        Arc::new(build_engine()),
+        Arc::new(NotificationChannels::default()),
+    )
+    .build(git_rudder_desktop::context())
+    .expect("the app must build with the mock runtime");
     let seen = Arc::new(Mutex::new(None));
     let record = Arc::clone(&seen);
 

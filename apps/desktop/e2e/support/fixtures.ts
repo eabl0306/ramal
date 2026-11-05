@@ -9,6 +9,8 @@ export const REPO: RepoHandle = {
   headSha: sha(0),
   isDetached: false,
   isEmpty: false,
+  trusted: true,
+  trustFindings: [],
 };
 
 function sha(index: number): string {

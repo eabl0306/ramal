@@ -11,7 +11,15 @@ import {
 } from './workspace';
 
 function handle(repoId: string, root: string): RepoHandle {
-  return { repoId, root, headRef: 'main', isDetached: false, isEmpty: false };
+  return {
+    repoId,
+    root,
+    headRef: 'main',
+    isDetached: false,
+    isEmpty: false,
+    trusted: true,
+    trustFindings: [],
+  };
 }
 
 function run(actions: readonly WorkspaceAction[], from = INITIAL_WORKSPACE): WorkspaceState {
