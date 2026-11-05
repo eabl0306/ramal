@@ -24,6 +24,9 @@ use std::fmt::Write as _;
 use std::path::{Path, PathBuf};
 
 use git_rudder_protocol::methods::{MethodVisitor, PROTOCOL_VERSION, RpcMethod, visit_methods};
+use git_rudder_protocol::notifications::{
+    EngineNotification, NotificationVisitor, visit_notifications,
+};
 use git_rudder_protocol::{RpcNotification, RpcRequest, RpcResponse};
 use ts_rs::{Config, TS, TypeVisitor};
 
@@ -82,6 +85,29 @@ impl MethodVisitor for MethodTable<'_> {
     }
 }
 
+/// Lineas de `EngineNotifications` y la lista de nombres, ya recogidas.
+struct Notifications {
+    entries: Vec<String>,
+    all: Vec<&'static str>,
+}
+
+/// Recoge las notificaciones exportando sus tipos.
+struct NotificationTable<'a> {
+    cfg: &'a Config,
+    types: &'a mut TypeFiles,
+    entries: Vec<String>,
+    all: Vec<&'static str>,
+}
+
+impl NotificationVisitor for NotificationTable<'_> {
+    fn visit<N: EngineNotification>(&mut self) {
+        export_root::<N::Params>(self.cfg, self.types);
+        self.entries
+            .push(format!("  {:?}: {};", N::NAME, N::Params::ident(self.cfg)));
+        self.all.push(N::NAME);
+    }
+}
+
 fn module_path(path: &Path) -> String {
     let without_extension = path.with_extension("");
     format!(
@@ -97,10 +123,12 @@ fn literal_list(names: &[&str]) -> String {
 
 fn imports_ts(cfg: &Config) -> String {
     let mut method_types = TypeFiles::new();
-    visit_methods(&mut ImportVisitor {
+    let mut visitor = ImportVisitor {
         cfg,
         types: &mut method_types,
-    });
+    };
+    visit_methods(&mut visitor);
+    visit_notifications(&mut visitor);
     let imports: BTreeMap<&String, String> = method_types
         .iter()
         .map(|(path, name)| (name, module_path(path)))
@@ -112,11 +140,13 @@ fn imports_ts(cfg: &Config) -> String {
     out
 }
 
-fn methods_ts(cfg: &Config, table: &MethodTable<'_>) -> String {
+fn methods_ts(cfg: &Config, table: &MethodTable<'_>, notifications: &Notifications) -> String {
     let imports = imports_ts(cfg);
     let entries = table.entries.join("\n");
     let all = literal_list(&table.all);
     let host_only = literal_list(&table.host_only);
+    let notification_entries = notifications.entries.join("\n");
+    let notification_names = literal_list(&notifications.all);
     format!(
         "{NOTE}{imports}
 /** Version del protocolo del motor. */
@@ -135,6 +165,17 @@ export const ENGINE_METHODS = {all} as const satisfies readonly EngineMethod[];
 
 /** Metodos que solo puede llamar un host: nunca un webview. */
 export const HOST_METHODS = {host_only} as const satisfies readonly EngineMethod[];
+
+/** Cada notificacion del motor hacia la interfaz con sus parametros. */
+export type EngineNotifications = {{
+{notification_entries}
+}};
+
+/** Nombre de una notificacion del motor. */
+export type EngineNotificationName = keyof EngineNotifications;
+
+/** Todas las notificaciones que manda el motor. */
+export const ENGINE_NOTIFICATIONS = {notification_names} as const satisfies readonly EngineNotificationName[];
 "
     )
 }
@@ -158,6 +199,14 @@ impl MethodVisitor for ImportVisitor<'_> {
     }
 }
 
+impl NotificationVisitor for ImportVisitor<'_> {
+    fn visit<N: EngineNotification>(&mut self) {
+        if let Some(path) = N::Params::output_path() {
+            self.types.insert(path, N::Params::ident(self.cfg));
+        }
+    }
+}
+
 fn index_ts(types: &TypeFiles) -> String {
     let mut out = String::from(NOTE);
     for path in types.keys() {
@@ -177,6 +226,17 @@ fn export_bindings_methods_and_index() {
     export_root::<RpcRequest>(&cfg, &mut types);
     export_root::<RpcResponse>(&cfg, &mut types);
     export_root::<RpcNotification>(&cfg, &mut types);
+    let mut collected = NotificationTable {
+        cfg: &cfg,
+        types: &mut types,
+        entries: Vec::new(),
+        all: Vec::new(),
+    };
+    visit_notifications(&mut collected);
+    let notifications = Notifications {
+        entries: collected.entries,
+        all: collected.all,
+    };
     let mut table = MethodTable {
         cfg: &cfg,
         types: &mut types,
@@ -186,7 +246,7 @@ fn export_bindings_methods_and_index() {
     };
     visit_methods(&mut table);
 
-    let methods = methods_ts(&cfg, &table);
+    let methods = methods_ts(&cfg, &table, &notifications);
     std::fs::write(dir.join("methods.ts"), methods).unwrap();
     std::fs::write(dir.join("index.ts"), index_ts(&types)).unwrap();
 

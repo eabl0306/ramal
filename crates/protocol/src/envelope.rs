@@ -21,7 +21,7 @@ pub mod error_code {
     pub const INVALID_PARAMS: i32 = -32_602;
     /// Fallo interno del motor.
     pub const INTERNAL_ERROR: i32 = -32_603;
-    /// Peticion cancelada (planificado; es el codigo de LSP).
+    /// Peticion cancelada con `$/cancel` (el codigo de LSP).
     pub const REQUEST_CANCELLED: i32 = -32_800;
     /// Cualquier error del motor con su `kind`.
     pub const ENGINE_ERROR: i32 = -32_000;
@@ -117,6 +117,10 @@ pub enum ErrorKind {
     GitVersionUnsupported,
     /// git fallo; el detalle solo esta en el log del motor.
     GitFailed,
+    /// El commit, la ref, el fichero o el submodulo pedido no existe.
+    NotFound,
+    /// La peticion se cancelo con `$/cancel` antes de terminar.
+    Cancelled,
     /// La pagina pedida de `graph/window` llevaba el `snapshot` de unas refs que
     /// ya no son las del repositorio. La interfaz vuelve a pedir desde la fila 0.
     StaleWindow,
@@ -204,8 +208,8 @@ impl RpcResponse {
     }
 }
 
-/// Notificacion: un mensaje sin id y sin respuesta (planificadas: `$/cancel`,
-/// `$/progress`, `repo/changed`).
+/// Notificacion: un mensaje sin id y sin respuesta. La interfaz manda `$/cancel`
+/// y el motor manda las de `define_notifications!` (`repo/changed`).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TS)]
 #[ts(export)]
 pub struct RpcNotification {

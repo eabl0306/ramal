@@ -23,6 +23,39 @@ pub struct GraphWindowParams {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub snapshot: Option<String>,
+    /// Ramas ocultas o aisladas, autor y fechas. Cambiar el filtro es empezar de
+    /// nuevo desde la fila 0.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub filter: Option<GraphFilter>,
+}
+
+/// Filtro del grafo. Las refs van con su nombre completo (`refs/heads/main`) y
+/// las fechas en ISO 8601 (`2026-09-30` o `2026-09-30T10:00:00Z`).
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+#[ts(export)]
+pub struct GraphFilter {
+    /// Refs ocultas: sus commits solo salen si los alcanza otra.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub hidden: Option<Vec<String>>,
+    /// Refs aisladas: si hay alguna, solo se ve su historia.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub only: Option<Vec<String>>,
+    /// Texto del nombre o el correo del autor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub author: Option<String>,
+    /// Fecha de autor minima.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub since: Option<String>,
+    /// Fecha de autor maxima.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub until: Option<String>,
 }
 
 /// Clase de arista.

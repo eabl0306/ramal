@@ -7,4 +7,9 @@ export type OpenRepoParams = {
 /**
  * Carpeta del repositorio o cualquier carpeta dentro de el.
  */
-path: string, };
+path: string, 
+/**
+ * El host responde por la confianza (una carpeta de confianza de VS Code).
+ * Sin el, el motor decide con lo que recuerda y lo que encuentra.
+ */
+trusted?: boolean, };
