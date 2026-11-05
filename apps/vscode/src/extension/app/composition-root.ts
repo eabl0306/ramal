@@ -66,6 +66,7 @@ export async function composeExtension(
     reopenRepositories(connection, {
       ids: runtime.ids,
       panels,
+      repositories: workspaceRepositories,
       notifications: vscodeNotifications,
       translate: runtime.translate,
       logger,
@@ -112,7 +113,11 @@ function engineLauncher({
   logger.info(`git: ${gitPath ?? 'the first one on PATH (vscode.git gave none)'}`);
   return createSidecarLauncher({
     binaryPath,
-    args: engineArgs({ gitPath, logLevel: settings.logLevel }),
+    args: engineArgs({
+      gitPath,
+      dataDir: context.globalStorageUri.scheme === 'file' ? context.globalStorageUri.fsPath : '',
+      logLevel: settings.logLevel,
+    }),
     logger,
     onEngineLog: (line) => {
       engineLog.appendLine(line);

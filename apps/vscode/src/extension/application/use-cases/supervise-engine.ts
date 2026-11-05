@@ -86,6 +86,11 @@ class EngineSupervisor implements SupervisedEngine {
     return connection.request(request);
   }
 
+  /** Solo con un proceso listo: lo que se cancela vive en el, y si no esta ya no hay nada. */
+  notify(notification: RpcNotification): void {
+    if (this.#state.kind === 'running') this.#state.process.connection.notify(notification);
+  }
+
   onNotification(listener: (notification: RpcNotification) => void): Unsubscribe {
     this.#listeners.add(listener);
     return () => {

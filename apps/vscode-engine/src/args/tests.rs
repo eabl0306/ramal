@@ -19,11 +19,25 @@ fn without_arguments_it_serves_with_the_defaults() {
 }
 
 #[test]
-fn git_path_and_log_level_take_a_separate_or_inline_value() {
-    let separate = parse(&["--git-path", "/opt/git", "--log-level", "debug"]).unwrap();
-    let inline = parse(&["--git-path=/opt/git", "--log-level=debug"]).unwrap();
+fn git_path_data_dir_and_log_level_take_a_separate_or_inline_value() {
+    let separate = parse(&[
+        "--git-path",
+        "/opt/git",
+        "--data-dir",
+        "/state",
+        "--log-level",
+        "debug",
+    ])
+    .unwrap();
+    let inline = parse(&[
+        "--git-path=/opt/git",
+        "--data-dir=/state",
+        "--log-level=debug",
+    ])
+    .unwrap();
     let expected = Command::Serve(Args {
         git_path: Some(PathBuf::from("/opt/git")),
+        data_dir: Some(PathBuf::from("/state")),
         log_level: "debug".to_owned(),
     });
 

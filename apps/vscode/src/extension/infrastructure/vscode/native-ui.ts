@@ -41,4 +41,9 @@ export const workspaceRepositories: WorkspaceRepositories = {
       .filter((folder) => folder.uri.scheme === 'file')
       .map((folder) => ({ name: folder.name, path: folder.uri.fsPath }));
   },
+  vouches(path) {
+    if (!vscode.workspace.isTrusted) return false;
+    const folder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(path));
+    return folder?.uri.scheme === 'file';
+  },
 };

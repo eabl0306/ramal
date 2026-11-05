@@ -65,13 +65,22 @@ describe('transporte de VS Code', () => {
     expect(received).toEqual([notification]);
   });
 
-  it('rechaza una peticion sin id y no manda las notificaciones de control', async () => {
+  it('manda $/cancel como rpc/cancel con su id y descarta otras notificaciones', () => {
+    const api = fakeApi();
+    const transport = new VsCodeTransport(api);
+    transport.notify({ jsonrpc: '2.0', method: '$/cancel', params: { id: 4 } });
+    transport.notify({ jsonrpc: '2.0', method: '$/cancel', params: { id: 'x' } });
+    transport.notify({ jsonrpc: '2.0', method: '$/cancel', params: [] });
+    transport.notify({ jsonrpc: '2.0', method: 'repo/changed', params: { id: 4 } });
+    expect(api.posted).toEqual([{ type: 'rpc/cancel', id: 4 }]);
+  });
+
+  it('rechaza una peticion sin id e ignora lo que no espera', async () => {
     const api = fakeApi();
     const transport = new VsCodeTransport(api);
     await expect(
       transport.request({ jsonrpc: '2.0', method: 'graph/window', params: {} }),
     ).rejects.toThrow('a webview request needs an id');
-    transport.notify({ jsonrpc: '2.0', method: '$/cancel', params: { id: 1 } });
     transport.handle({ type: 'host/response', id: 1, result: null });
     transport.handle({
       type: 'rpc/response',

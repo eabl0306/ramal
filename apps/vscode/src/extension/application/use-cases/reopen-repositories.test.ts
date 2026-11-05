@@ -16,7 +16,10 @@ function openByPath(request: IdentifiedRpcRequest): Promise<ReturnType<typeof ok
   return Promise.resolve(ok(request, handle));
 }
 
-function deps(roots: readonly string[]): ReopenRepositoriesDeps & {
+function deps(
+  roots: readonly string[],
+  trusted: readonly string[] = [],
+): ReopenRepositoriesDeps & {
   readonly panels: FakePanels;
   readonly notifications: FakeNotifications;
 } {
@@ -27,6 +30,7 @@ function deps(roots: readonly string[]): ReopenRepositoriesDeps & {
   return {
     ids: createRequestIds(),
     panels,
+    repositories: { vouches: (path) => trusted.includes(path) },
     notifications: new FakeNotifications(),
     translate: createTranslator('es'),
     logger: new RecordingLogger(),
@@ -79,5 +83,16 @@ describe('volver a abrir los repositorios tras reiniciar el motor', () => {
     expect(d.panels.closed).toEqual([]);
     expect(d.panels.rebound).toEqual([]);
     expect(d.notifications.errors).toEqual([]);
+  });
+
+  it('vuelve a abrir con trusted lo que esta en una carpeta de confianza', async () => {
+    const d = deps(['/work/a', '/work/b'], ['/work/b']);
+    const engine = new FakeEngine();
+    engine.respond = openByPath;
+    await reopenRepositories(engine, d);
+    expect(engine.requests.map((request) => request.params)).toEqual([
+      { path: '/work/a' },
+      { path: '/work/b', trusted: true },
+    ]);
   });
 });

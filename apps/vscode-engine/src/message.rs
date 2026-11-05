@@ -5,11 +5,13 @@
 //! metodo, un array) da -32600, y en los dos casos el id es `null` si no se pudo
 //! leer.
 
-use git_rudder_engine::Engine;
-use git_rudder_protocol::{ErrorKind, RequestId, RpcError, RpcRequest, RpcResponse, error_code};
+use git_rudder_engine::{Engine, NotificationSink};
+use git_rudder_protocol::{
+    ErrorKind, RequestId, RpcError, RpcNotification, RpcRequest, RpcResponse, error_code,
+};
 use serde_json::Value;
 
-use crate::server::MessageHandler;
+use crate::server::{MessageHandler, OutboxSender};
 
 /// El motor como manejador de mensajes del servidor.
 #[derive(Debug)]
@@ -67,6 +69,30 @@ pub async fn respond(engine: &Engine, message: &[u8]) -> Option<RpcResponse> {
 fn failure(id: Option<RequestId>, code: i32, message: &str) -> RpcResponse {
     tracing::warn!(code, message, "rejected a message");
     RpcResponse::failure(id, RpcError::new(code, message, ErrorKind::Internal))
+}
+
+/// Las notificaciones del motor como marcos en la cola de salida del servidor.
+#[derive(Debug, Clone)]
+pub struct FrameSink(OutboxSender);
+
+impl FrameSink {
+    /// Sink que escribe en `outbox`.
+    #[must_use]
+    pub const fn new(outbox: OutboxSender) -> Self {
+        Self(outbox)
+    }
+}
+
+impl NotificationSink for FrameSink {
+    fn notify(&self, notification: RpcNotification) {
+        match serde_json::to_vec(&notification) {
+            Ok(bytes) => {
+                // Si la salida ya se cerro no hay nadie a quien avisar.
+                let _ = self.0.send(bytes);
+            }
+            Err(error) => tracing::error!(%error, "could not serialize a notification"),
+        }
+    }
 }
 
 #[cfg(test)]

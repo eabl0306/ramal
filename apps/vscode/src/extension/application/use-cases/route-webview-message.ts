@@ -1,4 +1,10 @@
-import type { JsonValue, RequestId, RpcError, RpcResponse } from '@git-rudder/bridge';
+import type {
+  JsonValue,
+  RequestId,
+  RpcError,
+  RpcNotification,
+  RpcResponse,
+} from '@git-rudder/bridge';
 import type { Locale } from '@git-rudder/i18n';
 
 import type {
@@ -15,6 +21,9 @@ import type { Logger } from '../ports/logger';
 import type { PanelChannel } from '../ports/webview-surface';
 import type { RequestIds } from '../request-ids';
 import { isMethodAllowed } from '../surfaces';
+
+/** La notificacion de control con que el motor cancela una peticion en curso. */
+const CANCEL = '$/cancel';
 
 /** Codigo JSON-RPC de metodo inexistente, el que recibe un metodo no permitido. */
 const METHOD_NOT_FOUND = -32_601;
@@ -69,9 +78,7 @@ class Router implements WebviewRouter {
   constructor(deps: WebviewRouterDeps) {
     this.#deps = deps;
     this.#unsubscribe = deps.engine.onNotification((notification) => {
-      for (const panel of this.#panels.values()) {
-        panel.post({ type: 'rpc/notification', notification });
-      }
+      this.#broadcast(notification);
     });
   }
 
@@ -98,6 +105,9 @@ class Router implements WebviewRouter {
         return;
       case 'rpc/request':
         await this.#forward(panel, message.request);
+        return;
+      case 'rpc/cancel':
+        this.#cancel(panel, message.id);
         return;
       case 'host/request':
         await this.#hostRequest(panel, message);
@@ -156,6 +166,32 @@ class Router implements WebviewRouter {
     }
     this.#deliver(hostId, response);
     this.#emit({ panelId: panel.id, method: request.method, outcome: 'answered' });
+  }
+
+  /**
+   * Una notificacion del motor llega solo a los paneles de su repositorio: un
+   * panel no se entera de lo que pasa en otro. Sin `repoId` es de todos.
+   */
+  #broadcast(notification: RpcNotification): void {
+    const repoId = repoIdOf(notification.params);
+    for (const panel of this.#panels.values()) {
+      if (repoId === undefined || repoId === panel.repoId) {
+        panel.post({ type: 'rpc/notification', notification });
+      }
+    }
+  }
+
+  /**
+   * `$/cancel` de una peticion del propio panel: se busca con que id del host
+   * salio. Un id que no es suyo, o que ya contesto, no hace nada.
+   */
+  #cancel(panel: PanelChannel, originalId: RequestId): void {
+    for (const [hostId, entry] of this.#inFlight) {
+      if (entry.panelId === panel.id && entry.originalId === originalId) {
+        this.#deps.engine.notify({ jsonrpc: '2.0', method: CANCEL, params: { id: hostId } });
+        return;
+      }
+    }
   }
 
   /** Devuelve la respuesta al panel que pidio, con su id original. */

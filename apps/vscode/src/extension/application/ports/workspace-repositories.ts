@@ -11,4 +11,10 @@ export interface WorkspaceFolderInfo {
  */
 export interface WorkspaceRepositories {
   list(): readonly WorkspaceFolderInfo[];
+  /**
+   * El usuario ya confio en esta ruta: el workspace es de confianza (Workspace
+   * Trust de VS Code) y la ruta esta dentro de una de sus carpetas. Fuera de
+   * ellas decide el motor con lo que encuentra (ADR 0020).
+   */
+  vouches(path: string): boolean;
 }

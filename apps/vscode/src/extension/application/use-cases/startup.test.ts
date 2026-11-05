@@ -92,7 +92,10 @@ describe('arranque del host', () => {
     const result = await openGraph({
       engine: runtime.engine,
       ids: runtime.ids,
-      repositories: { list: () => [{ name: 'git-rudder', path: '/work/git-rudder' }] },
+      repositories: {
+        list: () => [{ name: 'git-rudder', path: '/work/git-rudder' }],
+        vouches: () => false,
+      },
       dialogs: new FakeDialogs(),
       notifications,
       panels: new FakePanels(),

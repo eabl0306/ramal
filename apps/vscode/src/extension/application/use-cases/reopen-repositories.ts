@@ -6,11 +6,13 @@ import type { EngineConnection } from '../ports/engine-connection';
 import type { Logger } from '../ports/logger';
 import type { Notifications } from '../ports/notifications';
 import type { WebviewSurface } from '../ports/webview-surface';
+import type { WorkspaceRepositories } from '../ports/workspace-repositories';
 import type { RequestIds } from '../request-ids';
 
 export interface ReopenRepositoriesDeps {
   readonly ids: RequestIds;
   readonly panels: WebviewSurface;
+  readonly repositories: Pick<WorkspaceRepositories, 'vouches'>;
   readonly notifications: Notifications;
   readonly translate: Translate;
   readonly logger: Logger;
@@ -40,7 +42,10 @@ async function reopen(
   root: string,
 ): Promise<void> {
   try {
-    const handle = await callEngine(connection, deps.ids, 'repo/open', { path: root });
+    const handle = await callEngine(connection, deps.ids, 'repo/open', {
+      path: root,
+      ...(deps.repositories.vouches(root) ? { trusted: true } : {}),
+    });
     deps.panels.rebind(root, handle.repoId);
   } catch (error) {
     deps.logger.warn(`could not reopen ${root} after the restart: ${describeError(error)}`);

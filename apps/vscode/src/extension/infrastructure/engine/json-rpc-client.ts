@@ -51,6 +51,15 @@ export class JsonRpcClient implements EngineConnection {
     });
   }
 
+  notify(notification: RpcNotification): void {
+    if (this.#closed !== null) return;
+    try {
+      this.#write(encodeFrame(JSON.stringify(notification)));
+    } catch (error) {
+      this.#logger.warn(`could not send ${notification.method}: ${String(error)}`);
+    }
+  }
+
   onNotification(listener: (notification: RpcNotification) => void): Unsubscribe {
     this.#listeners.add(listener);
     return () => {

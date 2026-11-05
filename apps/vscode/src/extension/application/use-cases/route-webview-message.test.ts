@@ -264,4 +264,65 @@ describe('router de los mensajes de los webviews', () => {
     await router.receive('panel-1', { type: 'rpc/request', request: windowRequest(1) });
     expect(routed).toEqual([{ panelId: 'panel-1', method: 'graph/window', outcome: 'answered' }]);
   });
+
+  it('una notificacion con repoId solo llega a los paneles de ese repositorio', () => {
+    const { router, engine } = setup();
+    const mine = fakeChannel('panel-1', 'graph', 'repo-1');
+    const other = fakeChannel('panel-2', 'graph', 'repo-2');
+    router.attach(mine);
+    router.attach(other);
+    const notification = {
+      jsonrpc: '2.0',
+      method: 'repo/changed',
+      params: { repoId: 'repo-1' },
+    } as const;
+    engine.emit(notification);
+    expect(mine.posted).toEqual([{ type: 'rpc/notification', notification }]);
+    expect(other.posted).toEqual([]);
+  });
+
+  it('traduce el $/cancel de un webview al id con que salio la peticion', async () => {
+    const { router, engine } = setup();
+    let answer: (response: RpcResponse) => void = () => undefined;
+    engine.respond = () =>
+      new Promise((resolve) => {
+        answer = resolve;
+      });
+    const panel = fakeChannel('panel-1');
+    router.attach(panel);
+    const pending = router.receive('panel-1', { type: 'rpc/request', request: windowRequest(7) });
+    await flush();
+    await router.receive('panel-1', { type: 'rpc/cancel', id: 7 });
+    expect(engine.notifications).toEqual([
+      { jsonrpc: '2.0', method: '$/cancel', params: { id: 1001 } },
+    ]);
+    answer({
+      jsonrpc: '2.0',
+      id: 1001,
+      error: { code: -32_800, message: 'cancelled', data: { kind: 'cancelled' } },
+    });
+    await pending;
+    expect(panel.posted).toEqual([
+      {
+        type: 'rpc/response',
+        response: {
+          jsonrpc: '2.0',
+          id: 7,
+          error: { code: -32_800, message: 'cancelled', data: { kind: 'cancelled' } },
+        },
+      },
+    ]);
+  });
+
+  it('un $/cancel de una peticion de otro panel, o ya contestada, no llega al motor', async () => {
+    const { router, engine } = setup();
+    engine.respond = () => new Promise(() => undefined);
+    router.attach(fakeChannel('panel-1'));
+    router.attach(fakeChannel('panel-2'));
+    void router.receive('panel-1', { type: 'rpc/request', request: windowRequest(7) });
+    await flush();
+    await router.receive('panel-2', { type: 'rpc/cancel', id: 7 });
+    await router.receive('panel-1', { type: 'rpc/cancel', id: 8 });
+    expect(engine.notifications).toEqual([]);
+  });
 });

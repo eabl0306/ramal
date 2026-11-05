@@ -201,6 +201,15 @@ describe('supervision del motor', () => {
     expect(received).toEqual([changed, changed]);
   });
 
+  it('pasa las notificaciones al proceso listo y, sin el, las descarta', async () => {
+    const h = harness();
+    const cancel: RpcNotification = { jsonrpc: '2.0', method: '$/cancel', params: { id: 1 } };
+    h.engine.notify(cancel);
+    await h.engine.request(WINDOW_REQUEST);
+    h.engine.notify(cancel);
+    expect(h.launcher.last.connection.notifications).toEqual([cancel]);
+  });
+
   it('tras reiniciar vuelve a abrir lo que hiciera falta antes de dejar pasar peticiones', async () => {
     const h = harness();
     const reopened: EngineConnection[] = [];

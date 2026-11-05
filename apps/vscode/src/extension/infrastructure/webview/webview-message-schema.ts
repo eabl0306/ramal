@@ -33,6 +33,11 @@ const rpcRequest = z.strictObject({
   }),
 });
 
+const rpcCancel = z.strictObject({
+  type: z.literal('rpc/cancel'),
+  id: requestId,
+});
+
 /**
  * Un esquema por metodo nativo: sus parametros se validan antes de llegar a la
  * API de VS Code. Un metodo nuevo en `HostMethods` no compila sin el suyo.
@@ -53,7 +58,12 @@ function hostRequestOf<M extends HostMethod>(method: M) {
 const hostRequest = z.discriminatedUnion('method', [hostRequestOf('clipboard/writeText')]);
 
 /** Discriminada por `type`: un fallo dice que campo de que mensaje no encaja. */
-const webviewMessage = z.discriminatedUnion('type', [webviewReady, rpcRequest, hostRequest]);
+const webviewMessage = z.discriminatedUnion('type', [
+  webviewReady,
+  rpcRequest,
+  rpcCancel,
+  hostRequest,
+]);
 
 export type ParsedWebviewMessage =
   | { readonly ok: true; readonly message: WebviewToHostMessage }

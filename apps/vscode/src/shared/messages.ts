@@ -46,6 +46,16 @@ export interface RpcRequestMessage {
   readonly request: IdentifiedRpcRequest;
 }
 
+/**
+ * El webview ya no espera la respuesta de su peticion `id` (la del propio
+ * webview): el host la traduce al id con que la mando y le pasa `$/cancel` al
+ * motor. El motor contesta a la peticion con `cancelled`.
+ */
+export interface RpcCancelMessage {
+  readonly type: 'rpc/cancel';
+  readonly id: RequestId;
+}
+
 /** Una peticion nativa que resuelve el host con la API de VS Code. */
 export type HostRequestMessage = {
   [M in HostMethod]: {
@@ -56,7 +66,8 @@ export type HostRequestMessage = {
   };
 }[HostMethod];
 
-export type WebviewToHostMessage = WebviewReadyMessage | RpcRequestMessage | HostRequestMessage;
+export type WebviewToHostMessage =
+  WebviewReadyMessage | RpcRequestMessage | RpcCancelMessage | HostRequestMessage;
 
 // ---------------------------------------------------------------- host -> webview
 
