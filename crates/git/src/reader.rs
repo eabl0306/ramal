@@ -1,19 +1,34 @@
-//! `GitCliReader`: implementa `GitReader` lanzando git.
+//! `GitCliReader`: implementa los puertos de lectura lanzando git.
 //!
 //! La ruta del repositorio nunca va en argv: es el directorio de trabajo del
 //! proceso. Asi una ruta que empiece por `-` no puede convertirse en una opcion.
+//!
+//! El ejecutable se puede cambiar en caliente ([`GitSetup`]): el lanzador y la
+//! version detectada viven tras un candado y cada llamada se lleva una copia del
+//! lanzador, asi ningun candado cruza un `await`.
+
+mod commits;
+mod conflict;
+mod diff_file;
+mod history;
+mod inspect;
+mod inventory;
+mod log;
+mod safety;
+mod status;
+mod support;
 
 use std::path::{Path, PathBuf};
-use std::sync::OnceLock;
+use std::sync::{PoisonError, RwLock};
 
 use async_trait::async_trait;
-use git_rudder_core_application::{GitReadError, GitReader, GitVersionInfo, LogQuery};
-use git_rudder_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot, Sha};
+use git_rudder_core_application::{GitReadError, GitReader, GitSetup, GitVersionInfo, LogQuery};
+use git_rudder_core_domain::{CommitRecord, Head, RefName, RefSnapshot, RepoRoot, Sha, TrustLevel};
 
 use crate::cli::version::{capabilities_for, parse_version};
-use crate::cli::{GitBinary, GitCommand, GitRunner, RunError, RunLimits, RunOutput};
-use crate::parse::log::{LOG_DATE, LOG_FORMAT, parse_log};
+use crate::cli::{GitBinary, GitCommand, GitRunner, Invocation, RunLimits, RunOutput};
 use crate::parse::refs::{REFS_FORMAT, parse_refs};
+use support::{failed, first_line, is_not_a_repository, parse_error, path_from_stdout, run_error};
 
 /// Configuracion del lector.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -27,8 +42,9 @@ pub struct GitCliConfig {
 /// Lector de git sobre el CLI.
 #[derive(Debug)]
 pub struct GitCliReader {
-    runner: Option<GitRunner>,
-    version: OnceLock<GitVersionInfo>,
+    runner: RwLock<Option<GitRunner>>,
+    version: RwLock<Option<GitVersionInfo>>,
+    limits: RunLimits,
 }
 
 impl GitCliReader {
@@ -37,35 +53,65 @@ impl GitCliReader {
     /// contarlo.
     #[must_use]
     pub fn new(config: GitCliConfig) -> Self {
-        let runner =
-            GitBinary::resolve(config.binary).map(|binary| GitRunner::new(binary, config.limits));
+        let reader = Self {
+            runner: RwLock::new(None),
+            version: RwLock::new(None),
+            limits: config.limits,
+        };
+        reader.use_binary(config.binary);
+        reader
+    }
+
+    fn use_binary(&self, explicit: Option<PathBuf>) {
+        let runner = GitBinary::resolve(explicit).map(|binary| GitRunner::new(binary, self.limits));
         if runner.is_none() {
             tracing::warn!("no git executable found in PATH");
         }
-        Self {
-            runner,
-            version: OnceLock::new(),
+        *self.runner.write().unwrap_or_else(PoisonError::into_inner) = runner;
+        *self.version.write().unwrap_or_else(PoisonError::into_inner) = None;
+    }
+
+    fn runner(&self) -> Result<GitRunner, GitReadError> {
+        self.runner
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone()
+            .ok_or(GitReadError::NotFound)
+    }
+
+    /// Lanza una llamada.
+    pub(crate) async fn invoke(&self, call: Invocation<'_>) -> Result<RunOutput, GitReadError> {
+        self.runner()?.invoke(call).await.map_err(run_error)
+    }
+
+    /// Lanza `command` en el repositorio.
+    pub(crate) async fn run(
+        &self,
+        cwd: &Path,
+        command: &GitCommand,
+    ) -> Result<RunOutput, GitReadError> {
+        self.invoke(Invocation::new(Some(cwd), command)).await
+    }
+
+    /// Lanza `command` en el repositorio con su confianza y exige que salga bien.
+    pub(crate) async fn stdout(
+        &self,
+        repo: &RepoRoot,
+        trust: TrustLevel,
+        command: &GitCommand,
+    ) -> Result<Vec<u8>, GitReadError> {
+        let call = Invocation {
+            untrusted: !trust.is_trusted(),
+            ..Invocation::new(Some(repo.as_path()), command)
+        };
+        let output = self.invoke(call).await?;
+        if !output.success() {
+            return Err(failed(&command.subcommand(), &output));
         }
+        Ok(output.stdout)
     }
 
-    fn runner(&self) -> Result<&GitRunner, GitReadError> {
-        self.runner.as_ref().ok_or(GitReadError::NotFound)
-    }
-
-    async fn run(&self, cwd: &Path, command: &GitCommand) -> Result<RunOutput, GitReadError> {
-        self.runner()?
-            .run(Some(cwd), command)
-            .await
-            .map_err(run_error)
-    }
-}
-
-#[async_trait]
-impl GitReader for GitCliReader {
-    async fn version(&self) -> Result<GitVersionInfo, GitReadError> {
-        if let Some(info) = self.version.get() {
-            return Ok(info.clone());
-        }
+    async fn detect_version(&self) -> Result<GitVersionInfo, GitReadError> {
         let runner = self.runner()?;
         let output = runner
             .run(None, &GitCommand::new("version"))
@@ -78,12 +124,28 @@ impl GitReader for GitCliReader {
         let version = parse_version(&text).ok_or_else(|| GitReadError::Failed {
             detail: format!("unrecognized git version output: {}", text.trim()),
         })?;
-        let info = GitVersionInfo {
+        Ok(GitVersionInfo {
             path: runner.binary().to_path_buf(),
             version,
             capabilities: capabilities_for(version),
-        };
-        Ok(self.version.get_or_init(|| info).clone())
+        })
+    }
+}
+
+#[async_trait]
+impl GitReader for GitCliReader {
+    async fn version(&self) -> Result<GitVersionInfo, GitReadError> {
+        let cached = self
+            .version
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone();
+        if let Some(info) = cached {
+            return Ok(info);
+        }
+        let info = self.detect_version().await?;
+        *self.version.write().unwrap_or_else(PoisonError::into_inner) = Some(info.clone());
+        Ok(info)
     }
 
     async fn discover(&self, path: &Path) -> Result<RepoRoot, GitReadError> {
@@ -130,36 +192,15 @@ impl GitReader for GitCliReader {
         repo: &RepoRoot,
         query: &LogQuery,
     ) -> Result<Vec<CommitRecord>, GitReadError> {
-        // Solo las refs que el grafo sabe etiquetar (las mismas que read_refs)
-        // mas HEAD, para que un HEAD separado siga saliendo. Con --all salian
-        // como ramas sin nombre refs/original (filter-branch), refs/prefetch
-        // (git maintenance), refs/jj, refs/pull o refs/bisect, y tras un
-        // filter-branch el historial viejo entero aparecia duplicado. Stash y
-        // notas tampoco son historia del proyecto. --ignore-missing evita que un
-        // HEAD sin nacer (rama huerfana en un repo con commits) haga fallar el
-        // log. Los HEAD separados de otros worktrees quedan fuera a proposito
-        // hasta que los worktrees tengan sus propias refs.
-        let command = GitCommand::new("log")
-            .arg("--topo-order")
-            .arg("--branches")
-            .arg("--remotes")
-            .arg("--tags")
-            .arg("--ignore-missing")
-            .arg("-z")
-            .arg("--no-color")
-            .arg("--no-show-signature")
-            .arg("--encoding=UTF-8")
-            .arg(LOG_DATE)
-            .arg(LOG_FORMAT)
-            .max_count(query.max_count)
-            // Tiene que ir lo ultimo: revisions() escribe --end-of-options y lo
-            // que venga detras ya no se lee como opcion.
-            .revisions(["HEAD"]);
-        let output = self.run(repo.as_path(), &command).await?;
-        if !output.success() {
-            return Err(failed("log", &output));
-        }
-        parse_log(&output.stdout).map_err(|error| parse_error(&error))
+        log::read_log(self, repo, query).await
+    }
+}
+
+#[async_trait]
+impl GitSetup for GitCliReader {
+    async fn reconfigure(&self, binary: Option<PathBuf>) -> Result<GitVersionInfo, GitReadError> {
+        self.use_binary(binary);
+        self.version().await
     }
 }
 
@@ -181,64 +222,5 @@ fn head_from(symbolic: &RunOutput, target: &RunOutput) -> Result<Head, GitReadEr
         }
         (Some(1), Some(target)) => Ok(Head::Detached { target }),
         _ => Err(failed("symbolic-ref", symbolic)),
-    }
-}
-
-fn first_line(stdout: &[u8]) -> String {
-    String::from_utf8_lossy(stdout)
-        .lines()
-        .next()
-        .unwrap_or_default()
-        .to_owned()
-}
-
-/// La raiz que imprime git, sin el salto de linea. En Unix una ruta puede no ser
-/// UTF-8, asi que se conserva tal cual.
-fn path_from_stdout(mut stdout: Vec<u8>) -> PathBuf {
-    while stdout
-        .last()
-        .is_some_and(|byte| *byte == b'\n' || *byte == b'\r')
-    {
-        stdout.pop();
-    }
-    #[cfg(unix)]
-    {
-        use std::os::unix::ffi::OsStringExt;
-        PathBuf::from(std::ffi::OsString::from_vec(stdout))
-    }
-    #[cfg(not(unix))]
-    {
-        PathBuf::from(String::from_utf8_lossy(&stdout).into_owned())
-    }
-}
-
-/// Con `LC_ALL=C` los mensajes de git son estables.
-fn is_not_a_repository(stderr: &str) -> bool {
-    stderr.contains("not a git repository") || stderr.contains("must be run in a work tree")
-}
-
-fn run_error(error: RunError) -> GitReadError {
-    match error {
-        RunError::NotFound(_) => GitReadError::NotFound,
-        RunError::MissingDirectory(path) => GitReadError::NotARepository { path },
-        other => GitReadError::Failed {
-            detail: other.to_string(),
-        },
-    }
-}
-
-fn parse_error(error: &dyn std::fmt::Display) -> GitReadError {
-    GitReadError::Failed {
-        detail: error.to_string(),
-    }
-}
-
-fn failed(subcommand: &str, output: &RunOutput) -> GitReadError {
-    GitReadError::Failed {
-        detail: format!(
-            "git {subcommand} exited with {:?}: {}",
-            output.code,
-            output.stderr.trim()
-        ),
     }
 }

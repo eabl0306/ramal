@@ -1,8 +1,18 @@
 //! Parsers de la salida de git. Cada formato vive junto a su parser para que no se
 //! desincronicen.
 
+pub mod blame;
+pub mod changes;
+pub mod commit;
+pub mod config;
+pub mod diff;
+pub mod file_history;
+pub mod inventory;
 pub mod log;
+pub mod operation;
+pub mod quote;
 pub mod refs;
+pub mod status;
 
 use thiserror::Error;
 

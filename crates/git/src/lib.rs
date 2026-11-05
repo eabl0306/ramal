@@ -1,5 +1,6 @@
-//! Adaptador driven del git CLI: implementa `GitReader` lanzando el ejecutable de
-//! git (ADR 0009). Nada de libgit2.
+//! Adaptador driven del git CLI: implementa los puertos de lectura lanzando el
+//! ejecutable de git (ADR 0009), mas la vigilancia del disco y la busqueda de
+//! repositorios en carpetas. Nada de libgit2.
 //!
 //! Reglas que evitan los errores clasicos de envolver una CLI:
 //!
@@ -17,6 +18,10 @@
 pub mod cli;
 pub mod parse;
 pub mod reader;
+pub mod scan;
+pub mod watch;
 
-pub use cli::{GitBinary, GitCommand, GitRunner, RunError, RunLimits, RunOutput};
+pub use cli::{GitBinary, GitCommand, GitRunner, Invocation, RunError, RunLimits, RunOutput};
 pub use reader::{GitCliConfig, GitCliReader};
+pub use scan::FsScanner;
+pub use watch::NotifyWatcher;

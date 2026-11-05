@@ -8,7 +8,7 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use super::{GitRunner, RunError, RunLimits, STDERR_LIMIT};
+use super::{GitRunner, Invocation, RunError, RunLimits, STDERR_LIMIT};
 use crate::cli::{GitBinary, GitCommand};
 
 fn real_git() -> GitRunner {
@@ -20,7 +20,7 @@ fn real_git() -> GitRunner {
 fn every_call_gets_the_safe_environment_and_global_options() {
     let runner = real_git();
     let command = GitCommand::new("log").arg("--all");
-    let process = runner.process(Some(Path::new("/work")), &command);
+    let process = runner.process(&Invocation::new(Some(Path::new("/work")), &command));
     let std = process.as_std();
 
     let args: Vec<&OsStr> = std.get_args().collect();
@@ -42,6 +42,7 @@ fn every_call_gets_the_safe_environment_and_global_options() {
         ("LC_ALL", "C"),
         ("GIT_TERMINAL_PROMPT", "0"),
         ("GIT_OPTIONAL_LOCKS", "0"),
+        ("GIT_LITERAL_PATHSPECS", "1"),
     ] {
         assert!(
             envs.contains(&(OsStr::new(name), Some(OsStr::new(value)))),
@@ -186,4 +187,86 @@ async fn a_flood_of_stderr_is_drained_and_truncated() {
 
     assert_eq!(output.code, Some(3));
     assert_eq!(output.stderr.len(), STDERR_LIMIT);
+}
+
+#[test]
+fn an_untrusted_read_turns_fsmonitor_off_on_the_command_line() {
+    let runner = real_git();
+    let command = GitCommand::new("status");
+    let call = Invocation {
+        untrusted: true,
+        ..Invocation::new(None, &command)
+    };
+
+    let process = runner.process(&call);
+    let args: Vec<&OsStr> = process.as_std().get_args().collect();
+
+    assert_eq!(
+        args.get(5..8),
+        Some(
+            ["-c", "core.fsmonitor=false", "status"]
+                .map(OsStr::new)
+                .as_slice()
+        )
+    );
+}
+
+#[tokio::test]
+async fn stdin_reaches_git_and_is_closed() {
+    let command = GitCommand::new("hash-object").arg("--stdin");
+    let call = Invocation {
+        stdin: Some(b"hello\n"),
+        ..Invocation::new(None, &command)
+    };
+
+    let output = real_git().invoke(call).await.unwrap();
+
+    assert!(output.success(), "{}", output.stderr);
+    assert_eq!(
+        String::from_utf8_lossy(&output.stdout).trim(),
+        "ce013625030ba8dba906f756967f9e9ca394464a"
+    );
+}
+
+#[tokio::test]
+async fn a_truncated_call_keeps_the_start_instead_of_failing() {
+    let command = GitCommand::new("version");
+    let call = Invocation {
+        truncate_at: Some(4),
+        ..Invocation::new(None, &command)
+    };
+
+    let output = real_git().invoke(call).await.unwrap();
+
+    assert!(output.truncated);
+    assert_eq!(output.stdout, b"git ");
+
+    let whole = Invocation {
+        truncate_at: Some(1 << 20),
+        ..Invocation::new(None, &command)
+    };
+    assert!(!real_git().invoke(whole).await.unwrap().truncated);
+}
+
+#[test]
+fn config_overrides_go_before_the_subcommand() {
+    let runner = real_git();
+    let command = GitCommand::new("diff");
+    let overrides = ["filter.lfs.clean=".to_owned()];
+    let call = Invocation {
+        config: &overrides,
+        ..Invocation::new(None, &command)
+    };
+
+    let process = runner.process(&call);
+    let args: Vec<&OsStr> = process.as_std().get_args().collect();
+
+    assert_eq!(
+        args.get(5..8),
+        Some(
+            ["-c", "filter.lfs.clean=", "diff"]
+                .map(OsStr::new)
+                .as_slice()
+        )
+    );
 }

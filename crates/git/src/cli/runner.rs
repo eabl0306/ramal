@@ -1,10 +1,11 @@
 //! Lanza git con el entorno fijo, limites de tiempo y de salida, y lo mata si la
 //! llamada se abandona.
 //!
-//! `kill_on_drop` mata a git si el futuro se suelta (por el limite de tiempo o
-//! porque el host deja de esperar). Matar el grupo de procesos entero, que hace
-//! falta cuando git lanza hijos (ssh, helpers, hooks), llega con la cancelacion de
-//! operaciones largas (planificada): las lecturas del primer corte no lanzan hijos.
+//! `kill_on_drop` mata a git si el futuro se suelta: por el limite de tiempo,
+//! porque el host deja de esperar o porque la interfaz cancelo con `$/cancel`.
+//! Matar el grupo de procesos entero, que hace falta cuando git lanza hijos (ssh,
+//! helpers, hooks), llega con las escrituras y la red: las lecturas no lanzan
+//! hijos.
 
 use std::io;
 use std::path::{Path, PathBuf};
@@ -12,10 +13,13 @@ use std::process::Stdio;
 use std::time::{Duration, Instant};
 
 use thiserror::Error;
-use tokio::io::{AsyncRead, AsyncReadExt};
 use tokio::process::Command;
 
 use super::GitCommand;
+
+mod pipes;
+
+use pipes::{read_stdout, read_truncated, write_input};
 
 /// Opciones globales de cada llamada: sin paginador, rutas sin escapar y sin color.
 const GLOBAL_ARGS: &[&str] = &[
@@ -36,6 +40,16 @@ const FIXED_ENV: &[(&str, &str)] = &[
     ("GIT_TERMINAL_PROMPT", "0"),
     ("GIT_OPTIONAL_LOCKS", "0"),
 ];
+
+/// Una ruta que llega de la interfaz es una ruta, no un patron: sin esto `:(top)x`,
+/// `*` o `:!x` se leerian como magia de pathspec. Va en cada llamada salvo en las
+/// que no admiten ninguna magia (`check-ignore`).
+const LITERAL_PATHSPECS: &str = "GIT_LITERAL_PATHSPECS";
+
+/// Opciones globales de una lectura sin confianza (ADR 0020): `core.fsmonitor`
+/// apagado en la linea de comandos, que gana a lo que diga el fichero. El diff
+/// externo y los `textconv` se apagan en cada subcomando que los usaria.
+const UNTRUSTED_ARGS: &[&str] = &["-c", "core.fsmonitor=false"];
 
 /// Variables que redirigen git a otro repositorio o le cuelan configuracion. Si el
 /// motor arranca desde un hook de git (o desde una terminal dentro de uno) las
@@ -100,10 +114,48 @@ pub enum RunError {
 pub struct RunOutput {
     /// Codigo de salida, o `None` si git murio por una senal.
     pub code: Option<i32>,
-    /// Salida estandar completa.
+    /// Salida estandar completa (o su principio, si `truncated`).
     pub stdout: Vec<u8>,
     /// Comienzo de stderr, para el log.
     pub stderr: String,
+    /// stdout se corto en el limite de [`Invocation::truncate_at`].
+    pub truncated: bool,
+}
+
+/// Una llamada a git con todo lo que la distingue.
+#[derive(Debug, Clone, Copy)]
+pub struct Invocation<'a> {
+    /// Directorio de trabajo; sin el, el del proceso.
+    pub cwd: Option<&'a Path>,
+    /// Argumentos.
+    pub command: &'a GitCommand,
+    /// Bytes para stdin (revisiones con `--stdin`, rutas para `check-ignore`).
+    pub stdin: Option<&'a [u8]>,
+    /// Lectura sin confianza: apaga `core.fsmonitor`.
+    pub untrusted: bool,
+    /// Configuracion que gana a la del repositorio (`-c clave=valor`), como los
+    /// filtros neutralizados de una lectura sin confianza.
+    pub config: &'a [String],
+    /// Cortar stdout aqui en vez de fallar (un diff enorme se ensena recortado).
+    pub truncate_at: Option<usize>,
+    /// `GIT_LITERAL_PATHSPECS=1`; por defecto si.
+    pub literal_pathspecs: bool,
+}
+
+impl<'a> Invocation<'a> {
+    /// Llamada simple en `cwd`.
+    #[must_use]
+    pub const fn new(cwd: Option<&'a Path>, command: &'a GitCommand) -> Self {
+        Self {
+            cwd,
+            command,
+            stdin: None,
+            untrusted: false,
+            config: &[],
+            truncate_at: None,
+            literal_pathspecs: true,
+        }
+    }
 }
 
 impl RunOutput {
@@ -147,7 +199,17 @@ impl GitRunner {
         cwd: Option<&Path>,
         command: &GitCommand,
     ) -> Result<RunOutput, RunError> {
-        if let Some(dir) = cwd
+        self.invoke(Invocation::new(cwd, command)).await
+    }
+
+    /// Como [`GitRunner::run`], con stdin, sin confianza o con la salida
+    /// recortada.
+    ///
+    /// # Errors
+    ///
+    /// Los de [`GitRunner::run`].
+    pub async fn invoke(&self, call: Invocation<'_>) -> Result<RunOutput, RunError> {
+        if let Some(dir) = call.cwd
             && !tokio::fs::metadata(dir)
                 .await
                 .is_ok_and(|meta| meta.is_dir())
@@ -155,16 +217,20 @@ impl GitRunner {
             return Err(RunError::MissingDirectory(dir.to_path_buf()));
         }
         let started = Instant::now();
-        let mut process = self.process(cwd, command);
+        let mut process = self.process(&call);
         let mut child = process.spawn().map_err(|error| match error.kind() {
             io::ErrorKind::NotFound | io::ErrorKind::PermissionDenied => RunError::NotFound(error),
             _ => RunError::Io(error),
         })?;
+        let input = child.stdin.take().zip(call.stdin);
         let stdout = child.stdout.take();
         let stderr = child.stderr.take();
+        let limit = call.truncate_at.unwrap_or(self.limits.max_output_bytes);
+        let truncate = call.truncate_at.is_some();
         let collect = async {
-            let (stdout, stderr) = tokio::try_join!(
-                read_capped(stdout, self.limits.max_output_bytes),
+            let ((), (stdout, truncated), stderr) = tokio::try_join!(
+                write_input(input),
+                read_stdout(stdout, limit, truncate),
                 read_truncated(stderr, STDERR_LIMIT),
             )?;
             let status = child.wait().await?;
@@ -172,13 +238,14 @@ impl GitRunner {
                 code: status.code(),
                 stdout,
                 stderr: String::from_utf8_lossy(&stderr).into_owned(),
+                truncated,
             })
         };
         let output = tokio::time::timeout(self.limits.timeout, collect)
             .await
             .map_err(|_| RunError::TimedOut(self.limits.timeout))??;
         tracing::debug!(
-            subcommand = %command.subcommand(),
+            subcommand = %call.command.subcommand(),
             code = ?output.code,
             elapsed_ms = started.elapsed().as_millis(),
             "git finished"
@@ -186,12 +253,23 @@ impl GitRunner {
         Ok(output)
     }
 
-    fn process(&self, cwd: Option<&Path>, command: &GitCommand) -> Command {
+    fn process(&self, call: &Invocation<'_>) -> Command {
         let mut process = Command::new(&self.binary);
+        let stdin = if call.stdin.is_some() {
+            Stdio::piped()
+        } else {
+            Stdio::null()
+        };
+        process.args(GLOBAL_ARGS);
+        if call.untrusted {
+            process.args(UNTRUSTED_ARGS);
+        }
+        for entry in call.config {
+            process.arg("-c").arg(entry);
+        }
         process
-            .args(GLOBAL_ARGS)
-            .args(command.args())
-            .stdin(Stdio::null())
+            .args(call.command.args())
+            .stdin(stdin)
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .kill_on_drop(true);
@@ -199,48 +277,15 @@ impl GitRunner {
             process.env_remove(name);
         }
         process.envs(FIXED_ENV.iter().copied());
-        if let Some(dir) = cwd {
+        if call.literal_pathspecs {
+            process.env(LITERAL_PATHSPECS, "1");
+        } else {
+            process.env_remove(LITERAL_PATHSPECS);
+        }
+        if let Some(dir) = call.cwd {
             process.current_dir(dir);
         }
         process
-    }
-}
-
-/// Lee todo `reader` y falla si pasa de `limit` bytes.
-async fn read_capped<R: AsyncRead + Unpin>(
-    reader: Option<R>,
-    limit: usize,
-) -> Result<Vec<u8>, RunError> {
-    let Some(reader) = reader else {
-        return Ok(Vec::new());
-    };
-    let mut buffer = Vec::new();
-    let cap = u64::try_from(limit).unwrap_or(u64::MAX).saturating_add(1);
-    reader.take(cap).read_to_end(&mut buffer).await?;
-    if buffer.len() > limit {
-        return Err(RunError::OutputTooLarge(limit));
-    }
-    Ok(buffer)
-}
-
-/// Lee todo `reader` pero solo guarda los primeros `limit` bytes. Se sigue leyendo
-/// para que git no se bloquee con la tuberia llena.
-async fn read_truncated<R: AsyncRead + Unpin>(
-    reader: Option<R>,
-    limit: usize,
-) -> Result<Vec<u8>, RunError> {
-    let Some(mut reader) = reader else {
-        return Ok(Vec::new());
-    };
-    let mut kept = Vec::new();
-    let mut chunk = [0_u8; 8 * 1024];
-    loop {
-        let read = reader.read(&mut chunk).await?;
-        if read == 0 {
-            return Ok(kept);
-        }
-        let room = limit.saturating_sub(kept.len()).min(read);
-        kept.extend_from_slice(chunk.get(..room).unwrap_or_default());
     }
 }
 

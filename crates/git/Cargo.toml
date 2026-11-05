@@ -13,13 +13,15 @@ license.workspace = true
 async-trait = { workspace = true }
 git-rudder-core-application = { workspace = true }
 git-rudder-core-domain = { workspace = true }
+notify = { workspace = true }
+# Ficheros temporales para los tres lados de un conflicto (git merge-file).
+tempfile = { workspace = true }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["process", "io-util", "fs"] }
+tokio = { workspace = true, features = ["process", "io-util", "fs", "rt", "sync", "time"] }
 tracing = { workspace = true }
 
 [dev-dependencies]
 pretty_assertions = { workspace = true }
-tempfile = { workspace = true }
 
 [lints]
 workspace = true

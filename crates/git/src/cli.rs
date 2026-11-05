@@ -8,7 +8,7 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 
 pub use command::GitCommand;
-pub use runner::{GitRunner, RunError, RunLimits, RunOutput};
+pub use runner::{GitRunner, Invocation, RunError, RunLimits, RunOutput};
 
 /// Nombre del ejecutable segun el sistema.
 const GIT_EXECUTABLE: &str = if cfg!(windows) { "git.exe" } else { "git" };
