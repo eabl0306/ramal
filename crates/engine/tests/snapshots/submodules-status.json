@@ -1,0 +1,32 @@
+{
+  "branch": {
+    "branch": "main",
+    "headSha": "<sha-0>",
+    "isDetached": false,
+    "isUnborn": false
+  },
+  "counts": {
+    "conflicted": 0,
+    "staged": 0,
+    "unstaged": 1,
+    "untracked": 0
+  },
+  "entries": [
+    {
+      "path": "vendor/inner",
+      "staged": false,
+      "state": {
+        "index": "unmodified",
+        "kind": "changed",
+        "submodule": {
+          "commitChanged": true,
+          "hasTrackedChanges": false,
+          "hasUntracked": false
+        },
+        "worktree": "modified"
+      },
+      "unstaged": true
+    }
+  ],
+  "repoId": "<repoId>"
+}

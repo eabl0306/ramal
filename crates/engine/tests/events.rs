@@ -55,7 +55,7 @@ impl GitReader for HangingGit {
     }
 }
 
-fn request(id: Option<u32>, method: &str, params: serde_json::Value) -> RpcRequest {
+fn request(id: Option<u32>, method: &str, params: &serde_json::Value) -> RpcRequest {
     serde_json::from_value(json!({
         "jsonrpc": "2.0",
         "id": id,
@@ -78,7 +78,7 @@ async fn a_cancelled_request_answers_cancelled_with_the_lsp_code() {
     let open = request(
         Some(9),
         "repo/open",
-        json!({ "path": "/work/r", "trusted": true }),
+        &json!({ "path": "/work/r", "trusted": true }),
     );
     let pending = tokio::spawn({
         let engine = Arc::clone(&engine);
@@ -87,7 +87,7 @@ async fn a_cancelled_request_answers_cancelled_with_the_lsp_code() {
     tokio::time::sleep(Duration::from_millis(50)).await;
 
     let ignored = engine
-        .handle(request(None, "$/cancel", json!({ "id": 9 })))
+        .handle(request(None, "$/cancel", &json!({ "id": 9 })))
         .await;
     let response = tokio::time::timeout(Duration::from_secs(5), pending)
         .await
@@ -110,19 +110,19 @@ async fn a_cancel_for_an_unknown_id_or_with_bad_params_is_ignored() {
 
     assert_eq!(
         engine
-            .handle(request(None, "$/cancel", json!({ "id": 1 })))
+            .handle(request(None, "$/cancel", &json!({ "id": 1 })))
             .await,
         None
     );
     assert_eq!(
         engine
-            .handle(request(None, "$/cancel", json!({ "x": 1 })))
+            .handle(request(None, "$/cancel", &json!({ "x": 1 })))
             .await,
         None
     );
     assert_eq!(
         engine
-            .handle(request(None, "other/notification", json!({})))
+            .handle(request(None, "other/notification", &json!({})))
             .await,
         None
     );

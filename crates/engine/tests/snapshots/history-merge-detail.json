@@ -1,0 +1,25 @@
+{
+  "authorEmail": "ana@example.com",
+  "authorName": "Ana Ruiz",
+  "authoredAt": "2026-09-30T10:04:00+02:00",
+  "committedAt": "2026-09-30T10:04:00+02:00",
+  "committerEmail": "ana@example.com",
+  "committerName": "Ana Ruiz",
+  "files": [
+    {
+      "additions": 0,
+      "deletions": 0,
+      "oldPath": "src/old.rs",
+      "path": "src/new.rs",
+      "status": "renamed"
+    }
+  ],
+  "message": "Merge feature/rename",
+  "parents": [
+    "<sha-0>",
+    "<sha-1>"
+  ],
+  "sha": "<sha-2>",
+  "shortSha": "<sha-2:short>",
+  "summary": "Merge feature/rename"
+}

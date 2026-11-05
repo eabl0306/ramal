@@ -24,7 +24,7 @@ async fn host(engine: &Engine, method: &str, params: Value) -> Result<Value, Rpc
     engine.dispatch(method, params, CallContext::host()).await
 }
 
-fn kind(error: &RpcError) -> ErrorKind {
+const fn kind(error: &RpcError) -> ErrorKind {
     error.data.unwrap().kind
 }
 
@@ -97,8 +97,8 @@ async fn a_host_can_vouch_for_a_repository() {
     assert_eq!(handle["trustFindings"], json!([]));
 }
 
-#[tokio::test]
-async fn background_summaries_and_folder_scans_work_without_opening() {
+/// Un repo con un cambio sin seguimiento y otro repo dentro, en `nested`.
+fn with_nested_repo() -> FixtureRepo {
     let top = FixtureRepo::new();
     top.commit("Top");
     let nested = top.path().join("nested");
@@ -109,6 +109,12 @@ async fn background_summaries_and_folder_scans_work_without_opening() {
         .status()
         .unwrap();
     top.write("dirty.txt", "x\n");
+    top
+}
+
+#[tokio::test]
+async fn background_summaries_and_folder_scans_work_without_opening() {
+    let top = with_nested_repo();
     let engine = EngineBuilder::new(EngineConfig::default()).build();
 
     let summary = host(
@@ -121,7 +127,7 @@ async fn background_summaries_and_folder_scans_work_without_opening() {
     let scan = host(
         &engine,
         "repos/scan",
-        json!({ "path": path_text(&top.path().parent().unwrap()), "maxDepth": 3 }),
+        json!({ "path": path_text(top.path().parent().unwrap()), "maxDepth": 3 }),
     )
     .await
     .unwrap();

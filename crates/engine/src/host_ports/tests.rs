@@ -28,7 +28,11 @@ fn a_repo_change_becomes_a_repo_changed_notification_without_id() {
         repo_id: RepoId::new("repo-0123456789abcdef"),
     });
 
-    let sent = recorder.0.lock().unwrap_or_else(PoisonError::into_inner);
+    let sent = recorder
+        .0
+        .lock()
+        .unwrap_or_else(PoisonError::into_inner)
+        .clone();
     let [notification] = sent.as_slice() else {
         unreachable!("one notification: {sent:?}")
     };

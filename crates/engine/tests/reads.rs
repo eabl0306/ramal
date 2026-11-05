@@ -39,7 +39,7 @@ async fn opened(repo: &FixtureRepo) -> (Engine, String) {
     (engine, handle["repoId"].as_str().unwrap().to_owned())
 }
 
-fn kind(error: &RpcError) -> ErrorKind {
+const fn kind(error: &RpcError) -> ErrorKind {
     error.data.unwrap().kind
 }
 
@@ -195,8 +195,8 @@ async fn search_returns_rows_and_a_filtered_window_keeps_only_matches() {
     assert_eq!(kind(&bad_filter), ErrorKind::InvalidParams);
 }
 
-#[tokio::test]
-async fn stashes_history_blame_and_conflicts_answer_through_the_protocol() {
+/// Un merge a medias con conflicto en `a.txt` y un stash con un no rastreado.
+fn merging_with_a_stash() -> FixtureRepo {
     let repo = FixtureRepo::new();
     repo.commit_files(&[("a.txt", "base\n")], "Base");
     repo.checkout_new("feature");
@@ -206,6 +206,12 @@ async fn stashes_history_blame_and_conflicts_answer_through_the_protocol() {
     repo.write("w.txt", "wip\n");
     repo.stash("wip");
     assert!(!repo.try_git(&["merge", "--quiet", "feature"]));
+    repo
+}
+
+#[tokio::test]
+async fn stashes_history_blame_and_conflicts_answer_through_the_protocol() {
+    let repo = merging_with_a_stash();
     let (engine, repo_id) = opened(&repo).await;
 
     let stashes = call(&engine, "stash/list", json!({ "repoId": repo_id }))
