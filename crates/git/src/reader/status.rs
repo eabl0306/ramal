@@ -3,10 +3,10 @@
 use std::path::{Path, PathBuf};
 
 use async_trait::async_trait;
-use git_rudder_core_application::{DiffRequest, GitReadError, StatusReader};
+use git_rudder_core_application::{DiffRequest, GitReadError, HistoryReader as _, StatusReader};
 use git_rudder_core_domain::diff::{DiffTarget, FileDiff, Whitespace};
 use git_rudder_core_domain::status::WorkingTreeStatus;
-use git_rudder_core_domain::{RepoRoot, TrustLevel};
+use git_rudder_core_domain::{RepoRoot, Sha, TrustLevel};
 
 use super::GitCliReader;
 use super::diff_file::{MAX_DIFF_BYTES, file_diff};
@@ -49,7 +49,8 @@ impl StatusReader for GitCliReader {
         trust: TrustLevel,
         request: &DiffRequest,
     ) -> Result<FileDiff, GitReadError> {
-        let command = diff_command(request, trust);
+        let parent = self.first_parent(repo, request).await?;
+        let command = diff_command(request, trust, parent);
         let (text, truncated) = self.diff_text(repo, trust, &command).await?;
         let mut sections = parse_diff(&text, request.options.word_diff);
         let untracked = sections.is_empty()
@@ -74,6 +75,26 @@ impl StatusReader for GitCliReader {
 }
 
 impl GitCliReader {
+    /// El primer padre del commit de un diff `Commit`, contra el que se compara.
+    /// `None` en un commit raiz o si el diff no es de un commit.
+    async fn first_parent(
+        &self,
+        repo: &RepoRoot,
+        request: &DiffRequest,
+    ) -> Result<Option<Sha>, GitReadError> {
+        let DiffTarget::Commit(sha) = request.target else {
+            return Ok(None);
+        };
+        match self
+            .resolve_commit(repo, &format!("{}^1", sha.to_hex()))
+            .await
+        {
+            Ok(parent) => Ok(Some(parent)),
+            Err(GitReadError::Missing { .. }) => Ok(None),
+            Err(error) => Err(error),
+        }
+    }
+
     /// Texto de un diff, recortado si es enorme. `--no-index` sale con 1 si hay
     /// diferencias, y eso no es un fallo.
     async fn diff_text(
@@ -118,20 +139,26 @@ impl GitCliReader {
     }
 }
 
-fn diff_command(request: &DiffRequest, trust: TrustLevel) -> GitCommand {
-    let base = match request.target {
-        DiffTarget::WorkingTree | DiffTarget::Range { .. } => GitCommand::new("diff"),
-        DiffTarget::Index => GitCommand::new("diff").arg("--cached"),
-        DiffTarget::Commit(_) => GitCommand::new("show")
+/// El diff de `request`. Un commit se compara con su primer padre con dos
+/// arboles explicitos (`git diff <padre> <commit>`), tambien en un merge: con
+/// git 2.34, `git show --diff-merges=first-parent` daba el diff combinado y un
+/// fichero nuevo salia como modificado. Solo un commit raiz va por `git show`.
+fn diff_command(request: &DiffRequest, trust: TrustLevel, parent: Option<Sha>) -> GitCommand {
+    let base = match (request.target, parent) {
+        (DiffTarget::Index, _) => GitCommand::new("diff").arg("--cached"),
+        (DiffTarget::Commit(_), None) => GitCommand::new("show")
             .arg("--format=")
-            .arg("--no-show-signature")
-            .arg("--diff-merges=first-parent"),
+            .arg("--no-show-signature"),
+        _ => GitCommand::new("diff"),
     };
     let command = options(diff_safety(base, trust), request).arg("-M");
-    let command = match request.target {
-        DiffTarget::Commit(sha) => command.revisions([sha.to_hex()]),
-        DiffTarget::Range { from, to } => command.revisions([from.to_hex(), to.to_hex()]),
-        DiffTarget::WorkingTree | DiffTarget::Index => command,
+    let command = match (request.target, parent) {
+        (DiffTarget::Commit(sha), Some(parent)) => {
+            command.revisions([parent.to_hex(), sha.to_hex()])
+        }
+        (DiffTarget::Commit(sha), None) => command.revisions([sha.to_hex()]),
+        (DiffTarget::Range { from, to }, _) => command.revisions([from.to_hex(), to.to_hex()]),
+        (DiffTarget::WorkingTree | DiffTarget::Index, _) => command,
     };
     let old = request.old_path.iter().map(path_arg);
     command.paths(std::iter::once(path_arg(&request.path)).chain(old))
